@@ -1,0 +1,107 @@
+/* ==== Estilos Generales ==== */
+body {
+  font-family: Arial, sans-serif;
+  background: linear-gradient(to right, #f5f8ec, #eff0f1);
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+}
+
+.calculator {
+  background: #fff;
+  margin: 30px auto;
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0px 4px 10px rgba(0,0,0,0.2);
+  max-width: 600px;
+  width: 100%;
+}
+
+.header h1 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+/* ==== Input Ticket ==== */
+.input-group {
+  margin-bottom: 20px;
+}
+.input-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: bold;
+}
+.input-group input {
+  width: 100%;
+  padding: 10px;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  font-size: 1em;
+}
+
+/* ==== Tabla ==== */
+.table-container {
+  overflow-x: auto;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+thead {
+  background: #007bff;
+  color: #fff;
+}
+th, td {
+  padding: 12px;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+}
+.denominacion {
+  font-weight: bold;
+}
+.subtotal {
+  color: #007bff;
+  font-weight: bold;
+}
+
+/* ==== Resultado ==== */
+.resultado {
+  margin: 20px 0;
+  font-size: 1.3em;
+  font-weight: bold;
+  text-align: right;
+  color: #222;
+}
+
+/* ==== Botones ==== */
+.buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+.btn {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.btn-sugerir {
+  background: #ffc107;
+}
+.btn-calcular {
+  background: #28a745;
+  color: #fff;
+}
+.btn-borrar {
+  background: #dc3545;
+  color: #fff;
+}
+.btn:hover {
+  opacity: 0.8;
+}

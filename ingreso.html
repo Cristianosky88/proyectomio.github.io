@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generador de Informe - Ingreso Personal Externo</title>
+  <style>
+      :root {
+          --primary: #2563eb;
+          --primary-hover: #1d4ed8;
+          --primary-light: #dbeafe;
+          --secondary: #10b981;
+          --secondary-hover: #059669;
+          --danger: #dc2626;
+          --success: #059669;
+          --gray-50: #f9fafb;
+          --gray-100: #f3f4f6;
+          --gray-200: #e5e7eb;
+          --gray-300: #d1d5db;
+          --gray-500: #6b7280;
+          --gray-700: #374151;
+          --gray-800: #1f2937;
+          --gray-900: #111827;
+          --white: #ffffff;
+          --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+          --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+          --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+          --radius: 8px;
+          --radius-lg: 12px;
+          --radius-xl: 16px;
+      }
+
+      * {
+          box-sizing: border-box;
+      }
+
+      body {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+          background: linear-gradient(135deg, var(--gray-50) 0%, var(--primary-light) 100%);
+          color: var(--gray-800);
+          margin: 0;
+          padding: 20px;
+          min-height: 100vh;
+          line-height: 1.6;
+      }
+
+      .container {
+          max-width: 800px;
+          margin: 0 auto;
+      }
+
+      .header {
+          text-align: center;
+          margin-bottom: 2rem;
+          padding: 2rem 0;
+      }
+
+      .header h1 {
+          margin: 0;
+          font-size: 2.5rem;
+          font-weight: 700;
+          color: var(--gray-900);
+      }
+
+      .header p {
+          margin: 0.5rem 0 0 0;
+          color: var(--gray-500);
+          font-size: 1.1rem;
+      }
+
+      .card {
+          background: var(--white);
+          border-radius: var(--radius-xl);
+          box-shadow: var(--shadow-xl);
+          margin-bottom: 2rem;
+          overflow: hidden;
+          border: 1px solid var(--gray-200);
+      }
+
+      .card-header {
+          background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+          color: var(--white);
+          padding: 1.5rem 2rem;
+      }
+
+      .card-header h2 {
+          margin: 0;
+          font-size: 1.5rem;
+          font-weight: 600;
+      }
+
+      .card-body {
+          padding: 2rem;
+      }
+
+      .event-section {
+          background: var(--gray-50);
+          border: 2px solid var(--gray-200);
+          border-radius: var(--radius-lg);
+          padding: 1.5rem;
+          margin-bottom: 1.5rem;
+          position: relative;
+      }
+
+      .event-section::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 4px;
+          height: 100%;
+          background: var(--primary);
+      }
+
+      .event-section.event-2::before {
+          background: var(--secondary);
+      }
+
+      .event-title {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          margin-bottom: 1.5rem;
+          font-weight: 600;
+          font-size: 1.1rem;
+          color: var(--gray-800);
+      }
+
+      .event-number {
+          width: 32px;
+          height: 32px;
+          background: var(--primary);
+          color: var(--white);
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: 700;
+          font-size: 0.9rem;
+      }
+
+      .event-section.event-2 .event-number {
+          background: var(--secondary);
+      }
+
+      .form-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+          gap: 1.5rem;
+          margin-bottom: 1rem;
+      }
+
+      .form-group {
+          position: relative;
+      }
+
+      .form-group.full-width {
+          grid-column: 1 / -1;
+      }
+
+      label {
+          display: block;
+          margin-bottom: 0.5rem;
+          font-weight: 500;
+          color: var(--gray-700);
+          font-size: 0.9rem;
+      }
+
+      input, textarea {
+          width: 100%;
+          padding: 0.875rem 1rem;
+          border: 2px solid var(--gray-300);
+          border-radius: var(--radius);
+          font-size: 1rem;
+          font-family: inherit;
+          transition: all 0.2s ease;
+          background: var(--white);
+      }
+
+      input:focus, textarea:focus {
+          outline: none;
+          border-color: var(--primary);
+          box-shadow: 0 0 0 3px var(--primary-light);
+      }
+
+      textarea {
+          resize: vertical;
+          min-height: 80px;
+      }
+
+      .btn {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.5rem;
+          padding: 0.875rem 2rem;
+          border: none;
+          border-radius: var(--radius);
+          font-size: 1rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s ease;
+      }
+
+      .btn-primary {
+          background: var(--primary);
+          color: var(--white);
+      }
+
+      .btn-primary:hover {
+          background: var(--primary-hover);
+      }
+
+      .btn-secondary {
+          background: var(--secondary);
+          color: var(--white);
+      }
+
+      .btn-secondary:hover {
+          background: var(--secondary-hover);
+      }
+
+      .btn-outline {
+          background: var(--white);
+          color: var(--primary);
+          border: 2px solid var(--primary);
+      }
+
+      .btn-outline:hover {
+          background: var(--primary);
+          color: var(--white);
+      }
+
+      .btn-group {
+          display: flex;
+          gap: 1rem;
+          margin-top: 2rem;
+          flex-wrap: wrap;
+      }
+
+      .btn-group .btn {
+          flex: 1;
+          min-width: 180px;
+      }
+
+      .report-container {
+          display: none;
+      }
+
+      .report-container.show {
+          display: block;
+      }
+
+      .report-content {
+          background: var(--gray-50);
+          border: 2px solid var(--gray-200);
+          border-radius: var(--radius-lg);
+          padding: 2rem;
+          margin-bottom: 1rem;
+          line-height: 1.8;
+          white-space: pre-wrap;
+      }
+
+      .highlight {
+          background: #fbbf24;
+          color: #92400e;
+          padding: 0.25rem 0.5rem;
+          border-radius: 4px;
+          font-weight: 600;
+      }
+
+      .timestamp {
+          text-align: center;
+          color: var(--gray-500);
+          font-size: 0.875rem;
+          font-style: italic;
+          margin-top: 1rem;
+      }
+
+      .loading {
+          display: none;
+          width: 20px;
+          height: 20px;
+          border: 3px solid rgba(255,255,255,.3);
+          border-radius: 50%;
+          border-top-color: #fff;
+          animation: spin 1s ease-in-out infinite;
+      }
+
+      .notification {
+          position: fixed;
+          top: 20px;
+          right: 20px;
+          background: var(--success);
+          color: var(--white);
+          padding: 1rem 1.5rem;
+          border-radius: var(--radius);
+          box-shadow: var(--shadow-lg);
+          transform: translateX(400px);
+          transition: transform 0.3s ease;
+          z-index: 1000;
+      }
+
+      .notification.show {
+          transform: translateX(0);
+      }
+
+      .notification.error {
+          background: var(--danger);
+      }
+
+      .error-message {
+          color: var(--danger);
+          font-size: 0.875rem;
+          margin-top: 0.5rem;
+          display: none;
+      }
+
+      .form-group.error .error-message {
+          display: block;
+      }
+
+      .form-group.error input,
+      .form-group.error textarea {
+          border-color: var(--danger);
+      }
+
+      @keyframes spin {
+          to { transform: rotate(360deg); }
+      }
+
+      @media (max-width: 768px) {
+          body { padding: 10px; }
+          .header h1 { font-size: 2rem; }
+          .card-body { padding: 1.5rem; }
+          .form-grid { grid-template-columns: 1fr; gap: 1rem; }
+          .btn-group { flex-direction: column; }
+          .btn-group .btn { min-width: unset; }
+      }
+  </style>
+</head>
+<body>
+  <div class="container">
+      <header class="header">
+          <h1>🚪 Sistema de Informes</h1>
+          <p>Ingreso y Egreso de Personal Externo</p>
+      </header>
+
+      <div class="card">
+          <div class="card-header">
+              <h2>📋 Formulario de Registro</h2>
+          </div>
+          <div class="card-body">
+              <form id="report-form">
+                  <div class="event-section event-1">
+                      <div class="event-title">
+                          <div class="event-number">1</div>
+                          Ingreso de Personal Externo
+                      </div>
+                      
+                      <div class="form-grid">
+                          <div class="form-group">
+                              <label for="time1">⏰ Hora de Ingreso</label>
+                              <input type="time" id="time1" required value="01:26">
+                              <div class="error-message">La hora es obligatoria</div>
+                          </div>
+                          
+                          <div class="form-group">
+                              <label for="supervisor1">👤 Control Interno</label>
+                              <input type="text" id="supervisor1" required 
+                                     value="Padilla Jorge" placeholder="Nombre del supervisor">
+                              <div class="error-message">El supervisor es obligatorio</div>
+                          </div>
+                          
+                          <div class="form-group">
+                              <label for="company1">🏢 Empresa</label>
+                              <input type="text" id="company1" required 
+                                     value="Bazurco Facility" placeholder="Nombre de la empresa">
+                              <div class="error-message">La empresa es obligatoria</div>
+                          </div>
+                          
+                          <div class="form-group">
+                              <label for="worker1">👷 Personal Externo</label>
+                              <input type="text" id="worker1" required 
+                                     value="Sr. Yapura Sergio" placeholder="Nombre del trabajador">
+                              <div class="error-message">El nombre del trabajador es obligatorio</div>
+                          </div>
+                          
+                          <div class="form-group full-width">
+                              <label for="task">📋 Descripción de la Tarea</label>
+                              <textarea id="task" required placeholder="Describe la tarea a realizar...">para realizar tareas de limpieza en el Casino desde las 02:00 Hs. hasta las 04:00 Hs.</textarea>
+                              <div class="error-message">La descripción de la tarea es obligatoria</div>
+                          </div>
+                      </div>
+                  </div>
+
+                  <div class="event-section event-2">
+                      <div class="event-title">
+                          <div class="event-number">2</div>
+                          Finalización del Servicio
+                      </div>
+                      
+                      <div class="form-grid">
+                          <div class="form-group">
+                              <label for="time2">⏰ Hora de Salida</label>
+                              <input type="time" id="time2" required value="04:05">
+                              <div class="error-message">La hora es obligatoria</div>
+                          </div>
+                          
+                          <div class="form-group">
+                              <label for="supervisor2">👤 Control Interno</label>
+                              <input type="text" id="supervisor2" required 
+                                     value="Padilla Jorge" placeholder="Nombre del supervisor">
+                              <div class="error-message">El supervisor es obligatorio</div>
+                          </div>
+                          
+                          <div class="form-group">
+                              <label for="company2">🏢 Empresa</label>
+                              <input type="text" id="company2" required 
+                                     value="Bazurco Facility" placeholder="Nombre de la empresa">
+                              <div class="error-message">La empresa es obligatoria</div>
+                          </div>
+                          
+                          <div class="form-group">
+                              <label for="worker2">👷 Personal Externo</label>
+                              <input type="text" id="worker2" required 
+                                     value="Sr. Vilte Nicolas" placeholder="Nombre del trabajador">
+                              <div class="error-message">El nombre del trabajador es obligatorio</div>
+                          </div>
+                      </div>
+                  </div>
+
+                  <div class="btn-group">
+                      <button type="button" class="btn btn-primary" id="generateBtn">
+                          <span class="btn-text">📄 Generar Informe</span>
+                          <span class="loading"></span>
+                      </button>
+                      <button type="button" class="btn btn-outline" id="clearBtn">
+                          🗑️ Limpiar Formulario
+                      </button>
+                      <button type="button" class="btn btn-outline" id="resetBtn">
+                          🔄 Valores por Defecto
+                      </button>
+                  </div>
+              </form>
+          </div>
+      </div>
+
+      <div id="report-container" class="card report-container">
+          <div class="card-header">
+              <h2>📄 Informe Generado</h2>
+          </div>
+          <div class="card-body">
+              <div id="report-content" class="report-content"></div>
+              <div class="btn-group">
+                  <button id="copy-btn" class="btn btn-secondary">
+                      📋 Copiar al Portapapeles
+                  </button>
+                  <button id="save-btn" class="btn btn-outline">
+                      💾 Descargar
+                  </button>
+              </div>
+              <div class="timestamp" id="timestamp"></div>
+          </div>
+      </div>
+  </div>
+
+  <div id="notification" class="notification">
+      <span id="notification-text">¡Operación exitosa!</span>
+  </div>
+
+  <script>
+      // Valores por defecto
+      const defaultValues = {
+          time1: '01:26',
+          supervisor1: 'Padilla Jorge',
+          company1: 'Bazurco Facility',
+          worker1: 'Sr. Yapura Sergio',
+          task: 'para realizar tareas de limpieza en el Casino desde las 02:00 Hs. hasta las 04:00 Hs.',
+          time2: '04:05',
+          supervisor2: 'Padilla Jorge',
+          company2: 'Bazurco Facility',
+          worker2: 'Sr. Vilte Nicolas'
+      };
+
+      // Esperar a que el DOM esté listo
+      document.addEventListener('DOMContentLoaded', function() {
+          console.log('DOM cargado, configurando eventos...');
+          
+          // Configurar botones principales
+          const generateBtn = document.getElementById('generateBtn');
+          const clearBtn = document.getElementById('clearBtn');
+          const resetBtn = document.getElementById('resetBtn');
+          
+          if (generateBtn) {
+              generateBtn.addEventListener('click', function() {
+                  console.log('Botón generar clickeado');
+                  generateReport();
+              });
+          }
+          
+          if (clearBtn) {
+              clearBtn.addEventListener('click', function() {
+                  console.log('Botón limpiar clickeado');
+                  clearForm();
+              });
+          }
+          
+          if (resetBtn) {
+              resetBtn.addEventListener('click', function() {
+                  console.log('Botón reset clickeado');
+                  resetToDefaults();
+              });
+          }
+
+          // Configurar botones del informe
+          const copyBtn = document.getElementById('copy-btn');
+          const saveBtn = document.getElementById('save-btn');
+          
+          if (copyBtn) {
+              copyBtn.addEventListener('click', function() {
+                  console.log('Botón copiar clickeado');
+                  copyToClipboard();
+              });
+          }
+          
+          if (saveBtn) {
+              saveBtn.addEventListener('click', function() {
+                  console.log('Botón descargar clickeado');
+                  downloadReport();
+              });
+          }
+
+          // Configurar sincronización automática
+          setupAutoSync();
+          
+          console.log('Eventos configurados correctamente');
+      });
+
+      // Configurar sincronización automática de campos
+      function setupAutoSync() {
+          const supervisor1 = document.getElementById('supervisor1');
+          const supervisor2 = document.getElementById('supervisor2');
+          const company1 = document.getElementById('company1');
+          const company2 = document.getElementById('company2');
+          
+          if (supervisor1 && supervisor2) {
+              supervisor1.addEventListener('input', function(e) {
+                  supervisor2.value = e.target.value;
+              });
+          }
+          
+          if (company1 && company2) {
+              company1.addEventListener('input', function(e) {
+                  company2.value = e.target.value;
+              });
+          }
+      }
+
+      // Validar formulario
+      function validateForm() {
+          const inputs = document.querySelectorAll('input[required], textarea[required]');
+          let isValid = true;
+
+          inputs.forEach(function(input) {
+              const formGroup = input.closest('.form-group');
+              if (!input.value.trim()) {
+                  formGroup.classList.add('error');
+                  isValid = false;
+              } else {
+                  formGroup.classList.remove('error');
+              }
+          });
+
+          return isValid;
+      }
+
+      // Generar informe
+      function generateReport() {
+          console.log('Generando informe...');
+          
+          if (!validateForm()) {
+              showNotification('Por favor, complete todos los campos obligatorios', 'error');
+              return;
+          }
+
+          const submitBtn = document.getElementById('generateBtn');
+          const btnText = submitBtn.querySelector('.btn-text');
+          const loading = submitBtn.querySelector('.loading');
+
+          // Mostrar loading
+          btnText.style.display = 'none';
+          loading.style.display = 'inline-block';
+          submitBtn.disabled = true;
+
+          // Simular procesamiento
+          setTimeout(function() {
+              try {
+                  const data = getFormData();
+                  const report = createReport(data);
+                  
+                  const reportContent = document.getElementById('report-content');
+                  const reportContainer = document.getElementById('report-container');
+                  const timestamp = document.getElementById('timestamp');
+                  
+                  if (reportContent) {
+                      reportContent.innerHTML = report;
+                  }
+                  
+                  if (timestamp) {
+                      timestamp.textContent = 'Generado el: ' + new Date().toLocaleString('es-AR');
+                  }
+                  
+                  if (reportContainer) {
+                      reportContainer.classList.add('show');
+                      setTimeout(function() {
+                          reportContainer.scrollIntoView({ behavior: 'smooth' });
+                      }, 100);
+                  }
+
+                  showNotification('¡Informe generado exitosamente!', 'success');
+              } catch (error) {
+                  console.error('Error generando informe:', error);
+                  showNotification('Error al generar el informe', 'error');
+              }
+
+              // Restaurar botón
+              btnText.style.display = 'inline';
+              loading.style.display = 'none';
+              submitBtn.disabled = false;
+          }, 1000);
+      }
+
+      // Obtener datos del formulario
+      function getFormData() {
+          return {
+              time1: document.getElementById('time1').value,
+              supervisor1: document.getElementById('supervisor1').value.trim(),
+              company1: document.getElementById('company1').value.trim(),
+              worker1: document.getElementById('worker1').value.trim(),
+              task: document.getElementById('task').value.trim(),
+              time2: document.getElementById('time2').value,
+              supervisor2: document.getElementById('supervisor2').value.trim(),
+              company2: document.getElementById('company2').value.trim(),
+              worker2: document.getElementById('worker2').value.trim()
+          };
+      }
+
+      // Crear informe formateado
+      function createReport(data) {
+          const formatTime = function(time) {
+              return time ? time + " Hs." : "";
+          };
+          
+          const highlight = function(text) {
+              return '<span class="highlight">' + text + '</span>';
+          };
+
+          return '<strong>Ingreso Personal Externo</strong>\n\n' +
+                 'A las ' + formatTime(data.time1) + ' CCTV Recibe llamada de ' + highlight(data.supervisor1) + 
+                 ', informa que ingresa personal de ' + highlight(data.company1) + ' ' + highlight(data.worker1) + ' ' + data.task + '\n\n' +
+                 'A las ' + formatTime(data.time2) + ' CCTV Recibe llamada de ' + highlight(data.supervisor2) + 
+                 ', informa que personal de ' + highlight(data.company2) + ' ' + highlight(data.worker2) + ' finaliza servicio y se retira del Casino.-';
+      }
+
+      // Limpiar formulario
+      function clearForm() {
+          if (confirm('¿Está seguro de que desea limpiar todos los campos?')) {
+              const inputs = document.querySelectorAll('input, textarea');
+              inputs.forEach(function(input) {
+                  input.value = '';
+              });
+              
+              const reportContainer = document.getElementById('report-container');
+              if (reportContainer) {
+                  reportContainer.classList.remove('show');
+              }
+              
+              const errorGroups = document.querySelectorAll('.form-group.error');
+              errorGroups.forEach(function(group) {
+                  group.classList.remove('error');
+              });
+
+              showNotification('¡Formulario limpiado!', 'success');
+          }
+      }
+
+      // Restablecer valores por defecto
+      function resetToDefaults() {
+          Object.keys(defaultValues).forEach(function(key) {
+              const element = document.getElementById(key);
+              if (element) {
+                  element.value = defaultValues[key];
+              }
+          });
+          
+          const errorGroups = document.querySelectorAll('.form-group.error');
+          errorGroups.forEach(function(group) {
+              group.classList.remove('error');
+          });
+
+          showNotification('¡Valores por defecto restablecidos!', 'success');
+      }
+
+      // Copiar al portapapeles
+      function copyToClipboard() {
+          const reportContent = document.getElementById('report-content');
+          if (!reportContent) {
+              showNotification('No hay informe para copiar', 'error');
+              return;
+          }
+
+          const text = reportContent.textContent || reportContent.innerText || '';
+          if (!text.trim()) {
+              showNotification('No hay contenido para copiar', 'error');
+              return;
+          }
+          
+          if (navigator.clipboard) {
+              navigator.clipboard.writeText(text).then(function() {
+                  showNotification('¡Texto copiado al portapapeles!', 'success');
+              }).catch(function() {
+                  fallbackCopy(text);
+              });
+          } else {
+              fallbackCopy(text);
+          }
+      }
+
+      // Método alternativo de copia
+      function fallbackCopy(text) {
+          const textArea = document.createElement('textarea');
+          textArea.value = text;
+          textArea.style.position = 'fixed';
+          textArea.style.left = '-9999px';
+          document.body.appendChild(textArea);
+          textArea.select();
+          try {
+              document.execCommand('copy');
+              showNotification('¡Texto copiado!', 'success');
+          } catch (err) {
+              showNotification('Error al copiar', 'error');
+          }
+          document.body.removeChild(textArea);
+      }
+
+      // Descargar informe
+      function downloadReport() {
+          const reportContent = document.getElementById('report-content');
+          if (!reportContent) {
+              showNotification('No hay informe para descargar', 'error');
+              return;
+          }
+
+          const text = reportContent.textContent || reportContent.innerText || '';
+          const timestamp = document.getElementById('timestamp').textContent;
+          const content = text + '\n\n' + timestamp;
+          
+          const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'informe-personal-externo-' + new Date().toISOString().split('T')[0] + '.txt';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+          
+          showNotification('¡Archivo descargado!', 'success');
+      }
+
+      // Mostrar notificación
+      function showNotification(message, type) {
+          const notification = document.getElementById('notification');
+          const notificationText = document.getElementById('notification-text');
+          
+          if (!notification || !notificationText) return;
+          
+          notificationText.textContent = message;
+          notification.classList.remove('show', 'error');
+          
+          if (type === 'error') {
+              notification.classList.add('error');
+          }
+          
+          notification.classList.add('show');
+          
+          setTimeout(function() {
+              notification.classList.remove('show');
+          }, 3000);
+      }
+  </script>
+</body>
+</html>

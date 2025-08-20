@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Texto de Recibo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+    :root {
+        --primary-color: #4f46e5;
+        --primary-hover: #4338ca;
+        --secondary-color: #64748b;
+        --success-color: #22c55e;
+        --background: #f8fafc;
+        --card-bg: #ffffff;
+        --text-primary: #1e293b;
+        --text-secondary: #64748b;
+        --border-color: #e2e8f0;
+        --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+        --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+        --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
+    }
+
+    body.dark-mode {
+        --background: #1a202c;
+        --card-bg: #2d3748;
+        --text-primary: #f8fafc;
+        --text-secondary: #a0aec0;
+        --border-color: #4a5568;
+        --primary-color: #63b3ed;
+        --primary-hover: #4299e1;
+    }
+
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: var(--background);
+        color: var(--text-primary);
+        line-height: 1.5;
+        min-height: 100vh;
+        padding: 2rem;
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+    }
+
+    .form-section, .output-section {
+        background: var(--card-bg);
+        border-radius: 1rem;
+        padding: 2rem;
+        box-shadow: var(--shadow-lg);
+        transition: background-color 0.3s ease;
+    }
+
+    h1 {
+        font-size: 1.875rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        margin-bottom: 2rem;
+        text-align: center;
+        transition: color 0.3s ease;
+    }
+
+    h2 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid var(--border-color);
+        transition: color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    label {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--text-secondary);
+        margin-bottom: 0.5rem;
+        transition: color 0.3s ease;
+    }
+
+    input, select {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 1px solid var(--border-color);
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+        transition: all 0.15s ease;
+        background: var(--background);
+        color: var(--text-primary);
+    }
+    
+    body.dark-mode input, body.dark-mode select {
+        background: var(--card-bg);
+    }
+
+
+    input:focus, select:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+
+    .row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .btn {
+        background: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 0.875rem 1.5rem;
+        border-radius: 0.5rem;
+        font-weight: 500;
+        font-size: 0.875rem;
+        cursor: pointer;
+        transition: all 0.15s ease;
+        width: 100%;
+        margin-bottom: 1rem; /* Added margin for spacing between buttons */
+    }
+
+    .btn:hover {
+        background: var(--primary-hover);
+        transform: translateY(-1px);
+    }
+
+    #btnLimpiar {
+        background-color: #f43f5e; /* Red color for clear button */
+    }
+
+    #btnLimpiar:hover {
+        background-color: #e11d48;
+    }
+
+    #btnVolverInicio {
+        background-color: #0ea5e9; /* Blue color for home button */
+    }
+
+    #btnVolverInicio:hover {
+        background-color: #0284c7;
+    }
+    
+    .output-text {
+        font-family: 'Roboto Mono', monospace;
+        font-size: 0.875rem;
+        line-height: 1.7;
+        background: var(--background);
+        padding: 1.5rem;
+        border-radius: 0.5rem;
+        border: 1px solid var(--border-color);
+        white-space: pre-wrap;
+        min-height: 500px;
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+        margin-bottom: 1rem; /* Spacing between text area and copy button */
+    }
+
+    .copy-btn {
+        background: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 0.875rem 1.5rem;
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+        cursor: pointer;
+        transition: all 0.15s ease;
+        width: 100%; /* Make it full width */
+        display: block;
+    }
+
+    .copy-btn:hover {
+        background: var(--primary-hover);
+    }
+
+    .copy-success {
+        background: var(--success-color) !important;
+    }
+
+    #btnToggleTheme {
+        position: fixed;
+        top: 1rem;
+        right: 1rem;
+        z-index: 1000;
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        width: 3rem;
+        height: 3rem;
+        border-radius: 50%;
+        font-size: 1.2rem;
+        cursor: pointer;
+        box-shadow: var(--shadow-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background-color 0.3s ease;
+    }
+
+    #btnToggleTheme:hover {
+        background-color: var(--primary-hover);
+    }
+
+    @media (max-width: 768px) {
+        .container {
+            grid-template-columns: 1fr;
+        }
+        
+        body {
+            padding: 1rem;
+        }
+        
+        .form-section, .output-section {
+            padding: 1.5rem;
+        }
+    }
+
+    /* Animaciones */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .form-section, .output-section {
+        animation: fadeIn 0.5s ease-out;
+    }
+    </style>
+</head>
+<body>
+    <button id="btnToggleTheme"><i class="fas fa-moon"></i></button>
+
+    <div class="container">
+        <div class="form-section">
+            <h1>📝 Generador de Texto</h1>
+            
+            <form id="textForm">
+                <h2>📋 Datos Principales</h2>
+                
+                <div class="row">
+                    <div class="form-group">
+                        <label for="hora1">🕐 Hora Línea 1:</label>
+                        <input type="time" id="hora1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="nombrePersonal">👤 Nombre de Personal:</label>
+                        <input type="text" id="nombrePersonal" required>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="form-group">
+                        <label for="nombreMaquina">🎰 N° Máquina:</label>
+                        <input type="text" id="nombreMaquina" required>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="form-group">
+                        <label for="valorDe">💰 Valor de:</label>
+                        <input type="number" id="valorDe" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="progresivoValor">📈 Progresivo de valor:</label>
+                        <input type="number" id="progresivoValor" step="0.01" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="totalPremio">🏆 Total Premio:</label>
+                    <input type="number" id="totalPremio" step="0.01" required>
+                </div>
+
+                <hr style="margin: 30px 0; border: 1px solid #dee2e6;">
+
+                <h2>📋 Otros Datos</h2>
+
+                <div class="row">
+                    <div class="form-group">
+                        <label for="hora2">🕐 Hora Línea 2:</label>
+                        <input type="time" id="hora2" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="hora3">🕐 Hora Línea 3:</label>
+                        <input type="time" id="hora3" required>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="form-group">
+                        <label for="hora4">🕐 Hora Línea 4:</label>
+                        <input type="time" id="hora4" required>
+                    </div>
+
+                <div class="form-group">
+                    <label for="cliente">👤 Nombre del Cliente:</label>
+                    <input type="text" id="cliente" placeholder="Nombre del cliente" required>
+                </div>
+                <div class="form-group">
+                    <label for="tipoCliente">👥 Tipo de Cliente:</label>
+                    <select id="tipoCliente" class="form-control" required>
+                        <option value="cliente">Cliente</option>
+                        <option value="clienta">Clienta</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="jefeCaja">Jefe de Caja:</label>
+                    <input type="text" id="jefeCaja" required>
+                </div>
+
+                    <div class="form-group">
+                        <label for="ventanilla">💰 Ventanilla:</label>
+                        <input type="text" id="ventanilla" required>
+                    </div>
+                </div>
+
+                <hr style="margin: 30px 0; border: 1px solid #dee2e6;">
+
+                <h2>📋 Información Adicional</h2>
+                <div class="row">
+                    <div class="form-group">
+                        <label for="maquinaInfo">🎰 Máquina:</label>
+                        <input type="text" id="maquinaInfo" placeholder="Información de la máquina">
+                    </div>
+                    <div class="form-group">
+                        <label for="juegoInfo">🎮 Juego:</label>
+                        <input type="text" id="juegoInfo" placeholder="Nombre del juego">
+                    </div>
+                    <div class="form-group">
+                        <label for="pagoManualInfo">💵 Pago Manual:</label>
+                        <input type="text" id="pagoManualInfo" placeholder="Información del pago manual">
+                    </div>
+                </div>
+
+                <button type="button" class="btn" onclick="generateText()">📋 Generar Texto</button>
+                <button type="button" class="btn" id="btnLimpiar">🧹 Limpiar</button>
+                <button type="button" class="btn" id="btnVolverInicio">🏠 Volver a Inicio</button>
+            </form>
+        </div>
+
+        <div class="output-section">
+            <h2>📄 Texto Generado</h2>
+            <div class="output-text" id="outputText">
+                <span style="color: #666; font-style: italic;">Completa el formulario y presiona "Generar Texto"...</span>
+            </div>
+            <button class="copy-btn" id="copyBtn" onclick="copyText()">📋 Copiar</button>
+        </div>
+    </div>
+
+    <script>
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('es-AR', {
+                style: 'decimal',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(amount);
+        }
+
+        function generateText() {
+            // Obtener los valores de las horas correctamente
+            const hora1 = document.getElementById('hora1').value;
+            const hora2 = document.getElementById('hora2').value;
+            const hora3 = document.getElementById('hora3').value;
+            const hora4 = document.getElementById('hora4').value;
+            
+            const nombrePersonal = document.getElementById('nombrePersonal').value;
+            const nombreMaquina = document.getElementById('nombreMaquina').value;
+            const valorDe = parseFloat(document.getElementById('valorDe').value) || 0;
+            const progresivoValor = parseFloat(document.getElementById('progresivoValor').value) || 0;
+            const totalPremio = valorDe + progresivoValor;
+            const cliente = document.getElementById('cliente').value;
+            const tipoCliente = document.getElementById('tipoCliente').value;
+            const jefeCaja = document.getElementById('jefeCaja').value;
+            const ventanilla = document.getElementById('ventanilla').value;
+            const maquinaInfo = document.getElementById('maquinaInfo').value;
+            const juegoInfo = document.getElementById('juegoInfo').value;
+            const pagoManualInfo = document.getElementById('pagoManualInfo').value;
+
+            // Definir el prefijo según el tipo de cliente
+            const prefijo = tipoCliente === 'clienta' ? 'la Sra.' : 'el Sr.';
+
+            const texto = `A las ${hora1} Hs. recibe llamada de ${nombrePersonal}, informa Jackpot en Máq. ${nombreMaquina} por un valor de ${formatCurrency(valorDe)} pero a dicho valor se le tiene que sumar un progresivo de valor ${formatCurrency(progresivoValor)} un total de premio ganador por ${formatCurrency(totalPremio)} -
+(A las ${hora2} Hs.) Revisión muestra que ${prefijo} ${cliente}, juega en Máq. ${nombreMaquina} al salir el premio -
+A las ${hora3} Hs. Jefe de Caja ${jefeCaja}, cancela en ventanilla de caja ${ventanilla} a ${prefijo} ${cliente} -
+A las ${hora4} Hs. ${nombrePersonal}, registra y descarga el premio de Máq. ${nombreMaquina} -
+
+Máquina: ${maquinaInfo}
+Juego: ${juegoInfo}
+Pago Manual: ${pagoManualInfo}
+
+Apéndice 1: Fotos -`;
+
+            document.getElementById('outputText').innerHTML = texto;
+        }
+
+        function copyText() {
+            const outputText = document.getElementById('outputText');
+            const textToCopy = outputText.textContent.trim();
+            
+            const copyBtn = document.getElementById('copyBtn');
+
+            navigator.clipboard.writeText(textToCopy).then(function() {
+                copyBtn.textContent = '✅ Copiado';
+                copyBtn.classList.add('copy-success');
+                
+                setTimeout(function() {
+                    copyBtn.textContent = '📋 Copiar';
+                    copyBtn.classList.remove('copy-success');
+                }, 2000);
+            }).catch(function(err) {
+                console.error('Error al copiar: ', err);
+                alert('Error al copiar el texto');
+            });
+        }
+
+        // Funcionalidad para el tema oscuro
+        const btnToggleTheme = document.getElementById('btnToggleTheme');
+        btnToggleTheme.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+            
+            const icon = btnToggleTheme.querySelector('i');
+            if (isDarkMode) {
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+            } else {
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+            }
+        });
+
+        // Aplicar el tema guardado en localStorage al cargar la página
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.body.classList.add('dark-mode');
+            const icon = btnToggleTheme.querySelector('i');
+            icon.classList.remove('fa-moon');
+            icon.classList.add('fa-sun');
+        }
+
+        // Auto-generar cuando se cambie cualquier campo
+        document.getElementById('textForm').addEventListener('input', function() {
+            generateText();
+        });
+
+        // Funcionalidad del botón de Limpiar
+        document.getElementById('btnLimpiar').addEventListener('click', function() {
+            document.getElementById('textForm').reset();
+            generateText(); 
+        });
+
+        // Funcionalidad del botón de Volver a Inicio
+        document.getElementById('btnVolverInicio').addEventListener('click', function() {
+            window.location.href = '/'; 
+        });
+
+        // Generar texto inicial
+        generateText();
+    </script>
+</body>
+</html>

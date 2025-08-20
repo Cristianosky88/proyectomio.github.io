@@ -1,0 +1,30 @@
+body {
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+    color: white;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+h1 {
+    font-weight: bold;
+}
+
+.module-card {
+    text-decoration: none;
+    color: white;
+    background: #1abc9c;
+    border-radius: 15px;
+    transition: transform 0.2s, background 0.3s;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.module-card:hover {
+    transform: scale(1.05);
+    background: #16a085;
+}
+
+.module-card i {
+    color: white;
+}
