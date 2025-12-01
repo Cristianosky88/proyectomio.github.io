@@ -1,103 +1,158 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Menú Principal</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-<link rel="stylesheet" href="css/global.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Centro de Reportes - Menú Principal</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { background-color: #f1f5f9; font-family: 'Segoe UI', sans-serif; }
+        .fade-in { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Efecto hover suave para las tarjetas */
+        .module-card:hover {
+            transform: translateY(-5px);
+            border-color: #6366f1; /* Indigo-500 */
+        }
+    </style>
 </head>
-<body>
+<body class="text-slate-800 min-h-screen flex flex-col">
 
-<div class="container text-center mt-5">
-    <h1 class="mb-4">📂 Centro de Reportes</h1>
-    <div class="row g-4">
-        <!-- Jackpot -->
-        <div class="col-12 col-md-4">
-            <a href="jackpot.html" class="card module-card">
-                <div class="card-body">
-                    <i class="fas fa-coins fa-4x mb-3"></i>
-                    <h4>Jackpot</h4>
+    <!-- Header -->
+    <div class="bg-slate-900 p-6 text-white shadow-lg z-10">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <div class="bg-indigo-600 p-3 rounded-xl shadow-lg shadow-indigo-500/30">
+                    <i data-lucide="layout-grid" class="w-8 h-8 text-white"></i>
                 </div>
-            </a>
-        </div>
-                <div class="col-12 col-md-4">
-            <a href="Jackpot2.html" class="card module-card">
-                <div class="card-body">
-                    <i class="fas fa-coins fa-4x mb-3"></i>
-                    <h4>Jackpot 2</h4>
+                <div>
+                    <h1 class="text-2xl font-bold tracking-tight">Centro de Reportes</h1>
+                    <p class="text-slate-400 text-sm uppercase tracking-wider font-medium">Sistema de Gestión Centralizado</p>
                 </div>
-            </a>
-        </div>
-
-        <!-- Calculadora -->
-        <div class="col-12 col-md-4">
-            <a href="calculadora.html" class="card module-card">
-                <div class="card-body">
-                    <i class="fas fa-calculator fa-4x mb-3"></i>
-                    <h4>Calculadora</h4>
+            </div>
+            <div class="hidden md:block text-right">
+                <div class="text-xs text-slate-400 mb-1">Usuario</div>
+                <div class="flex items-center gap-2 bg-slate-800 px-3 py-1 rounded-full border border-slate-700">
+                    <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                    <span class="text-sm font-semibold text-slate-200">Operador Activo</span>
                 </div>
-            </a>
+            </div>
         </div>
+    </div>
 
-        <!-- Palvar -->
-        <div class="col-12 col-md-4">
-            <a href="palvar.html" class="card module-card">
-                <div class="card-body">
-                    <i class="fas fa-chart-line fa-4x mb-3"></i>
-                    <h4>Pal Var</h4>
+    <!-- Main Content Grid -->
+    <div class="flex-1 p-6 md:p-10 max-w-7xl mx-auto w-full">
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 fade-in">
+
+            <!-- Jackpot -->
+            <a href="jackpot.html" class="module-card group bg-white p-6 rounded-2xl shadow-sm border border-slate-200 transition-all duration-300 flex flex-col items-center text-center cursor-pointer relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-yellow-400 to-yellow-600"></div>
+                <div class="bg-yellow-50 p-4 rounded-full mb-4 group-hover:bg-yellow-100 transition-colors">
+                    <i data-lucide="coins" class="w-10 h-10 text-yellow-600"></i>
                 </div>
+                <h3 class="text-lg font-bold text-slate-700 mb-1 group-hover:text-yellow-700 transition-colors">Jackpot</h3>
+                <p class="text-xs text-slate-400">Reporte de pagos mayores</p>
             </a>
-        </div>
-<div class="col-12 col-md-4">
-  <a href="ingreso.html" class="card module-card text-center shadow-sm">
-    <div class="card-body">
-      <i class="fas fa-person fa-4x mb-3 text-primary"></i>
-      <h4 class="card-title">Ingreso Personal Externo</h4>
-    </div>
-  </a>
-</div>
-<div class="col-12 col-md-4">
-  <a href="chk_bule.html" class="card module-card text-center shadow-sm">
-    <div class="card-body">
-      <i class="fas fa-shield fa-4x mb-3 text-primary"></i>
-      <h4 class="card-title">Chequeo de Botones Bulevard</h4>
-    </div>
-    
-  </a>
-</div>
-<div class="col-12 col-md-4">
-  <a href="chk_luxor.html" class="card module-card text-center shadow-sm">
-    <div class="card-body">
-      <i class="fas fa-shield fa-4x mb-3 text-primary"></i>
-      <h4 class="card-title">Chequeo de Botones Luxor</h4>
-    </div>
-  </a>
-</div>
-<div class="col-12 col-md-4">
-  <a href="calculadora2.html" class="card module-card text-center shadow-sm">
-    <div class="card-body">
-      <i class="fas fa-calculator fa-4x mb-3 text-primary"></i>
-      <h4 class="card-title">Calculadora2</h4>
-    </div>
-  </a>
-</div>
-<div class="col-12 col-md-4">
-  <a href="palcap.html" class="card module-card text-center shadow-sm">
-    <div class="card-body">
-      <i class="fas fa-calculator fa-4x mb-3 text-primary"></i>
-      <h4 class="card-title">Test2</h4>
-    </div>
-  </a>
-</div>
 
+            <!-- Jackpot 2 -->
+            <a href="Jackpot2.html" class="module-card group bg-white p-6 rounded-2xl shadow-sm border border-slate-200 transition-all duration-300 flex flex-col items-center text-center cursor-pointer relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-yellow-500 to-orange-500"></div>
+                <div class="bg-orange-50 p-4 rounded-full mb-4 group-hover:bg-orange-100 transition-colors">
+                    <i data-lucide="layers" class="w-10 h-10 text-orange-600"></i>
+                </div>
+                <h3 class="text-lg font-bold text-slate-700 mb-1 group-hover:text-orange-700 transition-colors">Jackpot 2</h3>
+                <p class="text-xs text-slate-400">Módulo secundario de pagos</p>
             </a>
-        </div>
-    </div>
-</div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="js/global.js"></script>
+            <!-- Calculadora -->
+            <a href="calculadora.html" class="module-card group bg-white p-6 rounded-2xl shadow-sm border border-slate-200 transition-all duration-300 flex flex-col items-center text-center cursor-pointer relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-400 to-indigo-500"></div>
+                <div class="bg-blue-50 p-4 rounded-full mb-4 group-hover:bg-blue-100 transition-colors">
+                    <i data-lucide="calculator" class="w-10 h-10 text-blue-600"></i>
+                </div>
+                <h3 class="text-lg font-bold text-slate-700 mb-1 group-hover:text-blue-700 transition-colors">Calculadora</h3>
+                <p class="text-xs text-slate-400">Cálculos básicos</p>
+            </a>
+
+            <!-- Pal Var -->
+            <a href="palvar.html" class="module-card group bg-white p-6 rounded-2xl shadow-sm border border-slate-200 transition-all duration-300 flex flex-col items-center text-center cursor-pointer relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-400 to-pink-500"></div>
+                <div class="bg-purple-50 p-4 rounded-full mb-4 group-hover:bg-purple-100 transition-colors">
+                    <i data-lucide="line-chart" class="w-10 h-10 text-purple-600"></i>
+                </div>
+                <h3 class="text-lg font-bold text-slate-700 mb-1 group-hover:text-purple-700 transition-colors">Pal Var</h3>
+                <p class="text-xs text-slate-400">Análisis de variación</p>
+            </a>
+
+            <!-- Ingreso Personal -->
+            <a href="ingreso.html" class="module-card group bg-white p-6 rounded-2xl shadow-sm border border-slate-200 transition-all duration-300 flex flex-col items-center text-center cursor-pointer relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-400 to-green-500"></div>
+                <div class="bg-emerald-50 p-4 rounded-full mb-4 group-hover:bg-emerald-100 transition-colors">
+                    <i data-lucide="user-plus" class="w-10 h-10 text-emerald-600"></i>
+                </div>
+                <h3 class="text-lg font-bold text-slate-700 mb-1 group-hover:text-emerald-700 transition-colors">Ingreso Personal</h3>
+                <p class="text-xs text-slate-400">Registro de externos</p>
+            </a>
+
+            <!-- Chequeo Bulevard -->
+            <a href="chk_bule.html" class="module-card group bg-white p-6 rounded-2xl shadow-sm border border-slate-200 transition-all duration-300 flex flex-col items-center text-center cursor-pointer relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-400 to-red-600"></div>
+                <div class="bg-red-50 p-4 rounded-full mb-4 group-hover:bg-red-100 transition-colors">
+                    <i data-lucide="shield-check" class="w-10 h-10 text-red-600"></i>
+                </div>
+                <h3 class="text-lg font-bold text-slate-700 mb-1 group-hover:text-red-700 transition-colors">Chequeo Bulevard</h3>
+                <p class="text-xs text-slate-400">Verificación de botones</p>
+            </a>
+
+            <!-- Chequeo Luxor -->
+            <a href="chk_luxor.html" class="module-card group bg-white p-6 rounded-2xl shadow-sm border border-slate-200 transition-all duration-300 flex flex-col items-center text-center cursor-pointer relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-500 to-rose-600"></div>
+                <div class="bg-rose-50 p-4 rounded-full mb-4 group-hover:bg-rose-100 transition-colors">
+                    <i data-lucide="shield" class="w-10 h-10 text-rose-600"></i>
+                </div>
+                <h3 class="text-lg font-bold text-slate-700 mb-1 group-hover:text-rose-700 transition-colors">Chequeo Luxor</h3>
+                <p class="text-xs text-slate-400">Verificación de botones</p>
+            </a>
+
+            <!-- Calculadora 2 (La nueva que hicimos) -->
+            <a href="calculadora2.html" class="module-card group bg-white p-6 rounded-2xl shadow-sm border border-slate-200 transition-all duration-300 flex flex-col items-center text-center cursor-pointer relative overflow-hidden ring-2 ring-indigo-100">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-violet-600"></div>
+                <div class="absolute top-2 right-2">
+                    <span class="bg-indigo-100 text-indigo-600 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Nuevo</span>
+                </div>
+                <div class="bg-indigo-50 p-4 rounded-full mb-4 group-hover:bg-indigo-100 transition-colors">
+                    <i data-lucide="calculator" class="w-10 h-10 text-indigo-600"></i>
+                </div>
+                <h3 class="text-lg font-bold text-slate-700 mb-1 group-hover:text-indigo-700 transition-colors">Calculadora 2</h3>
+                <p class="text-xs text-slate-400">Versión Slots Avanzada</p>
+            </a>
+
+            <!-- Test 2 (Palcap) -->
+            <a href="palcap.html" class="module-card group bg-white p-6 rounded-2xl shadow-sm border border-slate-200 transition-all duration-300 flex flex-col items-center text-center cursor-pointer relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-gray-400 to-slate-500"></div>
+                <div class="bg-slate-100 p-4 rounded-full mb-4 group-hover:bg-slate-200 transition-colors">
+                    <i data-lucide="flask-conical" class="w-10 h-10 text-slate-600"></i>
+                </div>
+                <h3 class="text-lg font-bold text-slate-700 mb-1 group-hover:text-slate-900 transition-colors">Test 2 (Palcap)</h3>
+                <p class="text-xs text-slate-400">Módulo de pruebas</p>
+            </a>
+
+        </div>
+
+        <!-- Footer -->
+        <div class="mt-12 text-center text-slate-400 text-sm">
+            <p>&copy; 2024 Centro de Operaciones. Todos los derechos reservados.</p>
+        </div>
+
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
 </body>
 </html>
