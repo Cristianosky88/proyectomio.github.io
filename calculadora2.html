@@ -3,1128 +3,952 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Números</title>
+    <title>Calculadora de Números Mejorada</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-        
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-        }
-        
-        h1 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 30px;
-            font-size: 2.2em;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        
-        .input-section {
-            margin-bottom: 30px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 10px;
-            font-weight: 600;
-            color: #555;
-            font-size: 1.1em;
-        }
-        
-        textarea {
-            width: 100%;
-            height: 150px;
-            padding: 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 12px;
-            font-size: 16px;
-            font-family: 'Courier New', monospace;
-            resize: vertical;
-            transition: border-color 0.3s ease;
-            background: #fafafa;
-        }
-        
-        textarea:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-        
-        .operations {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-        
-        .operation-btn {
-            padding: 15px 25px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        .operation-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
-        }
-        
-        .operation-btn:active {
-            transform: translateY(0);
-        }
-        
-        .results {
-            background: #f8f9ff;
-            border: 2px solid #e8ecff;
-            border-radius: 12px;
-            padding: 20px;
-            margin-top: 20px;
-        }
-        
-        .result-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid #e0e8ff;
-            font-size: 16px;
-        }
-        
-        .result-item:last-child {
-            border-bottom: none;
-        }
-        
-        .result-label {
-            font-weight: 600;
-            color: #555;
-        }
-        
-        .result-value {
-            font-family: 'Courier New', monospace;
-            font-weight: bold;
-            color: #667eea;
-            background: white;
-            padding: 5px 12px;
-            border-radius: 8px;
-            border: 1px solid #e0e8ff;
-        }
-        
-        .numbers-display {
-            background: white;
-            border: 1px solid #e0e8ff;
-            border-radius: 8px;
-            padding: 15px;
-            margin-top: 10px;
-            max-height: 100px;
-            overflow-y: auto;
-        }
-        
-        .number-tag {
-            display: inline-block;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            padding: 4px 10px;
-            margin: 3px;
-            border-radius: 15px;
-            font-size: 14px;
-            font-family: 'Courier New', monospace;
-        }
-        
-        .help-text {
-            color: #777;
-            font-size: 14px;
-            margin-top: 5px;
-            font-style: italic;
-        }
-        
-        .clear-btn {
-            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
-            margin-top: 15px;
-            width: 100%;
-        }
-        
-        .clear-btn:hover {
-            box-shadow: 0 10px 25px rgba(238, 90, 36, 0.3);
-        }
-        
-        /* ESTILOS PARA MODALES SLOTS */
-        .modal {
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.7);
-            backdrop-filter: blur(5px);
-        }
-        
-        .modal-content {
-            background: white;
-            margin: 5% auto;
-            padding: 30px;
-            border-radius: 20px;
-            width: 90%;
-            max-width: 600px;
-            max-height: 80vh;
-            overflow-y: auto;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
-        }
-        
-        .modal-content h3 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 25px;
-            font-size: 1.5em;
-        }
-        
-        .bill-inputs {
-            display: grid;
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-        
-        .bill-row {
-            display: grid;
-            grid-template-columns: 1fr auto 1fr;
-            align-items: center;
-            gap: 15px;
-            padding: 10px;
-            background: #f8f9ff;
-            border-radius: 10px;
-            border: 2px solid #e8ecff;
-        }
-        
-        .bill-row label {
-            font-weight: 600;
-            color: #555;
-        }
-        
-        .bill-row input {
-            width: 80px;
-            padding: 8px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            text-align: center;
-            font-size: 16px;
-            font-weight: bold;
-        }
-        
-        .bill-row input:focus {
-            border-color: #667eea;
-            outline: none;
-        }
-        
-        .bill-total {
-            font-family: 'Courier New', monospace;
-            font-weight: bold;
-            color: #667eea;
-            font-size: 16px;
-        }
-        
-        .arqueo-total {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            padding: 20px;
-            border-radius: 15px;
-            text-align: center;
-            margin: 20px 0;
-        }
-        
-        .arqueo-total h2 {
-            margin: 0 0 15px 0;
-            font-size: 1.8em;
-        }
-        
-        .comparison {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 15px;
-            flex-wrap: wrap;
-        }
-        
-        .comparison input {
-            padding: 8px;
-            border: 2px solid rgba(255,255,255,0.3);
-            border-radius: 8px;
-            background: rgba(255,255,255,0.1);
-            color: white;
-            text-align: center;
-            font-weight: bold;
-        }
-        
-        .comparison input::placeholder {
-            color: rgba(255,255,255,0.7);
-        }
-        
-        .difference-alert {
-            margin-top: 10px;
-            padding: 10px;
-            border-radius: 8px;
-            font-weight: bold;
-            text-align: center;
-        }
-        
-        .difference-ok {
-            background: rgba(0, 184, 148, 0.2);
-            color: #00b894;
-        }
-        
-        .difference-error {
-            background: rgba(255, 107, 107, 0.2);
-            color: #ff6b6b;
-        }
-        
-        .close-btn {
-            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 20px;
-            width: 100%;
-        }
-        
-        .close-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(238, 90, 36, 0.3);
-        }
-        
-        .payment-input {
-            margin-bottom: 20px;
-        }
-        
-        .payment-input input {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 10px;
-            font-size: 18px;
-            text-align: center;
-            font-weight: bold;
-        }
-        
-        .payment-breakdown {
-            background: #f8f9ff;
-            padding: 20px;
-            border-radius: 15px;
-            border: 2px solid #e8ecff;
-        }
-        
-        .credit-inputs {
-            display: grid;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        
-        .credit-inputs > div {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .credit-inputs input {
-            flex: 1;
-            padding: 10px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
-            text-align: center;
-        }
+        body { background-color: #f8fafc; font-family: sans-serif; }
+        .fade-in { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        .modal.hidden { display: none; }
+        .number-tag { cursor: pointer; transition: all 0.2s; }
+        .number-tag:hover { transform: scale(1.05); }
+        .copy-btn { animation: copyPulse 0.6s ease-out; }
+        @keyframes copyPulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
     </style>
 </head>
-<body>
-    <div class="container">
-        <h1>🧮 Calculadora de Números - Casino Slots</h1>
+<body class="p-4 md:p-8 text-slate-800">
+
+    <div class="max-w-5xl mx-auto bg-white rounded-xl shadow-xl overflow-hidden border border-slate-200">
         
-        <div class="input-section">
-            <label for="numbers">Pega tus números aquí:</label>
-            <textarea 
-                id="numbers" 
-                placeholder="Pega números o expresiones con formato argentino:
-Ejemplos:
+        <!-- Header -->
+        <div class="bg-slate-900 p-5 text-white flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="bg-indigo-600 p-2 rounded-lg">
+                    <i data-lucide="calculator" class="w-6 h-6 text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold">Calculadora de Números</h1>
+                    <p class="text-slate-400 text-xs uppercase tracking-wider">Casino Slots - Cálculos Rápidos</p>
+                </div>
+            </div>
+            <div class="text-right">
+                <div class="text-xs text-slate-400">Versión</div>
+                <div class="font-mono font-bold text-lg">3.0</div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12">
+            
+            <!-- COLUMNA IZQUIERDA: INPUTS -->
+            <div class="lg:col-span-7 p-6 space-y-6 bg-slate-50">
+                
+                <!-- 1. ENTRADA DE NÚMEROS -->
+                <div class="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
+                    <h3 class="font-bold text-slate-700 text-sm flex items-center gap-2 mb-4">
+                        <span class="bg-slate-200 text-slate-600 w-6 h-6 rounded-full flex items-center justify-center text-xs">1</span>
+                        Ingresa tus Números
+                    </h3>
+
+                    <label class="block text-xs font-semibold text-slate-500 mb-2">Pega números o expresiones (presiona Enter para calcular):</label>
+                    <textarea 
+                        id="numbers" 
+                        placeholder="Ejemplos:
 • 1.000 2.500,50 3.000
 • 20*20.000,75
 • 100.000+50.000,25
 • (1.500,50+500)*3
 
-Usa punto para miles y coma para decimales."
-            ></textarea>
-            <div class="help-text">
-                <strong>Formato argentino:</strong> Punto (.) para separar miles, coma (,) para decimales. Ejemplo: 1.234.567,89
-            </div>
-            
-            <div id="numbersDisplay" class="numbers-display" style="display: none;">
-                <strong>Números detectados:</strong>
-                <div id="numberTags"></div>
-            </div>
-        </div>
-        
-        <div class="operations">
-            <button class="operation-btn" onclick="calculate('sum')">➕ Sumar</button>
-            <button class="operation-btn" onclick="calculate('multiply')">✖️ Multiplicar</button>
-            <button class="operation-btn" onclick="calculate('subtract')">➖ Restar</button>
-            <button class="operation-btn" onclick="calculate('divide')">➗ Dividir</button>
-            <button class="operation-btn" onclick="calculate('average')">📊 Promedio</button>
-            <button class="operation-btn" onclick="calculate('stats')">📈 Estadísticas</button>
-        </div>
-        
-        <!-- FUNCIONES CRÍTICAS PARA SLOTS -->
-        <div style="background: linear-gradient(135deg, #ff6b6b, #ee5a24); padding: 20px; border-radius: 15px; margin: 20px 0;">
-            <h3 style="color: white; text-align: center; margin-bottom: 15px; font-size: 1.2em;">🎰 HERRAMIENTAS CAJA SLOTS</h3>
-            <div class="operations">
-                <button class="operation-btn" style="background: linear-gradient(135deg, #00b894, #00a085);" onclick="showBillCounter()">💰 Contador Billetes</button>
-                <button class="operation-btn" style="background: linear-gradient(135deg, #0984e3, #74b9ff);" onclick="showPaymentCalc()">💸 Cálculo Entrega</button>
-                <button class="operation-btn" style="background: linear-gradient(135deg, #fdcb6e, #e17055);" onclick="showCreditConverter()">🎫 Créditos ↔ Pesos</button>
-                <button class="operation-btn" style="background: linear-gradient(135deg, #a29bfe, #6c5ce7);" onclick="showShiftBalance()">📋 Cuadre Turno</button>
-                <button class="operation-btn" style="background: linear-gradient(135deg, #fd79a8, #e84393);" onclick="showDifferenceChecker()">⚠️ Verificar Diferencias</button>
-            </div>
-        </div>
+Usa punto (.) para miles y coma (,) para decimales"
+                        class="w-full h-32 p-3 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none resize-none bg-slate-50"
+                    ></textarea>
+                    <div class="text-xs text-slate-500 mt-2">
+                        <strong>Formato argentino:</strong> Punto para miles, coma para decimales. Ejemplo: 1.234.567,89
+                    </div>
+                </div>
 
-        <!-- MODALES PARA FUNCIONES SLOTS -->
-        <div id="billCounterModal" class="modal" style="display: none;">
-            <div class="modal-content">
-                <h3>💰 Contador de Billetes - Arqueo Rápido</h3>
-                <div class="bill-inputs">
-                    <div class="bill-row">
-                        <label>Billetes de $20.000:</label>
-                        <input type="number" id="bill20000" value="0" onchange="calculateBillTotal()">
-                        <span class="bill-total">= $<span id="total20000">0</span></span>
-                    </div>
-                    <div class="bill-row">
-                        <label>Billetes de $10.000:</label>
-                        <input type="number" id="bill10000" value="0" onchange="calculateBillTotal()">
-                        <span class="bill-total">= $<span id="total10000">0</span></span>
-                    </div>
-                    <div class="bill-row">
-                        <label>Billetes de $2.000:</label>
-                        <input type="number" id="bill2000" value="0" onchange="calculateBillTotal()">
-                        <span class="bill-total">= $<span id="total2000">0</span></span>
-                    </div>
-                    <div class="bill-row">
-                        <label>Billetes de $1.000:</label>
-                        <input type="number" id="bill1000" value="0" onchange="calculateBillTotal()">
-                        <span class="bill-total">= $<span id="total1000">0</span></span>
-                    </div>
-                    <div class="bill-row">
-                        <label>Billetes de $500:</label>
-                        <input type="number" id="bill500" value="0" onchange="calculateBillTotal()">
-                        <span class="bill-total">= $<span id="total500">0</span></span>
-                    </div>
-                    <div class="bill-row">
-                        <label>Billetes de $200:</label>
-                        <input type="number" id="bill200" value="0" onchange="calculateBillTotal()">
-                        <span class="bill-total">= $<span id="total200">0</span></span>
-                    </div>
-                    <div class="bill-row">
-                        <label>Billetes de $100:</label>
-                        <input type="number" id="bill100" value="0" onchange="calculateBillTotal()">
-                        <span class="bill-total">= $<span id="total100">0</span></span>
-                    </div>
-                    <div class="bill-row">
-                        <label>Billetes de $50:</label>
-                        <input type="number" id="bill50" value="0" onchange="calculateBillTotal()">
-                        <span class="bill-total">= $<span id="total50">0</span></span>
-                    </div>
-                    <div class="bill-row">
-                        <label>Billetes de $20:</label>
-                        <input type="number" id="bill20" value="0" onchange="calculateBillTotal()">
-                        <span class="bill-total">= $<span id="total20">0</span></span>
-                    </div>
-                    <div class="bill-row">
-                        <label>Billetes de $10:</label>
-                        <input type="number" id="bill10" value="0" onchange="calculateBillTotal()">
-                        <span class="bill-total">= $<span id="total10">0</span></span>
+                <!-- 2. OPERACIONES BÁSICAS -->
+                <div class="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
+                    <h3 class="font-bold text-slate-700 text-sm flex items-center gap-2 mb-4">
+                        <span class="bg-slate-200 text-slate-600 w-6 h-6 rounded-full flex items-center justify-center text-xs">2</span>
+                        Operaciones Básicas
+                    </h3>
+                    
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="calculate('sum')" class="px-3 py-2 bg-blue-100 text-blue-700 hover:bg-blue-200 rounded text-xs font-semibold transition">➕ Sumar</button>
+                        <button onclick="calculate('multiply')" class="px-3 py-2 bg-purple-100 text-purple-700 hover:bg-purple-200 rounded text-xs font-semibold transition">✖️ Multiplicar</button>
+                        <button onclick="calculate('subtract')" class="px-3 py-2 bg-red-100 text-red-700 hover:bg-red-200 rounded text-xs font-semibold transition">➖ Restar</button>
+                        <button onclick="calculate('divide')" class="px-3 py-2 bg-green-100 text-green-700 hover:bg-green-200 rounded text-xs font-semibold transition">➗ Dividir</button>
+                        <button onclick="calculate('average')" class="px-3 py-2 bg-yellow-100 text-yellow-700 hover:bg-yellow-200 rounded text-xs font-semibold transition">📊 Promedio</button>
+                        <button onclick="calculate('stats')" class="px-3 py-2 bg-cyan-100 text-cyan-700 hover:bg-cyan-200 rounded text-xs font-semibold transition">📈 Estadísticas</button>
                     </div>
                 </div>
-                <div class="arqueo-total">
-                    <h2>TOTAL ARQUEO: $<span id="arqueoTotal">0</span></h2>
-                    <div class="comparison">
-                        <label>Debería tener: $</label>
-                        <input type="text" id="shouldHave" placeholder="0" oninput="formatArgentineInput(this)" onchange="checkDifference()">
-                    </div>
-                    <div id="differenceResult"></div>
-                </div>
-                <button onclick="closeModal('billCounterModal')" class="close-btn">Cerrar</button>
-            </div>
-        </div>
 
-        <div id="paymentModal" class="modal" style="display: none;">
-            <div class="modal-content">
-                <h3>💸 Cálculo de Entrega</h3>
-                <div class="payment-input">
-                    <label>💸 Monto a entregar (formato argentino):</label>
-                    <input type="text" id="paymentAmount" placeholder="Ej: 15.750,50 o 1234,25 o 50000" oninput="formatArgentineInput(this)" onchange="calculateBestPayment()">
-                    <div class="help-text" style="margin-top: 8px; font-size: 13px; color: #666;">
-                        <strong>Formatos válidos:</strong><br>
-                        • Con decimales: 1.500,75 | 1234,50 | 500,25<br>
-                        • Sin decimales: 1.500 | 1234 | 50000<br>
-                        • Punto = miles, Coma = decimales
+                <!-- 3. HERRAMIENTAS SLOTS -->
+                <div class="bg-gradient-to-r from-orange-500 to-red-500 p-4 rounded-lg text-white">
+                    <h3 class="font-bold text-sm flex items-center gap-2 mb-4">
+                        <i data-lucide="zap" class="w-5 h-5"></i>
+                        Herramientas Caja Slots
+                    </h3>
+                    
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="showBillCounter()" class="px-3 py-2 bg-white bg-opacity-20 hover:bg-opacity-30 rounded text-xs font-semibold transition">💰 Contador Billetes</button>
+                        <button onclick="showPaymentCalc()" class="px-3 py-2 bg-white bg-opacity-20 hover:bg-opacity-30 rounded text-xs font-semibold transition">💸 Cálculo Entrega</button>
+                        <button onclick="showCreditConverter()" class="px-3 py-2 bg-white bg-opacity-20 hover:bg-opacity-30 rounded text-xs font-semibold transition">🎫 Créditos ↔ Pesos</button>
+                        <button onclick="showShiftBalance()" class="px-3 py-2 bg-white bg-opacity-20 hover:bg-opacity-30 rounded text-xs font-semibold transition">📋 Cuadre Turno</button>
                     </div>
                 </div>
-                <div id="paymentBreakdown"></div>
-                <button onclick="closeModal('paymentModal')" class="close-btn">Cerrar</button>
-            </div>
-        </div>
 
-        <div id="creditModal" class="modal" style="display: none;">
-            <div class="modal-content">
-                <h3>🎫 Conversión Créditos ↔ Pesos</h3>
-                <div class="credit-inputs">
-                    <div>
-                        <label>Valor del crédito: $</label>
-                        <input type="number" id="creditValue" value="0.25" step="0.01" onchange="convertCredits()">
+                <div class="flex gap-3 pt-2">
+                    <button onclick="clearAll()" class="px-4 py-2 text-sm text-slate-600 hover:text-red-600 font-medium transition flex items-center gap-2">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i> Reset
+                    </button>
+                </div>
+            </div>
+
+            <!-- COLUMNA DERECHA: RESULTADO -->
+            <div class="lg:col-span-5 bg-slate-100 border-l border-slate-200 flex flex-col">
+                <div class="p-6 sticky top-0 max-h-screen overflow-y-auto">
+                    <!-- NÚMEROS DETECTADOS -->
+                    <div class="mb-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h2 class="font-bold text-slate-800">Números Detectados</h2>
+                            <span id="numberCountBadge" class="text-xs bg-indigo-100 text-indigo-800 px-2 py-1 rounded-full font-medium">0</span>
+                        </div>
+                        
+                        <div id="numbersDisplay" class="bg-white rounded-lg shadow-sm border border-slate-300 p-4 min-h-24 hidden">
+                            <div id="numberTags" class="flex flex-wrap gap-2 mb-2"></div>
+                            <div class="text-xs text-slate-500 italic">Haz clic en un número para eliminarlo</div>
+                        </div>
+
+                        <div id="noNumbers" class="bg-slate-200 rounded-lg p-4 text-center text-slate-600 text-sm">
+                            Los números detectados aparecerán aquí
+                        </div>
                     </div>
-                    <div>
-                        <label>Créditos:</label>
-                        <input type="number" id="credits" placeholder="0" onchange="convertCredits()">
+
+                    <!-- RESULTADOS -->
+                    <div id="results" class="hidden">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-bold text-slate-800">📋 Resultados</h3>
+                            <button onclick="copyAllResults()" class="text-xs bg-indigo-600 text-white hover:bg-indigo-700 px-2 py-1 rounded transition flex items-center gap-1">
+                                <i data-lucide="copy" class="w-3 h-3"></i> Copiar
+                            </button>
+                        </div>
+                        <div id="resultsList" class="bg-white rounded-lg shadow-sm border border-slate-200 p-4 space-y-2"></div>
                     </div>
-                    <div>
-                        <label>Pesos: $</label>
-                        <input type="number" id="pesos" placeholder="0" onchange="convertPesos()">
+
+                    <!-- HISTORIAL -->
+                    <div id="historySection" class="hidden mt-6 pt-6 border-t border-slate-300">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="font-bold text-slate-800 flex items-center gap-2">
+                                <i data-lucide="history" class="w-4 h-4"></i>
+                                Historial
+                            </h3>
+                            <button onclick="clearHistory()" class="text-xs text-slate-500 hover:text-red-600 transition">Limpiar</button>
+                        </div>
+                        <div id="historyList" class="space-y-2"></div>
                     </div>
                 </div>
-                <div id="conversionResult"></div>
-                <button onclick="closeModal('creditModal')" class="close-btn">Cerrar</button>
             </div>
-        </div>
-        
-        <button class="operation-btn clear-btn" onclick="clearAll()">🗑️ Limpiar Todo</button>
-        
-        <div id="results" class="results" style="display: none;">
-            <h3 style="margin-bottom: 15px; color: #333;">📋 Resultados:</h3>
-            <div id="resultsList"></div>
         </div>
     </div>
 
-    <script>
-        let numbers = [];
+    <!-- TOAST NOTIFICACIONES -->
+    <div id="toast" class="hidden fixed bottom-4 right-4 bg-green-100 text-green-800 px-4 py-3 rounded-lg shadow-lg flex items-center gap-2 fade-in z-40">
+        <i data-lucide="check-circle" class="w-4 h-4"></i>
+        <span id="toastMessage">Copiado al portapapeles</span>
+    </div>
+
+    <!-- MODAL CONTADOR BILLETES -->
+    <div id="billCounterModal" class="modal hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md max-h-96 overflow-y-auto">
+            <div class="sticky top-0 bg-slate-900 text-white p-4 flex items-center gap-2">
+                <i data-lucide="banknote" class="w-5 h-5"></i>
+                <h3 class="font-bold">Contador de Billetes</h3>
+            </div>
+            <div class="p-6 space-y-3">
+                <div class="flex justify-between items-center">
+                    <label class="text-sm font-semibold text-slate-700">Billetes de $20.000:</label>
+                    <input type="number" id="bill20000" value="0" onchange="calculateBillTotal()" oninput="calculateBillTotal()" class="w-16 px-2 py-1 border border-slate-300 rounded text-center">
+                    <span class="text-sm font-semibold text-indigo-600">= $<span id="total20000">0</span></span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <label class="text-sm font-semibold text-slate-700">Billetes de $10.000:</label>
+                    <input type="number" id="bill10000" value="0" onchange="calculateBillTotal()" oninput="calculateBillTotal()" class="w-16 px-2 py-1 border border-slate-300 rounded text-center">
+                    <span class="text-sm font-semibold text-indigo-600">= $<span id="total10000">0</span></span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <label class="text-sm font-semibold text-slate-700">Billetes de $2.000:</label>
+                    <input type="number" id="bill2000" value="0" onchange="calculateBillTotal()" oninput="calculateBillTotal()" class="w-16 px-2 py-1 border border-slate-300 rounded text-center">
+                    <span class="text-sm font-semibold text-indigo-600">= $<span id="total2000">0</span></span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <label class="text-sm font-semibold text-slate-700">Billetes de $1.000:</label>
+                    <input type="number" id="bill1000" value="0" onchange="calculateBillTotal()" oninput="calculateBillTotal()" class="w-16 px-2 py-1 border border-slate-300 rounded text-center">
+                    <span class="text-sm font-semibold text-indigo-600">= $<span id="total1000">0</span></span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <label class="text-sm font-semibold text-slate-700">Billetes de $500:</label>
+                    <input type="number" id="bill500" value="0" onchange="calculateBillTotal()" oninput="calculateBillTotal()" class="w-16 px-2 py-1 border border-slate-300 rounded text-center">
+                    <span class="text-sm font-semibold text-indigo-600">= $<span id="total500">0</span></span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <label class="text-sm font-semibold text-slate-700">Billetes de $200:</label>
+                    <input type="number" id="bill200" value="0" onchange="calculateBillTotal()" oninput="calculateBillTotal()" class="w-16 px-2 py-1 border border-slate-300 rounded text-center">
+                    <span class="text-sm font-semibold text-indigo-600">= $<span id="total200">0</span></span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <label class="text-sm font-semibold text-slate-700">Billetes de $100:</label>
+                    <input type="number" id="bill100" value="0" onchange="calculateBillTotal()" oninput="calculateBillTotal()" class="w-16 px-2 py-1 border border-slate-300 rounded text-center">
+                    <span class="text-sm font-semibold text-indigo-600">= $<span id="total100">0</span></span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <label class="text-sm font-semibold text-slate-700">Billetes de $50:</label>
+                    <input type="number" id="bill50" value="0" onchange="calculateBillTotal()" oninput="calculateBillTotal()" class="w-16 px-2 py-1 border border-slate-300 rounded text-center">
+                    <span class="text-sm font-semibold text-indigo-600">= $<span id="total50">0</span></span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <label class="text-sm font-semibold text-slate-700">Billetes de $20:</label>
+                    <input type="number" id="bill20" value="0" onchange="calculateBillTotal()" oninput="calculateBillTotal()" class="w-16 px-2 py-1 border border-slate-300 rounded text-center">
+                    <span class="text-sm font-semibold text-indigo-600">= $<span id="total20">0</span></span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <label class="text-sm font-semibold text-slate-700">Billetes de $10:</label>
+                    <input type="number" id="bill10" value="0" onchange="calculateBillTotal()" oninput="calculateBillTotal()" class="w-16 px-2 py-1 border border-slate-300 rounded text-center">
+                    <span class="text-sm font-semibold text-indigo-600">= $<span id="total10">0</span></span>
+                </div>
+            </div>
+            <div class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-4">
+                <div class="text-center">
+                    <div class="text-xs opacity-80 mb-1">TOTAL ARQUEO</div>
+                    <div class="text-2xl font-bold">$<span id="arqueoTotal">0</span></div>
+                </div>
+                <input type="text" id="shouldHave" placeholder="Debería tener: $" oninput="formatArgentineInput(this); checkDifference()" class="w-full mt-3 px-3 py-2 rounded bg-white bg-opacity-20 text-white placeholder-white placeholder-opacity-70 text-center">
+                <div id="differenceResult" class="mt-2"></div>
+            </div>
+            <div class="p-4 border-t border-slate-200">
+                <button onclick="closeBillModal()" class="w-full px-4 py-2 bg-slate-200 hover:bg-slate-300 rounded font-semibold text-slate-800 transition">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL PAGO -->
+    <div id="paymentModal" class="modal hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md">
+            <div class="sticky top-0 bg-slate-900 text-white p-4 flex items-center gap-2">
+                <i data-lucide="credit-card" class="w-5 h-5"></i>
+                <h3 class="font-bold">Cálculo de Entrega</h3>
+            </div>
+            <div class="p-6">
+                <label class="block text-sm font-semibold text-slate-700 mb-2">Monto a entregar:</label>
+                <input type="text" id="paymentAmount" placeholder="Ej: 15.750,50" oninput="formatArgentineInput(this); calculateBestPayment()" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-center font-semibold mb-3">
+                <div id="paymentBreakdown"></div>
+            </div>
+            <div class="p-4 border-t border-slate-200">
+                <button onclick="closePaymentModal()" class="w-full px-4 py-2 bg-slate-200 hover:bg-slate-300 rounded font-semibold text-slate-800 transition">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL CRÉDITOS -->
+    <div id="creditModal" class="modal hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md">
+            <div class="sticky top-0 bg-slate-900 text-white p-4 flex items-center gap-2">
+                <i data-lucide="ticket" class="w-5 h-5"></i>
+                <h3 class="font-bold">Conversión Créditos ↔ Pesos</h3>
+            </div>
+            <div class="p-6 space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 mb-1">Valor del crédito: $</label>
+                    <input type="number" id="creditValue" value="0.25" step="0.01" oninput="convertCredits()" class="w-full px-3 py-2 border border-slate-300 rounded text-center">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 mb-1">Créditos:</label>
+                    <input type="number" id="credits" placeholder="0" oninput="convertCredits()" class="w-full px-3 py-2 border border-slate-300 rounded text-center">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 mb-1">Pesos: $</label>
+                    <input type="number" id="pesos" placeholder="0" oninput="convertPesos()" class="w-full px-3 py-2 border border-slate-300 rounded text-center">
+                </div>
+                <div id="conversionResult"></div>
+            </div>
+            <div class="p-4 border-t border-slate-200">
+                <button onclick="closeCreditModal()" class="w-full px-4 py-2 bg-slate-200 hover:bg-slate-300 rounded font-semibold text-slate-800 transition">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL CUADRE -->
+    <div id="shiftModal" class="modal hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md">
+            <div class="sticky top-0 bg-slate-900 text-white p-4 flex items-center gap-2">
+                <i data-lucide="clipboard-list" class="w-5 h-5"></i>
+                <h3 class="font-bold">Cuadre de Turno</h3>
+            </div>
+            <div class="p-6 space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 mb-1">Caja inicial: $</label>
+                    <input type="text" id="initialCash" placeholder="0" oninput="formatArgentineInput(this)" class="w-full px-3 py-2 border border-slate-300 rounded text-center">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 mb-1">Ventas del turno: $</label>
+                    <input type="text" id="salesAmount" placeholder="0" oninput="formatArgentineInput(this)" class="w-full px-3 py-2 border border-slate-300 rounded text-center">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 mb-1">Dinero en caja: $</label>
+                    <input type="text" id="cashInBox" placeholder="0" oninput="formatArgentineInput(this)" class="w-full px-3 py-2 border border-slate-300 rounded text-center">
+                </div>
+                <button onclick="calculateShiftBalance()" class="w-full px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded font-semibold transition">Calcular Cuadre</button>
+                <div id="shiftResult"></div>
+            </div>
+            <div class="p-4 border-t border-slate-200">
+                <button onclick="closeShiftModal()" class="w-full px-4 py-2 bg-slate-200 hover:bg-slate-300 rounded font-semibold text-slate-800 transition">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+<script>
+    lucide.createIcons();
+    let numbers = [];
+    let history = JSON.parse(localStorage.getItem('calcHistory')) || [];
+    
+    // Actualizar números cuando cambie el textarea
+    document.getElementById('numbers').addEventListener('input', function() {
+        const text = this.value.trim();
+        if (text) {
+            numbers = parseInput(text);
+            displayNumbers();
+        } else {
+            numbers = [];
+            document.getElementById('numbersDisplay').classList.add('hidden');
+            document.getElementById('noNumbers').classList.remove('hidden');
+            document.getElementById('results').classList.add('hidden');
+            document.getElementById('numberCountBadge').textContent = '0';
+        }
+    });
+
+    // Tecla Enter para calcular sumatoria
+    document.getElementById('numbers').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && e.ctrlKey) {
+            e.preventDefault();
+            calculate('sum');
+        }
+    });
+    
+    function parseInput(text) {
+        const results = [];
+        const lines = text.split(/[\n\r]+/);
         
-        // Actualizar números cuando cambie el textarea
-        document.getElementById('numbers').addEventListener('input', function() {
-            const text = this.value.trim();
-            if (text) {
-                numbers = parseInput(text);
-                displayNumbers();
-            } else {
-                numbers = [];
-                document.getElementById('numbersDisplay').style.display = 'none';
-                document.getElementById('results').style.display = 'none';
+        for (let line of lines) {
+            line = line.trim();
+            if (!line) continue;
+            
+            const parts = line.split(/[;]\s*|\s{2,}/);
+            
+            for (let part of parts) {
+                part = part.trim();
+                if (!part) continue;
+                
+                try {
+                    if (/[+\-*/()]/.test(part)) {
+                        let expression = convertArgentineToJS(part);
+                        const result = evaluateExpression(expression);
+                        if (!isNaN(result) && isFinite(result)) {
+                            results.push(result);
+                        }
+                    } else {
+                        const num = parseArgentineNumber(part);
+                        if (!isNaN(num) && isFinite(num)) {
+                            results.push(num);
+                        }
+                    }
+                } catch (e) {
+                    const argNumbers = extractArgentineNumbers(part);
+                    results.push(...argNumbers);
+                }
+            }
+        }
+        
+        return results;
+    }
+    
+    function parseArgentineNumber(str) {
+        if (!str) return NaN;
+        
+        str = str.replace(/\s/g, '');
+        
+        if (!str.includes(',')) {
+            if (/^\d{1,3}(\.\d{3})*$/.test(str)) {
+                return parseFloat(str.replace(/\./g, ''));
+            }
+            if (/^\d+$/.test(str)) {
+                return parseFloat(str);
+            }
+            return NaN;
+        }
+        
+        const parts = str.split(',');
+        if (parts.length !== 2) return NaN;
+        
+        const integerPart = parts[0];
+        const decimalPart = parts[1];
+        
+        if (!/^\d{1,2}$/.test(decimalPart)) return NaN;
+        
+        let cleanInteger;
+        if (/^\d{1,3}(\.\d{3})*$/.test(integerPart)) {
+            cleanInteger = integerPart.replace(/\./g, '');
+        } else if (/^\d+$/.test(integerPart)) {
+            cleanInteger = integerPart;
+        } else {
+            return NaN;
+        }
+        
+        const result = parseFloat(cleanInteger + '.' + decimalPart);
+        return isNaN(result) ? NaN : result;
+    }
+    
+    function convertArgentineToJS(expr) {
+        return expr.replace(/\d{1,3}(?:\.\d{3})*(?:,\d+)?/g, function(match) {
+            return parseArgentineNumber(match).toString();
+        });
+    }
+    
+    function extractArgentineNumbers(text) {
+        const numbers = [];
+        const regex = /\d{1,3}(?:\.\d{3})*(?:,\d+)?|\d+,\d+|\d+/g;
+        const matches = text.match(regex);
+        
+        if (matches) {
+            matches.forEach(match => {
+                const num = parseArgentineNumber(match);
+                if (!isNaN(num) && isFinite(num)) {
+                    numbers.push(num);
+                }
+            });
+        }
+        
+        return numbers;
+    }
+    
+    function formatArgentineNumber(num) {
+        return num.toLocaleString('es-AR', { 
+            minimumFractionDigits: 0, 
+            maximumFractionDigits: 2 
+        });
+    }
+    
+    function formatArgentineInput(input) {
+        const value = input.value.replace(/[^\d,]/g, '');
+        const parts = value.split(',');
+        
+        if (parts[0]) {
+            const intPart = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            input.value = parts[1] !== undefined ? intPart + ',' + parts[1].substring(0, 2) : intPart;
+        }
+    }
+    
+    function evaluateExpression(expr) {
+        expr = expr.replace(/\s/g, '');
+        
+        if (!/^[0-9+\-*/.() ]+$/.test(expr)) {
+            throw new Error('Expresión no válida');
+        }
+        
+        return Function('"use strict"; return (' + expr + ')')();
+    }
+    
+    function displayNumbers() {
+        const display = document.getElementById('numbersDisplay');
+        const tagsContainer = document.getElementById('numberTags');
+        const noNumbers = document.getElementById('noNumbers');
+        
+        if (numbers.length > 0) {
+            display.classList.remove('hidden');
+            noNumbers.classList.add('hidden');
+            tagsContainer.innerHTML = numbers.map((num, index) => 
+                `<span class="number-tag inline-block bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-xs font-semibold cursor-pointer hover:bg-indigo-200" onclick="deleteNumber(${index})" title="Haz clic para eliminar">${formatArgentineNumber(num)}</span>`
+            ).join('');
+            document.getElementById('numberCountBadge').textContent = numbers.length;
+        } else {
+            display.classList.add('hidden');
+            noNumbers.classList.remove('hidden');
+            document.getElementById('numberCountBadge').textContent = '0';
+        }
+    }
+
+    function deleteNumber(index) {
+        numbers.splice(index, 1);
+        displayNumbers();
+        if (numbers.length === 0) {
+            document.getElementById('results').classList.add('hidden');
+        }
+    }
+    
+    function calculate(operation) {
+        if (numbers.length === 0) {
+            alert('Por favor, ingresa algunos números primero.');
+            return;
+        }
+        
+        const results = document.getElementById('results');
+        const resultsList = document.getElementById('resultsList');
+        let result = '';
+        let resultValue = null;
+        
+        switch(operation) {
+            case 'sum':
+                resultValue = numbers.reduce((a, b) => a + b, 0);
+                result = `
+                    <div class="flex justify-between py-2 border-b border-slate-200 items-center group">
+                        <span class="font-semibold text-slate-700">Suma total:</span>
+                        <div class="flex items-center gap-2">
+                            <span class="font-mono font-bold text-indigo-600">${formatArgentineNumber(resultValue)}</span>
+                            <button onclick="copySingleResult('${formatArgentineNumber(resultValue)}')" class="opacity-0 group-hover:opacity-100 transition text-xs p-1 hover:bg-slate-200 rounded">
+                                <i data-lucide="copy" class="w-3 h-3"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                break;
+                
+            case 'multiply':
+                resultValue = numbers.reduce((a, b) => a * b, 1);
+                result = `
+                    <div class="flex justify-between py-2 border-b border-slate-200 items-center group">
+                        <span class="font-semibold text-slate-700">Producto total:</span>
+                        <div class="flex items-center gap-2">
+                            <span class="font-mono font-bold text-indigo-600">${formatArgentineNumber(resultValue)}</span>
+                            <button onclick="copySingleResult('${formatArgentineNumber(resultValue)}')" class="opacity-0 group-hover:opacity-100 transition text-xs p-1 hover:bg-slate-200 rounded">
+                                <i data-lucide="copy" class="w-3 h-3"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                break;
+                
+            case 'subtract':
+                resultValue = numbers.reduce((a, b) => a - b);
+                result = `
+                    <div class="flex justify-between py-2 border-b border-slate-200 items-center group">
+                        <span class="font-semibold text-slate-700">Resta secuencial:</span>
+                        <div class="flex items-center gap-2">
+                            <span class="font-mono font-bold text-indigo-600">${formatArgentineNumber(resultValue)}</span>
+                            <button onclick="copySingleResult('${formatArgentineNumber(resultValue)}')" class="opacity-0 group-hover:opacity-100 transition text-xs p-1 hover:bg-slate-200 rounded">
+                                <i data-lucide="copy" class="w-3 h-3"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                break;
+                
+            case 'divide':
+                resultValue = numbers.reduce((a, b) => a / b);
+                result = `
+                    <div class="flex justify-between py-2 border-b border-slate-200 items-center group">
+                        <span class="font-semibold text-slate-700">División secuencial:</span>
+                        <div class="flex items-center gap-2">
+                            <span class="font-mono font-bold text-indigo-600">${formatArgentineNumber(resultValue)}</span>
+                            <button onclick="copySingleResult('${formatArgentineNumber(resultValue)}')" class="opacity-0 group-hover:opacity-100 transition text-xs p-1 hover:bg-slate-200 rounded">
+                                <i data-lucide="copy" class="w-3 h-3"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                break;
+                
+            case 'average':
+                resultValue = numbers.reduce((a, b) => a + b, 0) / numbers.length;
+                result = `
+                    <div class="flex justify-between py-2 border-b border-slate-200 items-center group">
+                        <span class="font-semibold text-slate-700">Promedio:</span>
+                        <div class="flex items-center gap-2">
+                            <span class="font-mono font-bold text-indigo-600">${formatArgentineNumber(resultValue)}</span>
+                            <button onclick="copySingleResult('${formatArgentineNumber(resultValue)}')" class="opacity-0 group-hover:opacity-100 transition text-xs p-1 hover:bg-slate-200 rounded">
+                                <i data-lucide="copy" class="w-3 h-3"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                break;
+                
+            case 'stats':
+                const sum_stats = numbers.reduce((a, b) => a + b, 0);
+                const avg_stats = sum_stats / numbers.length;
+                const min = Math.min(...numbers);
+                const max = Math.max(...numbers);
+                const count = numbers.length;
+                
+                result = `
+                    <div class="flex justify-between py-2 border-b border-slate-200 items-center group">
+                        <span class="font-semibold text-slate-700">Cantidad:</span>
+                        <div class="flex items-center gap-2">
+                            <span class="font-mono font-bold text-indigo-600">${count}</span>
+                            <button onclick="copySingleResult('${count}')" class="opacity-0 group-hover:opacity-100 transition text-xs p-1 hover:bg-slate-200 rounded">
+                                <i data-lucide="copy" class="w-3 h-3"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flex justify-between py-2 border-b border-slate-200 items-center group">
+                        <span class="font-semibold text-slate-700">Suma:</span>
+                        <div class="flex items-center gap-2">
+                            <span class="font-mono font-bold text-indigo-600">${formatArgentineNumber(sum_stats)}</span>
+                            <button onclick="copySingleResult('${formatArgentineNumber(sum_stats)}')" class="opacity-0 group-hover:opacity-100 transition text-xs p-1 hover:bg-slate-200 rounded">
+                                <i data-lucide="copy" class="w-3 h-3"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flex justify-between py-2 border-b border-slate-200 items-center group">
+                        <span class="font-semibold text-slate-700">Promedio:</span>
+                        <div class="flex items-center gap-2">
+                            <span class="font-mono font-bold text-indigo-600">${formatArgentineNumber(avg_stats)}</span>
+                            <button onclick="copySingleResult('${formatArgentineNumber(avg_stats)}')" class="opacity-0 group-hover:opacity-100 transition text-xs p-1 hover:bg-slate-200 rounded">
+                                <i data-lucide="copy" class="w-3 h-3"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flex justify-between py-2 border-b border-slate-200 items-center group">
+                        <span class="font-semibold text-slate-700">Mínimo:</span>
+                        <div class="flex items-center gap-2">
+                            <span class="font-mono font-bold text-green-600">${formatArgentineNumber(min)}</span>
+                            <button onclick="copySingleResult('${formatArgentineNumber(min)}')" class="opacity-0 group-hover:opacity-100 transition text-xs p-1 hover:bg-slate-200 rounded">
+                                <i data-lucide="copy" class="w-3 h-3"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flex justify-between py-2 items-center group">
+                        <span class="font-semibold text-slate-700">Máximo:</span>
+                        <div class="flex items-center gap-2">
+                            <span class="font-mono font-bold text-red-600">${formatArgentineNumber(max)}</span>
+                            <button onclick="copySingleResult('${formatArgentineNumber(max)}')" class="opacity-0 group-hover:opacity-100 transition text-xs p-1 hover:bg-slate-200 rounded">
+                                <i data-lucide="copy" class="w-3 h-3"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                break;
+        }
+        
+        resultsList.innerHTML = result;
+        results.classList.remove('hidden');
+        
+        // Agregar al historial
+        if (resultValue !== null) {
+            addToHistory(operation, resultValue);
+        }
+        
+        results.scrollIntoView({ behavior: 'smooth' });
+        lucide.createIcons();
+    }
+
+    function addToHistory(operation, value) {
+        const operationNames = {
+            'sum': 'Suma', 'multiply': 'Multiplicación', 'subtract': 'Resta',
+            'divide': 'División', 'average': 'Promedio', 'stats': 'Estadísticas'
+        };
+
+        const entry = {
+            operation: operationNames[operation],
+            value: formatArgentineNumber(value),
+            time: new Date().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })
+        };
+
+        history.unshift(entry);
+        if (history.length > 10) history.pop();
+        localStorage.setItem('calcHistory', JSON.stringify(history));
+        displayHistory();
+    }
+
+    function displayHistory() {
+        if (history.length === 0) {
+            document.getElementById('historySection').classList.add('hidden');
+            return;
+        }
+
+        document.getElementById('historySection').classList.remove('hidden');
+        const historyList = document.getElementById('historyList');
+        historyList.innerHTML = history.map((entry, idx) => `
+            <div class="bg-slate-100 p-2 rounded border border-slate-200 flex justify-between items-center text-xs hover:bg-slate-200 transition">
+                <div>
+                    <span class="font-semibold text-slate-700">${entry.operation}</span>
+                    <span class="text-slate-500 ml-2">${entry.time}</span>
+                </div>
+                <div class="flex items-center gap-1">
+                    <span class="font-mono font-bold text-indigo-600">${entry.value}</span>
+                    <button onclick="copySingleResult('${entry.value}')" class="p-1 hover:bg-slate-300 rounded text-xs">
+                        <i data-lucide="copy" class="w-3 h-3"></i>
+                    </button>
+                </div>
+            </div>
+        `).join('');
+        lucide.createIcons();
+    }
+
+    function clearHistory() {
+        if (confirm('¿Limpiar historial?')) {
+            history = [];
+            localStorage.removeItem('calcHistory');
+            displayHistory();
+        }
+    }
+
+    function copySingleResult(text) {
+        navigator.clipboard.writeText(text.replace(/\./g, '').replace(',', '.')).then(() => {
+            showToast('Copiado al portapapeles');
+        });
+    }
+
+    function copyAllResults() {
+        const resultsText = document.getElementById('resultsList').innerText;
+        navigator.clipboard.writeText(resultsText).then(() => {
+            showToast('Resultados copiados');
+        });
+    }
+
+    function showToast(message) {
+        const toast = document.getElementById('toast');
+        document.getElementById('toastMessage').textContent = message;
+        toast.classList.remove('hidden');
+        setTimeout(() => toast.classList.add('hidden'), 3000);
+    }
+    
+    function clearAll() {
+        document.getElementById('numbers').value = '';
+        document.getElementById('numbersDisplay').classList.add('hidden');
+        document.getElementById('noNumbers').classList.remove('hidden');
+        document.getElementById('results').classList.add('hidden');
+        numbers = [];
+        document.getElementById('numberCountBadge').textContent = '0';
+    }
+    
+    // MODALES
+    function showBillCounter() {
+        document.getElementById('billCounterModal').classList.remove('hidden');
+        calculateBillTotal();
+    }
+    
+    function closeBillModal() {
+        document.getElementById('billCounterModal').classList.add('hidden');
+    }
+    
+    function showPaymentCalc() {
+        document.getElementById('paymentModal').classList.remove('hidden');
+    }
+    
+    function closePaymentModal() {
+        document.getElementById('paymentModal').classList.add('hidden');
+    }
+    
+    function showCreditConverter() {
+        document.getElementById('creditModal').classList.remove('hidden');
+    }
+    
+    function closeCreditModal() {
+        document.getElementById('creditModal').classList.add('hidden');
+    }
+    
+    function showShiftBalance() {
+        document.getElementById('shiftModal').classList.remove('hidden');
+    }
+    
+    function closeShiftModal() {
+        document.getElementById('shiftModal').classList.add('hidden');
+    }
+    
+    function calculateBillTotal() {
+        const bills = {
+            20000: parseInt(document.getElementById('bill20000').value) || 0,
+            10000: parseInt(document.getElementById('bill10000').value) || 0,
+            2000: parseInt(document.getElementById('bill2000').value) || 0,
+            1000: parseInt(document.getElementById('bill1000').value) || 0,
+            500: parseInt(document.getElementById('bill500').value) || 0,
+            200: parseInt(document.getElementById('bill200').value) || 0,
+            100: parseInt(document.getElementById('bill100').value) || 0,
+            50: parseInt(document.getElementById('bill50').value) || 0,
+            20: parseInt(document.getElementById('bill20').value) || 0,
+            10: parseInt(document.getElementById('bill10').value) || 0
+        };
+        
+        Object.keys(bills).forEach(denomination => {
+            const total = bills[denomination] * parseInt(denomination);
+            document.getElementById(`total${denomination}`).textContent = formatArgentineNumber(total);
+        });
+        
+        const grandTotal = Object.keys(bills).reduce((sum, denom) => {
+            return sum + (bills[denom] * parseInt(denom));
+        }, 0);
+        
+        document.getElementById('arqueoTotal').textContent = formatArgentineNumber(grandTotal);
+        checkDifference();
+    }
+    
+    function checkDifference() {
+        const actualText = document.getElementById('arqueoTotal').textContent;
+        const actual = parseArgentineNumber(actualText) || 0;
+        const shouldHaveText = document.getElementById('shouldHave').value;
+        const shouldHave = parseArgentineNumber(shouldHaveText) || 0;
+        const difference = actual - shouldHave;
+        
+        const resultDiv = document.getElementById('differenceResult');
+        
+        if (shouldHave === 0) {
+            resultDiv.innerHTML = '';
+            return;
+        }
+        
+        if (difference === 0) {
+            resultDiv.innerHTML = '<div class="mt-2 p-2 bg-green-100 text-green-700 rounded text-xs font-semibold text-center">✅ PERFECTO - SIN DIFERENCIAS</div>';
+        } else if (difference > 0) {
+            resultDiv.innerHTML = `<div class="mt-2 p-2 bg-yellow-100 text-yellow-700 rounded text-xs font-semibold text-center">📈 SOBRANTE: ${formatArgentineNumber(Math.abs(difference))}</div>`;
+        } else {
+            resultDiv.innerHTML = `<div class="mt-2 p-2 bg-red-100 text-red-700 rounded text-xs font-semibold text-center">📉 FALTANTE: ${formatArgentineNumber(Math.abs(difference))}</div>`;
+        }
+    }
+    
+    function calculateBestPayment() {
+        const amountText = document.getElementById('paymentAmount').value;
+        const amount = parseArgentineNumber(amountText) || 0;
+        if (amount === 0) return;
+        
+        const bills = [20000, 10000, 2000, 1000, 500, 200, 100, 50, 20, 10];
+        let remaining = Math.floor(amount);
+        const breakdown = {};
+        
+        bills.forEach(bill => {
+            if (remaining >= bill) {
+                breakdown[bill] = Math.floor(remaining / bill);
+                remaining = remaining % bill;
             }
         });
         
-        function parseInput(text) {
-            const results = [];
-            // Dividir por líneas y procesar cada una
-            const lines = text.split(/[\n\r]+/);
-            
-            for (let line of lines) {
-                line = line.trim();
-                if (!line) continue;
-                
-                // Dividir por puntos y comas o espacios múltiples
-                const parts = line.split(/[;]\s*|\s{2,}/);
-                
-                for (let part of parts) {
-                    part = part.trim();
-                    if (!part) continue;
-                    
-                    try {
-                        // Si contiene operadores matemáticos, evaluarlo
-                        if (/[+\-*/()]/.test(part)) {
-                            // Convertir numeración argentina a formato JavaScript
-                            let expression = convertArgentineToJS(part);
-                            const result = evaluateExpression(expression);
-                            if (!isNaN(result) && isFinite(result)) {
-                                results.push(result);
-                            }
-                        } else {
-                            // Es un número simple en formato argentino
-                            const num = parseArgentineNumber(part);
-                            if (!isNaN(num) && isFinite(num)) {
-                                results.push(num);
-                            }
-                        }
-                    } catch (e) {
-                        // Si hay error, tratar de extraer números en formato argentino
-                        const argNumbers = extractArgentineNumbers(part);
-                        results.push(...argNumbers);
-                    }
-                }
-            }
-            
-            return results;
-        }
-        
-        function parseArgentineNumber(str) {
-            if (!str) return NaN;
-            
-            // Eliminar espacios
-            str = str.replace(/\s/g, '');
-            
-            // Si no hay coma, es un número entero (puede tener puntos como separadores de miles)
-            if (!str.includes(',')) {
-                // Formato: 1.234.567 (solo miles)
-                if (/^\d{1,3}(\.\d{3})*$/.test(str)) {
-                    return parseFloat(str.replace(/\./g, ''));
-                }
-                // Número simple: 1234567
-                if (/^\d+$/.test(str)) {
-                    return parseFloat(str);
-                }
-                return NaN;
-            }
-            
-            // Tiene coma: formato argentino con decimales
-            const parts = str.split(',');
-            if (parts.length !== 2) return NaN;
-            
-            const integerPart = parts[0];
-            const decimalPart = parts[1];
-            
-            // Validar parte decimal (máximo 2 dígitos)
-            if (!/^\d{1,2}$/.test(decimalPart)) return NaN;
-            
-            // Validar parte entera
-            let cleanInteger;
-            if (/^\d{1,3}(\.\d{3})*$/.test(integerPart)) {
-                // Formato con puntos como separadores de miles: 1.234.567
-                cleanInteger = integerPart.replace(/\./g, '');
-            } else if (/^\d+$/.test(integerPart)) {
-                // Formato sin separadores: 1234567
-                cleanInteger = integerPart;
-            } else {
-                return NaN;
-            }
-            
-            // Combinar parte entera y decimal
-            const result = parseFloat(cleanInteger + '.' + decimalPart);
-            return isNaN(result) ? NaN : result;
-        }
-        
-        function convertArgentineToJS(expr) {
-            // Convertir números argentinos a formato JavaScript en expresiones
-            return expr.replace(/\d{1,3}(?:\.\d{3})*(?:,\d+)?/g, function(match) {
-                return parseArgentineNumber(match).toString();
-            });
-        }
-        
-        function extractArgentineNumbers(text) {
-            const numbers = [];
-            // Regex para capturar números en formato argentino
-            const regex = /\d{1,3}(?:\.\d{3})*(?:,\d+)?|\d+,\d+|\d+/g;
-            const matches = text.match(regex);
-            
-            if (matches) {
-                matches.forEach(match => {
-                    const num = parseArgentineNumber(match);
-                    if (!isNaN(num) && isFinite(num)) {
-                        numbers.push(num);
-                    }
-                });
-            }
-            
-            return numbers;
-        }
-        
-        function formatArgentineNumber(num) {
-            return num.toLocaleString('es-AR', { 
-                minimumFractionDigits: 0, 
-                maximumFractionDigits: 2 
-            });
-        }
-        
-        function formatArgentineInput(input) {
-            const value = input.value.replace(/[^\d,]/g, '');
-            const parts = value.split(',');
-            
-            if (parts[0]) {
-                const intPart = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-                input.value = parts[1] !== undefined ? intPart + ',' + parts[1].substring(0, 2) : intPart;
-            }
-        }
-        
-        function evaluateExpression(expr) {
-            // Función segura para evaluar expresiones matemáticas
-            // Eliminar espacios
-            expr = expr.replace(/\s/g, '');
-            
-            // Validar que solo contenga números, operadores y paréntesis seguros
-            if (!/^[0-9+\-*/.() ]+$/.test(expr)) {
-                throw new Error('Expresión no válida');
-            }
-            
-            // Usar Function constructor de forma segura
-            return Function('"use strict"; return (' + expr + ')')();
-        }
-        
-        function displayNumbers() {
-            const display = document.getElementById('numbersDisplay');
-            const tagsContainer = document.getElementById('numberTags');
-            
-            if (numbers.length > 0) {
-                display.style.display = 'block';
-                tagsContainer.innerHTML = numbers.map((num, index) => 
-                    `<span class="number-tag">${formatArgentineNumber(num)}</span>`
-                ).join('');
-            } else {
-                display.style.display = 'none';
-            }
-        }
-        
-        function calculate(operation) {
-            if (numbers.length === 0) {
-                alert('Por favor, ingresa algunos números primero.');
-                return;
-            }
-            
-            const results = document.getElementById('results');
-            const resultsList = document.getElementById('resultsList');
-            let result = '';
-            
-            switch(operation) {
-                case 'sum':
-                    const sum = numbers.reduce((a, b) => a + b, 0);
-                    result = `
-                        <div class="result-item">
-                            <span class="result-label">Suma total:</span>
-                            <span class="result-value">${formatArgentineNumber(sum)}</span>
-                        </div>
-                        <div class="result-item">
-                            <span class="result-label">Operación:</span>
-                            <span class="result-value">${numbers.map(n => formatArgentineNumber(n)).join(' + ')} = ${formatArgentineNumber(sum)}</span>
-                        </div>
-                    `;
-                    break;
-                    
-                case 'multiply':
-                    const product = numbers.reduce((a, b) => a * b, 1);
-                    result = `
-                        <div class="result-item">
-                            <span class="result-label">Producto total:</span>
-                            <span class="result-value">${formatArgentineNumber(product)}</span>
-                        </div>
-                        <div class="result-item">
-                            <span class="result-label">Operación:</span>
-                            <span class="result-value">${numbers.map(n => formatArgentineNumber(n)).join(' × ')} = ${formatArgentineNumber(product)}</span>
-                        </div>
-                    `;
-                    break;
-                    
-                case 'subtract':
-                    const difference = numbers.reduce((a, b) => a - b);
-                    result = `
-                        <div class="result-item">
-                            <span class="result-label">Resta secuencial:</span>
-                            <span class="result-value">${formatArgentineNumber(difference)}</span>
-                        </div>
-                        <div class="result-item">
-                            <span class="result-label">Operación:</span>
-                            <span class="result-value">${numbers.map(n => formatArgentineNumber(n)).join(' - ')} = ${formatArgentineNumber(difference)}</span>
-                        </div>
-                    `;
-                    break;
-                    
-                case 'divide':
-                    const quotient = numbers.reduce((a, b) => a / b);
-                    result = `
-                        <div class="result-item">
-                            <span class="result-label">División secuencial:</span>
-                            <span class="result-value">${formatArgentineNumber(quotient)}</span>
-                        </div>
-                        <div class="result-item">
-                            <span class="result-label">Operación:</span>
-                            <span class="result-value">${numbers.map(n => formatArgentineNumber(n)).join(' ÷ ')} = ${formatArgentineNumber(quotient)}</span>
-                        </div>
-                    `;
-                    break;
-                    
-                case 'average':
-                    const avg = numbers.reduce((a, b) => a + b, 0) / numbers.length;
-                    result = `
-                        <div class="result-item">
-                            <span class="result-label">Promedio:</span>
-                            <span class="result-value">${formatArgentineNumber(avg)}</span>
-                        </div>
-                        <div class="result-item">
-                            <span class="result-label">Cálculo:</span>
-                            <span class="result-value">(${numbers.map(n => formatArgentineNumber(n)).join(' + ')}) ÷ ${numbers.length} = ${formatArgentineNumber(avg)}</span>
-                        </div>
-                    `;
-                    break;
-                    
-                case 'stats':
-                    const sum_stats = numbers.reduce((a, b) => a + b, 0);
-                    const avg_stats = sum_stats / numbers.length;
-                    const min = Math.min(...numbers);
-                    const max = Math.max(...numbers);
-                    const count = numbers.length;
-                    
-                    result = `
-                        <div class="result-item">
-                            <span class="result-label">Cantidad de números:</span>
-                            <span class="result-value">${count}</span>
-                        </div>
-                        <div class="result-item">
-                            <span class="result-label">Suma:</span>
-                            <span class="result-value">${formatArgentineNumber(sum_stats)}</span>
-                        </div>
-                        <div class="result-item">
-                            <span class="result-label">Promedio:</span>
-                            <span class="result-value">${formatArgentineNumber(avg_stats)}</span>
-                        </div>
-                        <div class="result-item">
-                            <span class="result-label">Mínimo:</span>
-                            <span class="result-value">${formatArgentineNumber(min)}</span>
-                        </div>
-                        <div class="result-item">
-                            <span class="result-label">Máximo:</span>
-                            <span class="result-value">${formatArgentineNumber(max)}</span>
-                        </div>
-                    `;
-                    break;
-            }
-            
-            resultsList.innerHTML = result;
-            results.style.display = 'block';
-            results.scrollIntoView({ behavior: 'smooth' });
-        }
-        
-        function clearAll() {
-            document.getElementById('numbers').value = '';
-            document.getElementById('numbersDisplay').style.display = 'none';
-            document.getElementById('results').style.display = 'none';
-            numbers = [];
-        }
-        
-        // FUNCIONES PARA SLOTS
-        function showBillCounter() {
-            document.getElementById('billCounterModal').style.display = 'block';
-            calculateBillTotal();
-        }
-        
-        function showPaymentCalc() {
-            document.getElementById('paymentModal').style.display = 'block';
-        }
-        
-        function showCreditConverter() {
-            document.getElementById('creditModal').style.display = 'block';
-        }
-        
-        function showShiftBalance() {
-            // Modal para cuadre de turno
-            const modal = document.createElement('div');
-            modal.className = 'modal';
-            modal.style.display = 'block';
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <h3>📋 Cuadre de Turno</h3>
-                    <div style="margin-bottom: 20px;">
-                        <label>💰 Caja inicial: $</label>
-                        <input type="text" id="initialCash" placeholder="0" oninput="formatArgentineInput(this)" style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px; text-align: center;">
-                    </div>
-                    <div style="margin-bottom: 20px;">
-                        <label>💸 Ventas del turno: $</label>
-                        <input type="text" id="salesAmount" placeholder="0" oninput="formatArgentineInput(this)" style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px; text-align: center;">
-                    </div>
-                    <div style="margin-bottom: 20px;">
-                        <label>💵 Dinero en caja: $</label>
-                        <input type="text" id="cashInBox" placeholder="0" oninput="formatArgentineInput(this)" style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px; text-align: center;">
-                    </div>
-                    <button onclick="calculateShiftBalance()" class="operation-btn" style="margin-bottom: 10px; width: 100%;">Calcular Cuadre</button>
-                    <div id="shiftResult"></div>
-                    <button onclick="closeShiftModal()" class="close-btn">Cerrar</button>
-                </div>
-            `;
-            
-            document.body.appendChild(modal);
-            
-            // Función para cerrar modal
-            window.closeShiftModal = function() {
-                document.body.removeChild(modal);
-            };
-            
-            // Función para calcular cuadre
-            window.calculateShiftBalance = function() {
-                const initial = parseArgentineNumber(document.getElementById('initialCash').value) || 0;
-                const sales = parseArgentineNumber(document.getElementById('salesAmount').value) || 0;
-                const cashInBox = parseArgentineNumber(document.getElementById('cashInBox').value) || 0;
-                
-                const expectedTotal = initial + sales;
-                const difference = cashInBox - expectedTotal;
-                
-                let resultHTML = `
-                    <div class="payment-breakdown">
-                        <h4>📊 Resultado del Cuadre:</h4>
-                        <div class="result-item">
-                            <span class="result-label">Caja inicial:</span>
-                            <span class="result-value">${formatArgentineNumber(initial)}</span>
-                        </div>
-                        <div class="result-item">
-                            <span class="result-label">Ventas:</span>
-                            <span class="result-value">${formatArgentineNumber(sales)}</span>
-                        </div>
-                        <div class="result-item" style="border-top: 2px solid #667eea; padding-top: 10px;">
-                            <span class="result-label"><strong>Debería tener:</strong></span>
-                            <span class="result-value"><strong>${formatArgentineNumber(expectedTotal)}</strong></span>
-                        </div>
-                        <div class="result-item">
-                            <span class="result-label">Dinero real:</span>
-                            <span class="result-value">${formatArgentineNumber(cashInBox)}</span>
-                        </div>
-                        <div class="result-item">
-                            <span class="result-label">Diferencia:</span>
-                            <span class="result-value" style="color: ${difference === 0 ? '#00b894' : '#ff6b6b'}">
-                                ${formatArgentineNumber(difference)}
-                            </span>
-                        </div>
-                `;
-                
-                if (difference === 0) {
-                    resultHTML += '<div class="difference-alert difference-ok">✅ CUADRE PERFECTO</div>';
-                } else if (difference > 0) {
-                    resultHTML += '<div class="difference-alert difference-error">📈 SOBRANTE</div>';
-                } else {
-                    resultHTML += '<div class="difference-alert difference-error">📉 FALTANTE</div>';
-                }
-                
-                resultHTML += '</div>';
-                document.getElementById('shiftResult').innerHTML = resultHTML;
-            };
-            
-            // Cerrar modal al hacer click fuera
-            modal.onclick = function(event) {
-                if (event.target === modal) {
-                    closeShiftModal();
-                }
-            };
-        }
-        
-        function showDifferenceChecker() {
-            const expected = prompt('💰 Ingrese el monto esperado (formato argentino):');
-            if (!expected) return;
-            
-            const actual = prompt('💵 Ingrese el monto real contado (formato argentino):');
-            if (!actual) return;
-            
-            try {
-                const expectedAmount = parseArgentineNumber(expected);
-                const actualAmount = parseArgentineNumber(actual);
-                
-                if (isNaN(expectedAmount) || isNaN(actualAmount)) {
-                    alert('❌ Error: Por favor use formato argentino válido (ej: 1.500,75)');
-                    return;
-                }
-                
-                const difference = actualAmount - expectedAmount;
-                const percentage = expectedAmount !== 0 ? ((difference / expectedAmount) * 100) : 0;
-                
-                let message = `📊 VERIFICACIÓN DE DIFERENCIAS\n\n`;
-                message += `💰 Esperado: ${formatArgentineNumber(expectedAmount)}\n`;
-                message += `💵 Real: ${formatArgentineNumber(actualAmount)}\n`;
-                message += `📈 Diferencia: ${formatArgentineNumber(difference)}\n`;
-                message += `📊 Porcentaje: ${percentage.toFixed(2)}%\n\n`;
-                
-                if (difference === 0) {
-                    message += '✅ PERFECTO - Sin diferencias';
-                } else if (difference > 0) {
-                    message += '🔺 SOBRANTE detectado';
-                } else {
-                    message += '🔻 FALTANTE detectado';
-                }
-                
-                alert(message);
-                
-            } catch (e) {
-                alert('❌ Error al procesar los números. Use formato argentino (ej: 1.500,75)');
-            }
-        }
-        
-        function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
-        }
-        
-        function calculateBillTotal() {
-            const bills = {
-                20000: parseInt(document.getElementById('bill20000').value) || 0,
-                10000: parseInt(document.getElementById('bill10000').value) || 0,
-                2000: parseInt(document.getElementById('bill2000').value) || 0,
-                1000: parseInt(document.getElementById('bill1000').value) || 0,
-                500: parseInt(document.getElementById('bill500').value) || 0,
-                200: parseInt(document.getElementById('bill200').value) || 0,
-                100: parseInt(document.getElementById('bill100').value) || 0,
-                50: parseInt(document.getElementById('bill50').value) || 0,
-                20: parseInt(document.getElementById('bill20').value) || 0,
-                10: parseInt(document.getElementById('bill10').value) || 0
-            };
-            
-            // Actualizar totales individuales
-            Object.keys(bills).forEach(denomination => {
-                const total = bills[denomination] * parseInt(denomination);
-                document.getElementById(`total${denomination}`).textContent = formatArgentineNumber(total);
-            });
-            
-            // Calcular total general
-            const grandTotal = Object.keys(bills).reduce((sum, denom) => {
-                return sum + (bills[denom] * parseInt(denom));
-            }, 0);
-            
-            document.getElementById('arqueoTotal').textContent = formatArgentineNumber(grandTotal);
-            checkDifference();
-        }
-        
-        function checkDifference() {
-            const actualText = document.getElementById('arqueoTotal').textContent;
-            const actual = parseArgentineNumber(actualText) || 0;
-            const shouldHaveText = document.getElementById('shouldHave').value;
-            const shouldHave = parseArgentineNumber(shouldHaveText) || 0;
-            const difference = actual - shouldHave;
-            
-            const resultDiv = document.getElementById('differenceResult');
-            
-            if (shouldHave === 0) {
-                resultDiv.innerHTML = '';
-                return;
-            }
-            
-            if (difference === 0) {
-                resultDiv.innerHTML = '<div class="difference-alert difference-ok">✅ PERFECTO - SIN DIFERENCIAS</div>';
-            } else if (difference > 0) {
-                resultDiv.innerHTML = `<div class="difference-alert difference-error">📈 SOBRANTE: ${formatArgentineNumber(Math.abs(difference))}</div>`;
-            } else {
-                resultDiv.innerHTML = `<div class="difference-alert difference-error">📉 FALTANTE: ${formatArgentineNumber(Math.abs(difference))}</div>`;
-            }
-        }
-        
-        function calculateBestPayment() {
-            const amountText = document.getElementById('paymentAmount').value;
-            const amount = parseArgentineNumber(amountText) || 0;
-            if (amount === 0) return;
-            
-            const bills = [20000, 10000, 2000, 1000, 500, 200, 100, 50, 20, 10];
-            let remaining = Math.floor(amount);
-            const breakdown = {};
-            
-            bills.forEach(bill => {
-                if (remaining >= bill) {
-                    breakdown[bill] = Math.floor(remaining / bill);
-                    remaining = remaining % bill;
-                }
-            });
-            
-            let html = '<div class="payment-breakdown"><h4>💸 Mejor forma de entregar:</h4>';
-            Object.keys(breakdown).forEach(bill => {
-                if (breakdown[bill] > 0) {
-                    html += `<div class="result-item">
-                        <span class="result-label">${breakdown[bill]}x ${formatArgentineNumber(parseInt(bill))}:</span>
-                        <span class="result-value">${formatArgentineNumber(breakdown[bill] * parseInt(bill))}</span>
-                    </div>`;
-                }
-            });
-            
-            const totalEntregado = Object.keys(breakdown).reduce((sum, bill) => sum + (breakdown[bill] * parseInt(bill)), 0);
-            const diferencia = amount - totalEntregado;
-            
-            html += `<div class="result-item" style="border-top: 2px solid #667eea; padding-top: 10px; margin-top: 10px;">
-                <span class="result-label"><strong>Total a entregar:</strong></span>
-                <span class="result-value"><strong>${formatArgentineNumber(totalEntregado)}</strong></span>
-            </div>`;
-            
-            if (diferencia > 0) {
-                html += `<div class="result-item">
-                    <span class="result-label" style="color: #ff6b6b;">Falta (en monedas):</span>
-                    <span class="result-value" style="color: #ff6b6b;">${formatArgentineNumber(diferencia)}</span>
+        let html = '<div class="bg-slate-50 p-3 rounded border border-slate-200"><h4 class="text-sm font-semibold text-slate-700 mb-2">💸 Mejor forma de entregar:</h4>';
+        Object.keys(breakdown).forEach(bill => {
+            if (breakdown[bill] > 0) {
+                html += `<div class="flex justify-between text-sm py-1">
+                    <span class="text-slate-600">${breakdown[bill]}x $${formatArgentineNumber(parseInt(bill))}:</span>
+                    <span class="font-semibold text-indigo-600">${formatArgentineNumber(breakdown[bill] * parseInt(bill))}</span>
                 </div>`;
             }
-            
-            html += '</div>';
-            document.getElementById('paymentBreakdown').innerHTML = html;
+        });
+        
+        const totalEntregado = Object.keys(breakdown).reduce((sum, bill) => sum + (breakdown[bill] * parseInt(bill)), 0);
+        const diferencia = amount - totalEntregado;
+        
+        html += `<div class="border-t border-slate-300 mt-2 pt-2 flex justify-between font-semibold text-sm">
+            <span class="text-slate-700">Total:</span>
+            <span class="text-indigo-600">${formatArgentineNumber(totalEntregado)}</span>
+        </div>`;
+        
+        if (diferencia > 0) {
+            html += `<div class="mt-2 p-2 bg-yellow-100 text-yellow-700 rounded text-xs text-center font-semibold">Falta (en monedas): ${formatArgentineNumber(diferencia)}</div>`;
         }
         
-        function convertCredits() {
-            const creditValue = parseFloat(document.getElementById('creditValue').value) || 0;
-            const credits = parseFloat(document.getElementById('credits').value) || 0;
-            
-            if (creditValue > 0 && credits > 0) {
-                const pesos = credits * creditValue;
-                document.getElementById('pesos').value = pesos.toFixed(2);
-                updateConversionResult(credits, pesos, creditValue);
-            }
-        }
+        html += '</div>';
+        document.getElementById('paymentBreakdown').innerHTML = html;
+    }
+    
+    function convertCredits() {
+        const creditValue = parseFloat(document.getElementById('creditValue').value) || 0;
+        const credits = parseFloat(document.getElementById('credits').value) || 0;
         
-        function convertPesos() {
-            const creditValue = parseFloat(document.getElementById('creditValue').value) || 0;
-            const pesos = parseFloat(document.getElementById('pesos').value) || 0;
-            
-            if (creditValue > 0 && pesos > 0) {
-                const credits = pesos / creditValue;
-                document.getElementById('credits').value = credits.toFixed(2);
-                updateConversionResult(credits, pesos, creditValue);
-            }
+        if (creditValue > 0 && credits > 0) {
+            const pesos = credits * creditValue;
+            document.getElementById('pesos').value = pesos.toFixed(2);
+            updateConversionResult(credits, pesos, creditValue);
         }
+    }
+    
+    function convertPesos() {
+        const creditValue = parseFloat(document.getElementById('creditValue').value) || 0;
+        const pesos = parseFloat(document.getElementById('pesos').value) || 0;
         
-        function updateConversionResult(credits, pesos, creditValue) {
-            const resultDiv = document.getElementById('conversionResult');
-            resultDiv.innerHTML = `
-                <div class="payment-breakdown">
-                    <h4>🎫 Conversión:</h4>
-                    <div class="result-item">
-                        <span class="result-label">Créditos:</span>
-                        <span class="result-value">${formatArgentineNumber(credits)}</span>
-                    </div>
-                    <div class="result-item">
-                        <span class="result-label">Valor por crédito:</span>
-                        <span class="result-value">${creditValue.toFixed(2)}</span>
-                    </div>
-                    <div class="result-item" style="border-top: 2px solid #667eea; padding-top: 10px;">
-                        <span class="result-label"><strong>Total en pesos:</strong></span>
-                        <span class="result-value"><strong>${formatArgentineNumber(pesos)}</strong></span>
-                    </div>
+        if (creditValue > 0 && pesos > 0) {
+            const credits = pesos / creditValue;
+            document.getElementById('credits').value = credits.toFixed(2);
+            updateConversionResult(credits, pesos, creditValue);
+        }
+    }
+    
+    function updateConversionResult(credits, pesos, creditValue) {
+        const resultDiv = document.getElementById('conversionResult');
+        resultDiv.innerHTML = `
+            <div class="bg-slate-50 p-3 rounded border border-slate-200">
+                <h4 class="text-sm font-semibold text-slate-700 mb-2">🎫 Conversión:</h4>
+                <div class="flex justify-between text-sm py-1">
+                    <span class="text-slate-600">Créditos:</span>
+                    <span class="font-semibold text-indigo-600">${formatArgentineNumber(credits)}</span>
                 </div>
-            `;
+                <div class="flex justify-between text-sm py-1">
+                    <span class="text-slate-600">Valor por crédito:</span>
+                    <span class="font-semibold text-indigo-600">$${creditValue.toFixed(2)}</span>
+                </div>
+                <div class="flex justify-between text-sm py-1 border-t border-slate-300 pt-2 mt-2 font-semibold">
+                    <span class="text-slate-700">Total en pesos:</span>
+                    <span class="text-green-600">$${formatArgentineNumber(pesos)}</span>
+                </div>
+            </div>
+        `;
+    }
+    
+    function calculateShiftBalance() {
+        const initial = parseArgentineNumber(document.getElementById('initialCash').value) || 0;
+        const sales = parseArgentineNumber(document.getElementById('salesAmount').value) || 0;
+        const cashInBox = parseArgentineNumber(document.getElementById('cashInBox').value) || 0;
+        
+        const expectedTotal = initial + sales;
+        const difference = cashInBox - expectedTotal;
+        
+        let resultHTML = `
+            <div class="bg-slate-50 p-3 rounded border border-slate-200 mt-4">
+                <h4 class="text-sm font-semibold text-slate-700 mb-2">📊 Resultado del Cuadre:</h4>
+                <div class="flex justify-between text-sm py-1">
+                    <span class="text-slate-600">Caja inicial:</span>
+                    <span class="font-semibold text-indigo-600">$${formatArgentineNumber(initial)}</span>
+                </div>
+                <div class="flex justify-between text-sm py-1">
+                    <span class="text-slate-600">Ventas:</span>
+                    <span class="font-semibold text-indigo-600">$${formatArgentineNumber(sales)}</span>
+                </div>
+                <div class="flex justify-between text-sm py-1 border-t border-slate-300 pt-2 mt-1 font-semibold">
+                    <span class="text-slate-700">Debería tener:</span>
+                    <span class="text-indigo-600">$${formatArgentineNumber(expectedTotal)}</span>
+                </div>
+                <div class="flex justify-between text-sm py-1">
+                    <span class="text-slate-600">Dinero real:</span>
+                    <span class="font-semibold text-indigo-600">$${formatArgentineNumber(cashInBox)}</span>
+                </div>
+                <div class="flex justify-between text-sm py-1 border-t border-slate-300 pt-2 mt-1">
+                    <span class="text-slate-700 font-semibold">Diferencia:</span>
+                    <span class="font-mono font-bold" style="color: ${difference === 0 ? '#059669' : '#dc2626'}">$${formatArgentineNumber(difference)}</span>
+                </div>
+        `;
+        
+        if (difference === 0) {
+            resultHTML += '<div class="mt-2 p-2 bg-green-100 text-green-700 rounded text-xs text-center font-semibold">✅ CUADRE PERFECTO</div>';
+        } else if (difference > 0) {
+            resultHTML += '<div class="mt-2 p-2 bg-yellow-100 text-yellow-700 rounded text-xs text-center font-semibold">📈 SOBRANTE</div>';
+        } else {
+            resultHTML += '<div class="mt-2 p-2 bg-red-100 text-red-700 rounded text-xs text-center font-semibold">📉 FALTANTE</div>';
         }
         
-        // Cerrar modales al hacer click fuera
-        window.onclick = function(event) {
-            const modals = document.getElementsByClassName('modal');
-            for (let i = 0; i < modals.length; i++) {
-                if (event.target === modals[i]) {
-                    modals[i].style.display = 'none';
-                }
+        resultHTML += '</div>';
+        document.getElementById('shiftResult').innerHTML = resultHTML;
+    }
+    
+    // Cerrar modales al hacer click fuera
+    window.onclick = function(event) {
+        const modals = document.querySelectorAll('.modal');
+        modals.forEach(modal => {
+            if (event.target === modal) {
+                modal.classList.add('hidden');
             }
-        }
-    </script>
-</body>
+        });
+    }
+
+    // Cargar historial al iniciar
+    displayHistory();
+</script>
+
 </html>
