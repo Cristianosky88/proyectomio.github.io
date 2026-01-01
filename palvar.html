@@ -4,144 +4,393 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Control de Tickets</title>
-
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- CSS Personalizado -->
-    <link rel="stylesheet" href="css/palvar.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { background-color: #f8fafc; font-family: sans-serif; }
+        .fade-in { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
 </head>
-<body>
-    <!-- Botón Modo Oscuro/Claro -->
-    <button id="modoToggle" class="btn btn-secondary btn-sm position-fixed top-0 end-0 m-3">
-        <i class="fas fa-moon"></i>
-    </button>
+<body class="p-4 md:p-8 text-slate-800">
 
-    <div class="pal-var-container">
-        <div class="header-section text-center py-4">
-            <h2>Sistema de Control de Tickets</h2>
-            <p class="text-muted">Gestión de tickets y pagos</p>
+    <div class="max-w-5xl mx-auto bg-white rounded-xl shadow-xl overflow-hidden border border-slate-200">
+        
+        <!-- Header -->
+        <div class="bg-slate-900 p-5 text-white flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="bg-purple-600 p-2 rounded-lg">
+                    <i data-lucide="ticket" class="w-6 h-6 text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold">Sistema de Control de Tickets</h1>
+                    <p class="text-slate-400 text-xs uppercase tracking-wider">Gestión de Tickets y Pagos</p>
+                </div>
+            </div>
+            <button id="modoToggle" class="bg-slate-700 hover:bg-slate-600 p-2 rounded-lg transition" title="Alternar tema">
+                <i data-lucide="moon" class="w-5 h-5"></i>
+            </button>
         </div>
 
-        <div class="content-section container">
-            <form id="formTickets" autocomplete="off">
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <label for="nombrePersona" class="form-label">
-                            <i class="fas fa-user"></i> Nombre de la persona
-                        </label>
-                        <input type="text" class="form-control" id="nombrePersona" 
-                               required pattern="^[A-Za-zÁáÉéÍíÓóÚúÑñ\s]+$"
-                               placeholder="Ingrese el nombre">
-                    </div>
-
-                    <div class="col-md-6">
-                        <label for="clienteGenero" class="form-label">
-                            <i class="fas fa-users"></i> Tipo de cliente
-                        </label>
-                        <select id="clienteGenero" class="form-select" required>
-                            <option value="cliente">Cliente</option>
-                            <option value="clienta">Clienta</option>
-                        </select>
-                    </div>
-
-                    <div class="col-md-4">
-                        <label for="cantidadTickets" class="form-label">
-                            <i class="fas fa-ticket-alt"></i> Cantidad de tickets
-                        </label>
-                        <input type="number" class="form-control" id="cantidadTickets" 
-                               min="1" required placeholder="0">
-                    </div>
-
-                    <div class="col-md-4">
-                        <label for="valorTotal" class="form-label">
-                            <i class="fas fa-dollar-sign"></i> Valor total
-                        </label>
-                        <input type="text" class="form-control" id="valorTotal" 
-                               placeholder="0,00" required>
-                    </div>
-
-                    <div class="col-md-4">
-                        <label for="montoPagado" class="form-label">
-                            <i class="fas fa-money-bill-wave"></i> Monto pagado
-                        </label>
-                        <input type="text" class="form-control" id="montoPagado" 
-                               placeholder="0,00" required>
-                    </div>
-
-                    <div class="col-md-4">
-                        <label for="horaPrimeraOperacion" class="form-label">
-                            <i class="fas fa-clock"></i> Hora primera operación
-                        </label>
-                        <input type="time" class="form-control" id="horaPrimeraOperacion" 
-                               placeholder="Hora de la primera operación">
-                    </div>
-
-                    <div class="col-md-4">
-                        <label for="horaUltimaFila" class="form-label">
-                            <i class="fas fa-clock"></i> Hora última operación
-                        </label>
-                        <input type="time" class="form-control" id="horaUltimaFila" 
-                               placeholder="Hora de la última operación">
-                    </div>
-
-                    <div class="col-md-4">
-                        <label for="tipoCargo" class="form-label">
-                            <i class="fas fa-id-badge"></i> Cargo
-                        </label>
-                        <select id="tipoCargo" class="form-select" required>
-                            <option value="">Seleccionar cargo...</option>
-                            <option>Supervisor</option>
-                            <option>Jefe de Caja</option>
-                            <option>As. de Caja</option>
-                            <option>Encargado</option>
-                            <option>Operadora</option>
-                            <option>Operador</option>
-                            <option value="personalizado">Otro...</option>
-                        </select>
-                    </div>
-
-                    <div class="col-md-6" id="grupoPersonalizado" style="display:none;">
-                        <label for="cargoPersonalizado" class="form-label">
-                            <i class="fas fa-edit"></i> Cargo personalizado
-                        </label>
-                        <input type="text" class="form-control" id="cargoPersonalizado"
-                               placeholder="Especifique el cargo">
-                    </div>
-                </div>
-
-                <div id="avisoMonto" class="mt-3"></div>
-
-                <div class="buttons mt-4">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-file-alt"></i> Generar Reporte
-                    </button>
-                    <button type="button" class="btn btn-success" onclick="copiarReporte()">
-                        <i class="fas fa-copy"></i> Copiar al portapapeles
-                    </button>
-                    <button type="button" class="btn btn-danger" onclick="borrarHistorial()">
-                        <i class="fas fa-trash-alt"></i> Borrar Historial
-                    </button>
-                    <button class="btn btn-inicio" type="button" onclick="window.location.href='index.html'">🏠 Volver al Inicio</button>
-                </div>
-            </form>
-
-            <div id="reporte" class="mt-4"></div>
+        <div class="grid grid-cols-1 lg:grid-cols-12">
             
-            <div class="historial-section mt-5">
-                <h4><i class="fas fa-history"></i> Historial</h4>
-                <div id="historial" class="historial-items"></div>
+            <!-- COLUMNA IZQUIERDA: FORMULARIO -->
+            <div class="lg:col-span-7 p-6 space-y-4 bg-slate-50">
+                
+                <form id="formTickets" autocomplete="off" class="space-y-4">
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-500 mb-1">👤 Nombre de la Persona</label>
+                            <input type="text" id="nombrePersona" required pattern="^[A-Za-zÁáÉéÍíÓóÚúÑñ\s]+$" placeholder="Nombre completo" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-purple-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-500 mb-1">👥 Tipo de Cliente</label>
+                            <select id="clienteGenero" required class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-purple-500 outline-none">
+                                <option value="cliente">Cliente</option>
+                                <option value="clienta">Clienta</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-500 mb-1">🎫 Cantidad de Tickets</label>
+                            <input type="number" id="cantidadTickets" min="1" required placeholder="0" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-purple-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-500 mb-1">💵 Valor Total</label>
+                            <input type="text" id="valorTotal" placeholder="0,00" required class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-purple-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-500 mb-1">💰 Monto Pagado</label>
+                            <input type="text" id="montoPagado" placeholder="0,00" required class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-purple-500 outline-none">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-500 mb-1">⏰ Hora Primera Operación</label>
+                            <input type="time" id="horaPrimeraOperacion" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-purple-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-500 mb-1">⏰ Hora Última Operación</label>
+                            <input type="time" id="horaUltimaFila" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-purple-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-500 mb-1">🎯 Cargo</label>
+                            <input type="text" id="tipoCargo" required list="cargos-list" placeholder="Seleccionar cargo..." class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-purple-500 outline-none">
+                        </div>
+                    </div>
+
+                    <div id="grupoPersonalizado" class="hidden">
+                        <label class="block text-xs font-semibold text-slate-500 mb-1">✏️ Cargo Personalizado</label>
+                        <input type="text" id="cargoPersonalizado" placeholder="Especifique el cargo" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-purple-500 outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 mb-1">📝 Observaciones (Opcional)</label>
+                        <textarea id="observaciones" placeholder="Notas adicionales..." class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-purple-500 outline-none resize-none h-16"></textarea>
+                    </div>
+
+                    <div id="avisoMonto" class="p-3 rounded text-sm hidden"></div>
+
+                    <div class="flex gap-2 flex-wrap pt-4">
+                        <button type="submit" class="flex-1 min-w-[120px] px-4 py-2 bg-purple-600 text-white hover:bg-purple-700 rounded font-semibold text-sm transition flex items-center justify-center gap-2">
+                            <i data-lucide="file-text" class="w-4 h-4"></i>
+                            <span>Generar Reporte</span>
+                        </button>
+                        <button type="button" id="copiarBtn" class="flex-1 min-w-[120px] px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded font-semibold text-sm transition flex items-center justify-center gap-2">
+                            <i data-lucide="copy" class="w-4 h-4"></i>
+                            <span>Copiar</span>
+                        </button>
+                        <button type="button" id="borrarBtn" class="flex-1 min-w-[120px] px-4 py-2 bg-red-600 text-white hover:bg-red-700 rounded font-semibold text-sm transition flex items-center justify-center gap-2">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            <span>Borrar</span>
+                        </button>
+                        <button type="button" id="inicioBtn" class="flex-1 min-w-[120px] px-4 py-2 bg-slate-400 text-white hover:bg-slate-500 rounded font-semibold text-sm transition flex items-center justify-center gap-2">
+                            <i data-lucide="home" class="w-4 h-4"></i>
+                            <span>Inicio</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- COLUMNA DERECHA: REPORTE E HISTORIAL -->
+            <div class="lg:col-span-5 bg-slate-100 border-l border-slate-200 flex flex-col">
+                <div class="p-6 sticky top-0 max-h-screen overflow-y-auto">
+                    
+                    <!-- INDICADOR DE DEUDA -->
+                    <div id="deudaIndicador" class="hidden mb-4 p-4 rounded-lg">
+                        <div class="text-xs font-semibold mb-2">⚠️ Estado de Pago</div>
+                        <div id="deudaTexto" class="text-lg font-bold"></div>
+                    </div>
+
+                    <!-- REPORTE -->
+                    <div id="reportContainer" class="hidden">
+                        <h2 class="font-bold text-slate-800 mb-4">📄 Reporte Generado</h2>
+                        <div class="bg-white rounded-lg shadow-sm border border-slate-300 p-4 mb-4">
+                            <div id="reporte" class="text-sm font-mono whitespace-pre-wrap leading-relaxed text-slate-700"></div>
+                        </div>
+                    </div>
+
+                    <!-- HISTORIAL -->
+                    <div id="historialContainer">
+                        <h2 class="font-bold text-slate-800 mb-4">📋 Historial de Reportes</h2>
+                        <div id="historial" class="space-y-3">
+                            <div class="bg-slate-200 rounded-lg p-6 text-center text-slate-600 text-sm">
+                                <i data-lucide="history" class="w-8 h-8 mx-auto mb-2 opacity-50"></i>
+                                <p>Sin reportes aún</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- TOAST NOTIFICACIONES -->
+    <div id="notification" class="hidden fixed bottom-4 right-4 bg-green-100 text-green-800 px-4 py-3 rounded-lg shadow-lg flex items-center gap-2 fade-in z-40">
+        <i data-lucide="check-circle" class="w-4 h-4"></i>
+        <span id="notification-text">Operación exitosa</span>
+    </div>
 
-    <!-- JavaScript Personalizado -->
-    <script src="js/palvar.js"></script>
+    <!-- DATALIST DE CARGOS -->
+    <datalist id="cargos-list">
+        <option value="Supervisor"></option>
+        <option value="Jefe de Caja"></option>
+        <option value="As. de Caja"></option>
+        <option value="Encargado"></option>
+        <option value="Operadora"></option>
+        <option value="Operador"></option>
+        <option value="Cajera"></option>
+        <option value="Cajero"></option>
+        <option value="As de Sala."></option>
+    </datalist>
+
 </body>
+
+<script>
+    lucide.createIcons();
+
+    // Funciones utilitarias
+    const toNumberStringAR = num => num.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const parseNumberAR = input => input ? parseFloat(input.replace(/\./g, '').replace(',', '.')) || 0 : 0;
+    const formatCurrencyAR = value => new Intl.NumberFormat('es-AR', {
+        style: 'currency', currency: 'ARS', minimumFractionDigits: 2, maximumFractionDigits: 2
+    }).format(value);
+
+    // Elementos
+    const valorTotal = document.getElementById('valorTotal');
+    const montoPagado = document.getElementById('montoPagado');
+    const tipoCargo = document.getElementById('tipoCargo');
+    const cargoPersonalizado = document.getElementById('cargoPersonalizado');
+    const grupoPersonalizado = document.getElementById('grupoPersonalizado');
+    const formTickets = document.getElementById('formTickets');
+    const avisoMonto = document.getElementById('avisoMonto');
+    const reporteDiv = document.getElementById('reporte');
+    const historialDiv = document.getElementById('historial');
+    const observaciones = document.getElementById('observaciones');
+    const deudaIndicador = document.getElementById('deudaIndicador');
+    const deudaTexto = document.getElementById('deudaTexto');
+
+    // Formateo de campos numéricos
+    [valorTotal, montoPagado].forEach(input => {
+        input.addEventListener('blur', e => {
+            const num = parseNumberAR(e.target.value);
+            e.target.value = toNumberStringAR(num);
+            actualizarDeuda();
+        });
+    });
+
+    // Mostrar/ocultar campo personalizado (ya no es necesario)
+    tipoCargo.addEventListener('change', function () {
+        actualizarDeuda();
+    });
+
+    // Actualizar deuda en tiempo real
+    function actualizarDeuda() {
+        const total = parseNumberAR(valorTotal.value);
+        const pagado = parseNumberAR(montoPagado.value);
+        const saldo = total - pagado;
+
+        if (total === 0 || isNaN(total)) {
+            deudaIndicador.classList.add('hidden');
+            return;
+        }
+
+        deudaIndicador.classList.remove('hidden');
+
+        if (pagado > total) {
+            deudaTexto.textContent = '⚠️ EXCESO: ' + formatCurrencyAR(pagado - total);
+            deudaIndicador.classList.add('bg-red-100', 'border', 'border-red-300');
+            deudaIndicador.classList.remove('bg-green-100', 'border-green-300');
+            deudaTexto.classList.add('text-red-700');
+            deudaTexto.classList.remove('text-green-700');
+        } else if (saldo > 0) {
+            deudaTexto.textContent = '💳 DEUDA: ' + formatCurrencyAR(saldo);
+            deudaIndicador.classList.add('bg-red-100', 'border', 'border-red-300');
+            deudaIndicador.classList.remove('bg-green-100', 'border-green-300');
+            deudaTexto.classList.add('text-red-700');
+            deudaTexto.classList.remove('text-green-700');
+        } else {
+            deudaTexto.textContent = '✓ PAGADO';
+            deudaIndicador.classList.add('bg-green-100', 'border', 'border-green-300');
+            deudaIndicador.classList.remove('bg-red-100', 'border-red-300');
+            deudaTexto.classList.add('text-green-700');
+            deudaTexto.classList.remove('text-red-700');
+        }
+    }
+
+    // Envío del formulario
+    formTickets.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const nombre = document.getElementById('nombrePersona').value.trim();
+        const clienteGenero = document.getElementById('clienteGenero').value;
+        const cantidad = Number(document.getElementById('cantidadTickets').value);
+        const total = parseNumberAR(valorTotal.value);
+        const pagado = parseNumberAR(montoPagado.value);
+        const cargo = tipoCargo.value.trim();
+        const obs = observaciones.value.trim();
+        const horaPrimera = document.getElementById('horaPrimeraOperacion').value;
+        const horaUltima = document.getElementById('horaUltimaFila').value;
+
+        if (!nombre || !cantidad || !total || !pagado || !cargo) {
+            showNotification('Complete todos los campos obligatorios', 'error');
+            return;
+        }
+        if (!/^[A-Za-zÁáÉéÍíÓóÚúÑñ\s]+$/.test(nombre)) {
+            showNotification('El nombre solo puede contener letras y espacios', 'error');
+            return;
+        }
+
+        const saldo = total - pagado;
+        const fecha = new Date();
+
+        let reportText = `${nombre} (${clienteGenero})
+Cantidad de tickets: ${cantidad}
+Valor total: ${formatCurrencyAR(total)}
+Monto pagado: ${formatCurrencyAR(pagado)}
+Saldo: ${formatCurrencyAR(saldo)}
+${horaPrimera ? `Hora primera operación: ${horaPrimera}` : ''}
+${horaUltima ? `Hora última operación: ${horaUltima}` : ''}
+Cargo: ${cargo}
+${obs ? `Observaciones: ${obs}` : ''}
+Fecha y hora: ${fecha.toLocaleString('es-AR')}`;
+
+        reporteDiv.textContent = reportText;
+        document.getElementById('reportContainer').classList.remove('hidden');
+
+        // Guardar en historial
+        let historial = JSON.parse(localStorage.getItem('palvarHistorial')) || [];
+        historial.unshift({ 
+            text: reportText, 
+            timestamp: new Date().toLocaleString('es-AR'),
+            nombre: nombre,
+            cargo: cargo,
+            saldo: saldo
+        });
+        historial = historial.slice(0, 10);
+        localStorage.setItem('palvarHistorial', JSON.stringify(historial));
+
+        // Guardar datos para precarga
+        localStorage.setItem('palvarLastClient', JSON.stringify({
+            nombre: nombre,
+            clienteGenero: clienteGenero,
+            cargo: cargo
+        }));
+
+        actualizarHistorial();
+        showNotification('¡Reporte generado exitosamente!');
+    });
+
+    // Actualizar historial
+    function actualizarHistorial() {
+        const historial = JSON.parse(localStorage.getItem('palvarHistorial')) || [];
+        if (historial.length === 0) {
+            historialDiv.innerHTML = '<div class="bg-slate-200 rounded-lg p-6 text-center text-slate-600 text-sm"><i data-lucide="history" class="w-8 h-8 mx-auto mb-2 opacity-50"></i><p>Sin reportes aún</p></div>';
+        } else {
+            historialDiv.innerHTML = historial.map((item, idx) => `
+                <div class="bg-white rounded-lg shadow-sm border border-slate-300 p-3">
+                    <div class="text-xs text-slate-500 mb-2">${item.timestamp}</div>
+                    <div class="text-xs font-mono text-slate-700 whitespace-pre-wrap line-clamp-3">${item.text}</div>
+                    <button type="button" onclick="eliminarHistorialItem(${idx})" class="text-xs mt-2 text-red-600 hover:text-red-800">Eliminar</button>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+    }
+
+    function eliminarHistorialItem(idx) {
+        let historial = JSON.parse(localStorage.getItem('palvarHistorial')) || [];
+        historial.splice(idx, 1);
+        localStorage.setItem('palvarHistorial', JSON.stringify(historial));
+        actualizarHistorial();
+        showNotification('Registro eliminado');
+    }
+
+    // Copiar reporte
+    document.getElementById('copiarBtn').addEventListener('click', function () {
+        const texto = reporteDiv.textContent;
+        if (!texto) {
+            showNotification('Genera un reporte primero', 'error');
+            return;
+        }
+        navigator.clipboard.writeText(texto).then(() => {
+            showNotification('¡Copiado al portapapeles!');
+        }).catch(() => {
+            const textarea = document.createElement('textarea');
+            textarea.value = texto;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            showNotification('¡Copiado al portapapeles!');
+        });
+    });
+
+    // Borrar historial
+    document.getElementById('borrarBtn').addEventListener('click', function () {
+        if (confirm('¿Está seguro de borrar todo el historial?')) {
+            localStorage.removeItem('palvarHistorial');
+            actualizarHistorial();
+            showNotification('¡Historial borrado!');
+        }
+    });
+
+    // Volver al inicio
+    document.getElementById('inicioBtn').addEventListener('click', function () {
+        window.location.href = 'index.html';
+    });
+
+    // Mostrar notificación
+    function showNotification(message, type = 'success') {
+        const notification = document.getElementById('notification');
+        document.getElementById('notification-text').textContent = message;
+        notification.classList.remove('hidden', 'bg-red-100', 'text-red-800');
+        if (type === 'error') {
+            notification.classList.add('bg-red-100', 'text-red-800');
+        } else {
+            notification.classList.add('bg-green-100', 'text-green-800');
+        }
+        setTimeout(() => notification.classList.add('hidden'), 3000);
+    }
+
+    // Cargar historial al inicio
+    actualizarHistorial();
+
+    // Cargar datos precargados del último cliente
+    function cargarUltimosCliente() {
+        const lastClient = JSON.parse(localStorage.getItem('palvarLastClient'));
+        if (lastClient) {
+            document.getElementById('nombrePersona').value = lastClient.nombre;
+            document.getElementById('clienteGenero').value = lastClient.clienteGenero;
+            tipoCargo.value = lastClient.cargo;
+        }
+    }
+
+    cargarUltimosCliente();
+</script>
+
 </html>
