@@ -3,368 +3,369 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generador de Informes de Control</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <title>Control de Botones - Bulevard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        :root {
-            --color-primario: #3498db;
-            --color-primario-hover: #2980b9;
-            --color-secundario: #27ae60;
-            --color-secundario-hover: #229954;
-            --color-terciario: #95a5a6;
-            --color-terciario-hover: #7f8c8d;
-            --color-fondo: #f4f6f8;
-            --color-tarjeta: #ffffff;
-            --color-texto: #34495e;
-            --color-borde: #dfe4ea;
-            --sombra-tarjeta: 0 4px 12px rgba(0, 0, 0, 0.08);
-        }
-
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: var(--color-fondo);
-            color: var(--color-texto);
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 600px;
-        }
-
-        .tarjeta {
-            background-color: var(--color-tarjeta);
-            border: 1px solid var(--color-borde);
-            border-radius: 12px;
-            padding: 25px;
-            margin-bottom: 20px;
-            box-shadow: var(--sombra-tarjeta);
-            transition: all 0.3s ease;
-        }
-
-        .tarjeta:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
-        }
-
-        h2 {
-            margin-top: 0;
-            color: #2c3e50;
-            border-bottom: 2px solid var(--color-primario);
-            padding-bottom: 15px;
-            margin-bottom: 20px;
-            font-size: 1.4rem;
-        }
-
-        .campo {
-            margin-bottom: 15px;
-        }
-
-        label {
-            font-weight: 600;
-            display: block;
-            margin-bottom: 5px;
-            color: var(--color-texto);
-        }
-
-        input {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid var(--color-borde);
-            border-radius: 8px;
-            box-sizing: border-box;
-            transition: all 0.3s ease;
-            font-size: 1rem;
-        }
-
-        input:focus {
-            outline: none;
-            border-color: var(--color-primario);
-            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
-        }
-
-        input:invalid {
-            border-color: #e74c3c;
-        }
-
-        .boton {
-            background-color: var(--color-primario);
-            color: #fff;
-            border: none;
-            padding: 14px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            width: 100%;
-            margin-top: 10px;
-            transition: all 0.3s ease;
-            font-size: 1rem;
-        }
-
-        .boton:hover {
-            background-color: var(--color-primario-hover);
-            transform: translateY(-1px);
-        }
-
-        .boton:active {
-            transform: translateY(0);
-        }
-        
-        /* Estilo para el botón de volver al inicio */
-        .boton-inicio {
-            background-color: var(--color-terciario);
-        }
-
-        .boton-inicio:hover {
-            background-color: var(--color-terciario-hover);
-        }
-
-        #contenedor-informe.oculto {
-            display: none;
-        }
-
-        #informe-html {
-            background-color: #f8f9fa;
-            border: 1px solid var(--color-borde);
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 15px;
-            line-height: 1.8;
-        }
-
-        #informe-html p {
-            margin: 12px 0;
-            line-height: 1.8;
-        }
-
-        .etiqueta-informe {
-            background-color: #e9ecef;
-            border: 1px solid #ced4da;
-            border-radius: 4px;
-            padding: 4px 8px;
-            display: inline-block;
-            white-space: nowrap;
-            font-weight: 500;
-            color: #495057;
-        }
-
-        .boton-copiar {
-            background-color: var(--color-secundario);
-        }
-
-        .boton-copiar:hover {
-            background-color: var(--color-secundario-hover);
-        }
-
-        .boton-copiado {
-            background-color: #2ecc71 !important;
-        }
-
-        .fade-in {
-            animation: fadeIn 0.5s ease-in;
-        }
-
-        @keyframes fadeIn {
-            from { 
-                opacity: 0; 
-                transform: translateY(20px); 
-            }
-            to { 
-                opacity: 1; 
-                transform: translateY(0); 
-            }
-        }
-
-        .timestamp {
-            text-align: center;
-            color: #7f8c8d;
-            font-size: 0.9rem;
-            margin-top: 15px;
-            font-style: italic;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                max-width: 100%;
-            }
-            
-            .tarjeta {
-                padding: 20px;
-            }
-            
-            h2 {
-                font-size: 1.2rem;
-            }
-        }
+        body { background-color: #f8fafc; font-family: sans-serif; }
+        .fade-in { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-<body>
+<body class="p-4 md:p-8 text-slate-800">
 
-<main class="container">
-    <div class="tarjeta">
-        <h2>🛡️ Control de Botones - Bulevard</h2>
-        <form id="formulario-informe">
-            <div class="campo">
-                <label for="hora1">⏰ Hora (Evento 1):</label>
-                <input type="time" id="hora1" required value="18:23">
+    <div class="max-w-5xl mx-auto bg-white rounded-xl shadow-xl overflow-hidden border border-slate-200">
+        
+        <!-- Header -->
+        <div class="bg-slate-900 p-5 text-white flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="bg-blue-600 p-2 rounded-lg">
+                    <i data-lucide="shield-alert" class="w-6 h-6 text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold">Control de Botones - Bulevard</h1>
+                    <p class="text-slate-400 text-xs uppercase tracking-wider">Sistema de Registro - CCTV</p>
+                </div>
             </div>
-            <div class="campo">
-                <label for="informante1">👤 Informante (Evento 1):</label>
-                <input type="text" id="informante1" required value="Control Interno Castaño Pablo" placeholder="Nombre del informante">
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12">
+            
+            <!-- COLUMNA IZQUIERDA: FORMULARIO -->
+            <div class="lg:col-span-7 p-6 space-y-4 bg-slate-50">
+                
+                <!-- CARGAR ÚLTIMO REGISTRO -->
+                <div id="loadLastContainer" class="hidden bg-blue-50 border border-blue-300 rounded-lg p-3 flex items-center justify-between">
+                    <span class="text-xs text-blue-700">✓ Último registro disponible</span>
+                    <button type="button" id="loadLastBtn" class="px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition">Cargar</button>
+                </div>
+
+                <form id="formulario-informe" class="space-y-4">
+                    
+                    <div class="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
+                        <h3 class="font-bold text-slate-700 text-sm mb-4">📍 Evento 1</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-500 mb-1">⏰ Hora</label>
+                                <input type="time" id="hora1" required class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                                <small id="error-hora1" class="text-red-600 text-xs hidden">⚠️ Hora 2 debe ser posterior</small>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-500 mb-1">👤 Informante</label>
+                                <input type="text" id="informante1" required value="Control Interno Castaño Pablo" placeholder="Nombre del informante" list="informantes-list" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
+                        <h3 class="font-bold text-slate-700 text-sm mb-4">📍 Evento 2</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-500 mb-1">⏰ Hora</label>
+                                <input type="time" id="hora2" required class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                                <small id="error-hora2" class="text-red-600 text-xs hidden">⚠️ Debe ser posterior a Evento 1</small>
+                                <small id="duracion" class="text-green-600 text-xs hidden"></small>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-500 mb-1">👤 Informante</label>
+                                <input type="text" id="informante2" required value="Control Interno Castaño Pablo" placeholder="Nombre del informante" list="informantes-list" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 mb-1">🏢 Personal Argos</label>
+                        <input type="text" id="argos" required value="Sra. Guaymas Belen" placeholder="Nombre del personal de Argos" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
+
+                    <div class="flex gap-2 pt-4">
+                        <button type="button" id="generarBtn" class="flex-1 px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded font-semibold text-sm transition flex items-center justify-center gap-2">
+                            <i data-lucide="file-text" class="w-4 h-4"></i>
+                            <span>Generar Informe</span>
+                        </button>
+                        <button type="button" id="guardarBtn" class="px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded font-semibold text-sm transition flex items-center justify-center gap-2">
+                            <i data-lucide="save" class="w-4 h-4"></i>
+                            <span>Guardar</span>
+                        </button>
+                        <button type="button" id="inicioBtn" class="px-4 py-2 bg-slate-400 text-white hover:bg-slate-500 rounded font-semibold text-sm transition flex items-center justify-center gap-2">
+                            <i data-lucide="home" class="w-4 h-4"></i>
+                            <span>Inicio</span>
+                        </button>
+                    </div>
+                </form>
             </div>
-            <div class="campo">
-                <label for="hora2">⏰ Hora (Evento 2):</label>
-                <input type="time" id="hora2" required value="18:40">
+
+            <!-- COLUMNA DERECHA: RESULTADO -->
+            <div class="lg:col-span-5 bg-slate-100 border-l border-slate-200 flex flex-col">
+                <div class="p-6 sticky top-0 max-h-screen overflow-y-auto">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="font-bold text-slate-800">📄 Informe Generado</h2>
+                        <div class="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded-full">Historial</div>
+                    </div>
+                    
+                    <!-- HISTORIAL DE INFORMES -->
+                    <div class="mb-4 p-3 bg-slate-50 rounded-lg border border-slate-200">
+                        <select id="historicoSelect" class="w-full p-2 bg-white border border-slate-300 rounded text-xs focus:ring-2 focus:ring-blue-500 outline-none hover:border-blue-400 transition">
+                            <option value="">📜 Seleccionar informe anterior...</option>
+                        </select>
+                        <small class="text-slate-500 mt-1 block">Últimos 10 registros guardados</small>
+                    </div>
+
+                    <div id="reportContainer" class="hidden">
+                        <div class="bg-white rounded-lg shadow-sm border border-slate-300 p-4 mb-4">
+                            <div id="informe" class="text-sm whitespace-pre-wrap leading-relaxed text-slate-700"></div>
+                        </div>
+                        <button id="copiarBtn" class="w-full px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded font-semibold text-sm transition flex items-center justify-center gap-2">
+                            <i data-lucide="copy" class="w-4 h-4"></i>
+                            <span>Copiar al Portapapeles</span>
+                        </button>
+                        <div id="timestamp" class="text-xs text-slate-500 text-center italic mt-3"></div>
+                    </div>
+
+                    <div id="noReport" class="bg-slate-200 rounded-lg p-6 text-center text-slate-600 text-sm">
+                        <i data-lucide="clipboard" class="w-8 h-8 mx-auto mb-2 opacity-50"></i>
+                        <p>El informe aparecerá aquí una vez generado</p>
+                    </div>
+                </div>
             </div>
-            <div class="campo">
-                <label for="informante2">👤 Informante (Evento 2):</label>
-                <input type="text" id="informante2" required value="Control Interno Castaño Pablo" placeholder="Nombre del informante">
-            </div>
-            <div class="campo">
-                <label for="argos">🏢 Personal Argos:</label>
-                <input type="text" id="argos" required value="Sra. Guaymas Belen" placeholder="Nombre del personal de Argos">
-            </div>
-            <button type="button" class="boton" onclick="generarInforme()">📋 Generar Informe</button>
-            <button class="boton boton-inicio" type="button" onclick="window.location.href='index.html'">🏠 Volver al Inicio</button>
-        </form>
+        </div>
     </div>
 
-    <div id="contenedor-informe" class="tarjeta oculto fade-in">
-        <h2>📄 Informe Generado</h2>
-        <div id="informe-html"></div>
-        <button id="copiar-btn" class="boton boton-copiar">📋 Copiar al Portapapeles</button>
-        <div class="timestamp" id="timestamp"></div>
+    <!-- DATALISTS -->
+    <datalist id="informantes-list">
+        <option value="Supervisor de Seguridad Padilla Jorge"></option>
+        <option value="Control Interno Zamboni Rodrigo"></option>
+        <option value="Control Interno Flores Julian"></option>
+        <option value="Control Interno Argañaraz Lorena"></option>
+        <option value="Control Interno Frias Ximena"></option>
+        <option value="Control Interno Castaño Pablo"></option>
+        <option value="Gerente Seguridad Rodriguez"></option>
+        <option value="Supervisor Flores Juan"></option>
+        <option value="Jefe Turno Martinez Pedro"></option>
+        <option value="Operador Lopez Carlos"></option>
+    </datalist>
+
+    <!-- TOAST NOTIFICACIONES -->
+    <div id="notification" class="hidden fixed bottom-4 right-4 bg-green-100 text-green-800 px-4 py-3 rounded-lg shadow-lg flex items-center gap-2 fade-in z-40">
+        <i data-lucide="check-circle" class="w-4 h-4"></i>
+        <span id="notification-text">Operación exitosa</span>
     </div>
-</main>
+
+</body>
 
 <script>
-    // Se ejecuta cuando el DOM está completamente cargado para evitar errores
-    document.addEventListener('DOMContentLoaded', () => {
-        const formulario = document.getElementById('formulario-informe');
-        const contenedorInforme = document.getElementById('contenedor-informe');
-        const informeHtml = document.getElementById('informe-html');
-        const copiarBtn = document.getElementById('copiar-btn');
-        const timestampElement = document.getElementById('timestamp');
+    lucide.createIcons();
 
-        // Auto-completar informante2 cuando se cambia informante1
-        document.getElementById('informante1').addEventListener('input', function() {
-            document.getElementById('informante2').value = this.value;
-        });
+    const formulario = document.getElementById('formulario-informe');
+    const informeDiv = document.getElementById('informe');
+    const reportContainer = document.getElementById('reportContainer');
+    const noReport = document.getElementById('noReport');
+    const copiarBtn = document.getElementById('copiarBtn');
+    const generarBtn = document.getElementById('generarBtn');
+    const guardarBtn = document.getElementById('guardarBtn');
+    const inicioBtn = document.getElementById('inicioBtn');
+    const timestampElement = document.getElementById('timestamp');
+    const historicoSelect = document.getElementById('historicoSelect');
+    const loadLastContainer = document.getElementById('loadLastContainer');
+    const loadLastBtn = document.getElementById('loadLastBtn');
 
-        // Validación en tiempo real
-        document.querySelectorAll('input[required]').forEach(input => {
-            input.addEventListener('blur', function() {
-                if (!this.value.trim()) {
-                    this.style.borderColor = '#e74c3c';
-                } else {
-                    this.style.borderColor = 'var(--color-borde)';
-                }
-            });
-        });
+    // Auto-completar informante2 cuando se cambia informante1
+    document.getElementById('informante1').addEventListener('input', function() {
+        document.getElementById('informante2').value = this.value;
+    });
 
-        // Función para generar el informe (ahora disponible globalmente)
-        window.generarInforme = function() {
-            // Obtenemos los valores de los campos
-            const hora1 = document.getElementById('hora1').value;
-            const informante1 = document.getElementById('informante1').value.trim();
-            const hora2 = document.getElementById('hora2').value;
-            const informante2 = document.getElementById('informante2').value.trim();
-            const argos = document.getElementById('argos').value.trim();
-            
-            // Validación adicional
-            if (!hora1 || !informante1 || !hora2 || !informante2 || !argos) {
-                alert('Por favor, complete todos los campos obligatorios.');
-                return;
-            }
+    // Validación de horas en tiempo real
+    document.getElementById('hora1').addEventListener('change', validarHoras);
+    document.getElementById('hora2').addEventListener('change', validarHoras);
 
-            // Función para formatear hora
-            const formatearHora = (hora) => hora ? hora + " Hs." : "";
-            
-            // Función para crear las etiquetas grises con estilo
-            const crearEtiqueta = (texto) => `<span class="etiqueta-informe">${texto}</span>`;
+    function validarHoras() {
+        const hora1 = document.getElementById('hora1').value;
+        const hora2 = document.getElementById('hora2').value;
+        const error1 = document.getElementById('error-hora1');
+        const error2 = document.getElementById('error-hora2');
+        const duracion = document.getElementById('duracion');
 
-            // Generamos el informe usando HTML para mantener el estilo
-            const contenido = `
-                <p><strong>Control de Botones - Bulevard -</strong></p>
-                <p>A las ${formatearHora(hora1)} CCTV recibe llamada de ${crearEtiqueta(informante1)}, informa que realizará chequeo de botones antipánico.-</p>
-                <p>A las ${formatearHora(hora2)} ${crearEtiqueta(informante2)}, informa que se comunicó personal de Argos ${crearEtiqueta(argos)} informando que se recibió todas las señales de los pulsadores.-</p>
-            `;
+        if (!hora1 || !hora2) return;
 
-            // Mostramos el informe en pantalla
-            informeHtml.innerHTML = contenido;
-            timestampElement.textContent = `Generado el: ${new Date().toLocaleString('es-AR')}`;
-            contenedorInforme.classList.remove('oculto');
-            
-            // Scroll suave al informe
-            setTimeout(() => {
-                contenedorInforme.scrollIntoView({ 
-                    behavior: 'smooth', 
-                    block: 'start' 
-                });
-            }, 100);
+        const [h1, m1] = hora1.split(':').map(Number);
+        const [h2, m2] = hora2.split(':').map(Number);
+        const minutos1 = h1 * 60 + m1;
+        const minutos2 = h2 * 60 + m2;
+
+        if (minutos2 <= minutos1) {
+            error1.classList.remove('hidden');
+            error2.classList.remove('hidden');
+            duracion.classList.add('hidden');
+        } else {
+            error1.classList.add('hidden');
+            error2.classList.add('hidden');
+            const diff = minutos2 - minutos1;
+            const mins = diff % 60;
+            const hrs = Math.floor(diff / 60);
+            duracion.textContent = `⏱️ Duración: ${hrs}h ${mins}m`;
+            duracion.classList.remove('hidden');
         }
-        
-        // Funcionalidad para el botón de copiar
-        copiarBtn.addEventListener('click', async () => {
-            try {
-                // Obtenemos el texto sin formato HTML
-                const textoParaCopiar = informeHtml.innerText || informeHtml.textContent;
-                
-                // Usamos la API del Portapapeles, es segura y moderna
-                await navigator.clipboard.writeText(textoParaCopiar);
-                
-                // Feedback visual al usuario para confirmar que se copió
-                const textoOriginal = copiarBtn.innerText;
-                copiarBtn.innerText = '✅ ¡Copiado!';
-                copiarBtn.classList.add('boton-copiado');
-                
-                // Volver al estado original después de 2 segundos
-                setTimeout(() => {
-                    copiarBtn.innerText = textoOriginal;
-                    copiarBtn.classList.remove('boton-copiado');
-                }, 2000);
-                
-            } catch (err) {
-                console.error('Error al copiar el texto: ', err);
-                
-                // Fallback por si la API no funciona (muy raro en navegadores modernos)
-                try {
-                    const textArea = document.createElement('textarea');
-                    textArea.value = informeHtml.innerText || informeHtml.textContent;
-                    textArea.style.position = 'fixed';
-                    textArea.style.left = '-999999px';
-                    textArea.style.top = '-999999px';
-                    document.body.appendChild(textArea);
-                    textArea.focus();
-                    textArea.select();
-                    document.execCommand('copy');
-                    document.body.removeChild(textArea);
-                    
-                    // Feedback visual
-                    const textoOriginal = copiarBtn.innerText;
-                    copiarBtn.innerText = '✅ ¡Copiado!';
-                    copiarBtn.classList.add('boton-copiado');
-                    
-                    setTimeout(() => {
-                        copiarBtn.innerText = textoOriginal;
-                        copiarBtn.classList.remove('boton-copiado');
-                    }, 2000);
-                    
-                } catch (fallbackErr) {
-                    console.error('Error en el fallback de copia: ', fallbackErr);
-                    alert('No se pudo copiar el texto. Por favor, seleccione y copie manualmente.');
-                }
-            }
+    }
+
+    // Cargar último registro
+    function cargarUltimos() {
+        const ultimo = localStorage.getItem('chkBuleLastRecord');
+        if (ultimo) {
+            const data = JSON.parse(ultimo);
+            document.getElementById('hora1').value = data.hora1 || '';
+            document.getElementById('informante1').value = data.informante1 || '';
+            document.getElementById('hora2').value = data.hora2 || '';
+            document.getElementById('informante2').value = data.informante2 || '';
+            document.getElementById('argos').value = data.argos || '';
+            loadLastContainer.classList.remove('hidden');
+            validarHoras();
+        }
+    }
+
+    loadLastBtn.addEventListener('click', cargarUltimos);
+
+    // Cargar historial desde localStorage
+    function actualizarHistorial() {
+        const historial = JSON.parse(localStorage.getItem('chkBuleHistorial') || '[]');
+        historicoSelect.innerHTML = '<option value="">📜 Seleccionar informe anterior...</option>';
+        historial.reverse().forEach((item, idx) => {
+            const option = document.createElement('option');
+            option.value = idx;
+            option.textContent = `${item.fecha} - ${item.hora1} a ${item.hora2} (${item.informante1})`;
+            historicoSelect.appendChild(option);
         });
+    }
+
+    historicoSelect.addEventListener('change', function() {
+        if (!this.value) return;
+        const historial = JSON.parse(localStorage.getItem('chkBuleHistorial') || '[]').reverse();
+        const item = historial[this.value];
+        if (item) {
+            informeDiv.textContent = item.contenido;
+            timestampElement.textContent = `Generado el: ${item.fecha}`;
+            reportContainer.classList.remove('hidden');
+            noReport.classList.add('hidden');
+        }
+    });
+
+    // Generar informe
+    generarBtn.addEventListener('click', function() {
+        const hora1 = document.getElementById('hora1').value;
+        const informante1 = document.getElementById('informante1').value.trim();
+        const hora2 = document.getElementById('hora2').value;
+        const informante2 = document.getElementById('informante2').value.trim();
+        const argos = document.getElementById('argos').value.trim();
+
+        if (!hora1 || !informante1 || !hora2 || !informante2 || !argos) {
+            showNotification('Complete todos los campos obligatorios', 'error');
+            return;
+        }
+
+        // Validar horas
+        const [h1, m1] = hora1.split(':').map(Number);
+        const [h2, m2] = hora2.split(':').map(Number);
+        if (h2 * 60 + m2 <= h1 * 60 + m1) {
+            showNotification('La hora 2 debe ser posterior a la hora 1', 'error');
+            return;
+        }
+
+        const contenido = `Control de Botones - Bulevard
+
+A las ${hora1} Hs. CCTV recibe llamada de ${informante1}, informa que realizará chequeo de botones antipánico.
+
+A las ${hora2} ${informante2}, informa que se comunicó personal de Argos ${argos} informando que se recibió todas las señales de los pulsadores.`;
+
+        informeDiv.textContent = contenido;
+        timestampElement.textContent = `Generado el: ${new Date().toLocaleString('es-AR')}`;
+        reportContainer.classList.remove('hidden');
+        noReport.classList.add('hidden');
+        showNotification('¡Informe generado exitosamente!');
+    });
+
+    // Guardar registro
+    guardarBtn.addEventListener('click', function() {
+        const hora1 = document.getElementById('hora1').value;
+        const informante1 = document.getElementById('informante1').value.trim();
+        const hora2 = document.getElementById('hora2').value;
+        const informante2 = document.getElementById('informante2').value.trim();
+        const argos = document.getElementById('argos').value.trim();
+
+        if (!hora1 || !informante1 || !hora2 || !informante2 || !argos) {
+            showNotification('Complete todos los campos', 'error');
+            return;
+        }
+
+        // Guardar como último registro
+        localStorage.setItem('chkBuleLastRecord', JSON.stringify({
+            hora1, informante1, hora2, informante2, argos
+        }));
+
+        // Guardar en historial (máx 10)
+        const contenido = informeDiv.textContent || `Control de Botones - Bulevard\n\nA las ${hora1} Hs. CCTV recibe llamada de ${informante1}, informa que realizará chequeo de botones antipánico.\n\nA las ${hora2} ${informante2}, informa que se comunicó personal de Argos ${argos} informando que se recibió todas las señales de los pulsadores.`;
+        const historial = JSON.parse(localStorage.getItem('chkBuleHistorial') || '[]');
+        historial.unshift({
+            fecha: new Date().toLocaleString('es-AR'),
+            hora1, hora2, informante1,
+            contenido
+        });
+        if (historial.length > 10) historial.pop();
+        localStorage.setItem('chkBuleHistorial', JSON.stringify(historial));
+
+        actualizarHistorial();
+        showNotification('¡Registro guardado!');
+    });
+
+    // Copiar al portapapeles
+    copiarBtn.addEventListener('click', async () => {
+        const textoParaCopiar = informeDiv.textContent;
+        try {
+            await navigator.clipboard.writeText(textoParaCopiar);
+            showNotification('¡Copiado al portapapeles!');
+        } catch (err) {
+            const textArea = document.createElement('textarea');
+            textArea.value = textoParaCopiar;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            showNotification('¡Copiado al portapapeles!');
+        }
+    });
+
+    // Establecer hora actual en los inputs
+    function establecerHoraActual() {
+        const now = new Date();
+        const horas = String(now.getHours()).padStart(2, '0');
+        const minutos = String(now.getMinutes()).padStart(2, '0');
+        const horaActual = `${horas}:${minutos}`;
+        document.getElementById('hora1').value = horaActual;
+        document.getElementById('hora2').value = horaActual;
+    }
+
+    // Volver al inicio
+    inicioBtn.addEventListener('click', function() {
+        window.location.href = 'index.html';
+    });
+
+    // Mostrar notificación
+    function showNotification(message, type = 'success') {
+        const notification = document.getElementById('notification');
+        document.getElementById('notification-text').textContent = message;
+        notification.classList.remove('hidden', 'bg-red-100', 'text-red-800');
+        if (type === 'error') {
+            notification.classList.add('bg-red-100', 'text-red-800');
+        } else {
+            notification.classList.add('bg-green-100', 'text-green-800');
+        }
+        setTimeout(() => notification.classList.add('hidden'), 3000);
+    }
+
+    // Inicializar al cargar página
+    window.addEventListener('load', function() {
+        establecerHoraActual();
+        actualizarHistorial();
+        cargarUltimos();
     });
 </script>
-</body>
+
 </html>
