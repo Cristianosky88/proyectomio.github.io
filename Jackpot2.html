@@ -3,477 +3,274 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generador de Texto de Recibo</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <title>Jackpot - Reporte</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-    :root {
-        --primary-color: #4f46e5;
-        --primary-hover: #4338ca;
-        --secondary-color: #64748b;
-        --success-color: #22c55e;
-        --background: #f8fafc;
-        --card-bg: #ffffff;
-        --text-primary: #1e293b;
-        --text-secondary: #64748b;
-        --border-color: #e2e8f0;
-        --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
-        --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
-        --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
-    }
-
-    body.dark-mode {
-        --background: #1a202c;
-        --card-bg: #2d3748;
-        --text-primary: #f8fafc;
-        --text-secondary: #a0aec0;
-        --border-color: #4a5568;
-        --primary-color: #63b3ed;
-        --primary-hover: #4299e1;
-    }
-
-    * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-    }
-
-    body {
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        background: var(--background);
-        color: var(--text-primary);
-        line-height: 1.5;
-        min-height: 100vh;
-        padding: 2rem;
-        transition: background-color 0.3s ease, color 0.3s ease;
-    }
-
-    .container {
-        max-width: 1400px;
-        margin: 0 auto;
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 2rem;
-    }
-
-    .form-section, .output-section {
-        background: var(--card-bg);
-        border-radius: 1rem;
-        padding: 2rem;
-        box-shadow: var(--shadow-lg);
-        transition: background-color 0.3s ease;
-    }
-
-    h1 {
-        font-size: 1.875rem;
-        font-weight: 700;
-        color: var(--primary-color);
-        margin-bottom: 2rem;
-        text-align: center;
-        transition: color 0.3s ease;
-    }
-
-    h2 {
-        font-size: 1.25rem;
-        font-weight: 600;
-        color: var(--text-primary);
-        margin-bottom: 1.5rem;
-        padding-bottom: 0.75rem;
-        border-bottom: 2px solid var(--border-color);
-        transition: color 0.3s ease, border-color 0.3s ease;
-    }
-
-    .form-group {
-        margin-bottom: 1.5rem;
-    }
-
-    label {
-        display: block;
-        font-size: 0.875rem;
-        font-weight: 500;
-        color: var(--text-secondary);
-        margin-bottom: 0.5rem;
-        transition: color 0.3s ease;
-    }
-
-    input, select {
-        width: 100%;
-        padding: 0.75rem 1rem;
-        border: 1px solid var(--border-color);
-        border-radius: 0.5rem;
-        font-size: 0.875rem;
-        transition: all 0.15s ease;
-        background: var(--background);
-        color: var(--text-primary);
-    }
-    
-    body.dark-mode input, body.dark-mode select {
-        background: var(--card-bg);
-    }
-
-
-    input:focus, select:focus {
-        outline: none;
-        border-color: var(--primary-color);
-        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-    }
-
-    .row {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1.5rem;
-        margin-bottom: 1.5rem;
-    }
-
-    .btn {
-        background: var(--primary-color);
-        color: white;
-        border: none;
-        padding: 0.875rem 1.5rem;
-        border-radius: 0.5rem;
-        font-weight: 500;
-        font-size: 0.875rem;
-        cursor: pointer;
-        transition: all 0.15s ease;
-        width: 100%;
-        margin-bottom: 1rem; /* Added margin for spacing between buttons */
-    }
-
-    .btn:hover {
-        background: var(--primary-hover);
-        transform: translateY(-1px);
-    }
-
-    #btnLimpiar {
-        background-color: #f43f5e; /* Red color for clear button */
-    }
-
-    #btnLimpiar:hover {
-        background-color: #e11d48;
-    }
-
-    #btnVolverInicio {
-        background-color: #0ea5e9; /* Blue color for home button */
-    }
-
-    #btnVolverInicio:hover {
-        background-color: #0284c7;
-    }
-    
-    .output-text {
-        font-family: 'Roboto Mono', monospace;
-        font-size: 0.875rem;
-        line-height: 1.7;
-        background: var(--background);
-        padding: 1.5rem;
-        border-radius: 0.5rem;
-        border: 1px solid var(--border-color);
-        white-space: pre-wrap;
-        min-height: 500px;
-        transition: background-color 0.3s ease, border-color 0.3s ease;
-        margin-bottom: 1rem; /* Spacing between text area and copy button */
-    }
-
-    .copy-btn {
-        background: var(--primary-color);
-        color: white;
-        border: none;
-        padding: 0.875rem 1.5rem;
-        border-radius: 0.5rem;
-        font-size: 0.875rem;
-        cursor: pointer;
-        transition: all 0.15s ease;
-        width: 100%; /* Make it full width */
-        display: block;
-    }
-
-    .copy-btn:hover {
-        background: var(--primary-hover);
-    }
-
-    .copy-success {
-        background: var(--success-color) !important;
-    }
-
-    #btnToggleTheme {
-        position: fixed;
-        top: 1rem;
-        right: 1rem;
-        z-index: 1000;
-        background-color: var(--primary-color);
-        color: white;
-        border: none;
-        width: 3rem;
-        height: 3rem;
-        border-radius: 50%;
-        font-size: 1.2rem;
-        cursor: pointer;
-        box-shadow: var(--shadow-md);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: background-color 0.3s ease;
-    }
-
-    #btnToggleTheme:hover {
-        background-color: var(--primary-hover);
-    }
-
-    @media (max-width: 768px) {
-        .container {
-            grid-template-columns: 1fr;
-        }
-        
-        body {
-            padding: 1rem;
-        }
-        
-        .form-section, .output-section {
-            padding: 1.5rem;
-        }
-    }
-
-    /* Animaciones */
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-
-    .form-section, .output-section {
-        animation: fadeIn 0.5s ease-out;
-    }
+        body { background-color: #f8fafc; font-family: sans-serif; }
+        .fade-in { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-<body>
-    <button id="btnToggleTheme"><i class="fas fa-moon"></i></button>
+<body class="p-4 md:p-8 text-slate-800">
 
-    <div class="container">
-        <div class="form-section">
-            <h1>📝 Generador de Texto</h1>
-            
-            <form id="textForm">
-                <h2>📋 Datos Principales</h2>
-                
-                <div class="row">
-                    <div class="form-group">
-                        <label for="hora1">🕐 Hora Línea 1:</label>
-                        <input type="time" id="hora1" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="nombrePersonal">👤 Nombre de Personal:</label>
-                        <input type="text" id="nombrePersonal" required>
-                    </div>
+    <div class="max-w-6xl mx-auto bg-white rounded-xl shadow-xl overflow-hidden border border-slate-200">
+        <!-- Header -->
+        <div class="bg-slate-900 p-5 text-white flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="bg-indigo-600 p-2 rounded-lg">
+                    <i data-lucide="trophy" class="w-6 h-6 text-white"></i>
                 </div>
-
-                <div class="row">
-                    <div class="form-group">
-                        <label for="nombreMaquina">🎰 N° Máquina:</label>
-                        <input type="text" id="nombreMaquina" required>
-                    </div>
+                <div>
+                    <h1 class="text-xl font-bold">Reporte Jackpot</h1>
+                    <p class="text-slate-400 text-xs uppercase tracking-wider">CCTV - Modulo de Caja</p>
                 </div>
-
-                <div class="row">
-                    <div class="form-group">
-                        <label for="valorDe">💰 Valor de:</label>
-                        <input type="number" id="valorDe" step="0.01" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="progresivoValor">📈 Progresivo de valor:</label>
-                        <input type="number" id="progresivoValor" step="0.01" required>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="totalPremio">🏆 Total Premio:</label>
-                    <input type="number" id="totalPremio" step="0.01" required>
-                </div>
-
-                <hr style="margin: 30px 0; border: 1px solid #dee2e6;">
-
-                <h2>📋 Otros Datos</h2>
-
-                <div class="row">
-                    <div class="form-group">
-                        <label for="hora2">🕐 Hora Línea 2:</label>
-                        <input type="time" id="hora2" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="hora3">🕐 Hora Línea 3:</label>
-                        <input type="time" id="hora3" required>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="form-group">
-                        <label for="hora4">🕐 Hora Línea 4:</label>
-                        <input type="time" id="hora4" required>
-                    </div>
-
-                <div class="form-group">
-                    <label for="cliente">👤 Nombre del Cliente:</label>
-                    <input type="text" id="cliente" placeholder="Nombre del cliente" required>
-                </div>
-                <div class="form-group">
-                    <label for="tipoCliente">👥 Tipo de Cliente:</label>
-                    <select id="tipoCliente" class="form-control" required>
-                        <option value="cliente">Cliente</option>
-                        <option value="clienta">Clienta</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="jefeCaja">Jefe de Caja:</label>
-                    <input type="text" id="jefeCaja" required>
-                </div>
-
-                    <div class="form-group">
-                        <label for="ventanilla">💰 Ventanilla:</label>
-                        <input type="text" id="ventanilla" required>
-                    </div>
-                </div>
-
-                <hr style="margin: 30px 0; border: 1px solid #dee2e6;">
-
-                <h2>📋 Información Adicional</h2>
-                <div class="row">
-                    <div class="form-group">
-                        <label for="maquinaInfo">🎰 Máquina:</label>
-                        <input type="text" id="maquinaInfo" placeholder="Información de la máquina">
-                    </div>
-                    <div class="form-group">
-                        <label for="juegoInfo">🎮 Juego:</label>
-                        <input type="text" id="juegoInfo" placeholder="Nombre del juego">
-                    </div>
-                    <div class="form-group">
-                        <label for="pagoManualInfo">💵 Pago Manual:</label>
-                        <input type="text" id="pagoManualInfo" placeholder="Información del pago manual">
-                    </div>
-                </div>
-
-                <button type="button" class="btn" onclick="generateText()">📋 Generar Texto</button>
-                <button type="button" class="btn" id="btnLimpiar">🧹 Limpiar</button>
-                <button type="button" class="btn" id="btnVolverInicio">🏠 Volver a Inicio</button>
-            </form>
+            </div>
+            <div class="text-right">
+                <div class="text-xs text-slate-400">Fecha</div>
+                <div class="font-mono font-bold text-lg" id="fechaActual">--/--/--</div>
+            </div>
         </div>
 
-        <div class="output-section">
-            <h2>📄 Texto Generado</h2>
-            <div class="output-text" id="outputText">
-                <span style="color: #666; font-style: italic;">Completa el formulario y presiona "Generar Texto"...</span>
+        <div class="grid grid-cols-1 lg:grid-cols-12">
+            <!-- Formulario -->
+            <div class="lg:col-span-7 p-6 bg-slate-50">
+                <form id="textForm" class="space-y-6">
+                <!-- Datos principales -->
+                <div class="bg-white p-4 rounded-lg shadow-sm border border-slate-200 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h3 class="font-bold text-slate-700 text-sm flex items-center gap-2">
+                            <span class="bg-slate-200 text-slate-600 w-6 h-6 rounded-full flex items-center justify-center text-xs">1</span>
+                            Datos principales
+                        </h3>
+                    </div>
+
+                    <div class="grid grid-cols-12 gap-4">
+                        <div class="col-span-4">
+                            <label class="block text-xs font-semibold text-slate-500 mb-1">Hora aviso</label>
+                            <input type="time" id="hora1" class="w-full p-2 bg-slate-50 border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                        </div>
+                        <div class="col-span-8">
+                            <label class="block text-xs font-semibold text-slate-500 mb-1">Nombre del personal</label>
+                            <input type="text" id="nombrePersonal" class="w-full p-2 bg-slate-50 border border-slate-300 rounded text-sm outline-none">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-12 gap-4">
+                        <div class="col-span-6">
+                            <label class="block text-xs font-semibold text-slate-500 mb-1">Nro Maquina</label>
+                            <input type="text" id="nombreMaquina" class="w-full p-2 bg-slate-50 border border-slate-300 rounded text-sm outline-none">
+                        </div>
+                        <div class="col-span-6">
+                            <label class="block text-xs font-semibold text-slate-500 mb-1">Ventanilla</label>
+                            <input type="text" id="ventanilla" class="w-full p-2 bg-slate-50 border border-slate-300 rounded text-sm outline-none">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-12 gap-4">
+                        <div class="col-span-4">
+                            <label class="block text-xs font-semibold text-slate-500 mb-1">Valor base</label>
+                            <input type="number" step="0.01" id="valorDe" class="w-full p-2 bg-slate-50 border border-slate-300 rounded text-sm outline-none">
+                        </div>
+                        <div class="col-span-4">
+                            <label class="block text-xs font-semibold text-slate-500 mb-1">Progresivo</label>
+                            <input type="number" step="0.01" id="progresivoValor" class="w-full p-2 bg-slate-50 border border-slate-300 rounded text-sm outline-none">
+                        </div>
+                        <div class="col-span-4">
+                            <label class="block text-xs font-semibold text-slate-500 mb-1">Total premio</label>
+                            <input type="number" step="0.01" id="totalPremio" class="w-full p-2 bg-slate-50 border border-slate-300 rounded text-sm outline-none" placeholder="Opcional">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Otros datos -->
+                <div class="bg-white p-4 rounded-lg shadow-sm border border-slate-200 space-y-4">
+                    <h3 class="font-bold text-slate-700 text-sm flex items-center gap-2 mb-2">
+                        <span class="bg-slate-200 text-slate-600 w-6 h-6 rounded-full flex items-center justify-center text-xs">2</span>
+                        Tiempos y cliente
+                    </h3>
+
+                    <div class="grid grid-cols-12 gap-4">
+                        <div class="col-span-4">
+                            <label class="block text-xs font-semibold text-slate-500 mb-1">Hora revision</label>
+                            <input type="time" id="hora2" class="w-full p-2 bg-slate-50 border border-slate-300 rounded text-sm outline-none">
+                        </div>
+                        <div class="col-span-4">
+                            <label class="block text-xs font-semibold text-slate-500 mb-1">Hora pago</label>
+                            <input type="time" id="hora3" class="w-full p-2 bg-slate-50 border border-slate-300 rounded text-sm outline-none">
+                        </div>
+                        <div class="col-span-4">
+                            <label class="block text-xs font-semibold text-slate-500 mb-1">Hora descarga</label>
+                            <input type="time" id="hora4" class="w-full p-2 bg-slate-50 border border-slate-300 rounded text-sm outline-none">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-12 gap-4">
+                        <div class="col-span-8">
+                            <label class="block text-xs font-semibold text-slate-500 mb-1">Nombre cliente</label>
+                            <input type="text" id="cliente" class="w-full p-2 bg-slate-50 border border-slate-300 rounded text-sm outline-none" placeholder="Apellido y nombre">
+                        </div>
+                        <div class="col-span-4">
+                            <label class="block text-xs font-semibold text-slate-500 mb-1">Tratamiento</label>
+                            <select id="tipoCliente" class="w-full p-2 bg-slate-50 border border-slate-300 rounded text-sm outline-none">
+                                <option value="cliente">Cliente (Sr.)</option>
+                                <option value="clienta">Clienta (Sra.)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-12 gap-4">
+                        <div class="col-span-6">
+                            <label class="block text-xs font-semibold text-slate-500 mb-1">Jefe de caja</label>
+                            <input type="text" id="jefeCaja" class="w-full p-2 bg-slate-50 border border-slate-300 rounded text-sm outline-none">
+                        </div>
+                        <div class="col-span-6">
+                            <label class="block text-xs font-semibold text-slate-500 mb-1">Responsable descarga</label>
+                            <input type="text" id="responsableDescarga" class="w-full p-2 bg-slate-50 border border-slate-300 rounded text-sm outline-none" placeholder="Opcional">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Info adicional -->
+                <div class="bg-white p-4 rounded-lg shadow-sm border border-slate-200 space-y-4">
+                    <h3 class="font-bold text-slate-700 text-sm flex items-center gap-2 mb-2">
+                        <span class="bg-slate-200 text-slate-600 w-6 h-6 rounded-full flex items-center justify-center text-xs">3</span>
+                        Informacion adicional
+                    </h3>
+
+                    <div class="grid grid-cols-12 gap-4">
+                        <div class="col-span-4">
+                            <label class="block text-xs font-semibold text-slate-500 mb-1">Maquina</label>
+                            <input type="text" id="maquinaInfo" class="w-full p-2 bg-slate-50 border border-slate-300 rounded text-sm outline-none" placeholder="Opcional">
+                        </div>
+                        <div class="col-span-4">
+                            <label class="block text-xs font-semibold text-slate-500 mb-1">Juego</label>
+                            <input type="text" id="juegoInfo" class="w-full p-2 bg-slate-50 border border-slate-300 rounded text-sm outline-none" placeholder="Opcional">
+                        </div>
+                        <div class="col-span-4">
+                            <label class="block text-xs font-semibold text-slate-500 mb-1">Pago manual</label>
+                            <input type="text" id="pagoManualInfo" class="w-full p-2 bg-slate-50 border border-slate-300 rounded text-sm outline-none" placeholder="Opcional">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap gap-3 pt-2">
+                    <button type="button" onclick="generateText()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded shadow-sm transition flex items-center gap-2">
+                        <i data-lucide="wand-2" class="w-4 h-4"></i> Generar texto
+                    </button>
+                    <button type="button" id="btnLimpiar" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold rounded border border-slate-300 transition flex items-center gap-2">
+                        <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Limpiar
+                    </button>
+                    <button type="button" id="btnVolverInicio" class="px-4 py-2 bg-sky-500 hover:bg-sky-600 text-white text-sm font-semibold rounded shadow-sm transition flex items-center gap-2">
+                        <i data-lucide="home" class="w-4 h-4"></i> Inicio
+                    </button>
+                </div>
+                </form>
             </div>
-            <button class="copy-btn" id="copyBtn" onclick="copyText()">📋 Copiar</button>
+
+            <!-- Vista previa -->
+            <div class="lg:col-span-5 bg-slate-100 border-l border-slate-200 flex flex-col">
+                <div class="p-6 sticky top-0 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h2 class="font-bold text-slate-800">Vista previa</h2>
+                        <span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full font-medium">En vivo</span>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-sm border border-slate-300 p-1 relative group">
+                        <textarea id="outputText" class="w-full h-72 p-4 text-sm font-mono leading-relaxed text-slate-700 resize-none outline-none" readonly spellcheck="false"></textarea>
+                        <button onclick="copyText()" class="absolute bottom-4 right-4 bg-slate-800 hover:bg-slate-700 text-white p-3 rounded-full shadow-lg transition-all transform hover:scale-105 group-hover:opacity-100 opacity-90 flex items-center gap-2">
+                            <i data-lucide="copy" class="w-5 h-5"></i>
+                            <span class="text-sm font-bold pr-1">Copiar</span>
+                        </button>
+                    </div>
+
+                    <div id="toast" class="hidden bg-green-100 border border-green-200 text-green-800 px-4 py-3 rounded-lg text-sm flex items-center gap-2 fade-in">
+                        <i data-lucide="check-circle" class="w-4 h-4"></i>
+                        <span>Copiado al portapapeles.</span>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
+        lucide.createIcons();
+        document.getElementById('fechaActual').innerText = new Date().toLocaleDateString('es-AR');
+
         function formatCurrency(amount) {
             return new Intl.NumberFormat('es-AR', {
                 style: 'decimal',
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2
-            }).format(amount);
+            }).format(amount || 0);
         }
 
         function generateText() {
-            // Obtener los valores de las horas correctamente
-            const hora1 = document.getElementById('hora1').value;
-            const hora2 = document.getElementById('hora2').value;
-            const hora3 = document.getElementById('hora3').value;
-            const hora4 = document.getElementById('hora4').value;
-            
-            const nombrePersonal = document.getElementById('nombrePersonal').value;
-            const nombreMaquina = document.getElementById('nombreMaquina').value;
+            const hora1 = document.getElementById('hora1').value || '--:--';
+            const hora2 = document.getElementById('hora2').value || '--:--';
+            const hora3 = document.getElementById('hora3').value || '--:--';
+            const hora4 = document.getElementById('hora4').value || '--:--';
+
+            const nombrePersonal = document.getElementById('nombrePersonal').value || '___';
+            const responsableDescarga = document.getElementById('responsableDescarga').value || nombrePersonal;
+            const nombreMaquina = document.getElementById('nombreMaquina').value || '___';
             const valorDe = parseFloat(document.getElementById('valorDe').value) || 0;
             const progresivoValor = parseFloat(document.getElementById('progresivoValor').value) || 0;
-            const totalPremio = valorDe + progresivoValor;
-            const cliente = document.getElementById('cliente').value;
-            const tipoCliente = document.getElementById('tipoCliente').value;
-            const jefeCaja = document.getElementById('jefeCaja').value;
-            const ventanilla = document.getElementById('ventanilla').value;
-            const maquinaInfo = document.getElementById('maquinaInfo').value;
-            const juegoInfo = document.getElementById('juegoInfo').value;
-            const pagoManualInfo = document.getElementById('pagoManualInfo').value;
+            const totalInput = parseFloat(document.getElementById('totalPremio').value);
+            const totalPremio = isNaN(totalInput) ? valorDe + progresivoValor : totalInput;
 
-            // Definir el prefijo según el tipo de cliente
+            const cliente = document.getElementById('cliente').value || '___';
+            const tipoCliente = document.getElementById('tipoCliente').value;
+            const jefeCaja = document.getElementById('jefeCaja').value || '___';
+            const ventanilla = document.getElementById('ventanilla').value || '___';
+            const maquinaInfo = document.getElementById('maquinaInfo').value || '---';
+            const juegoInfo = document.getElementById('juegoInfo').value || '---';
+            const pagoManualInfo = document.getElementById('pagoManualInfo').value || '---';
+
             const prefijo = tipoCliente === 'clienta' ? 'la Sra.' : 'el Sr.';
 
-            const texto = `A las ${hora1} Hs. recibe llamada de ${nombrePersonal}, informa Jackpot en Máq. ${nombreMaquina} por un valor de ${formatCurrency(valorDe)} pero a dicho valor se le tiene que sumar un progresivo de valor ${formatCurrency(progresivoValor)} un total de premio ganador por ${formatCurrency(totalPremio)} -
-(A las ${hora2} Hs.) Revisión muestra que ${prefijo} ${cliente}, juega en Máq. ${nombreMaquina} al salir el premio -
-A las ${hora3} Hs. Jefe de Caja ${jefeCaja}, cancela en ventanilla de caja ${ventanilla} a ${prefijo} ${cliente} -
-A las ${hora4} Hs. ${nombrePersonal}, registra y descarga el premio de Máq. ${nombreMaquina} -
+            const texto = `A las ${hora1} Hs. CCTV recibe llamada de ${nombrePersonal}, informa Jackpot en maq. ${nombreMaquina} por un valor de ${formatCurrency(valorDe)}, se suma progresivo de ${formatCurrency(progresivoValor)} alcanzando un total de ${formatCurrency(totalPremio)} -
+(A las ${hora2} Hs.) Revision muestra que ${prefijo} ${cliente} jugaba en maq. ${nombreMaquina} al salir el premio -
+A las ${hora3} Hs. Jefe de caja ${jefeCaja} cancela en ventanilla ${ventanilla} a ${prefijo} ${cliente} -
+A las ${hora4} Hs. ${responsableDescarga} registra y descarga el premio de maq. ${nombreMaquina} -
 
-Máquina: ${maquinaInfo}
+Maquina: ${maquinaInfo}
 Juego: ${juegoInfo}
-Pago Manual: ${pagoManualInfo}
+Pago manual: ${pagoManualInfo}
 
-Apéndice 1: Fotos -`;
+Apendice 1: Fotos -`;
 
-            document.getElementById('outputText').innerHTML = texto;
+            document.getElementById('outputText').value = texto;
         }
 
         function copyText() {
-            const outputText = document.getElementById('outputText');
-            const textToCopy = outputText.textContent.trim();
-            
-            const copyBtn = document.getElementById('copyBtn');
+            const copyText = document.getElementById('outputText');
+            copyText.select();
+            copyText.setSelectionRange(0, 99999);
+            document.execCommand('copy');
 
-            navigator.clipboard.writeText(textToCopy).then(function() {
-                copyBtn.textContent = '✅ Copiado';
-                copyBtn.classList.add('copy-success');
-                
-                setTimeout(function() {
-                    copyBtn.textContent = '📋 Copiar';
-                    copyBtn.classList.remove('copy-success');
-                }, 2000);
-            }).catch(function(err) {
-                console.error('Error al copiar: ', err);
-                alert('Error al copiar el texto');
+            const toast = document.getElementById('toast');
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 3000);
+        }
+
+        document.getElementById('btnLimpiar').addEventListener('click', () => {
+            document.querySelectorAll('input, select').forEach(el => {
+                if (el.type === 'select-one') {
+                    el.selectedIndex = 0;
+                } else {
+                    el.value = '';
+                }
             });
-        }
-
-        // Funcionalidad para el tema oscuro
-        const btnToggleTheme = document.getElementById('btnToggleTheme');
-        btnToggleTheme.addEventListener('click', () => {
-            document.body.classList.toggle('dark-mode');
-            const isDarkMode = document.body.classList.contains('dark-mode');
-            localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
-            
-            const icon = btnToggleTheme.querySelector('i');
-            if (isDarkMode) {
-                icon.classList.remove('fa-moon');
-                icon.classList.add('fa-sun');
-            } else {
-                icon.classList.remove('fa-sun');
-                icon.classList.add('fa-moon');
-            }
-        });
-
-        // Aplicar el tema guardado en localStorage al cargar la página
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme === 'dark') {
-            document.body.classList.add('dark-mode');
-            const icon = btnToggleTheme.querySelector('i');
-            icon.classList.remove('fa-moon');
-            icon.classList.add('fa-sun');
-        }
-
-        // Auto-generar cuando se cambie cualquier campo
-        document.getElementById('textForm').addEventListener('input', function() {
             generateText();
         });
 
-        // Funcionalidad del botón de Limpiar
-        document.getElementById('btnLimpiar').addEventListener('click', function() {
-            document.getElementById('textForm').reset();
-            generateText(); 
+        document.getElementById('btnVolverInicio').addEventListener('click', () => {
+            window.location.href = '/';
         });
 
-        // Funcionalidad del botón de Volver a Inicio
-        document.getElementById('btnVolverInicio').addEventListener('click', function() {
-            window.location.href = '/'; 
-        });
+        document.getElementById('textForm')?.addEventListener('input', generateText);
 
-        // Generar texto inicial
         generateText();
     </script>
 </body>
