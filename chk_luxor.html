@@ -19,7 +19,7 @@
         <!-- Header -->
         <div class="bg-slate-900 p-5 text-white flex justify-between items-center">
             <div class="flex items-center gap-3">
-                <div class="bg-purple-600 p-2 rounded-lg">
+                <div class="bg-indigo-600 p-2 rounded-lg">
                     <i data-lucide="check-circle" class="w-6 h-6 text-white"></i>
                 </div>
                 <div>
@@ -35,62 +35,62 @@
             <div class="lg:col-span-7 p-6 space-y-4 bg-slate-50">
                 
                 <!-- CARGAR ÚLTIMO REGISTRO -->
-                <div id="loadLastContainer" class="hidden bg-purple-50 border border-purple-300 rounded-lg p-3 flex items-center justify-between">
-                    <span class="text-xs text-purple-700">✓ Último registro disponible</span>
-                    <button type="button" id="loadLastBtn" class="px-3 py-1 bg-purple-600 text-white text-xs rounded hover:bg-purple-700 transition">Cargar</button>
+                <div id="loadLastContainer" class="hidden bg-indigo-50 border border-indigo-300 rounded-lg p-3 flex items-center justify-between">
+                    <span class="text-xs text-indigo-700">✓ Último registro disponible</span>
+                    <button type="button" id="loadLastBtn" class="px-3 py-1 bg-indigo-600 text-white text-xs rounded hover:bg-indigo-700 transition">Cargar</button>
                 </div>
 
                 <form id="formulario-informe" class="space-y-4">
                     
                     <div class="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
                         <h3 class="font-bold text-slate-700 text-sm flex items-center gap-2 mb-4">
-                            <span class="bg-purple-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">1</span>
+                            <span class="bg-slate-200 text-slate-700 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">1</span>
                             Inicio - Solicitud de Chequeo
                         </h3>
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-xs font-semibold text-slate-500 mb-1">⏰ Inicio</label>
-                                <input type="time" id="hora1" required class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-purple-500 outline-none">
+                                <input type="time" id="hora1" required class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
                                 <small id="error-hora1" class="text-red-600 text-xs hidden">⚠️ Hora 2 debe ser posterior</small>
                             </div>
                             <div>
                                 <label class="block text-xs font-semibold text-slate-500 mb-1">👤 Operador</label>
-                                <input type="text" id="operador1" required value="Op. Morales Jose Luis" placeholder="Nombre del operador" list="operadores-list" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-purple-500 outline-none">
+                                <input type="text" id="operador1" required value="Op. Morales Jose Luis" placeholder="Nombre del operador" list="operadores-list" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
                             </div>
                         </div>
                     </div>
 
                     <div class="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
                         <h3 class="font-bold text-slate-700 text-sm flex items-center gap-2 mb-4">
-                            <span class="bg-green-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">2</span>
+                            <span class="bg-slate-200 text-slate-700 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">2</span>
                             Finalización - Chequeo de Botones
                         </h3>
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-xs font-semibold text-slate-500 mb-1">⏰ Fin</label>
-                                <input type="time" id="hora2" required class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-purple-500 outline-none">
+                                <input type="time" id="hora2" required class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
                                 <small id="error-hora2" class="text-red-600 text-xs hidden">⚠️ Debe ser posterior a Evento 1</small>
                                 <small id="duracion" class="text-green-600 text-xs hidden"></small>
                             </div>
                             <div>
                                 <label class="block text-xs font-semibold text-slate-500 mb-1">👤 Operador</label>
-                                <input type="text" id="operador2" required value="Op. Morales Jose Luis" placeholder="Nombre del operador" list="operadores-list" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-purple-500 outline-none">
+                                <input type="text" id="operador2" required value="Op. Morales Jose Luis" placeholder="Nombre del operador" list="operadores-list" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
                             </div>
                         </div>
 
                         <div class="mt-4">
                             <label class="block text-xs font-semibold text-slate-500 mb-1">🏢 Personal de Argos</label>
-                            <input type="text" id="personal_argos" required value="Sra. Guaymas Belen" placeholder="Nombre del personal de Argos" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-purple-500 outline-none">
+                            <input type="text" id="personal_argos" required value="Sra. Guaymas Belen" placeholder="Nombre del personal de Argos" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
                         </div>
 
                         <div class="mt-4">
                             <label class="block text-xs font-semibold text-slate-500 mb-1">📋 Resultado del Chequeo</label>
-                            <input type="text" id="resultado" required value="informando que llegaron las señales de Caja y Tesoro." placeholder="Descripción del resultado" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-purple-500 outline-none">
+                            <input type="text" id="resultado" required value="informando que llegaron las señales de Caja y Tesoro." placeholder="Descripción del resultado" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
                         </div>
                     </div>
 
                     <div class="flex gap-2 pt-4">
-                        <button type="button" id="generarBtn" class="flex-1 px-4 py-2 bg-purple-600 text-white hover:bg-purple-700 rounded font-semibold text-sm transition flex items-center justify-center gap-2">
+                        <button type="button" id="generarBtn" class="flex-1 px-4 py-2 bg-indigo-600 text-white hover:bg-indigo-700 rounded font-semibold text-sm transition flex items-center justify-center gap-2">
                             <i data-lucide="file-text" class="w-4 h-4"></i>
                             <span>Generar Informe</span>
                         </button>
@@ -111,12 +111,12 @@
                 <div class="p-6 sticky top-0 max-h-screen overflow-y-auto">
                     <div class="flex items-center justify-between mb-4">
                         <h2 class="font-bold text-slate-800">📄 Informe Generado</h2>
-                        <div class="text-xs px-2 py-1 bg-purple-100 text-purple-700 rounded-full">Historial</div>
+                        <div class="text-xs px-2 py-1 bg-indigo-100 text-indigo-700 rounded-full">Historial</div>
                     </div>
                     
                     <!-- HISTORIAL DE INFORMES -->
                     <div class="mb-4 p-3 bg-slate-50 rounded-lg border border-slate-200">
-                        <select id="historicoSelect" class="w-full p-2 bg-white border border-slate-300 rounded text-xs focus:ring-2 focus:ring-purple-500 outline-none hover:border-purple-400 transition">
+                        <select id="historicoSelect" class="w-full p-2 bg-white border border-slate-300 rounded text-xs focus:ring-2 focus:ring-indigo-500 outline-none hover:border-indigo-400 transition">
                             <option value="">📜 Seleccionar informe anterior...</option>
                         </select>
                         <small class="text-slate-500 mt-1 block">Últimos 10 registros guardados</small>
@@ -378,3 +378,6 @@ A las ${hora2} ${operador2}, informa que se comunicó personal de Argos ${person
 </script>
 
 </html>
+
+
+
