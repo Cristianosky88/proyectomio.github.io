@@ -27,9 +27,6 @@
                     <p class="text-slate-400 text-xs uppercase tracking-wider">Gestión de Tickets y Pagos</p>
                 </div>
             </div>
-            <button id="modoToggle" class="bg-slate-700 hover:bg-slate-600 p-2 rounded-lg transition" title="Alternar tema">
-                <i data-lucide="moon" class="w-5 h-5"></i>
-            </button>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12">
@@ -119,7 +116,19 @@
             <!-- COLUMNA DERECHA: REPORTE E HISTORIAL -->
             <div class="lg:col-span-5 bg-slate-100 border-l border-slate-200 flex flex-col">
                 <div class="p-6 sticky top-0 max-h-screen overflow-y-auto">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="font-bold text-slate-800">📄 Reporte Generado</h2>
+                        <div class="text-xs px-2 py-1 bg-indigo-100 text-indigo-700 rounded-full">Historial</div>
+                    </div>
                     
+                    <!-- HISTORIAL DE REPORTES -->
+                    <div class="mb-4 p-3 bg-slate-50 rounded-lg border border-slate-200">
+                        <select id="historicoSelect" class="w-full p-2 bg-white border border-slate-300 rounded text-xs focus:ring-2 focus:ring-indigo-500 outline-none hover:border-indigo-400 transition">
+                            <option value="">📜 Seleccionar reporte anterior...</option>
+                        </select>
+                        <small class="text-slate-500 mt-1 block">Últimos 10 registros guardados</small>
+                    </div>
+
                     <!-- INDICADOR DE DEUDA -->
                     <div id="deudaIndicador" class="hidden mb-4 p-4 rounded-lg">
                         <div class="text-xs font-semibold mb-2">⚠️ Estado de Pago</div>
@@ -128,21 +137,19 @@
 
                     <!-- REPORTE -->
                     <div id="reportContainer" class="hidden">
-                        <h2 class="font-bold text-slate-800 mb-4">📄 Reporte Generado</h2>
                         <div class="bg-white rounded-lg shadow-sm border border-slate-300 p-4 mb-4">
                             <div id="reporte" class="text-sm font-mono whitespace-pre-wrap leading-relaxed text-slate-700"></div>
                         </div>
+                        <button id="copiarReporteBtn" class="w-full px-4 py-2 bg-indigo-600 text-white hover:bg-indigo-700 rounded font-semibold text-sm transition flex items-center justify-center gap-2 mb-3">
+                            <i data-lucide="copy" class="w-4 h-4"></i>
+                            <span>Copiar Reporte</span>
+                        </button>
+                        <div id="timestamp" class="text-xs text-slate-500 text-center italic"></div>
                     </div>
 
-                    <!-- HISTORIAL -->
-                    <div id="historialContainer">
-                        <h2 class="font-bold text-slate-800 mb-4">📋 Historial de Reportes</h2>
-                        <div id="historial" class="space-y-3">
-                            <div class="bg-slate-200 rounded-lg p-6 text-center text-slate-600 text-sm">
-                                <i data-lucide="history" class="w-8 h-8 mx-auto mb-2 opacity-50"></i>
-                                <p>Sin reportes aún</p>
-                            </div>
-                        </div>
+                    <div id="noReport" class="bg-slate-200 rounded-lg p-6 text-center text-slate-600 text-sm">
+                        <i data-lucide="clipboard" class="w-8 h-8 mx-auto mb-2 opacity-50"></i>
+                        <p>El reporte aparecerá aquí una vez generado</p>
                     </div>
                 </div>
             </div>
@@ -189,10 +196,14 @@
     const formTickets = document.getElementById('formTickets');
     const avisoMonto = document.getElementById('avisoMonto');
     const reporteDiv = document.getElementById('reporte');
-    const historialDiv = document.getElementById('historial');
     const observaciones = document.getElementById('observaciones');
     const deudaIndicador = document.getElementById('deudaIndicador');
     const deudaTexto = document.getElementById('deudaTexto');
+    const historicoSelect = document.getElementById('historicoSelect');
+    const reportContainer = document.getElementById('reportContainer');
+    const noReport = document.getElementById('noReport');
+    const copiarReporteBtn = document.getElementById('copiarReporteBtn');
+    const timestampElement = document.getElementById('timestamp');
 
     // Formateo de campos numéricos
     [valorTotal, montoPagado].forEach(input => {
@@ -305,22 +316,33 @@ Fecha y hora: ${fecha.toLocaleString('es-AR')}`;
         showNotification('¡Reporte generado exitosamente!');
     });
 
-    // Actualizar historial
+    // Actualizar historial con dropdown selector
     function actualizarHistorial() {
-        const historial = JSON.parse(localStorage.getItem('palvarHistorial')) || [];
-        if (historial.length === 0) {
-            historialDiv.innerHTML = '<div class="bg-slate-200 rounded-lg p-6 text-center text-slate-600 text-sm"><i data-lucide="history" class="w-8 h-8 mx-auto mb-2 opacity-50"></i><p>Sin reportes aún</p></div>';
-        } else {
-            historialDiv.innerHTML = historial.map((item, idx) => `
-                <div class="bg-white rounded-lg shadow-sm border border-slate-300 p-3">
-                    <div class="text-xs text-slate-500 mb-2">${item.timestamp}</div>
-                    <div class="text-xs font-mono text-slate-700 whitespace-pre-wrap line-clamp-3">${item.text}</div>
-                    <button type="button" onclick="eliminarHistorialItem(${idx})" class="text-xs mt-2 text-red-600 hover:text-red-800">Eliminar</button>
-                </div>
-            `).join('');
-            lucide.createIcons();
-        }
+        const historial = JSON.parse(localStorage.getItem('palvarHistorial') || '[]');
+        historicoSelect.innerHTML = '<option value="">📜 Seleccionar reporte anterior...</option>';
+        historial.forEach((item, idx) => {
+            const option = document.createElement('option');
+            option.value = idx;
+            option.textContent = `${item.timestamp} - ${item.nombre} (${item.cargo})`;
+            historicoSelect.appendChild(option);
+        });
     }
+
+    historicoSelect.addEventListener('change', function() {
+        if (!this.value) {
+            reportContainer.classList.add('hidden');
+            noReport.classList.remove('hidden');
+            return;
+        }
+        const historial = JSON.parse(localStorage.getItem('palvarHistorial') || '[]');
+        const item = historial[this.value];
+        if (item) {
+            reporteDiv.textContent = item.text;
+            timestampElement.textContent = `Generado el: ${item.timestamp}`;
+            reportContainer.classList.remove('hidden');
+            noReport.classList.add('hidden');
+        }
+    });
 
     function eliminarHistorialItem(idx) {
         let historial = JSON.parse(localStorage.getItem('palvarHistorial')) || [];
@@ -331,7 +353,7 @@ Fecha y hora: ${fecha.toLocaleString('es-AR')}`;
     }
 
     // Copiar reporte
-    document.getElementById('copiarBtn').addEventListener('click', function () {
+    copiarReporteBtn.addEventListener('click', function () {
         const texto = reporteDiv.textContent;
         if (!texto) {
             showNotification('Genera un reporte primero', 'error');
@@ -350,11 +372,36 @@ Fecha y hora: ${fecha.toLocaleString('es-AR')}`;
         });
     });
 
+    // Copiar reporte old button
+    const copiarBtn = document.getElementById('copiarBtn');
+    if (copiarBtn) {
+        copiarBtn.addEventListener('click', function () {
+            const texto = reporteDiv.textContent;
+            if (!texto) {
+                showNotification('Genera un reporte primero', 'error');
+                return;
+            }
+            navigator.clipboard.writeText(texto).then(() => {
+                showNotification('¡Copiado al portapapeles!');
+            }).catch(() => {
+                const textarea = document.createElement('textarea');
+                textarea.value = texto;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                showNotification('¡Copiado al portapapeles!');
+            });
+        });
+    }
+
     // Borrar historial
     document.getElementById('borrarBtn').addEventListener('click', function () {
         if (confirm('¿Está seguro de borrar todo el historial?')) {
             localStorage.removeItem('palvarHistorial');
             actualizarHistorial();
+            reportContainer.classList.add('hidden');
+            noReport.classList.remove('hidden');
             showNotification('¡Historial borrado!');
         }
     });
@@ -363,6 +410,17 @@ Fecha y hora: ${fecha.toLocaleString('es-AR')}`;
     document.getElementById('inicioBtn').addEventListener('click', function () {
         window.location.href = 'index.html';
     });
+
+    // Cargar último cliente al iniciar
+    const lastClient = JSON.parse(localStorage.getItem('palvarLastClient') || 'null');
+    if (lastClient) {
+        document.getElementById('nombrePersona').value = lastClient.nombre || '';
+        document.getElementById('clienteGenero').value = lastClient.clienteGenero || 'cliente';
+        document.getElementById('tipoCargo').value = lastClient.cargo || '';
+    }
+
+    // Inicializar historial
+    actualizarHistorial();
 
     // Mostrar notificación
     function showNotification(message, type = 'success') {
