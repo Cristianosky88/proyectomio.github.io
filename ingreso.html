@@ -59,7 +59,12 @@
                                         <option value="Control Interno Castaño Pablo">Control Interno Castaño Pablo</option>
                                         <option value="Control Interno Argañaraz Lorena">Control Interno Argañaraz Lorena</option>
                                         <option value="Control Interno Frias Ximena">Control Interno Frias Ximena</option>
+                                        <option value="custom">✎ Personalizado</option>
                                     </select>
+                                </div>
+                                <div id="custom-supervisor1" class="hidden">
+                                    <label class="block text-xs font-semibold text-slate-500 mb-1">👤 Control Interno Personalizado</label>
+                                    <input type="text" id="supervisor1-custom" placeholder="Ingresar nombre" class="w-full p-2 bg-slate-50 border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
                                 </div>
                             </div>
 
@@ -104,7 +109,12 @@
                                         <option value="Control Interno Castaño Pablo">Control Interno Castaño Pablo</option>
                                         <option value="Control Interno Argañaraz Lorena">Control Interno Argañaraz Lorena</option>
                                         <option value="Control Interno Frias Ximena">Control Interno Frias Ximena</option>
+                                        <option value="custom">✎ Personalizado</option>
                                     </select>
+                                </div>
+                                <div id="custom-supervisor2" class="hidden">
+                                    <label class="block text-xs font-semibold text-slate-500 mb-1">👤 Control Interno Personalizado</label>
+                                    <input type="text" id="supervisor2-custom" placeholder="Ingresar nombre" class="w-full p-2 bg-slate-50 border border-slate-300 rounded text-sm focus:ring-2 focus:ring-green-500 outline-none">
                                 </div>
                             </div>
 
@@ -242,15 +252,47 @@
             }
         });
 
+        // Manejar opciones personalizables de supervisores
+        document.getElementById('supervisor1').addEventListener('change', function() {
+            const customDiv = document.getElementById('custom-supervisor1');
+            const customInput = document.getElementById('supervisor1-custom');
+            if (this.value === 'custom') {
+                customDiv.classList.remove('hidden');
+                customInput.focus();
+            } else {
+                customDiv.classList.add('hidden');
+            }
+        });
+
+        document.getElementById('supervisor2').addEventListener('change', function() {
+            const customDiv = document.getElementById('custom-supervisor2');
+            const customInput = document.getElementById('supervisor2-custom');
+            if (this.value === 'custom') {
+                customDiv.classList.remove('hidden');
+                customInput.focus();
+            } else {
+                customDiv.classList.add('hidden');
+            }
+        });
+
         // Sincronización automática
         document.getElementById('supervisor1').addEventListener('input', function(e) {
             document.getElementById('supervisor2').value = e.target.value;
+            if (e.target.value === 'custom') {
+                document.getElementById('custom-supervisor2').classList.remove('hidden');
+                document.getElementById('custom-supervisor1').classList.remove('hidden');
+            }
         });
         document.getElementById('company1').addEventListener('input', function(e) {
             document.getElementById('company2').value = e.target.value;
         });
         document.getElementById('worker1').addEventListener('input', function(e) {
             document.getElementById('worker2').value = e.target.value;
+        });
+
+        // Sincronización de supervisores personalizados
+        document.getElementById('supervisor1-custom').addEventListener('input', function(e) {
+            document.getElementById('supervisor2-custom').value = e.target.value;
         });
 
         // Monitorear campos para actualizar indicador
@@ -269,14 +311,25 @@
     });
 
     function getFormData() {
+        let supervisor1 = document.getElementById('supervisor1').value;
+        let supervisor2 = document.getElementById('supervisor2').value;
+        
+        // Si se selecciona personalizado, usar el valor del input personalizado
+        if (supervisor1 === 'custom') {
+            supervisor1 = document.getElementById('supervisor1-custom').value.trim();
+        }
+        if (supervisor2 === 'custom') {
+            supervisor2 = document.getElementById('supervisor2-custom').value.trim();
+        }
+        
         return {
             time1: document.getElementById('time1').value,
-            supervisor1: document.getElementById('supervisor1').value.trim(),
+            supervisor1: supervisor1,
             company1: document.getElementById('company1').value.trim(),
             worker1: document.getElementById('worker1').value.trim(),
             task: document.getElementById('task').value.trim(),
             time2: document.getElementById('time2').value,
-            supervisor2: document.getElementById('supervisor2').value.trim(),
+            supervisor2: supervisor2,
             company2: document.getElementById('company2').value.trim(),
             worker2: document.getElementById('worker2').value.trim()
         };
@@ -286,6 +339,14 @@
         const inputs = document.querySelectorAll('#report-form input[required], #report-form textarea[required]');
         let isValid = true;
         inputs.forEach(input => {
+            // Validar campos personalizados solo si están visibles
+            if (input.id === 'supervisor1-custom' && document.getElementById('custom-supervisor1').classList.contains('hidden')) {
+                return;
+            }
+            if (input.id === 'supervisor2-custom' && document.getElementById('custom-supervisor2').classList.contains('hidden')) {
+                return;
+            }
+            
             if (!input.value.trim()) {
                 isValid = false;
                 input.classList.add('border-red-500');
