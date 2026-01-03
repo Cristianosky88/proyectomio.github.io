@@ -92,9 +92,10 @@ document.addEventListener('DOMContentLoaded', function () {
         const reporteHTML = `
             <div class="card mt-3">
                 <div class="card-body">
-                    <p>A las ${horaPrimeraLinea} Hs. CCTV recibe llamada de ${cargoFinal} ${nombre}, informa que recibió de ${clienteGenero} ${cantidad} tickets por un valor de ${formatCurrencyAR(total)}.-</p>
-                    <p>A las ${horaSegundaLinea} Hs. ${cargoFinal} ${nombre} redime ${cantidad} tickets.-</p>
-                    <p>A las ${horaTerceraLinea} Hs. ${cargoFinal} ${nombre} cancela en ventanilla de caja ${formatCurrencyAR(pagado)} a ${clienteGenero}.-</p>
+                    <p>A las ${horaPrimeraLinea} Hs. CCTV recibe llamada de ${cargoFinal} ${nombre} · , informa que recibió de ${clienteGenero} · ${cantidad} · tickets para cambio por valor de ${formatCurrencyAR(total)} .-</p>
+                    <p>A las ${horaSegundaLinea} Hs. ${cargoFinal} ${nombre} · redime ${cantidad} · tickets ·</p>
+                    <p>A las ${horaTerceraLinea} Hs. ${cargoFinal} ${nombre} · cancela en ventanilla de caja</p>
+                    <p>${formatCurrencyAR(pagado)} a ${clienteGenero} · · -</p>
                 </div>
             </div>
         `;

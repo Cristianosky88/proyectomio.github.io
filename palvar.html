@@ -101,9 +101,9 @@
                             <i data-lucide="copy" class="w-4 h-4"></i>
                             <span>Copiar</span>
                         </button>
-                        <button type="button" id="borrarBtn" class="flex-1 min-w-[120px] px-4 py-2 bg-red-600 text-white hover:bg-red-700 rounded font-semibold text-sm transition flex items-center justify-center gap-2">
-                            <i data-lucide="trash-2" class="w-4 h-4"></i>
-                            <span>Borrar</span>
+                        <button type="reset" id="resetBtn" class="flex-1 min-w-[120px] px-4 py-2 bg-orange-600 text-white hover:bg-orange-700 rounded font-semibold text-sm transition flex items-center justify-center gap-2">
+                            <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                            <span>Resetear</span>
                         </button>
                         <button type="button" id="inicioBtn" class="flex-1 min-w-[120px] px-4 py-2 bg-slate-400 text-white hover:bg-slate-500 rounded font-semibold text-sm transition flex items-center justify-center gap-2">
                             <i data-lucide="home" class="w-4 h-4"></i>
@@ -278,17 +278,15 @@
 
         const saldo = total - pagado;
         const fecha = new Date();
+        const horaFormateada = fecha.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', hour12: false });
+        
+        const horaPrimeraLinea = horaPrimera || horaFormateada;
+        const horaSegundaLinea = horaPrimera || horaFormateada;
+        const horaTerceraLinea = horaUltima || horaFormateada;
 
-        let reportText = `${nombre} (${clienteGenero})
-Cantidad de tickets: ${cantidad}
-Valor total: ${formatCurrencyAR(total)}
-Monto pagado: ${formatCurrencyAR(pagado)}
-Saldo: ${formatCurrencyAR(saldo)}
-${horaPrimera ? `Hora primera operación: ${horaPrimera}` : ''}
-${horaUltima ? `Hora última operación: ${horaUltima}` : ''}
-Cargo: ${cargo}
-${obs ? `Observaciones: ${obs}` : ''}
-Fecha y hora: ${fecha.toLocaleString('es-AR')}`;
+        let reportText = `A las ${horaPrimeraLinea} Hs. CCTV recibe llamada de ${cargo} ${nombre}, informa que recibió de ${clienteGenero}, ${cantidad} tickets para cambio por valor de ${formatCurrencyAR(total)}.-
+A las ${horaSegundaLinea} Hs. ${cargo} ${nombre} redime ${cantidad} tickets.-
+A las ${horaTerceraLinea} Hs. ${cargo} ${nombre} cancela en ventanilla de caja ${formatCurrencyAR(pagado)} a ${clienteGenero}.-`;
 
         reporteDiv.textContent = reportText;
         document.getElementById('reportContainer').classList.remove('hidden');
@@ -394,17 +392,6 @@ Fecha y hora: ${fecha.toLocaleString('es-AR')}`;
             });
         });
     }
-
-    // Borrar historial
-    document.getElementById('borrarBtn').addEventListener('click', function () {
-        if (confirm('¿Está seguro de borrar todo el historial?')) {
-            localStorage.removeItem('palvarHistorial');
-            actualizarHistorial();
-            reportContainer.classList.add('hidden');
-            noReport.classList.remove('hidden');
-            showNotification('¡Historial borrado!');
-        }
-    });
 
     // Volver al inicio
     document.getElementById('inicioBtn').addEventListener('click', function () {
