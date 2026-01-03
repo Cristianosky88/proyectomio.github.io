@@ -198,14 +198,27 @@
         const minutos1 = h1 * 60 + m1;
         const minutos2 = h2 * 60 + m2;
 
-        if (minutos2 <= minutos1) {
+        // Determinar si es válido: puede ser mismo día o cruzar medianoche
+        let esValido = false;
+        let diff = 0;
+        
+        if (minutos2 > minutos1) {
+            // Caso normal: mismo día
+            esValido = true;
+            diff = minutos2 - minutos1;
+        } else if (h1 >= 12 && minutos2 < minutos1) {
+            // Si entrada es en tarde/noche y salida es menor, asumir día siguiente
+            esValido = true;
+            diff = (24 * 60 - minutos1) + minutos2;
+        }
+
+        if (!esValido) {
             error1.classList.remove('hidden');
             error2.classList.remove('hidden');
             duracion.classList.add('hidden');
         } else {
             error1.classList.add('hidden');
             error2.classList.add('hidden');
-            const diff = minutos2 - minutos1;
             const mins = diff % 60;
             const hrs = Math.floor(diff / 60);
             duracion.textContent = `⏱️ Duración: ${hrs}h ${mins}m`;

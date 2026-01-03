@@ -59,7 +59,12 @@
                                         <option value="Control Interno Castaño Pablo">Control Interno Castaño Pablo</option>
                                         <option value="Control Interno Argañaraz Lorena">Control Interno Argañaraz Lorena</option>
                                         <option value="Control Interno Frias Ximena">Control Interno Frias Ximena</option>
+                                        <option value="custom">Personal Personalizado</option>
                                     </select>
+                                </div>
+                                <div id="custom-supervisor1" class="hidden">
+                                    <label class="block text-xs font-semibold text-slate-500 mb-1">👤 Control Interno Personalizado</label>
+                                    <input type="text" id="supervisor1-custom" placeholder="Ingresar nombre" class="w-full p-2 bg-slate-50 border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
                                 </div>
                             </div>
 
@@ -104,7 +109,12 @@
                                         <option value="Control Interno Castaño Pablo">Control Interno Castaño Pablo</option>
                                         <option value="Control Interno Argañaraz Lorena">Control Interno Argañaraz Lorena</option>
                                         <option value="Control Interno Frias Ximena">Control Interno Frias Ximena</option>
+                                        <option value="custom">Pesonal Personalizado</option>
                                     </select>
+                                </div>
+                                <div id="custom-supervisor2" class="hidden">
+                                    <label class="block text-xs font-semibold text-slate-500 mb-1">👤 Control Interno Personalizado</label>
+                                    <input type="text" id="supervisor2-custom" placeholder="Ingresar nombre" class="w-full p-2 bg-slate-50 border border-slate-300 rounded text-sm focus:ring-2 focus:ring-green-500 outline-none">
                                 </div>
                             </div>
 
@@ -148,7 +158,18 @@
             <!-- COLUMNA DERECHA: RESULTADO -->
             <div class="lg:col-span-5 bg-slate-100 border-l border-slate-200 flex flex-col">
                 <div class="p-6 sticky top-0 max-h-screen overflow-y-auto">
-                    <h2 class="font-bold text-slate-800 mb-4">📄 Vista Previa del Informe</h2>
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="font-bold text-slate-800">📄 Vista Previa del Informe</h2>
+                        <div class="text-xs px-2 py-1 bg-indigo-100 text-indigo-700 rounded-full">Historial</div>
+                    </div>
+                    
+                    <!-- HISTORIAL DE INFORMES -->
+                    <div class="mb-4 p-3 bg-slate-50 rounded-lg border border-slate-200">
+                        <select id="historicoSelect" class="w-full p-2 bg-white border border-slate-300 rounded text-xs focus:ring-2 focus:ring-indigo-500 outline-none hover:border-indigo-400 transition">
+                            <option value="">📜 Seleccionar informe anterior...</option>
+                        </select>
+                        <small class="text-slate-500 mt-1 block">Últimos 10 registros guardados</small>
+                    </div>
                     
                     <div id="report-container" class="hidden">
                         <div class="bg-white rounded-lg shadow-sm border border-slate-300 p-4 mb-4">
@@ -225,16 +246,53 @@
         document.getElementById('resetBtn').addEventListener('click', resetToDefaults);
         document.getElementById('copy-btn').addEventListener('click', copyToClipboard);
         document.getElementById('save-btn').addEventListener('click', downloadReport);
+        document.getElementById('historicoSelect').addEventListener('change', function() {
+            if (this.value !== '') {
+                cargarDelHistorial(parseInt(this.value));
+            }
+        });
+
+        // Manejar opciones personalizables de supervisores
+        document.getElementById('supervisor1').addEventListener('change', function() {
+            const customDiv = document.getElementById('custom-supervisor1');
+            const customInput = document.getElementById('supervisor1-custom');
+            if (this.value === 'custom') {
+                customDiv.classList.remove('hidden');
+                customInput.focus();
+            } else {
+                customDiv.classList.add('hidden');
+            }
+        });
+
+        document.getElementById('supervisor2').addEventListener('change', function() {
+            const customDiv = document.getElementById('custom-supervisor2');
+            const customInput = document.getElementById('supervisor2-custom');
+            if (this.value === 'custom') {
+                customDiv.classList.remove('hidden');
+                customInput.focus();
+            } else {
+                customDiv.classList.add('hidden');
+            }
+        });
 
         // Sincronización automática
         document.getElementById('supervisor1').addEventListener('input', function(e) {
             document.getElementById('supervisor2').value = e.target.value;
+            if (e.target.value === 'custom') {
+                document.getElementById('custom-supervisor2').classList.remove('hidden');
+                document.getElementById('custom-supervisor1').classList.remove('hidden');
+            }
         });
         document.getElementById('company1').addEventListener('input', function(e) {
             document.getElementById('company2').value = e.target.value;
         });
         document.getElementById('worker1').addEventListener('input', function(e) {
             document.getElementById('worker2').value = e.target.value;
+        });
+
+        // Sincronización de supervisores personalizados
+        document.getElementById('supervisor1-custom').addEventListener('input', function(e) {
+            document.getElementById('supervisor2-custom').value = e.target.value;
         });
 
         // Monitorear campos para actualizar indicador
@@ -249,17 +307,29 @@
 
         updateMissingFields();
         loadLastRecord();
+        actualizarHistorial();
     });
 
     function getFormData() {
+        let supervisor1 = document.getElementById('supervisor1').value;
+        let supervisor2 = document.getElementById('supervisor2').value;
+        
+        // Si se selecciona personalizado, usar el valor del input personalizado
+        if (supervisor1 === 'custom') {
+            supervisor1 = document.getElementById('supervisor1-custom').value.trim();
+        }
+        if (supervisor2 === 'custom') {
+            supervisor2 = document.getElementById('supervisor2-custom').value.trim();
+        }
+        
         return {
             time1: document.getElementById('time1').value,
-            supervisor1: document.getElementById('supervisor1').value.trim(),
+            supervisor1: supervisor1,
             company1: document.getElementById('company1').value.trim(),
             worker1: document.getElementById('worker1').value.trim(),
             task: document.getElementById('task').value.trim(),
             time2: document.getElementById('time2').value,
-            supervisor2: document.getElementById('supervisor2').value.trim(),
+            supervisor2: supervisor2,
             company2: document.getElementById('company2').value.trim(),
             worker2: document.getElementById('worker2').value.trim()
         };
@@ -269,6 +339,14 @@
         const inputs = document.querySelectorAll('#report-form input[required], #report-form textarea[required]');
         let isValid = true;
         inputs.forEach(input => {
+            // Validar campos personalizados solo si están visibles
+            if (input.id === 'supervisor1-custom' && document.getElementById('custom-supervisor1').classList.contains('hidden')) {
+                return;
+            }
+            if (input.id === 'supervisor2-custom' && document.getElementById('custom-supervisor2').classList.contains('hidden')) {
+                return;
+            }
+            
             if (!input.value.trim()) {
                 isValid = false;
                 input.classList.add('border-red-500');
@@ -302,7 +380,7 @@ A las ${data.time2} Hs. CCTV recibe llamada de ${data.supervisor2}, informa que 
         document.getElementById('no-report').classList.add('hidden');
         
         // Guardar en historial
-        saveRecord(data);
+        saveRecord(data, report);
         
         showNotification('¡Informe generado exitosamente!');
     }
@@ -360,7 +438,26 @@ A las ${data.time2} Hs. CCTV recibe llamada de ${data.supervisor2}, informa que 
             return false;
         }
 
-        if (time2 <= time1) {
+        // Convertir tiempos a minutos para comparación
+        const [h1, m1] = time1.split(':').map(Number);
+        const [h2, m2] = time2.split(':').map(Number);
+        const minutos1 = h1 * 60 + m1;
+        const minutos2 = h2 * 60 + m2;
+
+        // Si time1 es después de las 12:00 (tarde/noche) y time2 es menor, asumir que es del día siguiente
+        // Ej: 23:48 a 00:00, 23:00 a 01:00, etc.
+        let esValido = false;
+        
+        if (minutos2 > minutos1) {
+            // Caso normal: mismo día
+            esValido = true;
+        } else if (h1 >= 12 && minutos2 < minutos1) {
+            // Si la hora de entrada es en la tarde/noche (>= 12:00) 
+            // y la salida es menor, asumir que es del día siguiente
+            esValido = true;
+        }
+
+        if (!esValido) {
             showNotification('⚠️ La hora de salida debe ser posterior a la de ingreso', 'error');
             document.getElementById('time2').classList.add('border-red-500');
             return false;
@@ -370,12 +467,41 @@ A las ${data.time2} Hs. CCTV recibe llamada de ${data.supervisor2}, informa que 
         return true;
     }
 
-    function saveRecord(data) {
-        let records = JSON.parse(localStorage.getItem('ingresoRecords')) || [];
-        const record = { ...data, timestamp: new Date().toISOString() };
+    function saveRecord(data, contenido) {
+        let records = JSON.parse(localStorage.getItem('ingresoHistorial')) || [];
+        const record = { 
+            ...data, 
+            contenido: contenido,
+            fecha: new Date().toLocaleString('es-AR'),
+            timestamp: new Date().toISOString() 
+        };
         records.unshift(record);
         records = records.slice(0, 10); // Mantener últimos 10
-        localStorage.setItem('ingresoRecords', JSON.stringify(records));
+        localStorage.setItem('ingresoHistorial', JSON.stringify(records));
+        actualizarHistorial();
+    }
+
+    function actualizarHistorial() {
+        const historial = JSON.parse(localStorage.getItem('ingresoHistorial') || '[]');
+        const historicoSelect = document.getElementById('historicoSelect');
+        historicoSelect.innerHTML = '<option value="">📜 Seleccionar informe anterior...</option>';
+        historial.forEach((item, idx) => {
+            const option = document.createElement('option');
+            option.value = idx;
+            option.textContent = `${item.fecha} - ${item.time1} a ${item.time2} (${item.supervisor1})`;
+            historicoSelect.appendChild(option);
+        });
+    }
+
+    function cargarDelHistorial(idx) {
+        const historial = JSON.parse(localStorage.getItem('ingresoHistorial') || '[]');
+        if (historial[idx]) {
+            const item = historial[idx];
+            document.getElementById('report-content').textContent = item.contenido;
+            document.getElementById('timestamp').textContent = `Generado el: ${item.fecha}`;
+            document.getElementById('report-container').classList.remove('hidden');
+            document.getElementById('no-report').classList.add('hidden');
+        }
     }
 
     function loadLastRecord() {
