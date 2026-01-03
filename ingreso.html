@@ -438,7 +438,26 @@ A las ${data.time2} Hs. CCTV recibe llamada de ${data.supervisor2}, informa que 
             return false;
         }
 
-        if (time2 <= time1) {
+        // Convertir tiempos a minutos para comparación
+        const [h1, m1] = time1.split(':').map(Number);
+        const [h2, m2] = time2.split(':').map(Number);
+        const minutos1 = h1 * 60 + m1;
+        const minutos2 = h2 * 60 + m2;
+
+        // Si time1 es después de las 12:00 (tarde/noche) y time2 es menor, asumir que es del día siguiente
+        // Ej: 23:48 a 00:00, 23:00 a 01:00, etc.
+        let esValido = false;
+        
+        if (minutos2 > minutos1) {
+            // Caso normal: mismo día
+            esValido = true;
+        } else if (h1 >= 12 && minutos2 < minutos1) {
+            // Si la hora de entrada es en la tarde/noche (>= 12:00) 
+            // y la salida es menor, asumir que es del día siguiente
+            esValido = true;
+        }
+
+        if (!esValido) {
             showNotification('⚠️ La hora de salida debe ser posterior a la de ingreso', 'error');
             document.getElementById('time2').classList.add('border-red-500');
             return false;
