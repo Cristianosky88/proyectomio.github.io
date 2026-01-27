@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Declaración Jurada - CCTV</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #f8fafc; }
+        .report-font { 
+            font-family: 'Times New Roman', Times, serif; 
+            line-height: 1.5;
+        }
+        textarea { resize: none; }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-4xl mx-auto space-y-6">
+        
+        <!-- ENCABEZADO -->
+        <div class="bg-slate-900 p-6 rounded-2xl text-white shadow-xl flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-4">
+                <button onclick="volverAlInicio()" class="bg-slate-800 hover:bg-slate-700 p-3 rounded-xl transition-all border border-slate-700 shadow-inner" title="Restablecer ejemplo">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                    </svg>
+                </button>
+                <div>
+                    <h1 class="text-xl font-black tracking-tight uppercase">Registro de Declaración Jurada</h1>
+                    <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest italic">Generador CCTV</p>
+                </div>
+            </div>
+            <div class="bg-slate-800 px-4 py-2 rounded-xl border border-slate-700 flex items-center gap-3 shadow-inner">
+                <span class="text-[10px] font-black text-indigo-400 uppercase">Hora Inicio:</span>
+                <input type="time" id="horaGlobal" value="12:05" oninput="sincronizarTodo()" class="bg-transparent text-lg font-mono text-white outline-none">
+            </div>
+        </div>
+
+        <!-- SECCIÓN DE DATOS Y RESULTADO -->
+        <section class="bg-white rounded-3xl shadow-lg border border-slate-200 overflow-hidden">
+            <div class="bg-slate-700 p-4 text-white flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <h2 class="font-bold uppercase tracking-wider text-xs text-slate-200">Datos de la Novedad</h2>
+                </div>
+                <button onclick="limpiarSeccion()" class="text-[10px] text-red-400 font-bold hover:text-red-300 flex items-center gap-1 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                    BORRAR TODO
+                </button>
+            </div>
+            
+            <div class="p-6 space-y-6">
+                <!-- Inputs -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">Personal (Enc. / As. / Op.)</label>
+                        <input type="text" id="d-personal" placeholder="Ej: Enc. Gomez Juan" oninput="sincronizarTodo()" class="w-full p-3 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-slate-500 shadow-sm transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">Cliente (Sra. / Sr.)</label>
+                        <input type="text" id="d-cliente" placeholder="Ej: Sra. Garcia Maria" oninput="sincronizarTodo()" class="w-full p-3 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-slate-500 shadow-sm transition-all">
+                    </div>
+                </div>
+
+                <!-- Resultado -->
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center">
+                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Texto Final (Editable)</span>
+                        <div class="flex gap-2">
+                             <button onclick="sincronizarTodo()" class="p-2 text-slate-400 hover:text-indigo-500 transition-colors" title="Restablecer texto desde inputs">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                </svg>
+                            </button>
+                            <button onclick="copiarTexto()" class="bg-slate-900 hover:bg-slate-800 text-white px-8 py-2 rounded-xl text-xs font-black shadow-lg transition-all active:scale-95 flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                                </svg>
+                                COPIAR REPORTE
+                            </button>
+                        </div>
+                    </div>
+                    <textarea id="out-dj" class="report-font w-full h-56 p-5 bg-slate-50 border border-slate-200 rounded-2xl text-lg outline-none focus:bg-white focus:ring-2 focus:ring-indigo-100 transition-all shadow-inner"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <div class="bg-amber-50 border border-amber-200 p-4 rounded-xl text-center">
+            <p class="text-amber-800 text-[11px] leading-tight italic">
+                El sistema calcula automáticamente +1 y +2 minutos para los párrafos siguientes.
+            </p>
+        </div>
+    </div>
+
+    <!-- Mensaje de Copiado -->
+    <div id="toast" class="fixed bottom-10 left-1/2 transform -translate-x-1/2 bg-slate-900 text-white px-10 py-4 rounded-full font-black shadow-2xl opacity-0 transition-all pointer-events-none z-50">
+        TEXTO COPIADO
+    </div>
+
+    <script>
+        function sumarMinutos(hora, minutos) {
+            let [h, m] = hora.split(':').map(Number);
+            let d = new Date();
+            d.setHours(h);
+            d.setMinutes(m + minutos);
+            return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+        }
+
+        function sincronizarTodo() {
+            const hBase = document.getElementById('horaGlobal').value;
+            const h1 = hBase;
+            const h2 = sumarMinutos(hBase, 1);
+            const h3 = sumarMinutos(hBase, 2);
+
+            const dPers = document.getElementById('d-personal').value || "[Personal]";
+            const dClie = document.getElementById('d-cliente').value || "[Cliente]";
+
+            const outDj = 
+                `A las ${h1} Hs. CCTV recibe llamada de ${dPers}, informa que ${dClie} procederá a confeccionar Declaración Jurada.-\n\n` +
+                `A las ${h2} Hs. ${dClie} confecciona Declaración Jurada.-\n\n` +
+                `A las ${h3} Hs. ${dPers}, informa que finalizó llenado de declaración Jurada.-`;
+
+            document.getElementById('out-dj').value = outDj;
+        }
+
+        function limpiarSeccion() {
+            ['d-personal', 'd-cliente'].forEach(id => document.getElementById(id).value = "");
+            sincronizarTodo();
+        }
+
+        function volverAlInicio() {
+            document.getElementById('horaGlobal').value = "12:05";
+            document.getElementById('d-personal').value = "Enc. Gomez";
+            document.getElementById('d-cliente').value = "Clienta Sra. Garcia";
+            sincronizarTodo();
+        }
+
+        function copiarTexto() {
+            const el = document.getElementById('out-dj');
+            el.select();
+            document.execCommand('copy');
+            const toast = document.getElementById('toast');
+            toast.style.opacity = "1";
+            setTimeout(() => { toast.style.opacity = "0"; }, 2000);
+        }
+
+        window.onload = () => volverAlInicio();
+    </script>
+</body>
+</html>
