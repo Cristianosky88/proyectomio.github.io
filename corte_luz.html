@@ -60,9 +60,10 @@
             </div>
             
             <div class="p-6 space-y-6">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- Inputs Base -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 border-b pb-6">
                     <div class="md:col-span-1">
-                        <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">Nombre de Sala</label>
+                        <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">Sala Principal</label>
                         <input type="text" id="sala" list="salas-list" placeholder="Ej: Slots Mazza" oninput="sincronizarTodo()" class="w-full p-3 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-red-500 shadow-sm transition-all">
                         <datalist id="salas-list">
                             <option value="Slots Mazza">
@@ -82,6 +83,20 @@
                     </div>
                 </div>
 
+                <!-- CRONOLOGÍA DE CAÍDA (Punto 3) -->
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center">
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">Cronología de apagados parciales</label>
+                        <button onclick="agregarFila()" class="text-[10px] bg-slate-100 hover:bg-slate-200 text-slate-600 font-black px-3 py-1 rounded-lg flex items-center gap-1 transition-all">
+                            + AGREGAR EVENTO
+                        </button>
+                    </div>
+                    <div id="contenedorFilas" class="space-y-2">
+                        <!-- Las filas se insertan aquí -->
+                    </div>
+                </div>
+
+                <!-- Restablecimiento -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-100">
                     <div>
                         <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">Hora Informe / Restablece</label>
@@ -93,6 +108,7 @@
                     </div>
                 </div>
 
+                <!-- Resultado -->
                 <div class="space-y-3">
                     <div class="flex justify-between items-center">
                         <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Texto de Novedad (Editable)</span>
@@ -103,16 +119,10 @@
                             COPIAR TEXTO
                         </button>
                     </div>
-                    <textarea id="output" class="report-font w-full h-72 p-5 bg-slate-50 border border-slate-200 rounded-2xl text-lg outline-none focus:bg-white focus:ring-2 focus:ring-red-100 transition-all shadow-inner"></textarea>
+                    <textarea id="output" class="report-font w-full h-80 p-5 bg-slate-50 border border-slate-200 rounded-2xl text-lg outline-none focus:bg-white focus:ring-2 focus:ring-red-100 transition-all shadow-inner"></textarea>
                 </div>
             </div>
         </section>
-
-        <div class="bg-blue-50 border border-blue-200 p-4 rounded-xl text-center">
-            <p class="text-blue-800 text-[11px] font-bold leading-tight">
-                Punto 2 y 3 aplicados: Selector de salas rápidas y cálculo de duración automática.
-            </p>
-        </div>
     </div>
 
     <div id="toast" class="fixed bottom-10 left-1/2 transform -translate-x-1/2 bg-slate-900 text-white px-10 py-4 rounded-full font-black shadow-2xl opacity-0 transition-all pointer-events-none z-50 uppercase text-xs tracking-widest">
@@ -134,10 +144,28 @@
             const [h2, m2] = fin.split(':').map(Number);
             let t1 = h1 * 60 + m1;
             let t2 = h2 * 60 + m2;
-            
             if (t2 < t1) t2 += 1440; 
-            
             return t2 - t1;
+        }
+
+        function agregarFila(hora = "", desc = "") {
+            const contenedor = document.getElementById('contenedorFilas');
+            const div = document.createElement('div');
+            div.className = "flex gap-2 items-center group";
+            div.innerHTML = `
+                <input type="time" class="fila-hora p-2 border rounded-lg text-xs outline-none focus:ring-1 focus:ring-red-500 w-28 bg-white" value="${hora}" oninput="sincronizarTodo()">
+                <input type="text" class="fila-desc flex-grow p-2 border rounded-lg text-xs outline-none focus:ring-1 focus:ring-red-500 bg-white" placeholder="Ej: Máquinas 01-10 en Sala Anexo" value="${desc}" oninput="sincronizarTodo()">
+                <button onclick="eliminarFila(this)" class="p-2 text-slate-300 hover:text-red-500 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                </button>
+            `;
+            contenedor.appendChild(div);
+            sincronizarTodo();
+        }
+
+        function eliminarFila(btn) {
+            btn.parentElement.remove();
+            sincronizarTodo();
         }
 
         function sincronizarTodo() {
@@ -145,12 +173,13 @@
             const hRest = document.getElementById('horaRestablece').value;
             const hEnc = document.getElementById('horaEncienden').value;
 
-            const sala = document.getElementById('sala').value || "[Sala]";
+            const sala = document.getElementById('sala').value || "[Sala Principal]";
             const asis = document.getElementById('asistente').value || "[Asistente]";
             const rec = document.getElementById('reclamo').value || "[Reclamo]";
 
             const duracion = calcularDiferencia(hCorte, hEnc);
             
+            // UI Update
             if (duracion > 0) {
                 document.getElementById('badgeDuracion').classList.remove('hidden');
                 document.getElementById('valDuracion').textContent = duracion;
@@ -158,8 +187,22 @@
                 document.getElementById('badgeDuracion').classList.add('hidden');
             }
 
+            // Construcción del texto
+            let cronologiaTexto = "";
+            const horasFilas = document.querySelectorAll('.fila-hora');
+            const descFilas = document.querySelectorAll('.fila-desc');
+            
+            horasFilas.forEach((inputHora, index) => {
+                const h = inputHora.value;
+                const d = descFilas[index].value;
+                if(h && d) {
+                    cronologiaTexto += `A las ${h} Hs. Se observa que se apagan ${d}.-\n\n`;
+                }
+            });
+
             const texto = 
                 `A las ${hCorte} Hs. CCTV observa que se produce corte de suministro eléctrico en ${sala} y se apagan las maquinas en su totalidad.-\n\n` +
+                cronologiaTexto +
                 `A las ${hRest} Hs. Asistente de Sala ${asis}, informa que se produjo Corte de energía eléctrica en la Sala, también informa numero de reclamo ${rec}.-\n\n` +
                 `A las ${hRest} Hs. Se restablece suministro eléctrico en ${sala}.-\n\n` +
                 `A las ${hEnc} Hs. Se encienden las maquinas en la sala.-\n\n` +
@@ -170,6 +213,7 @@
 
         function limpiarSeccion() {
             ['sala', 'asistente', 'reclamo'].forEach(id => document.getElementById(id).value = "");
+            document.getElementById('contenedorFilas').innerHTML = "";
             sincronizarTodo();
         }
 
@@ -181,6 +225,11 @@
             document.getElementById('sala').value = "Slots Mazza";
             document.getElementById('asistente').value = "Chocobar Benjamin";
             document.getElementById('reclamo').value = "2462045";
+            
+            // Ejemplo de fila de cronología
+            document.getElementById('contenedorFilas').innerHTML = "";
+            agregarFila(getHoraActual(2), "máquinas 01-10 en Sala Mazza");
+            
             sincronizarTodo();
         }
 
