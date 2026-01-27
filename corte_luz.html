@@ -46,19 +46,31 @@
                     </svg>
                     <h2 class="font-bold uppercase tracking-wider text-xs text-slate-200">Detalles del Incidente</h2>
                 </div>
-                <button onclick="limpiarSeccion()" class="text-[10px] text-red-400 font-bold hover:text-red-300 flex items-center gap-1 transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                    LIMPIAR
-                </button>
+                <div class="flex items-center gap-4">
+                    <div id="badgeDuracion" class="hidden bg-yellow-500/20 text-yellow-400 text-[10px] font-black px-2 py-1 rounded border border-yellow-500/30 uppercase tracking-widest">
+                        Corte de <span id="valDuracion">0</span> min
+                    </div>
+                    <button onclick="limpiarSeccion()" class="text-[10px] text-red-400 font-bold hover:text-red-300 flex items-center gap-1 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                        LIMPIAR
+                    </button>
+                </div>
             </div>
             
             <div class="p-6 space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div class="md:col-span-1">
                         <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">Nombre de Sala</label>
-                        <input type="text" id="sala" placeholder="Ej: Slots Mazza" oninput="sincronizarTodo()" class="w-full p-3 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-red-500 shadow-sm transition-all">
+                        <input type="text" id="sala" list="salas-list" placeholder="Ej: Slots Mazza" oninput="sincronizarTodo()" class="w-full p-3 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-red-500 shadow-sm transition-all">
+                        <datalist id="salas-list">
+                            <option value="Slots Mazza">
+                            <option value="Salvador Mazza">
+                            <option value="Casino Central">
+                            <option value="Sala Anexo">
+                            <option value="Sala Vip">
+                        </datalist>
                     </div>
                     <div class="md:col-span-1">
                         <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">Asistente de Sala</label>
@@ -84,21 +96,21 @@
                 <div class="space-y-3">
                     <div class="flex justify-between items-center">
                         <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Texto de Novedad (Editable)</span>
-                        <button onclick="copiarTexto()" class="bg-red-700 hover:bg-red-800 text-white px-8 py-2 rounded-xl text-xs font-black shadow-lg transition-all active:scale-95 flex items-center gap-2 uppercase">
+                        <button onclick="copiarTexto()" class="bg-red-700 hover:bg-red-800 text-white px-8 py-2 rounded-xl text-xs font-black shadow-lg transition-all active:scale-95 flex items-center gap-2 uppercase text-center">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
                             </svg>
                             COPIAR TEXTO
                         </button>
                     </div>
-                    <textarea id="output" class="report-font w-full h-64 p-5 bg-slate-50 border border-slate-200 rounded-2xl text-lg outline-none focus:bg-white focus:ring-2 focus:ring-red-100 transition-all shadow-inner"></textarea>
+                    <textarea id="output" class="report-font w-full h-72 p-5 bg-slate-50 border border-slate-200 rounded-2xl text-lg outline-none focus:bg-white focus:ring-2 focus:ring-red-100 transition-all shadow-inner"></textarea>
                 </div>
             </div>
         </section>
 
         <div class="bg-blue-50 border border-blue-200 p-4 rounded-xl text-center">
             <p class="text-blue-800 text-[11px] font-bold leading-tight">
-                La hora de inicio se sincroniza automáticamente con tu reloj actual al cargar la página.
+                Punto 2 y 3 aplicados: Selector de salas rápidas y cálculo de duración automática.
             </p>
         </div>
     </div>
@@ -116,6 +128,18 @@
             return `${h}:${m}`;
         }
 
+        function calcularDiferencia(inicio, fin) {
+            if (!inicio || !fin) return 0;
+            const [h1, m1] = inicio.split(':').map(Number);
+            const [h2, m2] = fin.split(':').map(Number);
+            let t1 = h1 * 60 + m1;
+            let t2 = h2 * 60 + m2;
+            
+            if (t2 < t1) t2 += 1440; 
+            
+            return t2 - t1;
+        }
+
         function sincronizarTodo() {
             const hCorte = document.getElementById('horaCorte').value;
             const hRest = document.getElementById('horaRestablece').value;
@@ -125,11 +149,21 @@
             const asis = document.getElementById('asistente').value || "[Asistente]";
             const rec = document.getElementById('reclamo').value || "[Reclamo]";
 
+            const duracion = calcularDiferencia(hCorte, hEnc);
+            
+            if (duracion > 0) {
+                document.getElementById('badgeDuracion').classList.remove('hidden');
+                document.getElementById('valDuracion').textContent = duracion;
+            } else {
+                document.getElementById('badgeDuracion').classList.add('hidden');
+            }
+
             const texto = 
                 `A las ${hCorte} Hs. CCTV observa que se produce corte de suministro eléctrico en ${sala} y se apagan las maquinas en su totalidad.-\n\n` +
                 `A las ${hRest} Hs. Asistente de Sala ${asis}, informa que se produjo Corte de energía eléctrica en la Sala, también informa numero de reclamo ${rec}.-\n\n` +
                 `A las ${hRest} Hs. Se restablece suministro eléctrico en ${sala}.-\n\n` +
-                `A las ${hEnc} Hs. Se encienden las maquinas en la sala.-`;
+                `A las ${hEnc} Hs. Se encienden las maquinas en la sala.-\n\n` +
+                `(Duración total del corte: ${duracion} minutos).-`;
 
             document.getElementById('output').value = texto;
         }
@@ -140,9 +174,7 @@
         }
 
         function volverAlInicio() {
-            // Establecer hora actual para el corte
             document.getElementById('horaCorte').value = getHoraActual();
-            // Establecer horas posteriores automáticas (Ejemplo: +4 y +6 minutos como la imagen original)
             document.getElementById('horaRestablece').value = getHoraActual(4);
             document.getElementById('horaEncienden').value = getHoraActual(6);
             
