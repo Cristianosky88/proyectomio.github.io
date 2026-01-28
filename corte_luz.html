@@ -233,17 +233,16 @@
         }
 
         function volverAlInicio() {
-            document.getElementById('horaCorte').value = getHoraActual();
-            document.getElementById('horaRestablece').value = getHoraActual(4);
-            document.getElementById('horaEncienden').value = getHoraActual(6);
+            document.getElementById('horaCorte').value = "";
+            document.getElementById('horaRestablece').value = "";
+            document.getElementById('horaEncienden').value = "";
             
-            document.getElementById('sala').value = "Slots Mazza";
-            document.getElementById('asistente').value = "Chocobar Benjamin";
-            document.getElementById('reclamo').value = "2462045";
+            document.getElementById('sala').value = "";
+            document.getElementById('asistente').value = "";
+            document.getElementById('reclamo').value = "";
             
-            // Ejemplo de fila de cronología
+            // Sin filas de ejemplo
             document.getElementById('contenedorFilas').innerHTML = "";
-            agregarFila(getHoraActual(2), "máquinas 01-10 en Sala Mazza");
             
             sincronizarTodo();
         }
