@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador Técnico CCTV - Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #f1f5f9; }
+        .report-font { 
+            font-family: 'Times New Roman', Times, serif; 
+            line-height: 1.5;
+        }
+        textarea { resize: none; }
+        .input-accent { transition: all 0.2s; border: 1px solid #e2e8f0; }
+        .input-accent:focus { border-color: #6366f1; ring: 2px; ring-color: #a5b4fc; outline: none; }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-6xl mx-auto space-y-6">
+        
+        <!-- ENCABEZADO -->
+        <div class="bg-indigo-900 p-6 rounded-2xl text-white shadow-xl flex flex-col md:flex-row justify-between items-center gap-4 border-b-4 border-indigo-500">
+            <div class="flex items-center gap-4">
+                <button onclick="volverAlInicio()" class="bg-indigo-800 hover:bg-indigo-700 p-3 rounded-xl transition-all border border-indigo-600 shadow-inner" title="Cargar ejemplo">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                    </svg>
+                </button>
+                <div>
+                    <h1 class="text-xl font-black tracking-tight uppercase">Sistema de Gestión Técnica</h1>
+                    <p class="text-indigo-300 text-[10px] font-bold uppercase tracking-widest italic leading-none">CCTV - Monitoreo Profesional</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <div class="bg-indigo-950 px-4 py-2 rounded-xl border border-indigo-800 flex items-center gap-3 shadow-inner">
+                    <span class="text-[10px] font-black text-indigo-400 uppercase tracking-tighter">Hora Llamada:</span>
+                    <input type="time" id="horaLlamada" oninput="sincronizarTodo()" class="bg-transparent text-lg font-mono text-white outline-none">
+                    <button onclick="ponerHoraActual('horaLlamada')" class="p-1 text-indigo-400 hover:text-white transition-colors" title="Poner hora actual">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <!-- PANEL DE CONTROL IZQUIERDO -->
+            <div class="lg:col-span-4 space-y-6">
+                <!-- Tarea y Técnico -->
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-1 tracking-widest">Tipo de Tarea (Punto 8)</label>
+                            <select id="tipoTarea" onchange="sincronizarTodo()" class="w-full p-2.5 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 font-bold">
+                                <option value="Cerado">Cerado de Máquina</option>
+                                <option value="Mantenimiento Preventivo">Mantenimiento Preventivo</option>
+                                <option value="Reparación Técnica">Reparación Técnica</option>
+                                <option value="Cambio de Monitor">Cambio de Monitor</option>
+                                <option value="Revisión de Conectividad">Revisión de Conectividad</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-1 tracking-widest">Técnico (Punto 3)</label>
+                            <input type="text" id="tecnico" list="tecnicos-list" placeholder="Ej: Mansilla Nicolás" oninput="sincronizarTodo()" class="w-full p-2.5 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 font-bold">
+                            <datalist id="tecnicos-list">
+                                <option value="Mansilla Nicolás">
+                                <option value="Perez Juan">
+                                <option value="Rodriguez Luis">
+                                <option value="Gonzalez Carlos">
+                            </datalist>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Carga Masiva (Punto 6) -->
+                <div class="bg-indigo-50 p-5 rounded-2xl border border-indigo-100 shadow-sm">
+                    <h2 class="text-[10px] font-black text-indigo-600 uppercase mb-3 tracking-widest flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
+                        Carga Masiva (Rango)
+                    </h2>
+                    <div class="grid grid-cols-2 gap-2 mb-3">
+                        <input type="number" id="rangoInicio" placeholder="Desde ID" class="p-2 border rounded-lg text-xs outline-none">
+                        <input type="number" id="rangoFin" placeholder="Hasta ID" class="p-2 border rounded-lg text-xs outline-none">
+                    </div>
+                    <button onclick="aplicarRango()" class="w-full bg-indigo-600 text-white py-2 rounded-xl text-[10px] font-black uppercase hover:bg-indigo-700 transition-all shadow-md">
+                        Generar Bloque
+                    </button>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+                     <button onclick="limpiarSeccion()" class="w-full border-2 border-red-100 text-red-500 py-2 rounded-xl text-[10px] font-black uppercase hover:bg-red-50 transition-all">
+                        Limpiar Todo el Formulario
+                    </button>
+                </div>
+            </div>
+
+            <!-- PANEL DE LISTADO Y RESULTADO DERECHO -->
+            <div class="lg:col-span-8 space-y-6">
+                <!-- Lista de Máquinas -->
+                <section class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="bg-slate-800 p-4 text-white flex justify-between items-center">
+                        <h2 class="text-xs font-black uppercase tracking-wider">Cronología de Trabajo</h2>
+                        <button onclick="agregarFila()" class="bg-indigo-600 hover:bg-indigo-500 px-4 py-1.5 rounded-lg text-[10px] font-black uppercase transition-all flex items-center gap-2">
+                            <span>+</span> Añadir Máquina
+                        </button>
+                    </div>
+                    <div id="contenedorMaquinas" class="p-4 space-y-3 max-h-[400px] overflow-y-auto bg-slate-50">
+                        <!-- Las máquinas se insertan aquí -->
+                    </div>
+                </section>
+
+                <!-- Resultado Final -->
+                <section class="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
+                    <div class="p-4 bg-slate-100 border-b flex justify-between items-center">
+                        <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Texto Final Editable</span>
+                        <button onclick="copiarTexto()" class="bg-slate-900 hover:bg-black text-white px-10 py-3 rounded-xl text-xs font-black shadow-lg transition-all active:scale-95 flex items-center gap-2 uppercase">
+                            Copiar Reporte
+                        </button>
+                    </div>
+                    <textarea id="output" class="report-font w-full h-[500px] p-6 text-lg outline-none focus:bg-indigo-50/20 transition-all" spellcheck="false"></textarea>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="fixed bottom-10 left-1/2 transform -translate-x-1/2 bg-slate-900 text-white px-10 py-4 rounded-full font-black shadow-2xl opacity-0 transition-all pointer-events-none z-50 uppercase text-[10px] tracking-widest">
+        Texto copiado correctamente
+    </div>
+
+    <script>
+        function getHoraActual(offsetMinutos = 0) {
+            const ahora = new Date();
+            ahora.setMinutes(ahora.getMinutes() + offsetMinutos);
+            return `${String(ahora.getHours()).padStart(2, '0')}:${String(ahora.getMinutes()).padStart(2, '0')}`;
+        }
+
+        function ponerHoraActual(id) {
+            const el = document.getElementById(id);
+            if(el) {
+                el.value = getHoraActual();
+                sincronizarTodo();
+            }
+        }
+
+        function ponerHoraEnElemento(btn) {
+            const input = btn.previousElementSibling;
+            input.value = getHoraActual();
+            sincronizarTodo();
+        }
+
+        function agregarFila(idMaq = "", hInicio = "", hFin = "", nroInf = "") {
+            const contenedor = document.getElementById('contenedorMaquinas');
+            const idUnico = 'input-' + Date.now() + Math.random();
+            const div = document.createElement('div');
+            div.className = "flex flex-wrap md:flex-nowrap gap-2 items-end p-3 bg-white rounded-xl border border-slate-200 group relative";
+            div.innerHTML = `
+                <div class="w-full md:w-32">
+                    <label class="block text-[8px] font-bold text-slate-400 uppercase mb-1">ID</label>
+                    <input type="text" class="maq-id w-full p-2 border rounded-lg text-xs outline-none focus:ring-1 focus:ring-indigo-500 font-bold" value="${idMaq}" oninput="sincronizarTodo()">
+                </div>
+                <div class="w-1/2 md:w-28 flex items-center">
+                    <div class="flex-grow">
+                        <label class="block text-[8px] font-bold text-slate-400 uppercase mb-1">Inicio</label>
+                        <input type="time" class="maq-inicio w-full p-2 border rounded-lg text-xs outline-none focus:ring-1 focus:ring-indigo-500" value="${hInicio}" oninput="sincronizarTodo()">
+                    </div>
+                    <button onclick="ponerHoraEnElemento(this)" class="mt-5 ml-1 text-slate-300 hover:text-indigo-500"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></button>
+                </div>
+                <div class="w-1/2 md:w-28 flex items-center">
+                    <div class="flex-grow">
+                        <label class="block text-[8px] font-bold text-slate-400 uppercase mb-1">Fin</label>
+                        <input type="time" class="maq-fin w-full p-2 border rounded-lg text-xs outline-none focus:ring-1 focus:ring-indigo-500" value="${hFin}" oninput="sincronizarTodo()">
+                    </div>
+                    <button onclick="ponerHoraEnElemento(this)" class="mt-5 ml-1 text-slate-300 hover:text-indigo-500"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></button>
+                </div>
+                <div class="w-full md:w-32">
+                    <label class="block text-[8px] font-bold text-slate-400 uppercase mb-1">Estado Cámara (Punto 5)</label>
+                    <select class="maq-estado w-full p-2 border rounded-lg text-xs outline-none focus:ring-1 focus:ring-indigo-500" onchange="sincronizarTodo()">
+                        <option value="Correcta">Correcta</option>
+                        <option value="Intermitente">Intermitente</option>
+                        <option value="Sin Señal">Sin Señal</option>
+                        <option value="Ángulo Obstruido">Ángulo Obstruido</option>
+                    </select>
+                </div>
+                <div class="flex-grow">
+                    <label class="block text-[8px] font-bold text-slate-400 uppercase mb-1">Informe Nº</label>
+                    <input type="text" class="maq-informe w-full p-2 border rounded-lg text-xs outline-none focus:ring-1 focus:ring-indigo-500 font-mono" value="${nroInf}" oninput="sincronizarTodo()">
+                </div>
+                <button onclick="this.parentElement.remove(); sincronizarTodo();" class="p-2 text-slate-200 hover:text-red-500 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                </button>
+            `;
+            contenedor.appendChild(div);
+            sincronizarTodo();
+        }
+
+        function aplicarRango() {
+            const inicio = parseInt(document.getElementById('rangoInicio').value);
+            const fin = parseInt(document.getElementById('rangoFin').value);
+            if(!inicio || !fin || fin < inicio) return;
+            for(let i = inicio; i <= fin; i++) {
+                agregarFila(i.toString());
+            }
+        }
+
+        function sincronizarTodo() {
+            const hLlamada = document.getElementById('horaLlamada').value;
+            const tecnico = document.getElementById('tecnico').value || "[Nombre del Técnico]";
+            const tarea = document.getElementById('tipoTarea').value;
+            
+            const maqIds = Array.from(document.querySelectorAll('.maq-id')).map(i => i.value);
+            const maqInicios = Array.from(document.querySelectorAll('.maq-inicio')).map(i => i.value);
+            const maqFines = Array.from(document.querySelectorAll('.maq-fin')).map(i => i.value);
+            const maqEstados = Array.from(document.querySelectorAll('.maq-estado')).map(i => i.value);
+            const maqInformes = Array.from(document.querySelectorAll('.maq-informe')).map(i => i.value);
+
+            // Cabecera Dinámica
+            const listaMaq = maqIds.filter(id => id).map(id => `Máq. ${id}`).join(' y ');
+            
+            // Lógica de estado de cámara global basado en la primera máquina o si hay fallos
+            const algunFallo = maqEstados.some(e => e !== 'Correcta');
+            const respuestaCamaras = algunFallo ? 
+                `CCTV le informa que se observan anomalías en algunas cámaras durante el procedimiento.-` : 
+                `CCTV le responde que las cámaras y conexión funcionan correctamente.-`;
+
+            let texto = `A las ${hLlamada} Hs. CCTV recibe llamada de Técnico ${tecnico}, solicita confirmación de visualización de cámara y conexión online para realizar ${tarea} de ${listaMaq || "[Máquinas]"}.\n` +
+                        `${respuestaCamaras}\n\n`;
+
+            // Detalle por máquina
+            maqIds.forEach((id, index) => {
+                if (id) {
+                    const hIni = maqInicios[index];
+                    const hFin = maqFines[index];
+                    const estado = maqEstados[index];
+                    const inf = maqInformes[index];
+                    
+                    if (hIni) {
+                        texto += `A las ${hIni} Hs. Técnico ${tecnico}, informa que inicia ${tarea} de Máquina ${id}.-\n`;
+                    }
+                    if (hFin) {
+                        let textoEstado = estado === 'Correcta' ? '' : ` (Visualización: ${estado})`;
+                        texto += `A las ${hFin} Hs. Técnico ${tecnico}, informa que finalizó ${tarea} de Máquina ${id} con Informe Técnico Nº ${inf || "[Nº]"}${textoEstado}.-\n\n`;
+                    }
+                }
+            });
+
+            document.getElementById('output').value = texto.trim();
+        }
+
+        function limpiarSeccion() {
+            document.getElementById('tecnico').value = "";
+            document.getElementById('rangoInicio').value = "";
+            document.getElementById('rangoFin').value = "";
+            document.getElementById('contenedorMaquinas').innerHTML = "";
+            sincronizarTodo();
+        }
+
+        function volverAlInicio() {
+            document.getElementById('horaLlamada').value = "09:11";
+            document.getElementById('tecnico').value = "Mansilla Nicolás";
+            document.getElementById('tipoTarea').value = "Cerado";
+            
+            const contenedor = document.getElementById('contenedorMaquinas');
+            contenedor.innerHTML = "";
+            agregarFila("110490-06", "10:43", "11:11", "11470");
+            agregarFila("120385", "11:11", "11:28", "11471");
+            sincronizarTodo();
+        }
+
+        function copiarTexto() {
+            const el = document.getElementById('output');
+            el.select();
+            document.execCommand('copy');
+            const toast = document.getElementById('toast');
+            toast.style.opacity = "1";
+            setTimeout(() => { toast.style.opacity = "0"; }, 2000);
+        }
+
+        window.onload = () => volverAlInicio();
+    </script>
+</body>
+</html>
