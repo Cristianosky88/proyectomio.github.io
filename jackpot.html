@@ -22,13 +22,18 @@
                     <i data-lucide="wallet" class="w-6 h-6 text-white"></i>
                 </div>
                 <div>
-                    <h1 class="text-xl font-bold">Registro de Jackpot</h1>
-                    <p class="text-slate-400 text-xs uppercase tracking-wider">Control y auditoria de premios</p>
+                    <h1 class="text-xl font-bold">Registro de Jackpot - Modelo N° 1</h1>
+                    <p class="text-slate-400 text-xs uppercase tracking-wider">Planilla de Reporte Jackpot</p>
                 </div>
             </div>
-            <div class="text-right">
-                <div class="text-xs text-slate-400">Fecha</div>
-                <div class="font-mono font-bold text-lg" id="fechaActual">--/--/--</div>
+            <div class="flex items-center gap-4">
+                <button type="button" id="btnJackpot2Header" class="px-4 py-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-white hover:from-yellow-500 hover:to-orange-600 rounded-lg font-bold text-sm transition shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center gap-2 border-2 border-yellow-300">
+                    <i data-lucide="zap" class="w-4 h-4"></i> Jackpot 2
+                </button>
+                <div class="text-right">
+                    <div class="text-xs text-slate-400">Fecha</div>
+                    <div class="font-mono font-bold text-lg" id="fechaActual">--/--/--</div>
+                </div>
             </div>
         </div>
 
@@ -80,7 +85,7 @@
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-600 mb-2">Importe Jackpot ($) <span class="text-red-500">*</span></label>
-                            <input type="number" id="importe" name="importe" step="0.01" min="0" placeholder="0,00" required class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none font-semibold text-green-700">
+                            <input type="text" id="importe" name="importe" placeholder="0,00" required class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none font-semibold text-green-700">
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-600 mb-2">Hora de Revision <span class="text-red-500">*</span></label>
@@ -168,6 +173,7 @@
                                 <option value="LUCKY LUCKY">LUCKY LUCKY</option>
                                 <option value="OTRO">Otro</option>
                             </select>
+                            <input type="text" id="juego_personalizado" name="juego_personalizado" placeholder="Ingrese nombre del juego" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none mt-2 hidden" />
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-600 mb-2">Marca Maquina</label>
@@ -182,10 +188,11 @@
                                 <option value="NOVOMATIC">NOVOMATIC</option>
                                 <option value="OTRO">Otro</option>
                             </select>
+                            <input type="text" id="maquina_personalizada" name="maquina_personalizada" placeholder="Ingrese marca de máquina" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none mt-2 hidden" />
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-600 mb-2">Pago Manual</label>
-                            <input type="number" id="pago_manual" name="pago_manual" step="0.01" min="0" placeholder="0,00" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                            <input type="text" id="pago_manual" name="pago_manual" placeholder="00000" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
                         </div>
                     </div>
                     <div class="mt-4">
@@ -194,51 +201,25 @@
                     </div>
                 </div>
 
-                <!-- 6. DURACION DE EVENTOS -->
-                <div class="border-b border-slate-200 p-6 bg-slate-50">
-                    <h3 class="font-bold text-slate-800 text-lg mb-4">Duracion de Eventos (Calculada)</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div class="bg-white p-3 rounded border border-slate-200">
-                            <label class="block text-xs font-semibold text-slate-600 mb-2">CCTV a Revision</label>
-                            <div id="duracion1" class="text-lg font-bold text-indigo-600">-- min</div>
-                        </div>
-                        <div class="bg-white p-3 rounded border border-slate-200">
-                            <label class="block text-xs font-semibold text-slate-600 mb-2">Revision a Pago</label>
-                            <div id="duracion2" class="text-lg font-bold text-indigo-600">-- min</div>
-                        </div>
-                        <div class="bg-white p-3 rounded border border-slate-200">
-                            <label class="block text-xs font-semibold text-slate-600 mb-2">Tiempo Total</label>
-                            <div id="duracion3" class="text-lg font-bold text-emerald-600">-- min</div>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- 7. BOTONES DE ACCION -->
-                <div class="bg-slate-50 p-6 border-t border-slate-200 flex flex-wrap gap-2">
-                    <button type="button" id="btnCargarUltimo" class="px-4 py-2 bg-slate-200 text-slate-800 hover:bg-slate-300 rounded font-semibold text-sm transition flex items-center gap-2">
-                        <i data-lucide="upload" class="w-4 h-4"></i> Cargar Ultimo
-                    </button>
-                    <button type="button" id="btnAutocompletar" class="px-4 py-2 bg-indigo-600 text-white hover:bg-indigo-700 rounded font-semibold text-sm transition flex items-center gap-2">
-                        <i data-lucide="refresh-cw" class="w-4 h-4"></i> Autocompletar
-                    </button>
-                    <button type="button" id="btnGenerarResumen" class="px-4 py-2 bg-indigo-500 text-white hover:bg-indigo-600 rounded font-semibold text-sm transition flex items-center gap-2">
-                        <i data-lucide="file-text" class="w-4 h-4"></i> Generar Informe
-                    </button>
-                    <button type="submit" id="btnGuardar" class="px-4 py-2 bg-emerald-600 text-white hover:bg-emerald-700 rounded font-semibold text-sm transition flex items-center gap-2">
-                        <i data-lucide="save" class="w-4 h-4"></i> Guardar Registro
-                    </button>
-                    <button type="button" id="btnExportarTodo" class="px-4 py-2 bg-cyan-600 text-white hover:bg-cyan-700 rounded font-semibold text-sm transition flex items-center gap-2">
-                        <i data-lucide="download" class="w-4 h-4"></i> Exportar JSON
-                    </button>
-                    <button type="button" id="btnBorrarRegistros" class="px-4 py-2 bg-rose-600 text-white hover:bg-rose-700 rounded font-semibold text-sm transition flex items-center gap-2">
-                        <i data-lucide="trash-2" class="w-4 h-4"></i> Borrar Registros
-                    </button>
-                    <button type="button" id="btnLimpiarTodo" class="px-4 py-2 bg-slate-500 text-white hover:bg-slate-600 rounded font-semibold text-sm transition flex items-center gap-2">
-                        <i data-lucide="refresh-ccw" class="w-4 h-4"></i> Limpiar Form
-                    </button>
-                    <button type="button" id="btnInicio" class="px-4 py-2 bg-slate-800 text-white hover:bg-slate-900 rounded font-semibold text-sm transition flex items-center gap-2 ml-auto">
-                        <i data-lucide="home" class="w-4 h-4"></i> Volver
-                    </button>
+                <div class="bg-slate-50 p-6 border-t border-slate-200">
+                    <div class="flex flex-wrap gap-3 justify-center items-center">
+                        <button type="submit" id="btnGuardar" class="px-4 py-2 bg-emerald-600 text-white hover:bg-emerald-700 rounded font-semibold text-sm transition flex items-center gap-2">
+                            <i data-lucide="save" class="w-4 h-4"></i> Guardar Registro
+                        </button>
+                        <button type="button" id="btnGenerarResumen" class="px-4 py-2 bg-indigo-500 text-white hover:bg-indigo-600 rounded font-semibold text-sm transition flex items-center gap-2">
+                            <i data-lucide="file-text" class="w-4 h-4"></i> Generar Informe
+                        </button>
+                        <button type="button" id="btnLimpiarTodo" class="px-4 py-2 bg-slate-500 text-white hover:bg-slate-600 rounded font-semibold text-sm transition flex items-center gap-2">
+                            <i data-lucide="refresh-ccw" class="w-4 h-4"></i> Limpiar Form
+                        </button>
+                        <button type="button" id="btnBorrarRegistros" class="px-4 py-2 bg-rose-600 text-white hover:bg-rose-700 rounded font-semibold text-sm transition flex items-center gap-2">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i> Borrar Registros
+                        </button>
+                        <button type="button" id="btnInicio" class="px-6 py-2 bg-slate-800 text-white hover:bg-slate-900 rounded font-semibold text-sm transition flex items-center gap-2">
+                            <i data-lucide="home" class="w-4 h-4"></i> Volver
+                        </button>
+                    </div>
                 </div>
             </form>
 
@@ -291,6 +272,46 @@
     const form = document.getElementById('formJackpot');
     const inputs_hora = ['hora_cctv', 'hora_revision', 'hora_pago', 'hora_descarga'];
     let registrosFiltrados = [];
+
+    // ===== PERSONALIZACIÓN DE JUEGO Y MARCA =====
+    document.getElementById('juego').addEventListener('change', (e) => {
+        const personalizadoInput = document.getElementById('juego_personalizado');
+        if (e.target.value === 'OTRO') {
+            personalizadoInput.classList.remove('hidden');
+            personalizadoInput.required = true;
+        } else {
+            personalizadoInput.classList.add('hidden');
+            personalizadoInput.required = false;
+            personalizadoInput.value = '';
+        }
+    });
+
+    document.getElementById('maquina_independiente').addEventListener('change', (e) => {
+        const personalizadoInput = document.getElementById('maquina_personalizada');
+        if (e.target.value === 'OTRO') {
+            personalizadoInput.classList.remove('hidden');
+            personalizadoInput.required = true;
+        } else {
+            personalizadoInput.classList.add('hidden');
+            personalizadoInput.required = false;
+            personalizadoInput.value = '';
+        }
+    });
+
+    // ===== RECONOCER COMAS EN CAMPOS DECIMALES =====
+    ['importe', 'pago_manual'].forEach(id => {
+        const input = document.getElementById(id);
+        if (input) {
+            input.addEventListener('blur', (e) => {
+                // Reemplazar comas por puntos
+                let valor = e.target.value.replace(',', '.');
+                // Validar que sea un número válido
+                if (valor && !isNaN(valor)) {
+                    e.target.value = valor;
+                }
+            });
+        }
+    });
 
     // ===== FUNCIONES AUXILIARES =====
     function actualizarFecha() {
@@ -378,47 +399,6 @@
         });
     });
 
-    // ===== CARGAR ULTIMO REGISTRO =====
-    document.getElementById('btnCargarUltimo').addEventListener('click', () => {
-        const ultimoRegistro = localStorage.getItem('jackpotLastRecord');
-        if (!ultimoRegistro) {
-            showNotification('No hay registro anterior', 'error');
-            return;
-        }
-
-        const data = JSON.parse(ultimoRegistro);
-        Object.keys(data).forEach(key => {
-            const element = document.getElementById(key);
-            if (element) element.value = data[key];
-        });
-
-        calcularDuracion();
-        showNotification('Ultimo registro cargado');
-    });
-
-    // ===== AUTOCOMPLETAR =====
-    document.getElementById('btnAutocompletar').addEventListener('click', () => {
-        const ultimoRegistro = localStorage.getItem('jackpotLastRecord');
-        if (!ultimoRegistro) {
-            showNotification('No hay datos para autocompletar', 'error');
-            return;
-        }
-
-        const data = JSON.parse(ultimoRegistro);
-        
-        // Copiar campos excepto horas (para cambiar)
-        document.getElementById('quien_llama').value = data.quien_llama || '';
-        document.getElementById('nombre_llama').value = data.nombre_llama || '';
-        document.getElementById('tipo_cliente').value = data.tipo_cliente || '';
-        document.getElementById('nombre_cliente').value = data.nombre_cliente || '';
-        document.getElementById('quien_paga').value = data.quien_paga || '';
-        document.getElementById('nombre_paga').value = data.nombre_paga || '';
-        document.getElementById('juego').value = data.juego || '';
-        document.getElementById('maquina_independiente').value = data.maquina_independiente || '';
-
-        showNotification('Datos autocompletados');
-    });
-
     // ===== GUARDAR REGISTRO =====
     form.addEventListener('submit', (e) => {
         e.preventDefault();
@@ -429,9 +409,19 @@
         }
 
         const formData = new FormData(form);
+        const data = Object.fromEntries(formData);
+        
+        // Reemplazar valores con personalizados si es necesario
+        if (data.juego === 'OTRO' && data.juego_personalizado) {
+            data.juego = data.juego_personalizado;
+        }
+        if (data.maquina_independiente === 'OTRO' && data.maquina_personalizada) {
+            data.maquina_independiente = data.maquina_personalizada;
+        }
+        
         const registro = {
             timestamp: new Date().toLocaleString('es-AR'),
-            data: Object.fromEntries(formData),
+            data: data,
             duracion: document.getElementById('duracion3').textContent
         };
 
@@ -513,19 +503,6 @@
         showNotification('Resumen generado');
     });
 
-    // ===== EXPORTAR =====
-    document.getElementById('btnExportarTodo').addEventListener('click', () => {
-        const registros = JSON.parse(localStorage.getItem('jackpotRegistros') || '[]');
-        const json = JSON.stringify(registros, null, 2);
-        const blob = new Blob([json], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `jackpot_registros_${new Date().toISOString().slice(0,10)}.json`;
-        a.click();
-        showNotification('Archivo exportado');
-    });
-
     // ===== BORRAR REGISTROS =====
     document.getElementById('btnBorrarRegistros').addEventListener('click', () => {
         if (confirm('Borrar TODOS los registros? Esta accion no se puede deshacer.')) {
@@ -545,6 +522,11 @@
             document.getElementById(id).textContent = '-- min';
         });
         showNotification('Formulario limpiado');
+    });
+
+    // ===== IR A JACKPOT 2 =====
+    document.getElementById('btnJackpot2Header').addEventListener('click', () => {
+        window.location.href = 'Jackpot2.html';
     });
 
     // ===== VOLVER =====
