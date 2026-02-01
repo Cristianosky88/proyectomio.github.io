@@ -164,73 +164,73 @@ Usa punto (.) para miles y coma (,) para decimales"
 
     <!-- MODAL CONTADOR BILLETES -->
     <div id="billCounterModal" class="modal hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md max-h-96 overflow-y-auto">
-            <div class="sticky top-0 bg-slate-900 text-white p-4 flex items-center gap-2">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div class="sticky top-0 bg-slate-900 text-white p-3 flex items-center gap-2 z-10">
                 <i data-lucide="banknote" class="w-5 h-5"></i>
                 <h3 class="font-bold">Contador de Billetes</h3>
             </div>
-            <div class="p-6 space-y-3">
-                <div class="flex justify-between items-center">
+            <div class="p-4 space-y-1">
+                <div class="grid grid-cols-[1fr_auto_1fr] gap-3 items-center py-1 border-b border-slate-100">
                     <label class="text-sm font-semibold text-slate-700">Billetes de $20.000:</label>
-                    <input type="number" id="bill20000" value="0" onchange="calculateBillTotal()" oninput="calculateBillTotal()" class="w-16 px-2 py-1 border border-slate-300 rounded text-center">
-                    <span class="text-sm font-semibold text-indigo-600">= $<span id="total20000">0</span></span>
+                    <input type="number" id="bill20000" value="0" onchange="calculateBillTotal()" oninput="calculateBillTotal()" class="w-20 px-2 py-1 border border-slate-300 rounded text-center font-semibold">
+                    <span class="text-sm font-bold text-indigo-600 text-right">= $<span id="total20000">0</span></span>
                 </div>
-                <div class="flex justify-between items-center">
+                <div class="grid grid-cols-[1fr_auto_1fr] gap-3 items-center py-1 border-b border-slate-100">
                     <label class="text-sm font-semibold text-slate-700">Billetes de $10.000:</label>
-                    <input type="number" id="bill10000" value="0" onchange="calculateBillTotal()" oninput="calculateBillTotal()" class="w-16 px-2 py-1 border border-slate-300 rounded text-center">
-                    <span class="text-sm font-semibold text-indigo-600">= $<span id="total10000">0</span></span>
+                    <input type="number" id="bill10000" value="0" onchange="calculateBillTotal()" oninput="calculateBillTotal()" class="w-20 px-2 py-1 border border-slate-300 rounded text-center font-semibold">
+                    <span class="text-sm font-bold text-indigo-600 text-right">= $<span id="total10000">0</span></span>
                 </div>
-                <div class="flex justify-between items-center">
+                <div class="grid grid-cols-[1fr_auto_1fr] gap-4 items-center py-2 border-b border-slate-100">
                     <label class="text-sm font-semibold text-slate-700">Billetes de $2.000:</label>
-                    <input type="number" id="bill2000" value="0" onchange="calculateBillTotal()" oninput="calculateBillTotal()" class="w-16 px-2 py-1 border border-slate-300 rounded text-center">
-                    <span class="text-sm font-semibold text-indigo-600">= $<span id="total2000">0</span></span>
+                    <input type="number" id="bill2000" value="0" onchange="calculateBillTotal()" oninput="calculateBillTotal()" class="w-20 px-2 py-1 border border-slate-300 rounded text-center font-semibold">
+                    <span class="text-sm font-bold text-indigo-600 text-right">= $<span id="total2000">0</span></span>
                 </div>
-                <div class="flex justify-between items-center">
+                <div class="grid grid-cols-[1fr_auto_1fr] gap-3 items-center py-1 border-b border-slate-100">
                     <label class="text-sm font-semibold text-slate-700">Billetes de $1.000:</label>
-                    <input type="number" id="bill1000" value="0" onchange="calculateBillTotal()" oninput="calculateBillTotal()" class="w-16 px-2 py-1 border border-slate-300 rounded text-center">
-                    <span class="text-sm font-semibold text-indigo-600">= $<span id="total1000">0</span></span>
+                    <input type="number" id="bill1000" value="0" onchange="calculateBillTotal()" oninput="calculateBillTotal()" class="w-20 px-2 py-1 border border-slate-300 rounded text-center font-semibold">
+                    <span class="text-sm font-bold text-indigo-600 text-right">= $<span id="total1000">0</span></span>
                 </div>
-                <div class="flex justify-between items-center">
+                <div class="grid grid-cols-[1fr_auto_1fr] gap-3 items-center py-1 border-b border-slate-100">
                     <label class="text-sm font-semibold text-slate-700">Billetes de $500:</label>
-                    <input type="number" id="bill500" value="0" onchange="calculateBillTotal()" oninput="calculateBillTotal()" class="w-16 px-2 py-1 border border-slate-300 rounded text-center">
-                    <span class="text-sm font-semibold text-indigo-600">= $<span id="total500">0</span></span>
+                    <input type="number" id="bill500" value="0" onchange="calculateBillTotal()" oninput="calculateBillTotal()" class="w-20 px-2 py-1 border border-slate-300 rounded text-center font-semibold">
+                    <span class="text-sm font-bold text-indigo-600 text-right">= $<span id="total500">0</span></span>
                 </div>
-                <div class="flex justify-between items-center">
+                <div class="grid grid-cols-[1fr_auto_1fr] gap-3 items-center py-1 border-b border-slate-100">
                     <label class="text-sm font-semibold text-slate-700">Billetes de $200:</label>
-                    <input type="number" id="bill200" value="0" onchange="calculateBillTotal()" oninput="calculateBillTotal()" class="w-16 px-2 py-1 border border-slate-300 rounded text-center">
-                    <span class="text-sm font-semibold text-indigo-600">= $<span id="total200">0</span></span>
+                    <input type="number" id="bill200" value="0" onchange="calculateBillTotal()" oninput="calculateBillTotal()" class="w-20 px-2 py-1 border border-slate-300 rounded text-center font-semibold">
+                    <span class="text-sm font-bold text-indigo-600 text-right">= $<span id="total200">0</span></span>
                 </div>
-                <div class="flex justify-between items-center">
+                <div class="grid grid-cols-[1fr_auto_1fr] gap-3 items-center py-1 border-b border-slate-100">
                     <label class="text-sm font-semibold text-slate-700">Billetes de $100:</label>
-                    <input type="number" id="bill100" value="0" onchange="calculateBillTotal()" oninput="calculateBillTotal()" class="w-16 px-2 py-1 border border-slate-300 rounded text-center">
-                    <span class="text-sm font-semibold text-indigo-600">= $<span id="total100">0</span></span>
+                    <input type="number" id="bill100" value="0" onchange="calculateBillTotal()" oninput="calculateBillTotal()" class="w-20 px-2 py-1 border border-slate-300 rounded text-center font-semibold">
+                    <span class="text-sm font-bold text-indigo-600 text-right">= $<span id="total100">0</span></span>
                 </div>
-                <div class="flex justify-between items-center">
+                <div class="grid grid-cols-[1fr_auto_1fr] gap-3 items-center py-1 border-b border-slate-100">
                     <label class="text-sm font-semibold text-slate-700">Billetes de $50:</label>
-                    <input type="number" id="bill50" value="0" onchange="calculateBillTotal()" oninput="calculateBillTotal()" class="w-16 px-2 py-1 border border-slate-300 rounded text-center">
-                    <span class="text-sm font-semibold text-indigo-600">= $<span id="total50">0</span></span>
+                    <input type="number" id="bill50" value="0" onchange="calculateBillTotal()" oninput="calculateBillTotal()" class="w-20 px-2 py-1 border border-slate-300 rounded text-center font-semibold">
+                    <span class="text-sm font-bold text-indigo-600 text-right">= $<span id="total50">0</span></span>
                 </div>
-                <div class="flex justify-between items-center">
+                <div class="grid grid-cols-[1fr_auto_1fr] gap-3 items-center py-1 border-b border-slate-100">
                     <label class="text-sm font-semibold text-slate-700">Billetes de $20:</label>
-                    <input type="number" id="bill20" value="0" onchange="calculateBillTotal()" oninput="calculateBillTotal()" class="w-16 px-2 py-1 border border-slate-300 rounded text-center">
-                    <span class="text-sm font-semibold text-indigo-600">= $<span id="total20">0</span></span>
+                    <input type="number" id="bill20" value="0" onchange="calculateBillTotal()" oninput="calculateBillTotal()" class="w-20 px-2 py-1 border border-slate-300 rounded text-center font-semibold">
+                    <span class="text-sm font-bold text-indigo-600 text-right">= $<span id="total20">0</span></span>
                 </div>
-                <div class="flex justify-between items-center">
+                <div class="grid grid-cols-[1fr_auto_1fr] gap-3 items-center py-1">
                     <label class="text-sm font-semibold text-slate-700">Billetes de $10:</label>
-                    <input type="number" id="bill10" value="0" onchange="calculateBillTotal()" oninput="calculateBillTotal()" class="w-16 px-2 py-1 border border-slate-300 rounded text-center">
-                    <span class="text-sm font-semibold text-indigo-600">= $<span id="total10">0</span></span>
+                    <input type="number" id="bill10" value="0" onchange="calculateBillTotal()" oninput="calculateBillTotal()" class="w-20 px-2 py-1 border border-slate-300 rounded text-center font-semibold">
+                    <span class="text-sm font-bold text-indigo-600 text-right">= $<span id="total10">0</span></span>
                 </div>
             </div>
             <div class="bg-gradient-to-r from-indigo-700 to-slate-900 text-white p-4">
-                <div class="text-center">
-                    <div class="text-xs opacity-80 mb-1">TOTAL ARQUEO</div>
+                <div class="text-center mb-2">
+                    <div class="text-xs opacity-80 mb-1 uppercase tracking-wider">Total Arqueo</div>
                     <div class="text-2xl font-bold">$<span id="arqueoTotal">0</span></div>
                 </div>
-                <input type="text" id="shouldHave" placeholder="Debería tener: $" oninput="formatArgentineInput(this); checkDifference()" class="w-full mt-3 px-3 py-2 rounded bg-white bg-opacity-20 text-white placeholder-white placeholder-opacity-70 text-center">
+                <input type="text" id="shouldHave" placeholder="Debería tener: $" oninput="checkDifference()" class="w-full px-3 py-2 rounded-lg bg-white bg-opacity-20 text-white placeholder-white placeholder-opacity-70 text-center font-semibold">
                 <div id="differenceResult" class="mt-2"></div>
             </div>
-            <div class="p-4 border-t border-slate-200">
-                <button onclick="closeBillModal()" class="w-full px-4 py-2 bg-slate-200 hover:bg-slate-300 rounded font-semibold text-slate-800 transition">Cerrar</button>
+            <div class="p-3 border-t border-slate-200">
+                <button onclick="closeBillModal()" class="w-full px-4 py-2 bg-slate-200 hover:bg-slate-300 rounded-lg font-semibold text-slate-800 transition">Cerrar</button>
             </div>
         </div>
     </div>
@@ -244,7 +244,7 @@ Usa punto (.) para miles y coma (,) para decimales"
             </div>
             <div class="p-6">
                 <label class="block text-sm font-semibold text-slate-700 mb-2">Monto a entregar:</label>
-                <input type="text" id="paymentAmount" placeholder="Ej: 15.750,50" oninput="formatArgentineInput(this); calculateBestPayment()" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-center font-semibold mb-3">
+                <input type="text" id="paymentAmount" placeholder="Ej: 15750,50 o 15.750,50" onblur="formatArgentineInput(this); calculateBestPayment()" onkeyup="calculateBestPayment()" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-center font-semibold mb-3">
                 <div id="paymentBreakdown"></div>
             </div>
             <div class="p-4 border-t border-slate-200">
@@ -444,13 +444,47 @@ Usa punto (.) para miles y coma (,) para decimales"
     }
     
     function formatArgentineInput(input) {
-        const value = input.value.replace(/[^\d,]/g, '');
-        const parts = value.split(',');
+        let value = input.value.trim();
+        if (!value) return;
         
-        if (parts[0]) {
-            const intPart = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-            input.value = parts[1] !== undefined ? intPart + ',' + parts[1].substring(0, 2) : intPart;
+        // Eliminar espacios
+        value = value.replace(/\s/g, '');
+        
+        // Contar cuántas comas hay
+        const commaCount = (value.match(/,/g) || []).length;
+        if (commaCount > 1) {
+            // Si hay más de una coma, eliminar la última
+            const lastCommaIndex = value.lastIndexOf(',');
+            value = value.substring(0, lastCommaIndex) + value.substring(lastCommaIndex + 1);
         }
+        
+        // Separar parte entera y decimal
+        let intPart = '';
+        let decPart = '';
+        
+        if (value.includes(',')) {
+            const parts = value.split(',');
+            intPart = parts[0].replace(/\./g, '');
+            decPart = parts[1] ? parts[1].substring(0, 2) : '';
+        } else {
+            intPart = value.replace(/\./g, '');
+        }
+        
+        // Validar que la parte entera solo tenga números
+        if (intPart && !/^\d+$/.test(intPart)) {
+            return;
+        }
+        
+        // Validar que la parte decimal solo tenga números
+        if (decPart && !/^\d*$/.test(decPart)) {
+            return;
+        }
+        
+        // Formatear parte entera con puntos
+        const formatted = intPart ? intPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.') : '';
+        
+        // Reconstruir el valor
+        input.value = decPart !== '' ? formatted + ',' + decPart : formatted;
     }
     
     function evaluateExpression(expr) {
@@ -813,7 +847,10 @@ Usa punto (.) para miles y coma (,) para decimales"
     function calculateBestPayment() {
         const amountText = document.getElementById('paymentAmount').value;
         const amount = parseArgentineNumber(amountText) || 0;
-        if (amount === 0) return;
+        if (amount === 0) {
+            document.getElementById('paymentBreakdown').innerHTML = '';
+            return;
+        }
         
         const bills = [20000, 10000, 2000, 1000, 500, 200, 100, 50, 20, 10];
         let remaining = Math.floor(amount);
@@ -827,8 +864,10 @@ Usa punto (.) para miles y coma (,) para decimales"
         });
         
         let html = '<div class="bg-slate-50 p-3 rounded border border-slate-200"><h4 class="text-sm font-semibold text-slate-700 mb-2">💸 Mejor forma de entregar:</h4>';
-        Object.keys(breakdown).forEach(bill => {
-            if (breakdown[bill] > 0) {
+        
+        // Mostrar billetes en orden descendente
+        bills.forEach(bill => {
+            if (breakdown[bill] && breakdown[bill] > 0) {
                 html += `<div class="flex justify-between text-sm py-1">
                     <span class="text-slate-600">${breakdown[bill]}x $${formatArgentineNumber(parseInt(bill))}:</span>
                     <span class="font-semibold text-indigo-600">${formatArgentineNumber(breakdown[bill] * parseInt(bill))}</span>
@@ -836,7 +875,7 @@ Usa punto (.) para miles y coma (,) para decimales"
             }
         });
         
-        const totalEntregado = Object.keys(breakdown).reduce((sum, bill) => sum + (breakdown[bill] * parseInt(bill)), 0);
+        const totalEntregado = bills.reduce((sum, bill) => sum + ((breakdown[bill] || 0) * bill), 0);
         const diferencia = amount - totalEntregado;
         
         html += `<div class="border-t border-slate-300 mt-2 pt-2 flex justify-between font-semibold text-sm">
@@ -845,13 +884,12 @@ Usa punto (.) para miles y coma (,) para decimales"
         </div>`;
         
         if (diferencia > 0) {
-            html += `<div class="mt-2 p-2 bg-yellow-100 text-yellow-700 rounded text-xs text-center font-semibold">Falta (en monedas): ${formatArgentineNumber(diferencia)}</div>`;
+            html += `<div class="mt-2 p-2 bg-yellow-100 text-yellow-700 rounded text-xs text-center font-semibold">Falta (en monedas): ${formatArgentineNumber(diferencia.toFixed(2))}</div>`;
         }
         
         html += '</div>';
         document.getElementById('paymentBreakdown').innerHTML = html;
     }
-    
     function convertCredits() {
         const creditValue = parseFloat(document.getElementById('creditValue').value) || 0;
         const credits = parseFloat(document.getElementById('credits').value) || 0;
