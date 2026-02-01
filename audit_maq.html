@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Gestión de Novedades - CCTV</title>
+    <title>Reporte de Control de Auditoria de Maquinas</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -35,9 +35,8 @@
             <div>
                 <h1 class="text-3xl font-bold text-slate-900 flex items-center gap-2">
                     <i data-lucide="shield-check" class="text-blue-600"></i>
-                    Control de Auditorías
+                    Reporte de Control de Auditorias de Maquinas
                 </h1>
-                <p class="text-slate-500">Generación automatizada y cronológica de novedades</p>
             </div>
             <div id="current-clock" class="bg-white px-6 py-3 rounded-2xl shadow-sm border border-slate-200 text-center">
                 <div class="text-2xl font-mono font-bold text-blue-600">00:00:00</div>
@@ -84,7 +83,7 @@
                     <h3 class="text-sm font-bold uppercase tracking-widest text-blue-400 mb-4">Personal en Turno</h3>
                     <div class="space-y-4">
                         <div>
-                            <label class="block text-xs text-slate-400 mb-1">Nombre (CCTV/Limpieza)</label>
+                            <label class="block text-xs text-slate-400 mb-1">Nombre de Personal (Control I/Operador)</label>
                             <input type="text" id="reporter-name" value="Zambrano Celeste" class="bg-slate-800 border-none w-full rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
                         </div>
                         <div>
@@ -238,16 +237,16 @@
 
             switch(type) {
                 case 'ingreso':
-                    text = `A las ${time} Hs. CCTV Recibe Llamada de Personal de Limpieza ${reporter}, en función ${role}, informando el ingreso de ${subject} para realizar ${task}.-`;
+                    text = `A las ${time} Hs. CCTV Recibe Llamada de  ${role} ${reporter}, informando el ingreso de ${subject} para realizar ${task}.-`;
                     break;
                 case 'inicio':
-                    text = `A las ${time} Hs. ${subject} informa que inicia ${task}.-`;
+                    text = `A las ${time} Hs. ${subject} informa que inicia ${task} auditoria de maquinas.-`;
                     break;
                 case 'finaliza':
-                    text = `A las ${time} Hs. Finaliza auditoría.-`;
+                    text = `A las ${time} Hs. Finaliza auditoría de maquinas.-`;
                     break;
                 case 'retiro':
-                    text = `A las ${time} Hs. Personal de Limpieza ${reporter}, en función ${role}, informa que se retiran ${subject}.-`;
+                    text = `A las ${time} Hs. Personal de ${role} ${reporter}, informa que se retiran ${subject}.-`;
                     break;
             }
 
