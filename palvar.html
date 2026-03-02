@@ -36,17 +36,21 @@
                 
                 <form id="formTickets" autocomplete="off" class="space-y-4">
                     
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
+                    <div class="grid grid-cols-3 gap-4">
+                        <div class="col-span-1">
                             <label class="block text-xs font-semibold text-slate-500 mb-1">👤 Nombre de la Persona</label>
                             <input type="text" id="nombrePersona" required pattern="^[A-Za-zÁáÉéÍíÓóÚúÑñ\s]+$" placeholder="Nombre completo" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
                         </div>
-                        <div>
+                        <div class="col-span-1">
                             <label class="block text-xs font-semibold text-slate-500 mb-1">👥 Tipo de Cliente</label>
                             <select id="clienteGenero" required class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
-                                <option value="cliente">Cliente</option>
-                                <option value="clienta">Clienta</option>
+                                <option value="Cliente Sr.">Cliente Sr.</option>
+                                <option value="Clienta Sra.">Clienta Sra.</option>
                             </select>
+                        </div>
+                        <div class="col-span-1">
+                            <label class="block text-xs font-semibold text-slate-500 mb-1">👤 Nombre del Cliente</label>
+                            <input type="text" id="nombreCliente" placeholder="Ej: Juan" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
                         </div>
                     </div>
 
@@ -259,6 +263,7 @@
 
         const nombre = document.getElementById('nombrePersona').value.trim();
         const clienteGenero = document.getElementById('clienteGenero').value;
+        const nombreCliente = document.getElementById('nombreCliente').value.trim();
         const cantidad = Number(document.getElementById('cantidadTickets').value);
         const total = parseNumberAR(valorTotal.value);
         const pagado = parseNumberAR(montoPagado.value);
@@ -284,9 +289,11 @@
         const horaSegundaLinea = horaPrimera || horaFormateada;
         const horaTerceraLinea = horaUltima || horaFormateada;
 
-        let reportText = `A las ${horaPrimeraLinea} Hs. CCTV recibe llamada de ${cargo} ${nombre}, informa que recibió de ${clienteGenero}, ${cantidad} tickets para cambio por valor de ${formatCurrencyAR(total)}.-
+        const clienteCompleto = nombreCliente ? `${clienteGenero} ${nombreCliente}` : clienteGenero;
+
+        let reportText = `A las ${horaPrimeraLinea} Hs. CCTV recibe llamada de ${cargo} ${nombre}, informa que recibió de ${clienteCompleto}, ${cantidad} tickets para cambio por valor de ${formatCurrencyAR(total)}.-
 A las ${horaSegundaLinea} Hs. ${cargo} ${nombre} redime ${cantidad} tickets.-
-A las ${horaTerceraLinea} Hs. ${cargo} ${nombre} cancela en ventanilla de caja ${formatCurrencyAR(pagado)} a ${clienteGenero}.-`;
+A las ${horaTerceraLinea} Hs. ${cargo} ${nombre} cancela en ventanilla de caja ${formatCurrencyAR(pagado)} a ${clienteCompleto}.-`;
 
         reporteDiv.textContent = reportText;
         document.getElementById('reportContainer').classList.remove('hidden');
@@ -307,6 +314,7 @@ A las ${horaTerceraLinea} Hs. ${cargo} ${nombre} cancela en ventanilla de caja $
         localStorage.setItem('palvarLastClient', JSON.stringify({
             nombre: nombre,
             clienteGenero: clienteGenero,
+            nombreCliente: nombreCliente,
             cargo: cargo
         }));
 
@@ -399,11 +407,12 @@ A las ${horaTerceraLinea} Hs. ${cargo} ${nombre} cancela en ventanilla de caja $
     });
 
     // Cargar último cliente al iniciar
-    const lastClient = JSON.parse(localStorage.getItem('palvarLastClient') || 'null');
-    if (lastClient) {
-        document.getElementById('nombrePersona').value = lastClient.nombre || '';
-        document.getElementById('clienteGenero').value = lastClient.clienteGenero || 'cliente';
-        document.getElementById('tipoCargo').value = lastClient.cargo || '';
+    const lastClientInit = JSON.parse(localStorage.getItem('palvarLastClient') || 'null');
+    if (lastClientInit) {
+        document.getElementById('nombrePersona').value = lastClientInit.nombre || '';
+        document.getElementById('clienteGenero').value = lastClientInit.clienteGenero || 'Cliente Sr.';
+        document.getElementById('nombreCliente').value = lastClientInit.nombreCliente || '';
+        document.getElementById('tipoCargo').value = lastClientInit.cargo || '';
     }
 
     // Inicializar historial
@@ -429,9 +438,10 @@ A las ${horaTerceraLinea} Hs. ${cargo} ${nombre} cancela en ventanilla de caja $
     function cargarUltimosCliente() {
         const lastClient = JSON.parse(localStorage.getItem('palvarLastClient'));
         if (lastClient) {
-            document.getElementById('nombrePersona').value = lastClient.nombre;
-            document.getElementById('clienteGenero').value = lastClient.clienteGenero;
-            tipoCargo.value = lastClient.cargo;
+            document.getElementById('nombrePersona').value = lastClient.nombre || '';
+            document.getElementById('clienteGenero').value = lastClient.clienteGenero || 'Cliente Sr.';
+            document.getElementById('nombreCliente').value = lastClient.nombreCliente || '';
+            tipoCargo.value = lastClient.cargo || '';
         }
     }
 
