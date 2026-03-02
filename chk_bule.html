@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Control de Botones - Bulevard</title>
+    <title>Control de Botones - Casino Bulevard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -23,7 +23,7 @@
                     <i data-lucide="shield-alert" class="w-6 h-6 text-white"></i>
                 </div>
                 <div>
-                    <h1 class="text-xl font-bold">Control de Botones - Bulevard</h1>
+                    <h1 class="text-xl font-bold">Control de Botones - Casino Bulevard</h1>
                     <p class="text-slate-400 text-xs uppercase tracking-wider">Reporte de Chequeo de Botones</p>
                 </div>
             </div>
@@ -51,11 +51,8 @@
                                 <small id="error-hora1" class="text-red-600 text-xs hidden">⚠️ Hora 2 debe ser posterior</small>
                             </div>
                             <div>
-                                <label class="block text-xs font-semibold text-slate-500 mb-1">👤 Informante</label>
-                                <div class="relative">
-                                    <input type="text" id="informante1" required value="Control Interno Castaño Pablo" placeholder="Nombre del informante" list="informantes-list" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-blue-500 outline-none">
-                                    <div class="hidden absolute z-20 mt-1 w-full max-h-52 overflow-auto bg-white border border-slate-200 rounded shadow-sm text-sm" data-dropdown="informante1"></div>
-                                </div>
+                                <label class="block text-xs font-semibold text-slate-500 mb-1">👤 Personal/Control Interno</label>
+                                <input type="text" id="informante1" required placeholder="Nombre del informante" list="informantes-list" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-blue-500 outline-none">
                             </div>
                         </div>
                     </div>
@@ -70,18 +67,15 @@
                                 <small id="duracion" class="text-green-600 text-xs hidden"></small>
                             </div>
                             <div>
-                                <label class="block text-xs font-semibold text-slate-500 mb-1">👤 Informante</label>
-                                <div class="relative">
-                                    <input type="text" id="informante2" required value="Control Interno Castaño Pablo" placeholder="Nombre del informante" list="informantes-list" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-blue-500 outline-none">
-                                    <div class="hidden absolute z-20 mt-1 w-full max-h-52 overflow-auto bg-white border border-slate-200 rounded shadow-sm text-sm" data-dropdown="informante2"></div>
-                                </div>
+                                <label class="block text-xs font-semibold text-slate-500 mb-1">👤 Personal/Control Interno</label>
+                                <input type="text" id="informante2" required placeholder="Nombre del informante" list="informantes-list" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-blue-500 outline-none">
                             </div>
                         </div>
                     </div>
 
                     <div>
                         <label class="block text-xs font-semibold text-slate-500 mb-1">🏢 Personal Argos</label>
-                        <input type="text" id="argos" required value="Sra. Guaymas Belen" placeholder="Nombre del personal de Argos" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                        <input type="text" id="argos" required placeholder="Nombre del personal de Argos" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-blue-500 outline-none">
                     </div>
 
                     <div class="flex gap-2 pt-4">
@@ -172,42 +166,11 @@
     const historicoSelect = document.getElementById('historicoSelect');
     const loadLastContainer = document.getElementById('loadLastContainer');
     const loadLastBtn = document.getElementById('loadLastBtn');
-    const informanteInputs = [document.getElementById('informante1'), document.getElementById('informante2')];
 
     // Auto-completar informante2 cuando se cambia informante1
     document.getElementById('informante1').addEventListener('input', function() {
         document.getElementById('informante2').value = this.value;
     });
-
-    // Construir dropdowns de informantes al hacer focus/click
-    const opcionesInformantes = Array.from(document.querySelectorAll('#informantes-list option')).map(o => o.value).filter(Boolean);
-
-    function buildDropdownFor(input) {
-        const dropdown = document.querySelector(`[data-dropdown="${input.id}"]`);
-        if (!dropdown) return;
-        dropdown.innerHTML = '';
-        opcionesInformantes.forEach(nombre => {
-            const btn = document.createElement('button');
-            btn.type = 'button';
-            btn.className = 'w-full text-left px-3 py-2 hover:bg-slate-100';
-            btn.textContent = nombre;
-            btn.addEventListener('mousedown', e => {
-                e.preventDefault();
-                input.value = nombre;
-                if (input.id === 'informante1') {
-                    document.getElementById('informante2').value = nombre;
-                }
-                dropdown.classList.add('hidden');
-            });
-            dropdown.appendChild(btn);
-        });
-
-        input.addEventListener('focus', () => dropdown.classList.remove('hidden'));
-        input.addEventListener('click', () => dropdown.classList.remove('hidden'));
-        input.addEventListener('blur', () => setTimeout(() => dropdown.classList.add('hidden'), 120));
-    }
-
-    informanteInputs.forEach(buildDropdownFor);
 
     // Validación de horas en tiempo real
     document.getElementById('hora1').addEventListener('change', validarHoras);
