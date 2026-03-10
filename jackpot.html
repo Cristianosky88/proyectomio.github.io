@@ -58,7 +58,6 @@
                                 <option value="">Seleccionar...</option>
                                 <option value="Encargado">Encargado</option>
                                 <option value="Encargada">Encargada</option>
-                                <option value="Gerente">Gerente</option>
                                 <option value="Supervisor">Supervisor</option>
                                 <option value="Asistente">Asistente</option>
                                 <option value="Operador">Operador</option>
@@ -67,7 +66,7 @@
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-600 mb-2">Nombre del Personal <span class="text-red-500">*</span></label>
-                            <input type="text" id="nombre_llama" name="nombre_llama" placeholder="Nombre completo" required class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none uppercase">
+                            <input type="text" id="nombre_llama" name="nombre_llama" placeholder="Nombre completo" required class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
                         </div>
                     </div>
                 </div>
@@ -80,7 +79,7 @@
                     </h3>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
-                            <label class="block text-xs font-semibold text-slate-600 mb-2">No. Maquina (6 digitos) <span class="text-red-500">*</span></label>
+                            <label class="block text-xs font-semibold text-slate-600 mb-2">N° de Maquina (6 digitos) <span class="text-red-500">*</span></label>
                             <input type="text" id="nro_maquina" name="nro_maquina" pattern="[0-9]{6}" maxlength="6" inputmode="numeric" placeholder="120305" required class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
                             <small class="text-slate-500 text-xs mt-1">Exactamente 6 digitos</small>
                         </div>
@@ -113,7 +112,7 @@
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-600 mb-2">Nombre del Cliente <span class="text-red-500">*</span></label>
-                            <input type="text" id="nombre_cliente" name="nombre_cliente" placeholder="Nombre completo" required class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none uppercase">
+                            <input type="text" id="nombre_cliente" name="nombre_cliente" placeholder="Nombre completo" required class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
                         </div>
                     </div>
                 </div>
@@ -144,7 +143,7 @@
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-600 mb-2">Nombre <span class="text-red-500">*</span></label>
-                            <input type="text" id="nombre_paga" name="nombre_paga" placeholder="Nombre personal" required class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none uppercase">
+                            <input type="text" id="nombre_paga" name="nombre_paga" placeholder="Nombre personal" required class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-600 mb-2">Hora Descarga <span class="text-red-500">*</span></label>
@@ -177,7 +176,7 @@
                             <input type="text" id="juego_personalizado" name="juego_personalizado" placeholder="Ingrese nombre del juego" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none mt-2 hidden" />
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-slate-600 mb-2">Marca Maquina</label>
+                            <label class="block text-xs font-semibold text-slate-600 mb-2">Marca de Maquina</label>
                             <select id="maquina_independiente" name="maquina_independiente" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
                                 <option value="">Seleccionar...</option>
                                 <option value="BALLY">BALLY</option>
@@ -275,24 +274,39 @@
                 
                 // Conservar solo dígitos, comas y puntos
                 val = val.replace(/[^\d.,]/g, '');
-                
-                let lastDot = val.lastIndexOf('.');
-                let lastComma = val.lastIndexOf(',');
-                let decimalPos = Math.max(lastDot, lastComma);
-                
-                if (decimalPos !== -1) {
-                    let integerPart = val.substring(0, decimalPos).replace(/[.,]/g, '');
-                    let decimalPart = val.substring(decimalPos + 1).replace(/[.,]/g, '');
-                    val = integerPart + '.' + decimalPart;
+
+                // Nueva lógica inteligente para no romper los números formateados como 200.400,10
+                // Contemos la cantidad de comas y puntos
+                const numPuntos = (val.match(/\./g) || []).length;
+                const numComas = (val.match(/,/g) || []).length;
+
+                if (numComas === 1 && numPuntos >= 1) {
+                    // Formato obvio: tiene ambas cosas, asumamos que puntos = miles, coma = decimal
+                    val = val.replace(/\./g, ''); // Quitamos los puntos de mil
+                    val = val.replace(',', '.');  // Pasamos la coma a punto nativo
+                } else if (numComas === 1 && numPuntos === 0) {
+                    // Formato con coma: 1000,50
+                    val = val.replace(',', '.');
+                } else if (numPuntos === 1 && numComas === 0) {
+                    // Formato con punto: 1000.50
+                    // Lo dejamos tal cual para que `Number` lo tome como decimal.
+                    // Nadie usa 1 solo separador de miles sin centavos. Y si lo hace (ej: 1.500), 
+                    // se transformará en 1,50 en vez de 1500, pero eso ya es un "tradeoff" si usamos pad numerico.
+                } else if (numPuntos > 1 && numComas === 0) {
+                    // Formato de varios puntos solos: 1.500.000 (sin centavos)
+                    val = val.replace(/\./g, '');
                 } else {
-                    val = val.replace(/[.,]/g, '');
+                    // Cualquier otra ensalada extraña, quitamos todos, excepto si hay una coma en la ultima posicion
+                    val = val.replace(/\./g, '').replace(/,/g, '.');
                 }
                 
                 const n = Number(val);
                 if (!isNaN(n) && val !== '') {
-                    // Formato argentino: decimal coma, pero sin separador de miles para no causar problemas en otros scripts
-                    // O mantenerlo simple y poner la coma para el importe
-                    e.target.value = n.toFixed(2).replace('.', ',');
+                    // Formateamos visualmente a formato Argentino con Intl.NumberFormat para respetar  el punto de mil
+                    e.target.value = new Intl.NumberFormat('es-AR', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    }).format(n);
                 }
             });
         }
@@ -398,10 +412,6 @@
             if (input.value) {
                 const label = document.querySelector(`label[for="${input.id}"]`)?.textContent || input.name;
                 let finalValue = input.value;
-                // Si es un campo de hora, eliminar los segundos si existen (ej. "12:34:56" -> "12:34")
-                if (input.type === 'time' && finalValue.split(':').length === 3) {
-                    finalValue = finalValue.split(':').slice(0, 2).join(':');
-                }
                 
                 // Reemplazos de personalizados
                 if (input.id === 'juego' && finalValue === 'OTRO') {
