@@ -57,6 +57,7 @@
                             <select id="quien_llama" name="quien_llama" required class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
                                 <option value="">Seleccionar...</option>
                                 <option value="Encargado">Encargado</option>
+                                <option value="Encargada">Encargada</option>
                                 <option value="Gerente">Gerente</option>
                                 <option value="Supervisor">Supervisor</option>
                                 <option value="Asistente">Asistente</option>
@@ -204,17 +205,11 @@
                 <!-- 7. BOTONES DE ACCION -->
                 <div class="bg-slate-50 p-6 border-t border-slate-200">
                     <div class="flex flex-wrap gap-3 justify-center items-center">
-                        <button type="submit" id="btnGuardar" class="px-4 py-2 bg-emerald-600 text-white hover:bg-emerald-700 rounded font-semibold text-sm transition flex items-center gap-2">
-                            <i data-lucide="save" class="w-4 h-4"></i> Guardar Registro
-                        </button>
                         <button type="button" id="btnGenerarResumen" class="px-4 py-2 bg-indigo-500 text-white hover:bg-indigo-600 rounded font-semibold text-sm transition flex items-center gap-2">
                             <i data-lucide="file-text" class="w-4 h-4"></i> Generar Informe
                         </button>
                         <button type="button" id="btnLimpiarTodo" class="px-4 py-2 bg-slate-500 text-white hover:bg-slate-600 rounded font-semibold text-sm transition flex items-center gap-2">
-                            <i data-lucide="refresh-ccw" class="w-4 h-4"></i> Limpiar Form
-                        </button>
-                        <button type="button" id="btnBorrarRegistros" class="px-4 py-2 bg-rose-600 text-white hover:bg-rose-700 rounded font-semibold text-sm transition flex items-center gap-2">
-                            <i data-lucide="trash-2" class="w-4 h-4"></i> Borrar Registros
+                            <i data-lucide="refresh-ccw" class="w-4 h-4"></i> Limpiar Informe
                         </button>
                         <button type="button" id="btnInicio" class="px-6 py-2 bg-slate-800 text-white hover:bg-slate-900 rounded font-semibold text-sm transition flex items-center gap-2">
                             <i data-lucide="home" class="w-4 h-4"></i> Volver
@@ -226,34 +221,6 @@
             <!-- RESUMEN -->
             <div id="resumen" class="hidden p-6 bg-indigo-50 border-t border-indigo-200 text-sm whitespace-pre-wrap font-mono leading-relaxed text-slate-700"></div>
 
-            <!-- TABLA DE REGISTROS -->
-            <div class="p-6 border-t border-slate-200">
-                <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-                    <i data-lucide="database" class="w-5 h-5"></i> Registros Guardados (Local)
-                </h2>
-                <div class="mb-4 flex gap-2">
-                    <input type="text" id="buscarRegistros" placeholder="Buscar por maquina, cliente, fecha..." class="flex-1 p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
-                    <button type="button" id="btnLimpiarBusqueda" class="px-3 py-2 bg-slate-300 text-slate-700 hover:bg-slate-400 rounded text-sm transition">Limpiar</button>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-sm border-collapse">
-                        <thead>
-                            <tr class="bg-slate-100 border-b border-slate-300">
-                                <th class="p-2 text-left font-semibold text-slate-700">#</th>
-                                <th class="p-2 text-left font-semibold text-slate-700">Fecha/Hora</th>
-                                <th class="p-2 text-left font-semibold text-slate-700">Maquina</th>
-                                <th class="p-2 text-left font-semibold text-slate-700">Importe</th>
-                                <th class="p-2 text-left font-semibold text-slate-700">Cliente</th>
-                                <th class="p-2 text-left font-semibold text-slate-700">Duracion</th>
-                                <th class="p-2 text-left font-semibold text-slate-700">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tbodyRegistros">
-                            <tr><td colspan="7" class="p-4 text-center text-slate-500">Sin registros guardados</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
         </div>
     </div>
 
@@ -298,16 +265,34 @@
         }
     });
 
-    // ===== RECONOCER COMAS EN CAMPOS DECIMALES =====
+    // ===== RECONOCER COMAS Y PUNTOS EN CAMPOS DECIMALES =====
     ['importe', 'pago_manual'].forEach(id => {
         const input = document.getElementById(id);
         if (input) {
             input.addEventListener('blur', (e) => {
-                // Reemplazar comas por puntos
-                let valor = e.target.value.replace(',', '.');
-                // Validar que sea un número válido
-                if (valor && !isNaN(valor)) {
-                    e.target.value = valor;
+                let val = e.target.value;
+                if (!val) return;
+                
+                // Conservar solo dígitos, comas y puntos
+                val = val.replace(/[^\d.,]/g, '');
+                
+                let lastDot = val.lastIndexOf('.');
+                let lastComma = val.lastIndexOf(',');
+                let decimalPos = Math.max(lastDot, lastComma);
+                
+                if (decimalPos !== -1) {
+                    let integerPart = val.substring(0, decimalPos).replace(/[.,]/g, '');
+                    let decimalPart = val.substring(decimalPos + 1).replace(/[.,]/g, '');
+                    val = integerPart + '.' + decimalPart;
+                } else {
+                    val = val.replace(/[.,]/g, '');
+                }
+                
+                const n = Number(val);
+                if (!isNaN(n) && val !== '') {
+                    // Formato argentino: decimal coma, pero sin separador de miles para no causar problemas en otros scripts
+                    // O mantenerlo simple y poner la coma para el importe
+                    e.target.value = n.toFixed(2).replace('.', ',');
                 }
             });
         }
@@ -381,9 +366,9 @@
         const dur2 = t2 && t3 ? (t3 - t2) : null;
         const dur3 = t1 && t3 ? (t3 - t1) : null;
 
-        document.getElementById('duracion1').textContent = dur1 ? `${dur1} min` : '-- min';
-        document.getElementById('duracion2').textContent = dur2 ? `${dur2} min` : '-- min';
-        document.getElementById('duracion3').textContent = dur3 ? `${dur3} min` : '-- min';
+        if (document.getElementById('duracion1')) document.getElementById('duracion1').textContent = dur1 ? `${dur1} min` : '-- min';
+        if (document.getElementById('duracion2')) document.getElementById('duracion2').textContent = dur2 ? `${dur2} min` : '-- min';
+        if (document.getElementById('duracion3')) document.getElementById('duracion3').textContent = dur3 ? `${dur3} min` : '-- min';
     }
 
     // ===== CONTAR CARACTERES =====
@@ -399,118 +384,57 @@
         });
     });
 
-    // ===== GUARDAR REGISTRO =====
-    form.addEventListener('submit', (e) => {
-        e.preventDefault();
-
+    // ===== GENERAR RESUMEN =====
+    document.getElementById('btnGenerarResumen').addEventListener('click', function() {
         if (!validarHoras()) {
             showNotification('Error: Las horas no son validas', 'error');
             return;
         }
 
-        const formData = new FormData(form);
-        const data = Object.fromEntries(formData);
-        
-        // Reemplazar valores con personalizados si es necesario
-        if (data.juego === 'OTRO' && data.juego_personalizado) {
-            data.juego = data.juego_personalizado;
-        }
-        if (data.maquina_independiente === 'OTRO' && data.maquina_personalizada) {
-            data.maquina_independiente = data.maquina_personalizada;
-        }
-        
-        const registro = {
-            timestamp: new Date().toLocaleString('es-AR'),
-            data: data,
-            duracion: document.getElementById('duracion3').textContent
-        };
-
-        let registros = JSON.parse(localStorage.getItem('jackpotRegistros') || '[]');
-        registros.push(registro);
-        if (registros.length > 50) registros.shift();
-        localStorage.setItem('jackpotRegistros', JSON.stringify(registros));
-        localStorage.setItem('jackpotLastRecord', JSON.stringify(registro.data));
-
-        showNotification('OK - Registro guardado exitosamente');
-        actualizarTabla();
-    });
-
-    // ===== ACTUALIZAR TABLA =====
-    function actualizarTabla(filtro = '') {
-        const registros = JSON.parse(localStorage.getItem('jackpotRegistros') || '[]');
-        const tbody = document.getElementById('tbodyRegistros');
-
-        registrosFiltrados = registros.filter(reg => {
-            if (!filtro) return true;
-            const busqueda = filtro.toLowerCase();
-            return (
-                reg.data.nro_maquina?.toLowerCase().includes(busqueda) ||
-                reg.data.nombre_cliente?.toLowerCase().includes(busqueda) ||
-                reg.timestamp?.toLowerCase().includes(busqueda)
-            );
-        });
-
-        if (registrosFiltrados.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" class="p-4 text-center text-slate-500">Sin registros guardados</td></tr>';
-            return;
-        }
-
-        tbody.innerHTML = registrosFiltrados.map((reg, idx) => `
-            <tr class="border-b border-slate-200 hover:bg-slate-50">
-                <td class="p-2">${idx + 1}</td>
-                <td class="p-2 text-xs">${reg.timestamp}</td>
-                <td class="p-2 font-mono font-bold text-indigo-600">${reg.data.nro_maquina}</td>
-                <td class="p-2 text-green-700 font-semibold">$${parseFloat(reg.data.importe).toFixed(2)}</td>
-                <td class="p-2">${reg.data.nombre_cliente}</td>
-                <td class="p-2 text-blue-600 font-semibold">${reg.duracion}</td>
-                <td class="p-2 flex gap-1">
-                    <button class="px-2 py-1 bg-blue-100 text-blue-700 hover:bg-blue-200 rounded text-xs transition" onclick="verDetalle(${registros.indexOf(reg)})">Ver</button>
-                    <button class="px-2 py-1 bg-red-100 text-red-700 hover:bg-red-200 rounded text-xs transition" onclick="eliminarRegistro(${registros.indexOf(reg)})">Del</button>
-                </td>
-            </tr>
-        `).join('');
-    }
-
-    // ===== BUSCAR REGISTROS =====
-    document.getElementById('buscarRegistros').addEventListener('input', (e) => {
-        actualizarTabla(e.target.value);
-    });
-
-    document.getElementById('btnLimpiarBusqueda').addEventListener('click', () => {
-        document.getElementById('buscarRegistros').value = '';
-        actualizarTabla();
-        showNotification('Busqueda limpiada');
-    });
-
-    // ===== GENERAR RESUMEN =====
-    document.getElementById('btnGenerarResumen').addEventListener('click', function() {
-        const inputs = form.querySelectorAll('input, select, textarea');
         let resumenText = 'RESUMEN DE JACKPOT\n' + '='.repeat(50) + '\n\n';
+        const allInputs = form.querySelectorAll('input, select, textarea');
         
-        inputs.forEach(input => {
+        allInputs.forEach(input => {
             if (input.value) {
                 const label = document.querySelector(`label[for="${input.id}"]`)?.textContent || input.name;
-                resumenText += `${label.replace(/\s*\*\s*$/, '')}: ${input.value}\n`;
+                let finalValue = input.value;
+                // Si es un campo de hora, eliminar los segundos si existen (ej. "12:34:56" -> "12:34")
+                if (input.type === 'time' && finalValue.split(':').length === 3) {
+                    finalValue = finalValue.split(':').slice(0, 2).join(':');
+                }
+                
+                // Reemplazos de personalizados
+                if (input.id === 'juego' && finalValue === 'OTRO') {
+                    finalValue = document.getElementById('juego_personalizado').value;
+                }
+                if (input.id === 'maquina_independiente' && finalValue === 'OTRO') {
+                    finalValue = document.getElementById('maquina_personalizada').value;
+                }
+                
+                if (input.id !== 'juego_personalizado' && input.id !== 'maquina_personalizada') {
+                    resumenText += `${label.replace(/\s*\*\s*$/, '')}: ${finalValue}\n`;
+                }
             }
         });
 
         resumenText += '\n' + '='.repeat(50) + '\n';
-        resumenText += `DURACION TOTAL: ${document.getElementById('duracion3').textContent}`;
+        
+        let duracionCalculada = '-- min';
+        const h1 = document.getElementById('hora_cctv').value;
+        const h3 = document.getElementById('hora_pago').value;
+        if (h1 && h3) {
+            const [h_1, m_1] = h1.split(':');
+            const [h_3, m_3] = h3.split(':');
+            duracionCalculada = ((parseInt(h_3) * 60 + parseInt(m_3)) - (parseInt(h_1) * 60 + parseInt(m_1))) + ' min';
+        }
+        
+        const duracionText = document.getElementById('duracion3') ? document.getElementById('duracion3').textContent : duracionCalculada;
+        resumenText += `DURACION TOTAL: ${duracionText}`;
 
         const resumenDiv = document.getElementById('resumen');
         resumenDiv.textContent = resumenText;
         resumenDiv.classList.remove('hidden');
         showNotification('Resumen generado');
-    });
-
-    // ===== BORRAR REGISTROS =====
-    document.getElementById('btnBorrarRegistros').addEventListener('click', () => {
-        if (confirm('Borrar TODOS los registros? Esta accion no se puede deshacer.')) {
-            localStorage.removeItem('jackpotRegistros');
-            localStorage.removeItem('jackpotLastRecord');
-            actualizarTabla();
-            showNotification('Todos los registros han sido borrados', 'error');
-        }
     });
 
     // ===== LIMPIAR FORMULARIO =====
@@ -519,7 +443,8 @@
         document.getElementById('resumen').classList.add('hidden');
         document.getElementById('charCount').textContent = '0';
         ['duracion1', 'duracion2', 'duracion3'].forEach(id => {
-            document.getElementById(id).textContent = '-- min';
+            const el = document.getElementById(id);
+            if (el) el.textContent = '-- min';
         });
         showNotification('Formulario limpiado');
     });
@@ -534,27 +459,9 @@
         window.location.href = 'index.html';
     });
 
-    // ===== FUNCIONES AUXILIARES DE TABLA =====
-    function verDetalle(idx) {
-        const registros = JSON.parse(localStorage.getItem('jackpotRegistros') || '[]');
-        const reg = registros[idx];
-        alert(JSON.stringify(reg.data, null, 2));
-    }
-
-    function eliminarRegistro(idx) {
-        if (confirm('Eliminar este registro?')) {
-            const registros = JSON.parse(localStorage.getItem('jackpotRegistros') || '[]');
-            registros.splice(idx, 1);
-            localStorage.setItem('jackpotRegistros', JSON.stringify(registros));
-            actualizarTabla();
-            showNotification('Registro eliminado');
-        }
-    }
-
     // ===== INICIALIZACION =====
     window.addEventListener('load', () => {
         actualizarFecha();
-        actualizarTabla();
     });
 </script>
 

@@ -55,9 +55,22 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function toMinutes(hhmm) {
-        if (!/^\d{2}:\d{2}$/.test(hhmm || '')) return null;
-        const [H, m] = hhmm.split(':').map(Number);
+        if (!hhmm) return null;
+        const parts = hhmm.split(':');
+        if (parts.length < 2) return null;
+        const H = Number(parts[0]);
+        const m = Number(parts[1]);
+        if (isNaN(H) || isNaN(m)) return null;
         return H * 60 + m;
+    }
+
+    function formatHoraSinSegundos(hhmm) {
+        if (!hhmm) return '';
+        const parts = hhmm.split(':');
+        if (parts.length >= 2) {
+            return `${parts[0].padStart(2, '0')}:${parts[1].padStart(2, '0')}`;
+        }
+        return hhmm;
     }
 
     function validarHoras(data) {
@@ -74,10 +87,24 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function formatearNumeroCampo(el) {
         if (!el || !el.value) return;
-        // Reemplazar punto por coma para formato argentino
-        const valor = el.value.replace('.', ',');
-        const n = Number(valor.replace(',', '.'));
-        if (!isNaN(n)) {
+        
+        let val = el.value;
+        val = val.replace(/[^\d.,]/g, '');
+        
+        let lastDot = val.lastIndexOf('.');
+        let lastComma = val.lastIndexOf(',');
+        let decimalPos = Math.max(lastDot, lastComma);
+        
+        if (decimalPos !== -1) {
+            let integerPart = val.substring(0, decimalPos).replace(/[.,]/g, '');
+            let decimalPart = val.substring(decimalPos + 1).replace(/[.,]/g, '');
+            val = integerPart + '.' + decimalPart;
+        } else {
+            val = val.replace(/[.,]/g, '');
+        }
+        
+        const n = Number(val);
+        if (!isNaN(n) && val !== '') {
             el.value = n.toFixed(2).replace('.', ',');
         }
     }
@@ -87,7 +114,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const fd = new FormData(form);
         const data = {};
         for (const [k, v] of fd.entries()) {
-            data[k] = (typeof v === 'string') ? normalizarTexto(v) : v;
+            let val = (typeof v === 'string') ? normalizarTexto(v) : v;
+            if (k.startsWith('hora_') && typeof val === 'string') {
+                val = formatHoraSinSegundos(val);
+            }
+            data[k] = val;
         }
         return data;
     }
@@ -115,19 +146,23 @@ document.addEventListener('DOMContentLoaded', function() {
         const honorifico = data.tipo_cliente === 'clienta' ? 'la Sra.' : 'al Sr.';
 
         if (data.hora_cctv) {
-            lineas.push(`A las ${data.hora_cctv} Hs. CCTV recibe llamada de ${data.quien_llama || ''} ${data.nombre_llama || ''}, informa Jackpot en Máq. ${data.nro_maquina || ''} por un valor de $${importeFmt}.-`);
+            const hCctv = formatHoraSinSegundos(data.hora_cctv);
+            lineas.push(`A las ${hCctv} Hs. CCTV recibe llamada de ${data.quien_llama || ''} ${data.nombre_llama || ''}, informa Jackpot en Máq. ${data.nro_maquina || ''} por un valor de $${importeFmt}.-`);
         }
         
         if (data.hora_revision) {
-            lineas.push(`(A las ${data.hora_revision} Hs.) Revisión muestra que ${data.tipo_cliente || 'cliente'} juega en Máq. ${data.nro_maquina || ''}.-`);
+            const hRev = formatHoraSinSegundos(data.hora_revision);
+            lineas.push(`(A las ${hRev} Hs.) Revisión muestra que ${data.tipo_cliente || 'cliente'} juega en Máq. ${data.nro_maquina || ''}.-`);
         }
         
         if (data.hora_pago) {
-            lineas.push(`A las ${data.hora_pago} Hs. ${data.quien_paga || ''} ${data.nombre_paga || ''}, cancela $${importeFmt} ${honorifico} ${data.nombre_cliente || ''}.-`);
+            const hPago = formatHoraSinSegundos(data.hora_pago);
+            lineas.push(`A las ${hPago} Hs. ${data.quien_paga || ''} ${data.nombre_paga || ''}, cancela $${importeFmt} ${honorifico} ${data.nombre_cliente || ''}.-`);
         }
         
         if (data.hora_descarga) {
-            lineas.push(`A las ${data.hora_descarga} Hs. ${data.quien_llama || ''} ${data.nombre_llama || ''} registra y descarga el premio.-`);
+            const hDescarga = formatHoraSinSegundos(data.hora_descarga);
+            lineas.push(`A las ${hDescarga} Hs. ${data.quien_llama || ''} ${data.nombre_llama || ''} registra y descarga el premio.-`);
         }
 
         if (data.maquina_independiente) {
