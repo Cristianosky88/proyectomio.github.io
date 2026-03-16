@@ -213,10 +213,6 @@
                             <input type="text" id="pago_manual" name="pago_manual" placeholder="00000" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
                         </div>
                     </div>
-                    <div class="mt-4">
-                        <label class="block text-xs font-semibold text-slate-600 mb-2">Observaciones <small class="text-slate-500 font-normal">(<span id="charCount">0</span>/200)</small></label>
-                        <textarea id="observaciones" name="observaciones" placeholder="Detalles especiales, notas importantes..." rows="3" maxlength="200" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none"></textarea>
-                    </div>
                 </div>
 
                 <!-- 7. BOTONES DE ACCION -->
@@ -475,10 +471,6 @@
         if (pago_manual) lineas.push(`Pago Manual:${pago_manual}.-`);
         lineas.push('');
         lineas.push('Apéndice 1: Fotos.-');
-        if (observaciones) {
-            lineas.push('');
-            lineas.push(`NOTA: ${observaciones}.-`);
-        }
 
         const resumenDiv = document.getElementById('resumen');
         resumenDiv.textContent = lineas.join('\n');
