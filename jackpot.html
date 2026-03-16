@@ -150,6 +150,24 @@
                             <input type="time" id="hora_descarga" name="hora_descarga" required class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
                         </div>
                     </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-2">Quien Registra/Descarga <span class="text-red-500">*</span></label>
+                            <select id="quien_descarga" name="quien_descarga" required class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                                <option value="">Seleccionar...</option>
+                                <option value="Encargado">Encargado</option>
+                                <option value="Encargada">Encargada</option>
+                                <option value="Supervisor">Supervisor</option>
+                                <option value="Asistente">Asistente</option>
+                                <option value="Operador">Operador</option>
+                                <option value="Otro">Otro</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-2">Nombre de quien Registra/Descarga <span class="text-red-500">*</span></label>
+                            <input type="text" id="nombre_descarga" name="nombre_descarga" placeholder="Nombre completo" required class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                        </div>
+                    </div>
                 </div>
 
                 <!-- 5. INFORMACION ADICIONAL -->
@@ -265,7 +283,7 @@
     });
 
     // ===== RECONOCER COMAS Y PUNTOS EN CAMPOS DECIMALES =====
-    ['importe', 'pago_manual'].forEach(id => {
+    ['importe'].forEach(id => {
         const input = document.getElementById(id);
         if (input) {
             input.addEventListener('blur', (e) => {
@@ -405,46 +423,68 @@
             return;
         }
 
-        let resumenText = 'RESUMEN DE JACKPOT\n' + '='.repeat(50) + '\n\n';
-        const allInputs = form.querySelectorAll('input, select, textarea');
-        
-        allInputs.forEach(input => {
-            if (input.value) {
-                const label = document.querySelector(`label[for="${input.id}"]`)?.textContent || input.name;
-                let finalValue = input.value;
-                
-                // Reemplazos de personalizados
-                if (input.id === 'juego' && finalValue === 'OTRO') {
-                    finalValue = document.getElementById('juego_personalizado').value;
-                }
-                if (input.id === 'maquina_independiente' && finalValue === 'OTRO') {
-                    finalValue = document.getElementById('maquina_personalizada').value;
-                }
-                
-                if (input.id !== 'juego_personalizado' && input.id !== 'maquina_personalizada') {
-                    resumenText += `${label.replace(/\s*\*\s*$/, '')}: ${finalValue}\n`;
-                }
-            }
-        });
+        // Recolectar valores
+        const hora_cctv      = document.getElementById('hora_cctv').value;
+        const quien_llama    = document.getElementById('quien_llama').value;
+        const nombre_llama   = document.getElementById('nombre_llama').value;
+        const nro_maquina    = document.getElementById('nro_maquina').value;
+        const importe        = document.getElementById('importe').value;
+        const hora_revision  = document.getElementById('hora_revision').value;
+        const tipo_cliente   = document.getElementById('tipo_cliente').value;
+        const nombre_cliente = document.getElementById('nombre_cliente').value;
+        const hora_pago      = document.getElementById('hora_pago').value;
+        const quien_paga     = document.getElementById('quien_paga').value;
+        const nombre_paga    = document.getElementById('nombre_paga').value;
+        const hora_descarga  = document.getElementById('hora_descarga').value;
+        const quien_descarga = document.getElementById('quien_descarga').value;
+        const nombre_descarga= document.getElementById('nombre_descarga').value;
+        const juegoSel       = document.getElementById('juego').value;
+        const juego          = juegoSel === 'OTRO' ? document.getElementById('juego_personalizado').value : juegoSel;
+        const maqSel         = document.getElementById('maquina_independiente').value;
+        const maquina        = maqSel === 'OTRO' ? document.getElementById('maquina_personalizada').value : maqSel;
+        const pago_manual    = document.getElementById('pago_manual').value;
+        const observaciones  = document.getElementById('observaciones').value;
 
-        resumenText += '\n' + '='.repeat(50) + '\n';
-        
-        let duracionCalculada = '-- min';
-        const h1 = document.getElementById('hora_cctv').value;
-        const h3 = document.getElementById('hora_pago').value;
-        if (h1 && h3) {
-            const [h_1, m_1] = h1.split(':');
-            const [h_3, m_3] = h3.split(':');
-            duracionCalculada = ((parseInt(h_3) * 60 + parseInt(m_3)) - (parseInt(h_1) * 60 + parseInt(m_1))) + ' min';
+        // Abreviar roles de personal
+        function abreviarRol(rol) {
+            const mapa = {
+                'Encargado':  'Enc.',
+                'Encargada':  'Enc.',
+                'Supervisor': 'Sup.',
+                'Asistente':  'Asist.',
+                'Operador':   'Op.',
+            };
+            return mapa[rol] || rol;
         }
-        
-        const duracionText = document.getElementById('duracion3') ? document.getElementById('duracion3').textContent : duracionCalculada;
-        resumenText += `DURACION TOTAL: ${duracionText}`;
+
+        // Tratamiento del cliente según género
+        const esClienta        = tipo_cliente === 'Clienta';
+        const tipoWord         = esClienta ? 'clienta' : 'cliente';
+        const tratamiento      = esClienta ? 'a la Sra.' : 'al Sr.';
+
+        // Construir líneas del informe
+        const lineas = [];
+
+        lineas.push(`A las ${hora_cctv} Hs. CCTV recibe llamada de ${abreviarRol(quien_llama)} ${nombre_llama}, informa Jackpot en Máq. ${nro_maquina} por un valor de $${importe}.-`);
+        lineas.push(`(A las ${hora_revision} Hs.) Revisión muestra que ${tipoWord} juega en Máq. ${nro_maquina} al salir el premio.-`);
+        lineas.push(`A las ${hora_pago} Hs. ${quien_paga} ${nombre_paga}, cancela en ventanilla de caja $${importe} ${tratamiento} ${nombre_cliente}.-`);
+        lineas.push(`A las ${hora_descarga} Hs. ${abreviarRol(quien_descarga)} ${nombre_descarga} registra y descarga el premio de Máq. ${nro_maquina}.-`);
+        lineas.push('');
+        if (maquina)     lineas.push(`Máquina:${maquina}.-`);
+        if (juego)       lineas.push(`Juego:${juego}.-`);
+        if (pago_manual) lineas.push(`Pago Manual:${pago_manual}.-`);
+        lineas.push('');
+        lineas.push('Apéndice 1: Fotos.-');
+        if (observaciones) {
+            lineas.push('');
+            lineas.push(`NOTA: ${observaciones}.-`);
+        }
 
         const resumenDiv = document.getElementById('resumen');
-        resumenDiv.textContent = resumenText;
+        resumenDiv.textContent = lineas.join('\n');
         resumenDiv.classList.remove('hidden');
-        showNotification('Resumen generado');
+        resumenDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        showNotification('Informe generado');
     });
 
     // ===== LIMPIAR FORMULARIO =====
