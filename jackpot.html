@@ -347,31 +347,14 @@
 
     // ===== VALIDACION DE HORAS =====
     function validarHoras() {
-        const h1 = document.getElementById('hora_cctv').value;
-        const h2 = document.getElementById('hora_revision').value;
-        const h3 = document.getElementById('hora_pago').value;
         const err1 = document.getElementById('errorHora1');
         const err2 = document.getElementById('errorHora2');
 
-        let valido = true;
+        // Se ocultaron los mensajes de error para permitir ingresar cualquier hora
+        if (err1) err1.classList.add('hidden');
+        if (err2) err2.classList.add('hidden');
 
-        // Validar hora_revision > hora_cctv
-        if (h1 && h2 && h2 <= h1) {
-            err1.classList.remove('hidden');
-            valido = false;
-        } else {
-            err1.classList.add('hidden');
-        }
-
-        // Validar hora_pago > hora_revision
-        if (h2 && h3 && h3 <= h2) {
-            err2.classList.remove('hidden');
-            valido = false;
-        } else {
-            err2.classList.add('hidden');
-        }
-
-        return valido;
+        return true;
     }
 
     // ===== CALCULAR DURACION =====
@@ -439,7 +422,7 @@
         const maqSel         = document.getElementById('maquina_independiente').value;
         const maquina        = maqSel === 'OTRO' ? document.getElementById('maquina_personalizada').value : maqSel;
         const pago_manual    = document.getElementById('pago_manual').value;
-        const observaciones  = document.getElementById('observaciones').value;
+        const observaciones  = document.getElementById('observaciones')?.value || '';
 
         // Abreviar roles de personal
         function abreviarRol(rol) {
