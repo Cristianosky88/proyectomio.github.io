@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador Rápido de Novedades CCTV</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* Personalización ligera para scroll y transiciones */
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f3f4f6; }
+        .transition-height { transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out; }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4 lg:p-8">
+
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-4xl overflow-hidden border border-gray-100">
+        <!-- Header -->
+        <div class="bg-slate-900 text-white p-5 md:px-8 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <div class="bg-blue-600 p-2.5 rounded-xl shadow-inner">
+                    <i data-lucide="shield" class="w-6 h-6 text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl md:text-2xl font-bold">Ingresos Adicional Policial</h1>
+                </div>
+            </div>
+            <a href="ingreso.html" class="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-lg transition-colors border border-slate-700 focus:ring-2 focus:ring-slate-500">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                <span class="text-sm font-medium hidden sm:inline">Volver al Inicio</span>
+            </a>
+        </div>
+
+        <!-- Contenido Dividido en 2 Columnas -->
+        <div class="p-6 md:p-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <!-- Columna Izquierda: Controles (Ocupa 5 de 12) -->
+            <div class="lg:col-span-5 space-y-5 border-b lg:border-b-0 lg:border-r border-gray-200 pb-8 lg:pb-0 lg:pr-8">
+            
+            <!-- Hora de Registro -->
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Hora de la llamada / Registro</label>
+                <div class="flex items-center bg-gray-50 border border-gray-300 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-blue-500">
+                    <div class="px-3 text-gray-500"><i data-lucide="clock" class="w-5 h-5"></i></div>
+                    <input type="time" id="horaReg" class="w-full py-2.5 px-2 bg-transparent outline-none font-medium text-gray-800">
+                </div>
+            </div>
+
+            <!-- Control Interno (Cargo y Nombre) -->
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Cargo y Nombre de Quien Llama</label>
+                <div class="flex items-center bg-gray-50 border border-gray-300 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 transition-shadow">
+                    <div class="px-3 text-gray-500"><i data-lucide="headset" class="w-5 h-5"></i></div>
+                    <input type="text" id="controlInterno" placeholder="Ej. Supervisor Juan Perez ó Control Interno Pablo" class="w-full py-2.5 px-2 bg-transparent outline-none text-gray-800 font-medium">
+                </div>
+            </div>
+
+            <!-- Tipo de Movimiento (Radios) -->
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Tipo de Movimiento</label>
+                <div class="flex gap-4">
+                    <label class="flex-1 cursor-pointer group">
+                        <input type="radio" name="tipo" value="ingresa" class="peer sr-only" checked>
+                        <div class="text-center p-3 rounded-lg border-2 border-gray-200 peer-checked:border-blue-500 peer-checked:bg-blue-50 peer-checked:text-blue-700 font-bold transition-all group-hover:border-blue-300 flex items-center justify-center gap-2">
+                            <i data-lucide="log-in" class="w-5 h-5"></i> Ingreso
+                        </div>
+                    </label>
+                    <label class="flex-1 cursor-pointer group">
+                        <input type="radio" name="tipo" value="retira" class="peer sr-only">
+                        <div class="text-center p-3 rounded-lg border-2 border-gray-200 peer-checked:border-red-500 peer-checked:bg-red-50 peer-checked:text-red-700 font-bold transition-all group-hover:border-red-300 flex items-center justify-center gap-2">
+                            <i data-lucide="log-out" class="w-5 h-5"></i> Egreso
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Adicional Policía -->
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Título y Nombre de Policía</label>
+                <div class="flex items-center bg-gray-50 border border-gray-300 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 transition-shadow">
+                    <div class="px-3 text-gray-500"><i data-lucide="shield" class="w-5 h-5"></i></div>
+                    <input type="text" id="policia" placeholder="Ej. Sr. Perez o Sra. Gomez" class="w-full py-2.5 px-2 bg-transparent outline-none text-gray-800 font-medium">
+                </div>
+            </div>
+
+            <!-- Tiempos de Servicio (Ocultables) -->
+            <div id="contenedorTiempos" class="transition-height max-h-40 opacity-100 overflow-hidden flex gap-4">
+                <div class="flex-1">
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Hora Inicio</label>
+                    <input type="time" id="horaInicio" class="w-full py-2.5 px-3 bg-gray-50 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="flex-1">
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Hora Fin</label>
+                    <input type="time" id="horaFin" class="w-full py-2.5 px-3 bg-gray-50 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+            </div>
+            </div> <!-- Cierre de Columna Izquierda -->
+
+            <!-- Columna Derecha: Resultado (Ocupa 7 de 12) -->
+            <div class="lg:col-span-7 flex flex-col justify-between h-full bg-slate-50 p-6 rounded-xl border border-gray-100">
+                <!-- Resultado -->
+                <div class="flex-grow mb-6 flex flex-col">
+                    <div class="flex justify-between items-center mb-3">
+                        <label class="block text-sm font-semibold text-slate-800 uppercase tracking-wide flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 bg-green-500 rounded-full inline-block"></span>
+                            Texto Generado (Editable)
+                        </label>
+                        <button id="btnActualizar" class="text-xs text-blue-600 hover:text-blue-800 font-bold flex items-center gap-1.5 transition-colors bg-blue-100 hover:bg-blue-200 px-3 py-1.5 rounded-md" title="Restaurar al texto original">
+                            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Restaurar Original
+                        </button>
+                    </div>
+                    <textarea id="resultado" class="w-full flex-grow min-h-[160px] lg:min-h-[220px] p-4 bg-white border border-blue-200 rounded-xl text-gray-800 outline-none resize-y focus:ring-2 focus:ring-blue-500 font-mono text-sm leading-relaxed shadow-sm transition-shadow"></textarea>
+                </div>
+
+                <!-- Botones -->
+                <div class="flex flex-col sm:flex-row gap-4 mt-auto">
+                    <button id="btnLimpiar" class="w-full sm:w-1/3 bg-white hover:bg-gray-50 text-gray-700 border-2 border-gray-200 font-bold py-3.5 px-4 rounded-xl shadow-sm transition duration-200 flex items-center justify-center gap-2 transform active:scale-95 focus:ring-2 focus:ring-gray-300">
+                        <i data-lucide="trash-2" class="w-5 h-5 text-gray-500"></i>
+                        <span>Limpiar</span>
+                    </button>
+                    <button id="btnCopiar" class="w-full sm:w-2/3 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-md transition duration-200 flex items-center justify-center gap-2 transform active:scale-95 focus:ring-4 focus:ring-blue-300">
+                        <i data-lucide="copy" class="w-5 h-5"></i>
+                        <span class="tracking-wide">Copiar Registro</span>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // Inicializar iconos
+        lucide.createIcons();
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Referencias a elementos
+            const horaReg = document.getElementById('horaReg');
+            const controlInterno = document.getElementById('controlInterno');
+            const policia = document.getElementById('policia');
+            const horaInicio = document.getElementById('horaInicio');
+            const horaFin = document.getElementById('horaFin');
+            const radiosTipo = document.querySelectorAll('input[name="tipo"]');
+            const btnCopiar = document.getElementById('btnCopiar');
+            const btnLimpiar = document.getElementById('btnLimpiar');
+            const btnActualizar = document.getElementById('btnActualizar');
+            const resultado = document.getElementById('resultado');
+            const contenedorTiempos = document.getElementById('contenedorTiempos');
+            const allInputs = document.querySelectorAll('input');
+
+            // Formatear hora a la timezone de Argentina
+            const formatTime = (date) => {
+                return date.toLocaleTimeString('es-AR', { 
+                    timeZone: 'America/Argentina/Buenos_Aires', 
+                    hourCycle: 'h23', 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+            };
+
+            // Inicializar estados
+            const init = () => {
+                const now = new Date();
+                horaReg.value = formatTime(now);
+                
+                horaInicio.value = formatTime(now);
+                const later = new Date(now.getTime() + 8 * 60 * 60 * 1000); // +8 horas aprox
+                horaFin.value = formatTime(later);
+
+                controlInterno.value = localStorage.getItem('cctv_controlInterno') || '';
+                policia.value = localStorage.getItem('cctv_policia') || '';
+
+                toggleTiempos();
+                generarTexto();
+            };
+
+            // Animación y toggle del bloque de tiempos
+            const toggleTiempos = () => {
+                const tipo = document.querySelector('input[name="tipo"]:checked').value;
+                if (tipo === 'ingresa') {
+                    contenedorTiempos.style.maxHeight = '150px';
+                    contenedorTiempos.style.opacity = '1';
+                } else {
+                    contenedorTiempos.style.maxHeight = '0px';
+                    contenedorTiempos.style.opacity = '0';
+                }
+            };
+
+            // Guardar nombres en el navegador
+            const guardarDatos = () => {
+                localStorage.setItem('cctv_controlInterno', controlInterno.value);
+                localStorage.setItem('cctv_policia', policia.value);
+            };
+
+            // Redacción del texto
+            const generarTexto = () => {
+                const valHoraReg = horaReg.value || '00:00';
+                const valControlInterno = controlInterno.value.trim() || '__________';
+                const valPolicia = policia.value.trim() || '__________';
+                const tipo = document.querySelector('input[name="tipo"]:checked').value;
+                
+                let texto = `A las ${valHoraReg} Hs. CCTV recibe llamada de ${valControlInterno}, informando que `;
+
+                if (tipo === 'ingresa') {
+                    const valHoraInicio = horaInicio.value || '00:00';
+                    const valHoraFin = horaFin.value || '00:00';
+                    texto += `ingresa Adicional de La Policia ${valPolicia}, el cual prestara servicio como Control Interno desde las horas ${valHoraInicio} hasta las horas ${valHoraFin}.-`;
+                } else {
+                    texto += `se retira Adicional de La Policia ${valPolicia}.-`;
+                }
+
+                resultado.value = texto;
+            };
+
+            // Copiado asíncrono al portapapeles moderno (con fallback local)
+            const copiarTexto = async () => {
+                const texto = resultado.value;
+                let copiado = false;
+                
+                try {
+                    // Intento 1: API Moderna (si está disponible y permitida)
+                    if (navigator.clipboard && window.isSecureContext) {
+                        await navigator.clipboard.writeText(texto);
+                        copiado = true;
+                    }
+                } catch (err) {
+                    console.warn("API Clipboard falló, usando método clásico...", err);
+                }
+
+                // Intento 2: Método clásico (Fallback)
+                if (!copiado) {
+                    try {
+                        resultado.select();
+                        resultado.setSelectionRange(0, 99999); // Para móviles
+                        const exito = document.execCommand("copy");
+                        window.getSelection().removeAllRanges(); // Quitar selección
+                        
+                        if (!exito) throw new Error("execCommand devolvió false");
+                    } catch (err) {
+                        console.error('Error en fallback de copiado: ', err);
+                        alert("Tu navegador bloqueó el copiado automático. Por favor selecciona el texto generado y presiona Ctrl+C (o mantén presionado para copiar).");
+                        return; // Termina la función aquí para no mostrar el botón verde
+                    }
+                }
+                
+                // Feedback visual de éxito
+                const span = btnCopiar.querySelector('span');
+                const icon = btnCopiar.querySelector('i');
+                const originalText = span.innerText;
+                const originalClass = btnCopiar.className;
+
+                span.innerText = "¡Copiado!";
+                btnCopiar.className = "w-full sm:w-2/3 bg-green-600 hover:bg-green-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-md transition duration-200 flex items-center justify-center gap-2 transform active:scale-95 focus:ring-4 focus:ring-green-500";
+                icon.setAttribute('data-lucide', 'check');
+                lucide.createIcons();
+
+                setTimeout(() => {
+                    span.innerText = originalText;
+                    btnCopiar.className = originalClass;
+                    icon.setAttribute('data-lucide', 'copy');
+                    lucide.createIcons();
+                }, 2000);
+            };
+
+            // Limpiar datos
+            const limpiarFormulario = () => {
+                controlInterno.value = '';
+                policia.value = '';
+                localStorage.removeItem('cctv_controlInterno');
+                localStorage.removeItem('cctv_policia');
+                const now = new Date();
+                horaReg.value = formatTime(now);
+                document.querySelector('input[name="tipo"][value="ingresa"]').checked = true;
+                
+                toggleTiempos();
+                generarTexto();
+            };
+
+            // Configurar Event Listeners (eficiencia y separación de lógica)
+            radiosTipo.forEach(radio => radio.addEventListener('change', () => {
+                toggleTiempos();
+                generarTexto();
+            }));
+
+            [controlInterno, policia].forEach(input => input.addEventListener('input', () => {
+                guardarDatos();
+                generarTexto();
+            }));
+
+            [horaReg, horaInicio, horaFin].forEach(input => input.addEventListener('change', generarTexto));
+            
+            // Seleccionar todo el texto al hacer click (Mejora de UX)
+            allInputs.forEach(input => input.addEventListener('focus', function() { this.select(); }));
+
+            btnCopiar.addEventListener('click', copiarTexto);
+            btnLimpiar.addEventListener('click', limpiarFormulario);
+            btnActualizar.addEventListener('click', generarTexto);
+
+            // Disparar inicio
+            init();
+        });
+    </script>
+</body>
+</html>
