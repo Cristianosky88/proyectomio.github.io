@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        body { background-color: #f8fafc; font-family: sans-serif; }
+        body { background-color: #f8fafc; font-family: 'Segoe UI', sans-serif; }
         .fade-in { animation: fadeIn 0.3s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
@@ -19,7 +19,7 @@
         <!-- Header -->
         <div class="bg-slate-900 p-5 text-white flex justify-between items-center">
             <div class="flex items-center gap-3">
-                <div class="bg-blue-600 p-2 rounded-lg">
+                <div class="bg-indigo-600 p-2 rounded-lg">
                     <i data-lucide="shield-alert" class="w-6 h-6 text-white"></i>
                 </div>
                 <div>
@@ -47,12 +47,12 @@
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-xs font-semibold text-slate-500 mb-1">⏰ Hora</label>
-                                <input type="time" id="hora1" required class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                                <input type="time" id="hora1" required class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
                                 <small id="error-hora1" class="text-red-600 text-xs hidden">⚠️ Hora 2 debe ser posterior</small>
                             </div>
                             <div>
                                 <label class="block text-xs font-semibold text-slate-500 mb-1">👤 Personal/Control Interno</label>
-                                <input type="text" id="informante1" required placeholder="Nombre del informante" list="informantes-list" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                                <input type="text" id="informante1" required placeholder="Nombre del informante" list="informantes-list" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
                             </div>
                         </div>
                     </div>
@@ -62,20 +62,20 @@
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-xs font-semibold text-slate-500 mb-1">⏰ Hora</label>
-                                <input type="time" id="hora2" required class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                                <input type="time" id="hora2" required class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
                                 <small id="error-hora2" class="text-red-600 text-xs hidden">⚠️ Debe ser posterior a Evento 1</small>
                                 <small id="duracion" class="text-green-600 text-xs hidden"></small>
                             </div>
                             <div>
                                 <label class="block text-xs font-semibold text-slate-500 mb-1">👤 Personal/Control Interno</label>
-                                <input type="text" id="informante2" required placeholder="Nombre del informante" list="informantes-list" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                                <input type="text" id="informante2" required placeholder="Nombre del informante" list="informantes-list" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
                             </div>
                         </div>
                     </div>
 
                     <div>
                         <label class="block text-xs font-semibold text-slate-500 mb-1">🏢 Personal Argos</label>
-                        <input type="text" id="argos" required placeholder="Nombre del personal de Argos" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                        <input type="text" id="argos" required placeholder="Nombre del personal de Argos" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
                     </div>
 
                     <div class="flex gap-2 pt-4">
@@ -105,7 +105,7 @@
                     
                     <!-- HISTORIAL DE INFORMES -->
                     <div class="mb-4 p-3 bg-slate-50 rounded-lg border border-slate-200">
-                        <select id="historicoSelect" class="w-full p-2 bg-white border border-slate-300 rounded text-xs focus:ring-2 focus:ring-blue-500 outline-none hover:border-blue-400 transition">
+                        <select id="historicoSelect" class="w-full p-2 bg-white border border-slate-300 rounded text-xs focus:ring-2 focus:ring-indigo-500 outline-none hover:border-blue-400 transition">
                             <option value="">📜 Seleccionar informe anterior...</option>
                         </select>
                         <small class="text-slate-500 mt-1 block">Últimos 10 registros guardados</small>

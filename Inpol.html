@@ -7,18 +7,19 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        /* Personalización ligera para scroll y transiciones */
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f3f4f6; }
+        body { background-color: #f8fafc; font-family: 'Segoe UI', sans-serif; }
         .transition-height { transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out; }
+        .fade-in { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4 lg:p-8">
 
-    <div class="bg-white rounded-2xl shadow-xl w-full max-w-4xl overflow-hidden border border-gray-100">
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-4xl overflow-hidden border border-slate-200">
         <!-- Header -->
         <div class="bg-slate-900 text-white p-5 md:px-8 flex items-center justify-between">
             <div class="flex items-center gap-4">
-                <div class="bg-blue-600 p-2.5 rounded-xl shadow-inner">
+                <div class="bg-indigo-600 p-2 rounded-lg shadow-inner">
                     <i data-lucide="shield" class="w-6 h-6 text-white"></i>
                 </div>
                 <div>
@@ -35,39 +36,39 @@
         <div class="p-6 md:p-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
             
             <!-- Columna Izquierda: Controles (Ocupa 5 de 12) -->
-            <div class="lg:col-span-5 space-y-5 border-b lg:border-b-0 lg:border-r border-gray-200 pb-8 lg:pb-0 lg:pr-8">
+            <div class="lg:col-span-5 space-y-5 border-b lg:border-b-0 lg:border-r border-slate-200 pb-8 lg:pb-0 lg:pr-8">
             
             <!-- Hora de Registro -->
             <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-1">Hora de la llamada / Registro</label>
-                <div class="flex items-center bg-gray-50 border border-gray-300 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-blue-500">
-                    <div class="px-3 text-gray-500"><i data-lucide="clock" class="w-5 h-5"></i></div>
-                    <input type="time" id="horaReg" class="w-full py-2.5 px-2 bg-transparent outline-none font-medium text-gray-800">
+                <label class="block text-sm font-semibold text-slate-700 mb-1">Hora de la llamada / Registro</label>
+                <div class="flex items-center bg-slate-50 border border-slate-300 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-indigo-500">
+                    <div class="px-3 text-slate-500"><i data-lucide="clock" class="w-5 h-5"></i></div>
+                    <input type="time" id="horaReg" class="w-full py-2.5 px-2 bg-transparent outline-none font-medium text-slate-800">
                 </div>
             </div>
 
             <!-- Control Interno (Cargo y Nombre) -->
             <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-1">Cargo y Nombre de Quien Llama</label>
-                <div class="flex items-center bg-gray-50 border border-gray-300 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 transition-shadow">
-                    <div class="px-3 text-gray-500"><i data-lucide="headset" class="w-5 h-5"></i></div>
-                    <input type="text" id="controlInterno" placeholder="Ej. Supervisor Juan Perez ó Control Interno Pablo" class="w-full py-2.5 px-2 bg-transparent outline-none text-gray-800 font-medium">
+                <label class="block text-sm font-semibold text-slate-700 mb-1">Cargo y Nombre de Quien Llama</label>
+                <div class="flex items-center bg-slate-50 border border-slate-300 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-indigo-500 transition-shadow">
+                    <div class="px-3 text-slate-500"><i data-lucide="headset" class="w-5 h-5"></i></div>
+                    <input type="text" id="controlInterno" placeholder="Ej. Supervisor Juan Perez ó Control Interno Pablo" class="w-full py-2.5 px-2 bg-transparent outline-none text-slate-800 font-medium">
                 </div>
             </div>
 
             <!-- Tipo de Movimiento (Radios) -->
             <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">Tipo de Movimiento</label>
+                <label class="block text-sm font-semibold text-slate-700 mb-2">Tipo de Movimiento</label>
                 <div class="flex gap-4">
                     <label class="flex-1 cursor-pointer group">
                         <input type="radio" name="tipo" value="ingresa" class="peer sr-only" checked>
-                        <div class="text-center p-3 rounded-lg border-2 border-gray-200 peer-checked:border-blue-500 peer-checked:bg-blue-50 peer-checked:text-blue-700 font-bold transition-all group-hover:border-blue-300 flex items-center justify-center gap-2">
+                        <div class="text-center p-3 rounded-lg border-2 border-slate-200 peer-checked:border-indigo-500 peer-checked:bg-indigo-50 peer-checked:text-indigo-700 font-bold transition-all group-hover:border-indigo-300 flex items-center justify-center gap-2">
                             <i data-lucide="log-in" class="w-5 h-5"></i> Ingreso
                         </div>
                     </label>
                     <label class="flex-1 cursor-pointer group">
                         <input type="radio" name="tipo" value="retira" class="peer sr-only">
-                        <div class="text-center p-3 rounded-lg border-2 border-gray-200 peer-checked:border-red-500 peer-checked:bg-red-50 peer-checked:text-red-700 font-bold transition-all group-hover:border-red-300 flex items-center justify-center gap-2">
+                        <div class="text-center p-3 rounded-lg border-2 border-slate-200 peer-checked:border-red-500 peer-checked:bg-red-50 peer-checked:text-red-700 font-bold transition-all group-hover:border-red-300 flex items-center justify-center gap-2">
                             <i data-lucide="log-out" class="w-5 h-5"></i> Egreso
                         </div>
                     </label>
@@ -76,28 +77,28 @@
 
             <!-- Adicional Policía -->
             <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-1">Título y Nombre de Policía</label>
-                <div class="flex items-center bg-gray-50 border border-gray-300 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 transition-shadow">
-                    <div class="px-3 text-gray-500"><i data-lucide="shield" class="w-5 h-5"></i></div>
-                    <input type="text" id="policia" placeholder="Ej. Sr. Perez o Sra. Gomez" class="w-full py-2.5 px-2 bg-transparent outline-none text-gray-800 font-medium">
+                <label class="block text-sm font-semibold text-slate-700 mb-1">Título y Nombre de Policía</label>
+                <div class="flex items-center bg-slate-50 border border-slate-300 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-indigo-500 transition-shadow">
+                    <div class="px-3 text-slate-500"><i data-lucide="shield" class="w-5 h-5"></i></div>
+                    <input type="text" id="policia" placeholder="Ej. Sr. Perez o Sra. Gomez" class="w-full py-2.5 px-2 bg-transparent outline-none text-slate-800 font-medium">
                 </div>
             </div>
 
             <!-- Tiempos de Servicio (Ocultables) -->
             <div id="contenedorTiempos" class="transition-height max-h-40 opacity-100 overflow-hidden flex gap-4">
                 <div class="flex-1">
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Hora Inicio</label>
-                    <input type="time" id="horaInicio" class="w-full py-2.5 px-3 bg-gray-50 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Hora Inicio</label>
+                    <input type="time" id="horaInicio" class="w-full py-2.5 px-3 bg-slate-50 border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
                 </div>
                 <div class="flex-1">
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Hora Fin</label>
-                    <input type="time" id="horaFin" class="w-full py-2.5 px-3 bg-gray-50 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Hora Fin</label>
+                    <input type="time" id="horaFin" class="w-full py-2.5 px-3 bg-slate-50 border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
                 </div>
             </div>
             </div> <!-- Cierre de Columna Izquierda -->
 
             <!-- Columna Derecha: Resultado (Ocupa 7 de 12) -->
-            <div class="lg:col-span-7 flex flex-col justify-between h-full bg-slate-50 p-6 rounded-xl border border-gray-100">
+            <div class="lg:col-span-7 flex flex-col justify-between h-full bg-slate-50 p-6 rounded-xl border border-slate-200">
                 <!-- Resultado -->
                 <div class="flex-grow mb-6 flex flex-col">
                     <div class="flex justify-between items-center mb-3">
@@ -109,16 +110,16 @@
                             <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Restaurar Original
                         </button>
                     </div>
-                    <textarea id="resultado" class="w-full flex-grow min-h-[160px] lg:min-h-[220px] p-4 bg-white border border-blue-200 rounded-xl text-gray-800 outline-none resize-y focus:ring-2 focus:ring-blue-500 font-mono text-sm leading-relaxed shadow-sm transition-shadow"></textarea>
+                    <textarea id="resultado" class="w-full flex-grow min-h-[160px] lg:min-h-[220px] p-4 bg-white border border-indigo-200 rounded-xl text-slate-800 outline-none resize-y focus:ring-2 focus:ring-indigo-500 font-mono text-sm leading-relaxed shadow-sm transition-shadow"></textarea>
                 </div>
 
                 <!-- Botones -->
                 <div class="flex flex-col sm:flex-row gap-4 mt-auto">
-                    <button id="btnLimpiar" class="w-full sm:w-1/3 bg-white hover:bg-gray-50 text-gray-700 border-2 border-gray-200 font-bold py-3.5 px-4 rounded-xl shadow-sm transition duration-200 flex items-center justify-center gap-2 transform active:scale-95 focus:ring-2 focus:ring-gray-300">
-                        <i data-lucide="trash-2" class="w-5 h-5 text-gray-500"></i>
+                    <button id="btnLimpiar" class="w-full sm:w-1/3 bg-white hover:bg-slate-50 text-slate-700 border-2 border-slate-200 font-bold py-3.5 px-4 rounded-xl shadow-sm transition duration-200 flex items-center justify-center gap-2 transform active:scale-95 focus:ring-2 focus:ring-slate-300">
+                        <i data-lucide="trash-2" class="w-5 h-5 text-slate-500"></i>
                         <span>Limpiar</span>
                     </button>
-                    <button id="btnCopiar" class="w-full sm:w-2/3 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-md transition duration-200 flex items-center justify-center gap-2 transform active:scale-95 focus:ring-4 focus:ring-blue-300">
+                    <button id="btnCopiar" class="w-full sm:w-2/3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-md transition duration-200 flex items-center justify-center gap-2 transform active:scale-95 focus:ring-4 focus:ring-indigo-300">
                         <i data-lucide="copy" class="w-5 h-5"></i>
                         <span class="tracking-wide">Copiar Registro</span>
                     </button>
