@@ -63,13 +63,10 @@
                                     <select id="supervisor1" required class="w-full p-2 bg-slate-50 border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
                                         <option value="">Seleccionar personal...</option>
                                         <option value="Supervisor de Seguridad Padilla Jorge">Supervisor de Seguridad Padilla Jorge</option>
-                                        <option value="Control Interno Flores Julian">Control Interno Flores Julian</option>
-                                        <option value="Control Interno Zamboni Rodrigo">Control Interno Zamboni Rodrigo</option>
+                                        <option value="Control Interno Yujra Fernando">Control Interno Yujra Fernando</option>
+                                        <option value="Control Interno Rizzato Enzo">Control Interno Rizzato Enzo</option>
                                         <option value="Control Interno Castaño Pablo">Control Interno Castaño Pablo</option>
-                                        <option value="Control Interno Argañaraz Lorena">Control Interno Argañaraz Lorena</option>
-                                        <option value="Control Interno Frias Ximena">Control Interno Frias Ximena</option>
-                                        <option value="Control Interno Zambrana Celeste">Control Interno Zambrana Celeste</option>
-                                        <option value="Control Interno Caqui Victoria">Control Interno Caqui Victoria</option>
+                                        <option value="Control Interno Robinson Gonzalo">Control Interno Robinson Gonzalo</option>
                                         <option value="custom">Personal Personalizado</option>
                                     </select>
                                 </div>
@@ -115,13 +112,10 @@
                                     <select id="supervisor2" required class="w-full p-2 bg-slate-50 border border-slate-300 rounded text-sm focus:ring-2 focus:ring-green-500 outline-none">
                                         <option value="">Seleccionar personal...</option>
                                         <option value="Supervisor de Seguridad Padilla Jorge">Supervisor de Seguridad Padilla Jorge</option>
-                                        <option value="Control Interno Flores Julian">Control Interno Flores Julian</option>
-                                        <option value="Control Interno Zamboni Rodrigo">Control Interno Zamboni Rodrigo</option>
+                                        <option value="Control Interno Yujra Fernando">Control Interno Yujra Fernando</option>
+                                        <option value="Control Interno Rizzato Enzo">Control Interno Rizzato Enzo</option>
                                         <option value="Control Interno Castaño Pablo">Control Interno Castaño Pablo</option>
-                                        <option value="Control Interno Argañaraz Lorena">Control Interno Argañaraz Lorena</option>
-                                        <option value="Control Interno Frias Ximena">Control Interno Frias Ximena</option>
-                                        <option value="Control Interno Zambrana Celeste">Control Interno Zambrana Celeste</option>
-                                        <option value="Control Interno Caqui Victoria">Control Interno Caqui Victoria</option>
+                                        <option value="Control Interno Robinson Gonzalo">Control Interno Robinson Gonzalo</option>
                                         <option value="custom">Pesonal Personalizado</option>
                                     </select>
                                 </div>
@@ -294,6 +288,9 @@
             if (e.target.value === 'custom') {
                 document.getElementById('custom-supervisor2').classList.remove('hidden');
                 document.getElementById('custom-supervisor1').classList.remove('hidden');
+            } else {
+                document.getElementById('custom-supervisor2').classList.add('hidden');
+                document.getElementById('custom-supervisor1').classList.add('hidden');
             }
         });
         document.getElementById('company1').addEventListener('input', function(e) {
