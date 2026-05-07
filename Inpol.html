@@ -3,302 +3,873 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generador Rápido de Novedades CCTV</title>
+    <title>Generador de Novedades CCTV - Ingresos Policiales</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        body { background-color: #f8fafc; font-family: 'Segoe UI', sans-serif; }
-        .transition-height { transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out; }
-        .fade-in { animation: fadeIn 0.3s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --success: #059669;
+            --danger: #dc2626;
+            --warning: #d97706;
+        }
+        
+        body { 
+            background-color: #f8fafc; 
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+            min-height: 100vh;
+        }
+        
+        .transition-height { 
+            transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out; 
+        }
+        
+        .fade-in { 
+            animation: fadeIn 0.3s ease-in-out; 
+        }
+        
+        @keyframes fadeIn { 
+            from { opacity: 0; transform: translateY(-10px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .slide-in {
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        /* Mejoras de accesibilidad */
+        @media (prefers-reduced-motion: reduce) {
+            * { animation-duration: 0.01ms !important; }
+        }
+        
+        /* Estilo para el historial */
+        .history-item {
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+        }
+        
+        .history-item:hover {
+            border-left-color: var(--primary);
+            background-color: #f0f4ff;
+        }
+        
+        .history-item.active {
+            background-color: #e0e7ff;
+            border-left-color: var(--primary);
+        }
+        
+        /* Scrollbar personalizado */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 3px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4 lg:p-8">
-
-    <div class="bg-white rounded-xl shadow-xl w-full max-w-4xl overflow-hidden border border-slate-200">
-        <!-- Header -->
-        <div class="bg-slate-900 text-white p-5 md:px-8 flex items-center justify-between">
-            <div class="flex items-center gap-4">
-                <div class="bg-indigo-600 p-2 rounded-lg shadow-inner">
-                    <i data-lucide="shield" class="w-6 h-6 text-white"></i>
+<body class="flex items-center justify-center p-4 lg:p-8">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-5xl overflow-hidden border border-slate-200">
+        
+        <!-- Header Mejorado -->
+        <header class="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white p-5 md:px-8">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div class="flex items-center gap-4">
+                    <div class="bg-indigo-600 p-2.5 rounded-xl shadow-lg">
+                        <i data-lucide="shield-check" class="w-6 h-6 text-white"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl md:text-2xl font-bold">Ingresos Adicional Policial</h1>
+                        <p class="text-slate-400 text-xs mt-0.5">Sistema de Registro CCTV • v2.0</p>
+                    </div>
                 </div>
-                <div>
-                    <h1 class="text-xl md:text-2xl font-bold">Ingresos Adicional Policial</h1>
+                
+                <div class="flex items-center gap-2">
+                    <!-- Indicador de hora actual -->
+                    <div class="hidden sm:flex items-center gap-2 text-xs bg-slate-700 px-3 py-1.5 rounded-lg">
+                        <i data-lucide="clock" class="w-3.5 h-3.5 text-indigo-400"></i>
+                        <span id="horaActual" class="text-slate-300"></span>
+                    </div>
+                    
+                    <a href="ingreso.html" class="flex items-center gap-2 bg-slate-700 hover:bg-slate-600 px-4 py-2.5 rounded-xl transition-all duration-200 border border-slate-600 focus:ring-2 focus:ring-slate-500 shadow-md hover:shadow-lg">
+                        <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                        <span class="text-sm font-medium hidden sm:inline">Volver</span>
+                    </a>
                 </div>
             </div>
-            <a href="ingreso.html" class="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-lg transition-colors border border-slate-700 focus:ring-2 focus:ring-slate-500">
-                <i data-lucide="arrow-left" class="w-4 h-4"></i>
-                <span class="text-sm font-medium hidden sm:inline">Volver al Inicio</span>
-            </a>
-        </div>
+        </header>
 
-        <!-- Contenido Dividido en 2 Columnas -->
-        <div class="p-6 md:p-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <!-- Contenido Principal -->
+        <div class="p-6 md:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6">
             
-            <!-- Columna Izquierda: Controles (Ocupa 5 de 12) -->
-            <div class="lg:col-span-5 space-y-5 border-b lg:border-b-0 lg:border-r border-slate-200 pb-8 lg:pb-0 lg:pr-8">
-            
-            <!-- Hora de Registro -->
-            <div>
-                <label class="block text-sm font-semibold text-slate-700 mb-1">Hora de la llamada / Registro</label>
-                <div class="flex items-center bg-slate-50 border border-slate-300 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-indigo-500">
-                    <div class="px-3 text-slate-500"><i data-lucide="clock" class="w-5 h-5"></i></div>
-                    <input type="time" id="horaReg" class="w-full py-2.5 px-2 bg-transparent outline-none font-medium text-slate-800">
-                </div>
-            </div>
-
-            <!-- Control Interno (Cargo y Nombre) -->
-            <div>
-                <label class="block text-sm font-semibold text-slate-700 mb-1">Cargo y Nombre de Quien Llama</label>
-                <div class="flex items-center bg-slate-50 border border-slate-300 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-indigo-500 transition-shadow">
-                    <div class="px-3 text-slate-500"><i data-lucide="headset" class="w-5 h-5"></i></div>
-                    <input type="text" id="controlInterno" placeholder="Ej. Supervisor Juan Perez ó Control Interno Pablo" class="w-full py-2.5 px-2 bg-transparent outline-none text-slate-800 font-medium">
-                </div>
-            </div>
-
-            <!-- Tipo de Movimiento (Radios) -->
-            <div>
-                <label class="block text-sm font-semibold text-slate-700 mb-2">Tipo de Movimiento</label>
-                <div class="flex gap-4">
-                    <label class="flex-1 cursor-pointer group">
-                        <input type="radio" name="tipo" value="ingresa" class="peer sr-only" checked>
-                        <div class="text-center p-3 rounded-lg border-2 border-slate-200 peer-checked:border-indigo-500 peer-checked:bg-indigo-50 peer-checked:text-indigo-700 font-bold transition-all group-hover:border-indigo-300 flex items-center justify-center gap-2">
-                            <i data-lucide="log-in" class="w-5 h-5"></i> Ingreso
+            <!-- Columna Izquierda: Controles (5/12) -->
+            <div class="lg:col-span-5 space-y-4 border-b lg:border-b-0 lg:border-r border-slate-200 pb-6 lg:pb-0 lg:pr-6">
+                
+                <!-- Sección: Datos Básicos -->
+                <div class="bg-slate-50 p-4 rounded-xl space-y-4">
+                    <h3 class="text-sm font-bold text-slate-600 uppercase tracking-wider flex items-center gap-2">
+                        <i data-lucide="file-input" class="w-4 h-4"></i>
+                        Datos del Registro
+                    </h3>
+                    
+                    <!-- Hora de Registro -->
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1.5">⏰ Hora de la Llamada</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i data-lucide="phone-call" class="w-4 h-4 text-slate-400"></i>
+                            </div>
+                            <input type="time" 
+                                   id="horaReg" 
+                                   class="w-full pl-10 pr-3 py-2.5 bg-white border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-slate-800 font-medium transition-all">
                         </div>
-                    </label>
-                    <label class="flex-1 cursor-pointer group">
-                        <input type="radio" name="tipo" value="retira" class="peer sr-only">
-                        <div class="text-center p-3 rounded-lg border-2 border-slate-200 peer-checked:border-red-500 peer-checked:bg-red-50 peer-checked:text-red-700 font-bold transition-all group-hover:border-red-300 flex items-center justify-center gap-2">
-                            <i data-lucide="log-out" class="w-5 h-5"></i> Egreso
+                    </div>
+
+                    <!-- Control Interno -->
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1.5">🎙️ Quién Informa (Cargo y Nombre)</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i data-lucide="user-check" class="w-4 h-4 text-slate-400"></i>
+                            </div>
+                            <input type="text" 
+                                   id="controlInterno" 
+                                   placeholder="Ej: Supervisor Juan Perez" 
+                                   list="supervisors-list"
+                                   class="w-full pl-10 pr-3 py-2.5 bg-white border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-slate-800 font-medium transition-all"
+                                   autocomplete="off">
                         </div>
-                    </label>
+                    </div>
+                    
+                    <!-- Tipo de Movimiento -->
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-2">🔄 Tipo de Movimiento</label>
+                        <div class="grid grid-cols-2 gap-3">
+                            <label class="cursor-pointer group">
+                                <input type="radio" name="tipo" value="ingresa" class="peer sr-only" checked>
+                                <div class="text-center p-3 rounded-xl border-2 border-slate-200 peer-checked:border-indigo-500 peer-checked:bg-indigo-50 peer-checked:text-indigo-700 font-bold transition-all group-hover:border-indigo-300 flex flex-col items-center gap-1 shadow-sm peer-checked:shadow-md">
+                                    <i data-lucide="log-in" class="w-6 h-6"></i>
+                                    <span class="text-sm">Ingreso</span>
+                                </div>
+                            </label>
+                            <label class="cursor-pointer group">
+                                <input type="radio" name="tipo" value="retira" class="peer sr-only">
+                                <div class="text-center p-3 rounded-xl border-2 border-slate-200 peer-checked:border-red-500 peer-checked:bg-red-50 peer-checked:text-red-700 font-bold transition-all group-hover:border-red-300 flex flex-col items-center gap-1 shadow-sm peer-checked:shadow-md">
+                                    <i data-lucide="log-out" class="w-6 h-6"></i>
+                                    <span class="text-sm">Egreso</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Sección: Datos del Personal -->
+                <div class="bg-slate-50 p-4 rounded-xl space-y-4">
+                    <h3 class="text-sm font-bold text-slate-600 uppercase tracking-wider flex items-center gap-2">
+                        <i data-lucide="users" class="w-4 h-4"></i>
+                        Datos del Personal
+                    </h3>
+                    
+                    <!-- Policía -->
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1.5">👮 Título y Nombre del Policía</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i data-lucide="badge" class="w-4 h-4 text-slate-400"></i>
+                            </div>
+                            <input type="text" 
+                                   id="policia" 
+                                   placeholder="Ej: Sr. Perez o Sra. Gomez" 
+                                   list="officers-list"
+                                   class="w-full pl-10 pr-3 py-2.5 bg-white border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-slate-800 font-medium transition-all"
+                                   autocomplete="off">
+                        </div>
+                    </div>
+                    
+                    <!-- Tiempos de Servicio (Ocultables) -->
+                    <div id="contenedorTiempos" class="transition-height max-h-40 opacity-100 overflow-hidden space-y-3">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1.5">🕐 Hora Inicio</label>
+                                <input type="time" 
+                                       id="horaInicio" 
+                                       class="w-full py-2.5 px-3 bg-white border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 font-medium transition-all">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1.5">🕛 Hora Fin</label>
+                                <input type="time" 
+                                       id="horaFin" 
+                                       class="w-full py-2.5 px-3 bg-white border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 font-medium transition-all">
+                            </div>
+                        </div>
+                        
+                        <!-- Duración calculada automáticamente -->
+                        <div id="duracionInfo" class="text-xs text-slate-500 bg-indigo-50 p-2 rounded-lg flex items-center gap-2 hidden">
+                            <i data-lucide="clock" class="w-3.5 h-3.5"></i>
+                            <span id="duracionTexto">Duración calculada: 0h 0m</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Sección: Estadísticas Rápidas -->
+                <div class="bg-gradient-to-r from-indigo-50 to-blue-50 p-4 rounded-xl border border-indigo-100">
+                    <h3 class="text-xs font-bold text-indigo-600 uppercase tracking-wider mb-2 flex items-center gap-2">
+                        <i data-lucide="bar-chart-2" class="w-3.5 h-3.5"></i>
+                        Estadísticas
+                    </h3>
+                    <div class="grid grid-cols-3 gap-2 text-center">
+                        <div>
+                            <div id="contadorHoy" class="text-lg font-bold text-indigo-700">0</div>
+                            <div class="text-xs text-slate-500">Hoy</div>
+                        </div>
+                        <div>
+                            <div id="contadorSemana" class="text-lg font-bold text-blue-700">0</div>
+                            <div class="text-xs text-slate-500">Semana</div>
+                        </div>
+                        <div>
+                            <div id="contadorTotal" class="text-lg font-bold text-purple-700">0</div>
+                            <div class="text-xs text-slate-500">Total</div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Adicional Policía -->
-            <div>
-                <label class="block text-sm font-semibold text-slate-700 mb-1">Título y Nombre de Policía</label>
-                <div class="flex items-center bg-slate-50 border border-slate-300 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-indigo-500 transition-shadow">
-                    <div class="px-3 text-slate-500"><i data-lucide="shield" class="w-5 h-5"></i></div>
-                    <input type="text" id="policia" placeholder="Ej. Sr. Perez o Sra. Gomez" class="w-full py-2.5 px-2 bg-transparent outline-none text-slate-800 font-medium">
-                </div>
-            </div>
-
-            <!-- Tiempos de Servicio (Ocultables) -->
-            <div id="contenedorTiempos" class="transition-height max-h-40 opacity-100 overflow-hidden flex gap-4">
-                <div class="flex-1">
-                    <label class="block text-sm font-semibold text-slate-700 mb-1">Hora Inicio</label>
-                    <input type="time" id="horaInicio" class="w-full py-2.5 px-3 bg-slate-50 border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
-                </div>
-                <div class="flex-1">
-                    <label class="block text-sm font-semibold text-slate-700 mb-1">Hora Fin</label>
-                    <input type="time" id="horaFin" class="w-full py-2.5 px-3 bg-slate-50 border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
-                </div>
-            </div>
-            </div> <!-- Cierre de Columna Izquierda -->
-
-            <!-- Columna Derecha: Resultado (Ocupa 7 de 12) -->
-            <div class="lg:col-span-7 flex flex-col justify-between h-full bg-slate-50 p-6 rounded-xl border border-slate-200">
-                <!-- Resultado -->
-                <div class="flex-grow mb-6 flex flex-col">
-                    <div class="flex justify-between items-center mb-3">
-                        <label class="block text-sm font-semibold text-slate-800 uppercase tracking-wide flex items-center gap-2">
-                            <span class="w-2.5 h-2.5 bg-green-500 rounded-full inline-block"></span>
-                            Texto Generado (Editable)
-                        </label>
-                        <button id="btnActualizar" class="text-xs text-blue-600 hover:text-blue-800 font-bold flex items-center gap-1.5 transition-colors bg-blue-100 hover:bg-blue-200 px-3 py-1.5 rounded-md" title="Restaurar al texto original">
-                            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Restaurar Original
+            <!-- Columna Derecha: Resultado (7/12) -->
+            <div class="lg:col-span-7 flex flex-col h-full space-y-4">
+                
+                <!-- Historial de Registros -->
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-sm font-bold text-slate-600 flex items-center gap-2">
+                            <i data-lucide="history" class="w-4 h-4"></i>
+                            Últimos Registros
+                        </h3>
+                        <button onclick="exportarHistorial()" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium flex items-center gap-1">
+                            <i data-lucide="download" class="w-3 h-3"></i>
+                            Exportar
                         </button>
                     </div>
-                    <textarea id="resultado" class="w-full flex-grow min-h-[160px] lg:min-h-[220px] p-4 bg-white border border-indigo-200 rounded-xl text-slate-800 outline-none resize-y focus:ring-2 focus:ring-indigo-500 font-mono text-sm leading-relaxed shadow-sm transition-shadow"></textarea>
+                    <div id="historialLista" class="space-y-1 max-h-32 overflow-y-auto text-xs">
+                        <p class="text-slate-400 text-center py-3">Sin registros anteriores</p>
+                    </div>
+                </div>
+                
+                <!-- Resultado -->
+                <div class="flex-grow bg-gradient-to-br from-slate-50 to-white p-5 rounded-xl border border-slate-200 shadow-inner">
+                    <div class="flex justify-between items-center mb-3">
+                        <label class="text-sm font-bold text-slate-700 uppercase tracking-wide flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse"></span>
+                            Texto Generado
+                        </label>
+                        <div class="flex gap-2">
+                            <button id="btnRestaurar" 
+                                    class="text-xs text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1.5 transition-colors bg-blue-100 hover:bg-blue-200 px-3 py-1.5 rounded-lg"
+                                    title="Restaurar al texto original">
+                                <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> 
+                                <span class="hidden sm:inline">Restaurar</span>
+                            </button>
+                            <button id="btnPrevisualizar" 
+                                    class="text-xs text-purple-600 hover:text-purple-800 font-medium flex items-center gap-1.5 transition-colors bg-purple-100 hover:bg-purple-200 px-3 py-1.5 rounded-lg"
+                                    title="Ver en formato final">
+                                <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+                                <span class="hidden sm:inline">Vista</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <textarea id="resultado" 
+                              class="w-full flex-grow min-h-[180px] lg:min-h-[200px] p-4 bg-white border-2 border-indigo-200 rounded-xl text-slate-800 outline-none resize-y focus:ring-4 focus:ring-indigo-100 focus:border-indigo-400 font-mono text-sm leading-relaxed shadow-sm transition-all"
+                              placeholder="El texto se generará automáticamente al completar los campos..."></textarea>
+                    
+                    <!-- Indicador de caracteres -->
+                    <div class="flex justify-between mt-2">
+                        <span id="contadorCaracteres" class="text-xs text-slate-400">0 caracteres</span>
+                        <span id="estadoTexto" class="text-xs text-green-500 flex items-center gap-1 hidden">
+                            <i data-lucide="check-circle" class="w-3 h-3"></i>
+                            Listo para copiar
+                        </span>
+                    </div>
                 </div>
 
-                <!-- Botones -->
-                <div class="flex flex-col sm:flex-row gap-4 mt-auto">
-                    <button id="btnLimpiar" class="w-full sm:w-1/3 bg-white hover:bg-slate-50 text-slate-700 border-2 border-slate-200 font-bold py-3.5 px-4 rounded-xl shadow-sm transition duration-200 flex items-center justify-center gap-2 transform active:scale-95 focus:ring-2 focus:ring-slate-300">
-                        <i data-lucide="trash-2" class="w-5 h-5 text-slate-500"></i>
+                <!-- Botones de Acción -->
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <button id="btnLimpiar" 
+                            class="w-full sm:w-1/4 bg-white hover:bg-slate-50 text-slate-700 border-2 border-slate-200 font-bold py-3 px-4 rounded-xl shadow-sm transition-all duration-200 flex items-center justify-center gap-2 hover:border-slate-300 active:scale-95 focus:ring-4 focus:ring-slate-200">
+                        <i data-lucide="trash-2" class="w-4 h-4 text-slate-500"></i>
                         <span>Limpiar</span>
                     </button>
-                    <button id="btnCopiar" class="w-full sm:w-2/3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-md transition duration-200 flex items-center justify-center gap-2 transform active:scale-95 focus:ring-4 focus:ring-indigo-300">
-                        <i data-lucide="copy" class="w-5 h-5"></i>
-                        <span class="tracking-wide">Copiar Registro</span>
+                    
+                    <button id="btnCopiar" 
+                            class="w-full sm:w-2/4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg transition-all duration-200 flex items-center justify-center gap-2 active:scale-95 focus:ring-4 focus:ring-indigo-300 hover:shadow-xl">
+                        <i data-lucide="copy" class="w-4 h-4"></i>
+                        <span>Copiar Registro</span>
+                    </button>
+                    
+                    <button id="btnDescargar" 
+                            class="w-full sm:w-1/4 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg transition-all duration-200 flex items-center justify-center gap-2 active:scale-95 focus:ring-4 focus:ring-green-300 hover:shadow-xl">
+                        <i data-lucide="file-down" class="w-4 h-4"></i>
+                        <span class="hidden sm:inline">TXT</span>
                     </button>
                 </div>
             </div>
-
         </div>
+        
+        <!-- Modal de Previsualización -->
+        <div id="modalPreview" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 p-4">
+            <div class="bg-white rounded-2xl p-6 max-w-2xl w-full shadow-2xl">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-bold text-slate-800">Vista Previa del Registro</h3>
+                    <button onclick="cerrarModal()" class="text-slate-400 hover:text-slate-600">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+                <pre id="previewContent" class="bg-slate-50 p-4 rounded-lg text-sm font-mono whitespace-pre-wrap"></pre>
+                <button onclick="cerrarModal()" class="mt-4 w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 transition-colors">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+        
+        <!-- Toast Notificaciones -->
+        <div id="toastContainer" class="fixed bottom-4 right-4 space-y-2 z-50"></div>
+
+        <!-- Datalists -->
+        <datalist id="supervisors-list">
+            <option value="Supervisor de Seguridad Padilla Jorge">
+            <option value="Control Interno Yujra Fernando">
+            <option value="Control Interno Rizzato Enzo">
+            <option value="Control Interno Castaño Pablo">
+            <option value="Control Interno Robinson Gonzalo">
+        </datalist>
+        
+        <datalist id="officers-list">
+            <option value="Sr. Sosa Lucas">
+            <option value="Sr. Vilte Nicolas">
+            <option value="Sra. Reyes Rosana">
+            <option value="Sra. Calapeña Lorena">
+            <option value="Sra. Chungara Leonor">
+        </datalist>
     </div>
 
     <script>
-        // Inicializar iconos
-        lucide.createIcons();
-
-        document.addEventListener('DOMContentLoaded', () => {
-            // Referencias a elementos
-            const horaReg = document.getElementById('horaReg');
-            const controlInterno = document.getElementById('controlInterno');
-            const policia = document.getElementById('policia');
-            const horaInicio = document.getElementById('horaInicio');
-            const horaFin = document.getElementById('horaFin');
-            const radiosTipo = document.querySelectorAll('input[name="tipo"]');
-            const btnCopiar = document.getElementById('btnCopiar');
-            const btnLimpiar = document.getElementById('btnLimpiar');
-            const btnActualizar = document.getElementById('btnActualizar');
-            const resultado = document.getElementById('resultado');
-            const contenedorTiempos = document.getElementById('contenedorTiempos');
-            const allInputs = document.querySelectorAll('input');
-
-            // Formatear hora a la timezone de Argentina
-            const formatTime = (date) => {
-                return date.toLocaleTimeString('es-AR', { 
-                    timeZone: 'America/Argentina/Buenos_Aires', 
-                    hourCycle: 'h23', 
-                    hour: '2-digit', 
-                    minute: '2-digit' 
-                });
+    (() => {
+        'use strict';
+        
+        // Configuración
+        const CONFIG = {
+            maxHistorialItems: 10,
+            autoSaveKey: 'cctv_policial_config',
+            storagePrefix: 'cctv_policial_'
+        };
+        
+        // Estado
+        const state = {
+            originalText: '',
+            historial: [],
+            contadores: {
+                hoy: 0,
+                semana: 0,
+                total: 0
+            }
+        };
+        
+        // Referencias DOM
+        const horaReg = document.getElementById('horaReg');
+        const controlInterno = document.getElementById('controlInterno');
+        const policia = document.getElementById('policia');
+        const horaInicio = document.getElementById('horaInicio');
+        const horaFin = document.getElementById('horaFin');
+        const radiosTipo = document.querySelectorAll('input[name="tipo"]');
+        const btnCopiar = document.getElementById('btnCopiar');
+        const btnLimpiar = document.getElementById('btnLimpiar');
+        const btnRestaurar = document.getElementById('btnRestaurar');
+        const btnPrevisualizar = document.getElementById('btnPrevisualizar');
+        const btnDescargar = document.getElementById('btnDescargar');
+        const resultado = document.getElementById('resultado');
+        const contenedorTiempos = document.getElementById('contenedorTiempos');
+        const duracionInfo = document.getElementById('duracionInfo');
+        const duracionTexto = document.getElementById('duracionTexto');
+        const contadorCaracteres = document.getElementById('contadorCaracteres');
+        const estadoTexto = document.getElementById('estadoTexto');
+        const historialLista = document.getElementById('historialLista');
+        const horaActual = document.getElementById('horaActual');
+        const modalPreview = document.getElementById('modalPreview');
+        const previewContent = document.getElementById('previewContent');
+        
+        // Utilidades
+        const formatTime = (date) => {
+            return date.toLocaleTimeString('es-AR', { 
+                timeZone: 'America/Argentina/Buenos_Aires', 
+                hourCycle: 'h23', 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+        };
+        
+        const $ = (selector) => document.querySelector(selector);
+        const $$ = (selector) => document.querySelectorAll(selector);
+        
+        // Inicialización
+        function init() {
+            lucide.createIcons();
+            
+            const now = new Date();
+            horaReg.value = formatTime(now);
+            horaInicio.value = formatTime(now);
+            
+            const later = new Date(now.getTime() + 8 * 60 * 60 * 1000);
+            horaFin.value = formatTime(later);
+            
+            cargarConfiguracion();
+            cargarHistorial();
+            actualizarContadores();
+            toggleTiempos();
+            generarTexto();
+            actualizarReloj();
+            
+            // Actualizar reloj cada minuto
+            setInterval(actualizarReloj, 60000);
+        }
+        
+        function actualizarReloj() {
+            const now = new Date();
+            horaActual.textContent = now.toLocaleTimeString('es-AR', { 
+                timeZone: 'America/Argentina/Buenos_Aires',
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+        }
+        
+        // Gestión de configuración
+        function cargarConfiguracion() {
+            const config = JSON.parse(localStorage.getItem(CONFIG.autoSaveKey) || '{}');
+            controlInterno.value = config.controlInterno || '';
+            policia.value = config.policia || '';
+        }
+        
+        function guardarConfiguracion() {
+            const config = {
+                controlInterno: controlInterno.value,
+                policia: policia.value
             };
+            localStorage.setItem(CONFIG.autoSaveKey, JSON.stringify(config));
+        }
+        
+        // Gestión de historial
+        function cargarHistorial() {
+            state.historial = JSON.parse(localStorage.getItem(CONFIG.storagePrefix + 'historial') || '[]');
+            renderizarHistorial();
+        }
+        
+        function guardarEnHistorial(texto) {
+            // Evitar duplicados inmediatos
+            if (state.historial.length > 0 && state.historial[0].texto === texto) {
+                return;
+            }
 
-            // Inicializar estados
-            const init = () => {
-                const now = new Date();
-                horaReg.value = formatTime(now);
-                
-                horaInicio.value = formatTime(now);
-                const later = new Date(now.getTime() + 8 * 60 * 60 * 1000); // +8 horas aprox
-                horaFin.value = formatTime(later);
-
-                controlInterno.value = localStorage.getItem('cctv_controlInterno') || '';
-                policia.value = localStorage.getItem('cctv_policia') || '';
-
-                toggleTiempos();
-                generarTexto();
+            const registro = {
+                texto: texto,
+                fecha: new Date().toISOString(),
+                tipo: document.querySelector('input[name="tipo"]:checked').value,
+                horaReg: horaReg.value
             };
-
-            // Animación y toggle del bloque de tiempos
-            const toggleTiempos = () => {
-                const tipo = document.querySelector('input[name="tipo"]:checked').value;
-                if (tipo === 'ingresa') {
-                    contenedorTiempos.style.maxHeight = '150px';
-                    contenedorTiempos.style.opacity = '1';
-                } else {
-                    contenedorTiempos.style.maxHeight = '0px';
-                    contenedorTiempos.style.opacity = '0';
+            
+            state.historial.unshift(registro);
+            state.historial = state.historial.slice(0, CONFIG.maxHistorialItems);
+            
+            localStorage.setItem(CONFIG.storagePrefix + 'historial', JSON.stringify(state.historial));
+            renderizarHistorial();
+            actualizarContadores();
+        }
+        
+        function renderizarHistorial() {
+            if (state.historial.length === 0) {
+                historialLista.innerHTML = '<p class="text-slate-400 text-center py-3">Sin registros anteriores</p>';
+                return;
+            }
+            
+            historialLista.innerHTML = state.historial.map((item, index) => `
+                <div class="history-item p-2 rounded cursor-pointer flex items-center justify-between hover:bg-indigo-50 transition-colors" 
+                     onclick="cargarRegistro(${index})">
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs ${item.tipo === 'ingresa' ? 'text-indigo-500' : 'text-red-500'}">
+                            ${item.tipo === 'ingresa' ? '⬆' : '⬇'}
+                        </span>
+                        <span class="text-slate-600">${item.horaReg}</span>
+                    </div>
+                    <span class="text-slate-400 text-xs">
+                        ${new Date(item.fecha).toLocaleDateString('es-AR')}
+                    </span>
+                </div>
+            `).join('');
+        }
+        
+        // Cargar un registro del historial
+        window.cargarRegistro = function(index) {
+            if (state.historial[index]) {
+                resultado.value = state.historial[index].texto;
+                state.originalText = state.historial[index].texto;
+                actualizarEstadoTexto();
+                showToast('Registro cargado del historial', 'info');
+            }
+        };
+        
+        // Exportar historial
+        window.exportarHistorial = function() {
+            if (state.historial.length === 0) {
+                showToast('No hay registros para exportar', 'warning');
+                return;
+            }
+            
+            let contenido = '=== HISTORIAL DE REGISTROS POLICIALES ===\n\n';
+            state.historial.forEach((item, idx) => {
+                contenido += `${idx + 1}. ${new Date(item.fecha).toLocaleString('es-AR')}\n`;
+                contenido += `${item.texto}\n\n---\n\n`;
+            });
+            
+            const blob = new Blob([contenido], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `historial-policial-${new Date().toISOString().split('T')[0]}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            showToast('Historial exportado exitosamente', 'success');
+        };
+        
+        // Contadores
+        function actualizarContadores() {
+            const ahora = new Date();
+            const hoy = state.historial.filter(item => {
+                const fecha = new Date(item.fecha);
+                return fecha.toDateString() === ahora.toDateString();
+            }).length;
+            
+            const inicioSemana = new Date(ahora);
+            inicioSemana.setDate(ahora.getDate() - ahora.getDay());
+            const semana = state.historial.filter(item => {
+                const fecha = new Date(item.fecha);
+                return fecha >= inicioSemana;
+            }).length;
+            
+            document.getElementById('contadorHoy').textContent = hoy;
+            document.getElementById('contadorSemana').textContent = semana;
+            document.getElementById('contadorTotal').textContent = state.historial.length;
+        }
+        
+        // Toggle de tiempos
+        function toggleTiempos() {
+            const tipo = document.querySelector('input[name="tipo"]:checked').value;
+            if (tipo === 'ingresa') {
+                contenedorTiempos.style.maxHeight = '200px';
+                contenedorTiempos.style.opacity = '1';
+                contenedorTiempos.style.pointerEvents = 'auto';
+            } else {
+                contenedorTiempos.style.maxHeight = '0px';
+                contenedorTiempos.style.opacity = '0';
+                contenedorTiempos.style.pointerEvents = 'none';
+                duracionInfo.classList.add('hidden');
+            }
+        }
+        
+        // Calcular duración
+        function calcularDuracion() {
+            if (!horaInicio.value || !horaFin.value) {
+                duracionInfo.classList.add('hidden');
+                return;
+            }
+            
+            const [h1, m1] = horaInicio.value.split(':').map(Number);
+            const [h2, m2] = horaFin.value.split(':').map(Number);
+            
+            let minutos = (h2 * 60 + m2) - (h1 * 60 + m1);
+            if (minutos < 0) minutos += 24 * 60; // Día siguiente
+            
+            const horas = Math.floor(minutos / 60);
+            const mins = minutos % 60;
+            
+            duracionTexto.textContent = `Duración: ${horas}h ${mins}m`;
+            duracionInfo.classList.remove('hidden');
+        }
+        
+        // Generar texto
+        function generarTexto() {
+            const valHoraReg = horaReg.value || '00:00';
+            const valControlInterno = controlInterno.value.trim() || '__________';
+            const valPolicia = policia.value.trim() || '__________';
+            const tipo = document.querySelector('input[name="tipo"]:checked').value;
+            
+            let texto = `A las ${valHoraReg} Hs. CCTV recibe llamada de ${valControlInterno}, informando que `;
+            
+            if (tipo === 'ingresa') {
+                const valHoraInicio = horaInicio.value || '00:00';
+                const valHoraFin = horaFin.value || '00:00';
+                texto += `ingresa Adicional de La Policia ${valPolicia}, el cual prestara servicio como Control Interno desde las horas ${valHoraInicio} hasta las horas ${valHoraFin}.-`;
+            } else {
+                texto += `se retira Adicional de La Policia ${valPolicia}.-`;
+            }
+            
+            resultado.value = texto;
+            state.originalText = texto;
+            actualizarEstadoTexto();
+        }
+        
+        function actualizarEstadoTexto() {
+            const length = resultado.value.length;
+            contadorCaracteres.textContent = `${length} caracteres`;
+            
+            if (length > 0) {
+                estadoTexto.classList.remove('hidden');
+            } else {
+                estadoTexto.classList.add('hidden');
+            }
+        }
+        
+        // Copiar al portapapeles
+        async function copiarTexto() {
+            if (!resultado.value.trim()) {
+                showToast('No hay texto para copiar', 'warning');
+                return;
+            }
+            
+            const texto = resultado.value;
+            let copiado = false;
+            
+            try {
+                if (navigator.clipboard && window.isSecureContext) {
+                    await navigator.clipboard.writeText(texto);
+                    copiado = true;
                 }
-            };
-
-            // Guardar nombres en el navegador
-            const guardarDatos = () => {
-                localStorage.setItem('cctv_controlInterno', controlInterno.value);
-                localStorage.setItem('cctv_policia', policia.value);
-            };
-
-            // Redacción del texto
-            const generarTexto = () => {
-                const valHoraReg = horaReg.value || '00:00';
-                const valControlInterno = controlInterno.value.trim() || '__________';
-                const valPolicia = policia.value.trim() || '__________';
-                const tipo = document.querySelector('input[name="tipo"]:checked').value;
-                
-                let texto = `A las ${valHoraReg} Hs. CCTV recibe llamada de ${valControlInterno}, informando que `;
-
-                if (tipo === 'ingresa') {
-                    const valHoraInicio = horaInicio.value || '00:00';
-                    const valHoraFin = horaFin.value || '00:00';
-                    texto += `ingresa Adicional de La Policia ${valPolicia}, el cual prestara servicio como Control Interno desde las horas ${valHoraInicio} hasta las horas ${valHoraFin}.-`;
-                } else {
-                    texto += `se retira Adicional de La Policia ${valPolicia}.-`;
-                }
-
-                resultado.value = texto;
-            };
-
-            // Copiado asíncrono al portapapeles moderno (con fallback local)
-            const copiarTexto = async () => {
-                const texto = resultado.value;
-                let copiado = false;
-                
+            } catch (err) {
+                console.warn('API Clipboard falló:', err);
+            }
+            
+            if (!copiado) {
                 try {
-                    // Intento 1: API Moderna (si está disponible y permitida)
-                    if (navigator.clipboard && window.isSecureContext) {
-                        await navigator.clipboard.writeText(texto);
-                        copiado = true;
-                    }
+                    resultado.select();
+                    resultado.setSelectionRange(0, 99999);
+                    const exito = document.execCommand('copy');
+                    window.getSelection().removeAllRanges();
+                    
+                    if (!exito) throw new Error('Falló el copiado');
+                    copiado = true;
                 } catch (err) {
-                    console.warn("API Clipboard falló, usando método clásico...", err);
+                    console.error('Error en copiado:', err);
+                    showToast('Error al copiar. Intente manualmente (Ctrl+C)', 'error');
+                    return;
                 }
-
-                // Intento 2: Método clásico (Fallback)
-                if (!copiado) {
-                    try {
-                        resultado.select();
-                        resultado.setSelectionRange(0, 99999); // Para móviles
-                        const exito = document.execCommand("copy");
-                        window.getSelection().removeAllRanges(); // Quitar selección
-                        
-                        if (!exito) throw new Error("execCommand devolvió false");
-                    } catch (err) {
-                        console.error('Error en fallback de copiado: ', err);
-                        alert("Tu navegador bloqueó el copiado automático. Por favor selecciona el texto generado y presiona Ctrl+C (o mantén presionado para copiar).");
-                        return; // Termina la función aquí para no mostrar el botón verde
-                    }
-                }
+            }
+            
+            if (copiado) {
+                // Feedback visual
+                const btn = btnCopiar;
+                const originalHTML = btn.innerHTML;
                 
-                // Feedback visual de éxito
-                const span = btnCopiar.querySelector('span');
-                const icon = btnCopiar.querySelector('i');
-                const originalText = span.innerText;
-                const originalClass = btnCopiar.className;
-
-                span.innerText = "¡Copiado!";
-                btnCopiar.className = "w-full sm:w-2/3 bg-green-600 hover:bg-green-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-md transition duration-200 flex items-center justify-center gap-2 transform active:scale-95 focus:ring-4 focus:ring-green-500";
-                icon.setAttribute('data-lucide', 'check');
+                btn.innerHTML = `
+                    <i data-lucide="check" class="w-4 h-4"></i>
+                    <span>¡Copiado!</span>
+                `;
+                btn.classList.add('bg-green-600', 'hover:bg-green-700');
+                btn.classList.remove('bg-indigo-600', 'hover:bg-indigo-700');
                 lucide.createIcons();
-
+                
+                // Guardar en historial
+                guardarEnHistorial(texto);
+                
                 setTimeout(() => {
-                    span.innerText = originalText;
-                    btnCopiar.className = originalClass;
-                    icon.setAttribute('data-lucide', 'copy');
+                    btn.innerHTML = originalHTML;
+                    btn.classList.add('bg-indigo-600', 'hover:bg-indigo-700');
+                    btn.classList.remove('bg-green-600', 'hover:bg-green-700');
                     lucide.createIcons();
                 }, 2000);
-            };
-
-            // Limpiar datos
-            const limpiarFormulario = () => {
-                controlInterno.value = '';
-                policia.value = '';
-                localStorage.removeItem('cctv_controlInterno');
-                localStorage.removeItem('cctv_policia');
-                const now = new Date();
-                horaReg.value = formatTime(now);
-                document.querySelector('input[name="tipo"][value="ingresa"]').checked = true;
                 
-                toggleTiempos();
-                generarTexto();
+                showToast('Texto copiado exitosamente', 'success');
+            }
+        }
+        
+        // Descargar como TXT
+        function descargarTexto() {
+            if (!resultado.value.trim()) {
+                showToast('No hay texto para descargar', 'warning');
+                return;
+            }
+            
+            const blob = new Blob([resultado.value], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `registro-policial-${new Date().toISOString().split('T')[0]}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            showToast('Archivo descargado', 'success');
+        }
+        
+        // Previsualizar
+        function previsualizar() {
+            if (!resultado.value.trim()) {
+                showToast('No hay texto para previsualizar', 'warning');
+                return;
+            }
+            
+            previewContent.textContent = resultado.value;
+            modalPreview.classList.remove('hidden');
+            modalPreview.classList.add('flex');
+        }
+        
+        window.cerrarModal = function() {
+            modalPreview.classList.add('hidden');
+            modalPreview.classList.remove('flex');
+        };
+        
+        // Limpiar
+        function limpiarFormulario() {
+            if (resultado.value && !confirm('¿Está seguro de limpiar todos los campos?')) {
+                return;
+            }
+            
+            controlInterno.value = '';
+            policia.value = '';
+            localStorage.removeItem(CONFIG.autoSaveKey);
+            
+            const now = new Date();
+            horaReg.value = formatTime(now);
+            horaInicio.value = formatTime(now);
+            
+            const later = new Date(now.getTime() + 8 * 60 * 60 * 1000);
+            horaFin.value = formatTime(later);
+            
+            document.querySelector('input[name="tipo"][value="ingresa"]').checked = true;
+            
+            toggleTiempos();
+            duracionInfo.classList.add('hidden');
+            generarTexto();
+            showToast('Formulario limpiado', 'info');
+        }
+        
+        // Toast notifications
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            
+            const colors = {
+                success: 'bg-green-100 text-green-800 border-green-300',
+                error: 'bg-red-100 text-red-800 border-red-300',
+                warning: 'bg-yellow-100 text-yellow-800 border-yellow-300',
+                info: 'bg-blue-100 text-blue-800 border-blue-300'
             };
-
-            // Configurar Event Listeners (eficiencia y separación de lógica)
+            
+            const toast = document.createElement('div');
+            toast.className = `fade-in ${colors[type]} px-4 py-3 rounded-lg shadow-lg flex items-center gap-2 border`;
+            toast.innerHTML = `
+                <i data-lucide="${type === 'success' ? 'check-circle' : type === 'error' ? 'x-circle' : 'alert-circle'}" class="w-4 h-4"></i>
+                <span>${message}</span>
+            `;
+            
+            container.appendChild(toast);
+            lucide.createIcons({ elements: [toast] });
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.3s';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+        
+        // Event Listeners
+        function setupEventListeners() {
+            // Radio buttons
             radiosTipo.forEach(radio => radio.addEventListener('change', () => {
                 toggleTiempos();
                 generarTexto();
             }));
-
-            [controlInterno, policia].forEach(input => input.addEventListener('input', () => {
-                guardarDatos();
-                generarTexto();
-            }));
-
-            [horaReg, horaInicio, horaFin].forEach(input => input.addEventListener('change', generarTexto));
             
-            // Seleccionar todo el texto al hacer click (Mejora de UX)
-            allInputs.forEach(input => input.addEventListener('focus', function() { this.select(); }));
-
+            // Inputs de texto
+            [controlInterno, policia].forEach(input => {
+                input.addEventListener('input', () => {
+                    guardarConfiguracion();
+                    generarTexto();
+                });
+            });
+            
+            // Inputs de tiempo
+            [horaReg, horaInicio, horaFin].forEach(input => {
+                input.addEventListener('change', generarTexto);
+            });
+            
+            [horaInicio, horaFin].forEach(input => {
+                input.addEventListener('change', calcularDuracion);
+            });
+            
+            // Textarea
+            resultado.addEventListener('input', actualizarEstadoTexto);
+            
+            // Botones
             btnCopiar.addEventListener('click', copiarTexto);
             btnLimpiar.addEventListener('click', limpiarFormulario);
-            btnActualizar.addEventListener('click', generarTexto);
-
-            // Disparar inicio
-            init();
-        });
+            btnRestaurar.addEventListener('click', () => {
+                resultado.value = state.originalText;
+                actualizarEstadoTexto();
+                showToast('Texto restaurado', 'info');
+            });
+            btnPrevisualizar.addEventListener('click', previsualizar);
+            btnDescargar.addEventListener('click', descargarTexto);
+            
+            // Atajos de teclado
+            document.addEventListener('keydown', (e) => {
+                if (e.ctrlKey && e.key === 'c' && document.activeElement !== resultado) {
+                    e.preventDefault();
+                    copiarTexto();
+                }
+                
+                if (e.ctrlKey && e.key === 's') {
+                    e.preventDefault();
+                    descargarTexto();
+                }
+            });
+            
+            // Seleccionar todo al hacer foco
+            document.querySelectorAll('input[type="text"], input[type="time"]').forEach(input => {
+                input.addEventListener('focus', function() { this.select(); });
+            });
+            
+            // Cerrar modal con ESC
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    window.cerrarModal();
+                }
+            });
+        }
+        
+        // Inicializar todo
+        setupEventListeners();
+        init();
+    })();
     </script>
 </body>
 </html>
