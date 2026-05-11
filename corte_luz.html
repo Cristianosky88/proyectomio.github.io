@@ -22,18 +22,24 @@
     <div class="max-w-5xl mx-auto bg-white rounded-xl shadow-xl overflow-hidden border border-slate-200">
         
         <!-- Header -->
-        <div class="bg-slate-900 p-5 text-white flex justify-between items-center">
+        <div class="bg-slate-900 p-5 text-white flex justify-between items-center rounded-t-xl mb-1 shadow-md">
             <div class="flex items-center gap-3">
                 <div class="bg-indigo-600 p-2 rounded-lg">
                     <i data-lucide="zap" class="w-6 h-6 text-white"></i>
                 </div>
                 <div>
                     <h1 class="text-xl font-bold">Corte de Suministro</h1>
+                    <p class="text-slate-400 text-xs uppercase tracking-wider">Reporte de Corte de Luz</p>
                 </div>
             </div>
-            <div class="flex items-center gap-3 bg-slate-800 px-4 py-2 rounded-lg border border-slate-700">
-                <span class="text-xs font-semibold text-red-400">Hora Corte:</span>
-                <input type="time" id="horaCorte" oninput="sincronizarTodo()" class="bg-transparent text-white font-mono outline-none">
+            <div class="flex items-center justify-end gap-3 flex-wrap">
+                <div class="flex items-center gap-3 bg-slate-800 px-4 py-2 rounded-lg border border-slate-700">
+                    <span class="text-xs font-semibold text-red-400">Hora Corte:</span>
+                    <input type="time" id="horaCorte" oninput="sincronizarTodo()" class="bg-transparent text-white font-mono outline-none">
+                </div>
+                <a href="index.html" class="p-2 hover:bg-slate-700 rounded-lg transition inline-flex items-center justify-center text-white" title="Volver a Inicio">
+                    <i data-lucide="home" class="w-5 h-5 text-white"></i>
+                </a>
             </div>
         </div>
 
@@ -108,9 +114,9 @@
                         <i data-lucide="trash-2" class="w-4 h-4"></i>
                         <span>Limpiar</span>
                     </button>
-                    <button type="button" onclick="window.location.href='index.html'" class="px-4 py-2 bg-slate-800 text-white hover:bg-slate-700 rounded font-semibold text-sm transition flex items-center justify-center gap-2">
-                        <i data-lucide="home" class="w-4 h-4"></i>
-                        <span>Inicio</span>
+                    <button type="button" onclick="window.print()" class="px-4 py-2 bg-slate-600 text-white hover:bg-slate-700 rounded font-semibold text-sm transition flex items-center justify-center gap-2">
+                        <i data-lucide="printer" class="w-4 h-4"></i>
+                        <span>Imprimir</span>
                     </button>
                 </div>
             </div>

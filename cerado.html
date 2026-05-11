@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cerados de Maquinas</title>
+    <title>Cerado de Máquinas</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -15,6 +15,65 @@
         textarea { resize: none; }
         .fade-in { animation: fadeIn 0.3s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Nuevos estilos mejorados */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        
+        .btn-hover-effect {
+            transition: all 0.2s ease-in-out;
+        }
+        .btn-hover-effect:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .input-focus-effect:focus {
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .machine-card {
+            transition: all 0.2s ease-in-out;
+        }
+        .machine-card:hover {
+            border-color: #93c5fd;
+            box-shadow: 0 2px 4px rgba(59, 130, 246, 0.1);
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        .slide-in {
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            body {
+                background-color: white;
+            }
+        }
     </style>
 </head>
 <body class="p-4 md:p-8 text-slate-800">
@@ -22,19 +81,28 @@
     <div class="max-w-5xl mx-auto bg-white rounded-xl shadow-xl overflow-hidden border border-slate-200">
         
         <!-- Header -->
-        <div class="bg-slate-900 p-5 text-white flex justify-between items-center">
+        <div class="bg-slate-900 p-5 text-white flex justify-between items-center rounded-t-xl">
             <div class="flex items-center gap-3">
                 <div class="bg-indigo-600 p-2 rounded-lg">
                     <i data-lucide="wrench" class="w-6 h-6 text-white"></i>
                 </div>
                 <div>
-                    <h1 class="text-xl font-bold">Cerados de Maquinas</h1>
-                    <p class="text-slate-400 text-xs uppercase tracking-wider">Sistema de Registro</p>
+                    <h1 class="text-xl font-bold">Cerado de Máquinas</h1>
+                    <p class="text-slate-400 text-xs uppercase tracking-wider">Reporte Técnico</p>
                 </div>
             </div>
-            <div class="flex items-center gap-3 bg-slate-800 px-4 py-2 rounded-lg border border-slate-700">
-                <span class="text-xs font-semibold text-blue-400">Hora Llamada:</span>
-                <input type="time" id="horaLlamada" oninput="sincronizarTodo()" class="bg-transparent text-white font-mono outline-none">
+            
+            <div class="flex items-center gap-3">
+                <div class="flex items-center gap-2 bg-slate-800 px-4 py-2 rounded-lg border border-slate-700">
+                    <span class="text-xs font-semibold text-blue-400">Hora Llamada:</span>
+                    <input type="time" id="horaLlamada" oninput="sincronizarTodo()" class="bg-transparent text-white font-mono outline-none">
+                </div>
+                <button onclick="volverAlInicio()" class="btn-hover-effect px-3 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg transition" title="Resetear formulario">
+                    <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                </button>
+                <a href="index.html" class="no-print text-indigo-400 hover:text-indigo-300 transition-colors flex items-center justify-center p-2" title="Volver a Inicio">
+                    <i data-lucide="home" class="w-6 h-6"></i>
+                </a>
             </div>
         </div>
 
@@ -48,7 +116,7 @@
                     <div class="space-y-4">
                         <div>
                             <label class="block text-xs font-semibold text-slate-500 mb-1">📋 Tipo de Tarea</label>
-                            <select id="tipoTarea" onchange="sincronizarTodo()" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                            <select id="tipoTarea" onchange="sincronizarTodo()" class="input-focus-effect w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all">
                                 <option value="Cerado">Cerado de Máquina</option>
                                 <option value="Mantenimiento Preventivo">Mantenimiento Preventivo</option>
                                 <option value="Reparación Técnica">Reparación Técnica</option>
@@ -58,12 +126,12 @@
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-500 mb-1">👤 Técnico</label>
-                            <input type="text" id="tecnico" list="tecnicos-list" placeholder="Ej: Mansilla Nicolás" oninput="sincronizarTodo()" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                            <input type="text" id="tecnico" list="tecnicos-list" placeholder="Ej: Nombre Apellido" oninput="sincronizarTodo()" class="input-focus-effect w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all">
                             <datalist id="tecnicos-list">
                                 <option value="Mansilla Nicolás">
-                                <option value="Perez Juan">
-                                <option value="Rodriguez Luis">
-                                <option value="Gonzalez Carlos">
+                                <option value="Pérez Juan">
+                                <option value="Rodríguez Luis">
+                                <option value="González Carlos">
                             </datalist>
                         </div>
                     </div>
@@ -76,22 +144,50 @@
                         Carga Masiva (Rango)
                     </h3>
                     <div class="grid grid-cols-2 gap-2 mb-3">
-                        <input type="number" id="rangoInicio" placeholder="Desde ID" class="p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-blue-500 outline-none">
-                        <input type="number" id="rangoFin" placeholder="Hasta ID" class="p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                        <input type="number" id="rangoInicio" placeholder="Desde ID" class="input-focus-effect p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+                        <input type="number" id="rangoFin" placeholder="Hasta ID" class="input-focus-effect p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all">
                     </div>
-                    <button onclick="aplicarRango()" class="w-full bg-blue-600 text-white py-2 rounded font-semibold text-sm hover:bg-blue-700 transition">
+                    <button onclick="aplicarRango()" class="btn-hover-effect w-full bg-blue-600 text-white py-2 rounded font-semibold text-sm hover:bg-blue-700 transition">
                         Generar Bloque
                     </button>
+                    <div class="mt-3 flex gap-2">
+                        <button onclick="agregarFila()" class="btn-hover-effect flex-1 px-3 py-1.5 bg-green-600 text-white rounded text-xs font-semibold hover:bg-green-700 transition flex items-center justify-center gap-1">
+                            <i data-lucide="plus" class="w-3 h-3"></i>
+                            Añadir Máquina
+                        </button>
+                        <button onclick="duplicarUltima()" class="btn-hover-effect flex-1 px-3 py-1.5 bg-purple-600 text-white rounded text-xs font-semibold hover:bg-purple-700 transition flex items-center justify-center gap-1">
+                            <i data-lucide="copy" class="w-3 h-3"></i>
+                            Duplicar Última
+                        </button>
+                    </div>
                 </div>
 
-                <div class="flex gap-2 pt-4">
-                    <button type="button" onclick="limpiarSeccion()" class="flex-1 px-4 py-2 bg-red-600 text-white hover:bg-red-700 rounded font-semibold text-sm transition flex items-center justify-center gap-2">
+                <!-- Plantillas rápidas -->
+                <div class="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
+                    <h3 class="font-bold text-slate-700 text-sm mb-3 flex items-center gap-2">
+                        <i data-lucide="file-text" class="w-4 h-4"></i>
+                        Plantillas Rápidas
+                    </h3>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="cargarPlantilla('cerado')" class="btn-hover-effect px-2 py-1.5 bg-slate-100 hover:bg-slate-200 rounded text-xs font-medium transition text-slate-700">
+                            Cerado Estándar
+                        </button>
+                        <button onclick="cargarPlantilla('mantenimiento')" class="btn-hover-effect px-2 py-1.5 bg-slate-100 hover:bg-slate-200 rounded text-xs font-medium transition text-slate-700">
+                            Mantenimiento
+                        </button>
+                        <button onclick="cargarPlantilla('monitor')" class="btn-hover-effect px-2 py-1.5 bg-slate-100 hover:bg-slate-200 rounded text-xs font-medium transition text-slate-700">
+                            Cambio Monitor
+                        </button>
+                        <button onclick="cargarPlantilla('reparacion')" class="btn-hover-effect px-2 py-1.5 bg-slate-100 hover:bg-slate-200 rounded text-xs font-medium transition text-slate-700">
+                            Reparación
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex gap-2 pt-4 no-print">
+                    <button type="button" onclick="limpiarSeccion()" class="btn-hover-effect flex-1 px-4 py-2 bg-red-600 text-white hover:bg-red-700 rounded font-semibold text-sm transition flex items-center justify-center gap-2">
                         <i data-lucide="trash-2" class="w-4 h-4"></i>
                         <span>Limpiar</span>
-                    </button>
-                    <button type="button" onclick="window.location.href='index.html'" class="px-4 py-2 bg-slate-800 text-white hover:bg-slate-700 rounded font-semibold text-sm transition flex items-center justify-center gap-2">
-                        <i data-lucide="home" class="w-4 h-4"></i>
-                        <span>Inicio</span>
                     </button>
                 </div>
             </div>
@@ -103,12 +199,17 @@
                     <div class="flex-shrink-0 mb-4">
                         <div class="flex items-center justify-between mb-3">
                             <h2 class="font-bold text-slate-800 text-sm">📋 Cronología de Trabajo</h2>
-                            <button onclick="agregarFila()" class="px-3 py-1.5 bg-blue-600 text-white rounded text-xs font-semibold hover:bg-blue-700 transition flex items-center gap-1">
-                                <i data-lucide="plus" class="w-3 h-3"></i>
-                                Añadir Máquina
-                            </button>
+                            <div class="flex gap-2">
+                                <span class="text-xs text-slate-500 flex items-center gap-1">
+                                    <span id="contadorMaquinas">0</span> máquinas
+                                </span>
+                                <button onclick="agregarFila()" class="btn-hover-effect px-3 py-1.5 bg-blue-600 text-white rounded text-xs font-semibold hover:bg-blue-700 transition flex items-center gap-1">
+                                    <i data-lucide="plus" class="w-3 h-3"></i>
+                                    Añadir Máquina
+                                </button>
+                            </div>
                         </div>
-                        <div id="contenedorMaquinas" class="space-y-2 h-48 overflow-y-auto bg-white rounded-lg shadow-sm border border-slate-300 p-3">
+                        <div id="contenedorMaquinas" class="custom-scrollbar space-y-2 h-48 overflow-y-auto bg-white rounded-lg shadow-sm border border-slate-300 p-3">
                             <!-- Las máquinas se insertan aquí -->
                         </div>
                     </div>
@@ -117,14 +218,22 @@
                     <div class="flex-1 flex flex-col min-h-0">
                         <div class="flex items-center justify-between mb-3 flex-shrink-0">
                             <h2 class="font-bold text-slate-800 text-sm">📄 Texto Generado</h2>
-                            <button onclick="copiarTexto()" class="px-3 py-1.5 bg-green-600 text-white hover:bg-green-700 rounded text-xs font-semibold transition flex items-center gap-1">
-                                <i data-lucide="copy" class="w-3 h-3"></i>
-                                Copiar
-                            </button>
+                            <div class="flex gap-2">
+                                <button onclick="copiarTexto()" class="btn-hover-effect px-3 py-1.5 bg-green-600 text-white hover:bg-green-700 rounded text-xs font-semibold transition flex items-center gap-1">
+                                    <i data-lucide="copy" class="w-3 h-3"></i>
+                                    Copiar
+                                </button>
+                            </div>
                         </div>
                         
                         <div class="bg-white rounded-lg shadow-sm border border-slate-300 p-4 flex-1 min-h-0">
-                            <textarea id="output" class="report-font w-full h-full p-3 bg-slate-50 border border-slate-200 rounded text-sm outline-none focus:bg-white focus:ring-2 focus:ring-blue-100 transition-all resize-none" spellcheck="false"></textarea>
+                            <textarea id="output" class="report-font w-full h-full p-3 bg-slate-50 border border-slate-200 rounded text-sm outline-none focus:bg-white focus:ring-2 focus:ring-blue-100 transition-all resize-none" spellcheck="false" readonly></textarea>
+                        </div>
+                        
+                        <!-- Barra de estado -->
+                        <div class="mt-2 flex justify-between items-center text-xs text-slate-500">
+                            <span id="estadoTexto">Listo para generar</span>
+                            <span id="contadorCaracteres">0 caracteres</span>
                         </div>
                     </div>
                 </div>
@@ -140,173 +249,355 @@
 
 <script>
     lucide.createIcons();
-        function getHoraActual(offsetMinutos = 0) {
-            const ahora = new Date();
-            ahora.setMinutes(ahora.getMinutes() + offsetMinutos);
-            return `${String(ahora.getHours()).padStart(2, '0')}:${String(ahora.getMinutes()).padStart(2, '0')}`;
-        }
+    
+    // ==================== FUNCIONES MEJORADAS ====================
+    
+    function getHoraActual(offsetMinutos = 0) {
+        const ahora = new Date();
+        ahora.setMinutes(ahora.getMinutes() + offsetMinutos);
+        return `${String(ahora.getHours()).padStart(2, '0')}:${String(ahora.getMinutes()).padStart(2, '0')}`;
+    }
 
-        function ponerHoraActual(id) {
-            const el = document.getElementById(id);
-            if(el) {
-                el.value = getHoraActual();
-                sincronizarTodo();
-            }
-        }
-
-        function ponerHoraEnElemento(btn) {
-            const input = btn.previousElementSibling;
-            input.value = getHoraActual();
+    function ponerHoraActual(id) {
+        const el = document.getElementById(id);
+        if(el) {
+            el.value = getHoraActual();
             sincronizarTodo();
         }
+    }
 
-        function agregarFila(idMaq = "", hInicio = "", hFin = "", nroInf = "") {
-            const contenedor = document.getElementById('contenedorMaquinas');
-            const div = document.createElement('div');
-            div.className = "p-3 bg-slate-50 rounded border border-slate-200 space-y-2";
-            div.innerHTML = `
-                <div class="grid grid-cols-12 gap-2 items-end">
-                    <div class="col-span-12">
-                        <label class="block text-[9px] font-semibold text-slate-500 mb-1">ID Máquina</label>
-                        <input type="text" class="maq-id w-full p-1.5 border border-slate-300 rounded text-xs outline-none focus:ring-1 focus:ring-blue-500" value="${idMaq}" oninput="sincronizarTodo()" placeholder="Ej: 110490-06">
-                    </div>
-                    
-                    <div class="col-span-6">
-                        <label class="block text-[9px] font-semibold text-slate-500 mb-1">⏰ Inicio</label>
-                        <input type="time" class="maq-inicio w-full p-1.5 border border-slate-300 rounded text-xs outline-none focus:ring-1 focus:ring-blue-500" value="${hInicio}" oninput="sincronizarTodo()">
-                    </div>
-                    
-                    <div class="col-span-6">
-                        <label class="block text-[9px] font-semibold text-slate-500 mb-1">⏰ Fin</label>
-                        <input type="time" class="maq-fin w-full p-1.5 border border-slate-300 rounded text-xs outline-none focus:ring-1 focus:ring-blue-500" value="${hFin}" oninput="sincronizarTodo()">
-                    </div>
-                    
-                    <div class="col-span-8">
-                        <label class="block text-[9px] font-semibold text-slate-500 mb-1">📹 Estado Cámara</label>
-                        <select class="maq-estado w-full p-1.5 border border-slate-300 rounded text-xs outline-none focus:ring-1 focus:ring-blue-500" onchange="sincronizarTodo()">
-                            <option value="Correcta">Correcta</option>
-                            <option value="Intermitente">Intermitente</option>
-                            <option value="Sin Señal">Sin Señal</option>
-                            <option value="Ángulo Obstruido">Ángulo Obstruido</option>
-                        </select>
-                    </div>
-                    
-                    <div class="col-span-4">
-                        <label class="block text-[9px] font-semibold text-slate-500 mb-1">📋 Informe Nº</label>
-                        <input type="text" class="maq-informe w-full p-1.5 border border-slate-300 rounded text-xs outline-none focus:ring-1 focus:ring-blue-500" value="${nroInf}" oninput="sincronizarTodo()" placeholder="12345">
+    function ponerHoraEnElemento(btn) {
+        const input = btn.previousElementSibling;
+        input.value = getHoraActual();
+        sincronizarTodo();
+    }
+
+    function agregarFila(idMaq = "", hInicio = "", hFin = "", nroInf = "") {
+        const contenedor = document.getElementById('contenedorMaquinas');
+        const div = document.createElement('div');
+        div.className = "machine-card p-3 bg-slate-50 rounded border border-slate-200 space-y-2 slide-in";
+        div.innerHTML = `
+            <div class="grid grid-cols-12 gap-2 items-end">
+                <div class="col-span-12">
+                    <label class="block text-[9px] font-semibold text-slate-500 mb-1">ID Máquina</label>
+                    <input type="text" class="maq-id input-focus-effect w-full p-1.5 border border-slate-300 rounded text-xs outline-none focus:ring-1 focus:ring-blue-500 transition-all" value="${idMaq}" oninput="sincronizarTodo()" placeholder="Ej: 110490-06">
+                </div>
+                
+                <div class="col-span-6">
+                    <label class="block text-[9px] font-semibold text-slate-500 mb-1">⏰ Inicio</label>
+                    <div class="flex gap-1">
+                        <input type="time" class="maq-inicio input-focus-effect w-full p-1.5 border border-slate-300 rounded text-xs outline-none focus:ring-1 focus:ring-blue-500 transition-all" value="${hInicio}" oninput="sincronizarTodo()">
+                        <button onclick="this.previousElementSibling.value = getHoraActual(); sincronizarTodo();" class="btn-hover-effect px-1.5 bg-slate-200 hover:bg-slate-300 rounded text-xs transition" title="Ahora">
+                            <i data-lucide="clock" class="w-3 h-3"></i>
+                        </button>
                     </div>
                 </div>
                 
-                <button onclick="this.parentElement.remove(); sincronizarTodo(); lucide.createIcons();" class="w-full px-2 py-1 text-xs text-red-600 hover:bg-red-50 rounded transition flex items-center justify-center gap-1">
+                <div class="col-span-6">
+                    <label class="block text-[9px] font-semibold text-slate-500 mb-1">⏰ Fin</label>
+                    <div class="flex gap-1">
+                        <input type="time" class="maq-fin input-focus-effect w-full p-1.5 border border-slate-300 rounded text-xs outline-none focus:ring-1 focus:ring-blue-500 transition-all" value="${hFin}" oninput="sincronizarTodo()">
+                        <button onclick="this.previousElementSibling.value = getHoraActual(); sincronizarTodo();" class="btn-hover-effect px-1.5 bg-slate-200 hover:bg-slate-300 rounded text-xs transition" title="Ahora">
+                            <i data-lucide="clock" class="w-3 h-3"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="col-span-8">
+                    <label class="block text-[9px] font-semibold text-slate-500 mb-1">📹 Estado Cámara</label>
+                    <select class="maq-estado input-focus-effect w-full p-1.5 border border-slate-300 rounded text-xs outline-none focus:ring-1 focus:ring-blue-500 transition-all" onchange="sincronizarTodo()">
+                        <option value="Correcta">Correcta</option>
+                        <option value="Intermitente">Intermitente</option>
+                        <option value="Sin Señal">Sin Señal</option>
+                        <option value="Ángulo Obstruido">Ángulo Obstruido</option>
+                    </select>
+                </div>
+                
+                <div class="col-span-4">
+                    <label class="block text-[9px] font-semibold text-slate-500 mb-1">📋 Informe Nº</label>
+                    <input type="text" class="maq-informe input-focus-effect w-full p-1.5 border border-slate-300 rounded text-xs outline-none focus:ring-1 focus:ring-blue-500 transition-all" value="${nroInf}" oninput="sincronizarTodo()" placeholder="12345">
+                </div>
+            </div>
+            
+            <div class="flex gap-1">
+                <button onclick="this.parentElement.parentElement.remove(); sincronizarTodo(); actualizarContador();" class="flex-1 px-2 py-1 text-xs text-red-600 hover:bg-red-50 rounded transition flex items-center justify-center gap-1">
                     <i data-lucide="trash-2" class="w-3 h-3"></i>
                     <span>Eliminar</span>
                 </button>
-            `;
-            contenedor.appendChild(div);
-            lucide.createIcons();
-            sincronizarTodo();
-        }
+                <button onclick="duplicarFila(this)" class="flex-1 px-2 py-1 text-xs text-blue-600 hover:bg-blue-50 rounded transition flex items-center justify-center gap-1">
+                    <i data-lucide="copy" class="w-3 h-3"></i>
+                    <span>Duplicar</span>
+                </button>
+            </div>
+        `;
+        contenedor.appendChild(div);
+        lucide.createIcons();
+        sincronizarTodo();
+        actualizarContador();
+    }
 
-        function aplicarRango() {
-            const inicio = parseInt(document.getElementById('rangoInicio').value);
-            const fin = parseInt(document.getElementById('rangoFin').value);
-            if(!inicio || !fin || fin < inicio) return;
-            for(let i = inicio; i <= fin; i++) {
-                agregarFila(i.toString());
+    function aplicarRango() {
+        const inicio = parseInt(document.getElementById('rangoInicio').value);
+        const fin = parseInt(document.getElementById('rangoFin').value);
+        
+        if(!inicio || !fin) {
+            showNotification('Complete ambos campos del rango', 'error');
+            return;
+        }
+        
+        if(fin < inicio) {
+            showNotification('El valor final debe ser mayor al inicial', 'error');
+            return;
+        }
+        
+        if(fin - inicio > 50) {
+            if(!confirm('¿Está seguro de generar más de 50 máquinas? Esto puede ralentizar el sistema.')) {
+                return;
             }
         }
-
-        function sincronizarTodo() {
-            const hLlamada = document.getElementById('horaLlamada').value;
-            const tecnico = document.getElementById('tecnico').value || "[Nombre del Técnico]";
-            const tarea = document.getElementById('tipoTarea').value;
-            
-            const maqIds = Array.from(document.querySelectorAll('.maq-id')).map(i => i.value);
-            const maqInicios = Array.from(document.querySelectorAll('.maq-inicio')).map(i => i.value);
-            const maqFines = Array.from(document.querySelectorAll('.maq-fin')).map(i => i.value);
-            const maqEstados = Array.from(document.querySelectorAll('.maq-estado')).map(i => i.value);
-            const maqInformes = Array.from(document.querySelectorAll('.maq-informe')).map(i => i.value);
-
-            // Cabecera Dinámica
-            const listaMaq = maqIds.filter(id => id).map(id => `Máq. ${id}`).join(' y ');
-            
-            // Lógica de estado de cámara global basado en la primera máquina o si hay fallos
-            const algunFallo = maqEstados.some(e => e !== 'Correcta');
-            const respuestaCamaras = algunFallo ? 
-                `CCTV le informa que se observan anomalías en algunas cámaras durante el procedimiento.-` : 
-                `CCTV le responde que las cámaras y conexión funcionan correctamente.-`;
-
-            let texto = `A las ${hLlamada} Hs. CCTV recibe llamada de Técnico ${tecnico}, solicita confirmación de visualización de cámara y conexión online para realizar ${tarea} de ${listaMaq || "[Máquinas]"}.\n` +
-                        `${respuestaCamaras}\n\n`;
-
-            // Detalle por máquina
-            maqIds.forEach((id, index) => {
-                if (id) {
-                    const hIni = maqInicios[index];
-                    const hFin = maqFines[index];
-                    const estado = maqEstados[index];
-                    const inf = maqInformes[index];
-                    
-                    if (hIni) {
-                        texto += `A las ${hIni} Hs. Técnico ${tecnico}, informa que inicia ${tarea} de Máquina ${id}.-\n`;
-                    }
-                    if (hFin) {
-                        let textoEstado = estado === 'Correcta' ? '' : ` (Visualización: ${estado})`;
-                        texto += `A las ${hFin} Hs. Técnico ${tecnico}, informa que finalizó ${tarea} de Máquina ${id} con Informe Técnico Nº ${inf || "[Nº]"}${textoEstado}.-\n\n`;
-                    }
-                }
-            });
-
-            document.getElementById('output').value = texto.trim();
+        
+        for(let i = inicio; i <= fin; i++) {
+            agregarFila(i.toString());
         }
+        
+        showNotification(`Generadas ${fin - inicio + 1} máquinas correctamente`);
+    }
 
-        function limpiarSeccion() {
+    function duplicarFila(btn) {
+        const fila = btn.parentElement.parentElement;
+        const id = fila.querySelector('.maq-id').value;
+        const inicio = fila.querySelector('.maq-inicio').value;
+        const fin = fila.querySelector('.maq-fin').value;
+        const informe = fila.querySelector('.maq-informe').value;
+        const estado = fila.querySelector('.maq-estado').value;
+        
+        agregarFila(id, inicio, fin, informe);
+        
+        // Copiar también el estado
+        const ultimaFila = document.getElementById('contenedorMaquinas').lastElementChild;
+        ultimaFila.querySelector('.maq-estado').value = estado;
+        
+        sincronizarTodo();
+        showNotification('Máquina duplicada correctamente');
+    }
+
+    function duplicarUltima() {
+        const filas = document.querySelectorAll('#contenedorMaquinas .machine-card');
+        if (filas.length === 0) {
+            showNotification('No hay máquinas para duplicar', 'error');
+            return;
+        }
+        
+        const ultima = filas[filas.length - 1];
+        const id = ultima.querySelector('.maq-id').value;
+        const inicio = ultima.querySelector('.maq-inicio').value;
+        const fin = ultima.querySelector('.maq-fin').value;
+        const informe = ultima.querySelector('.maq-informe').value;
+        const estado = ultima.querySelector('.maq-estado').value;
+        
+        agregarFila(id, inicio, fin, informe);
+        
+        const nuevaFila = document.getElementById('contenedorMaquinas').lastElementChild;
+        nuevaFila.querySelector('.maq-estado').value = estado;
+        
+        sincronizarTodo();
+        showNotification('Última máquina duplicada');
+    }
+
+    function cargarPlantilla(tipo) {
+        document.getElementById('tecnico').value = "Mansilla Nicolás";
+        
+        switch(tipo) {
+            case 'cerado':
+                document.getElementById('tipoTarea').value = "Cerado";
+                break;
+            case 'mantenimiento':
+                document.getElementById('tipoTarea').value = "Mantenimiento Preventivo";
+                break;
+            case 'monitor':
+                document.getElementById('tipoTarea').value = "Cambio de Monitor";
+                break;
+            case 'reparacion':
+                document.getElementById('tipoTarea').value = "Reparación Técnica";
+                break;
+        }
+        
+        sincronizarTodo();
+        showNotification(`Plantilla "${tipo}" cargada`);
+    }
+
+    function sincronizarTodo() {
+        const hLlamada = document.getElementById('horaLlamada').value;
+        const tecnico = document.getElementById('tecnico').value || "[Nombre del Técnico]";
+        const tarea = document.getElementById('tipoTarea').value;
+        
+        const maqIds = Array.from(document.querySelectorAll('.maq-id')).map(i => i.value);
+        const maqInicios = Array.from(document.querySelectorAll('.maq-inicio')).map(i => i.value);
+        const maqFines = Array.from(document.querySelectorAll('.maq-fin')).map(i => i.value);
+        const maqEstados = Array.from(document.querySelectorAll('.maq-estado')).map(i => i.value);
+        const maqInformes = Array.from(document.querySelectorAll('.maq-informe')).map(i => i.value);
+
+        // Cabecera Dinámica
+        const maquinasValidas = maqIds.filter(id => id);
+        const listaMaq = maquinasValidas.length > 0 ? 
+            maquinasValidas.map(id => `Máq. ${id}`).join(' y ') : 
+            "[Máquinas]";
+        
+        // Lógica de estado de cámara global
+        const algunFallo = maqEstados.some(e => e !== 'Correcta' && e !== '');
+        const respuestaCamaras = algunFallo ? 
+            `CCTV le informa que se observan anomalías en algunas cámaras durante el procedimiento.-` : 
+            `CCTV le responde que las cámaras y conexión funcionan correctamente.-`;
+
+        let texto = `A las ${hLlamada} Hs. CCTV recibe llamada de Técnico ${tecnico}, solicita confirmación de visualización de cámara y conexión online para realizar ${tarea} de ${listaMaq}.\n` +
+                    `${respuestaCamaras}\n\n`;
+
+        // Detalle por máquina
+        maqIds.forEach((id, index) => {
+            if (id) {
+                const hIni = maqInicios[index];
+                const hFin = maqFines[index];
+                const estado = maqEstados[index];
+                const inf = maqInformes[index];
+                
+                if (hIni) {
+                    texto += `A las ${hIni} Hs. Técnico ${tecnico}, informa que inicia ${tarea} de Máquina ${id}.-\n`;
+                }
+                if (hFin) {
+                    let textoEstado = estado === 'Correcta' ? '' : ` (Visualización: ${estado})`;
+                    texto += `A las ${hFin} Hs. Técnico ${tecnico}, informa que finalizó ${tarea} de Máquina ${id} con Informe Técnico Nº ${inf || "[Nº]"}${textoEstado}.-\n\n`;
+                }
+            }
+        });
+
+        const outputFinal = texto.trim();
+        document.getElementById('output').value = outputFinal;
+        
+        // Actualizar barra de estado
+        actualizarEstado(outputFinal);
+        actualizarContador();
+    }
+
+    function actualizarEstado(texto) {
+        const estadoEl = document.getElementById('estadoTexto');
+        const caracteresEl = document.getElementById('contadorCaracteres');
+        
+        if (!estadoEl || !caracteresEl) return;
+        
+        if (!texto) {
+            estadoEl.textContent = 'Sin contenido';
+            estadoEl.className = 'text-red-500';
+        } else {
+            const lineas = texto.split('\n').length;
+            estadoEl.textContent = `${lineas} líneas generadas`;
+            estadoEl.className = 'text-green-600';
+        }
+        
+        caracteresEl.textContent = `${texto.length} caracteres`;
+    }
+
+    function actualizarContador() {
+        const contador = document.getElementById('contadorMaquinas');
+        if (contador) {
+            const total = document.querySelectorAll('#contenedorMaquinas .machine-card').length;
+            contador.textContent = total;
+        }
+    }
+
+    function limpiarSeccion() {
+        if (confirm('¿Está seguro de limpiar todos los datos?')) {
             document.getElementById('tecnico').value = "";
             document.getElementById('rangoInicio').value = "";
             document.getElementById('rangoFin').value = "";
             document.getElementById('contenedorMaquinas').innerHTML = "";
             sincronizarTodo();
+            showNotification('Formulario limpiado correctamente');
         }
+    }
 
-        function volverAlInicio() {
-            const now = new Date();
-            const horas = String(now.getHours()).padStart(2, '0');
-            const minutos = String(now.getMinutes()).padStart(2, '0');
-            document.getElementById('horaLlamada').value = `${horas}:${minutos}`;
-            document.getElementById('tecnico').value = "";
-            document.getElementById('tipoTarea').value = "Cerado";
-            
-            const contenedor = document.getElementById('contenedorMaquinas');
-            contenedor.innerHTML = "";
-            sincronizarTodo();
+    function volverAlInicio() {
+        const now = new Date();
+        const horas = String(now.getHours()).padStart(2, '0');
+        const minutos = String(now.getMinutes()).padStart(2, '0');
+        document.getElementById('horaLlamada').value = `${horas}:${minutos}`;
+        document.getElementById('tecnico').value = "";
+        document.getElementById('tipoTarea').value = "Cerado";
+        document.getElementById('rangoInicio').value = "";
+        document.getElementById('rangoFin').value = "";
+        
+        const contenedor = document.getElementById('contenedorMaquinas');
+        contenedor.innerHTML = "";
+        sincronizarTodo();
+        showNotification('Sistema reiniciado');
+    }
+
+    function copiarTexto() {
+        const el = document.getElementById('output');
+        const textoParaCopiar = el.value;
+        
+        if (!textoParaCopiar) {
+            showNotification('No hay texto para copiar', 'error');
+            return;
         }
+        
+        navigator.clipboard.writeText(textoParaCopiar).then(() => {
+            showNotification('¡Texto copiado al portapapeles!');
+        }).catch(() => {
+            el.select();
+            document.execCommand('copy');
+            showNotification('¡Texto copiado al portapapeles!');
+        });
+    }
 
-        function copiarTexto() {
-            const el = document.getElementById('output');
-            const textoParaCopiar = el.value;
-            
-            navigator.clipboard.writeText(textoParaCopiar).then(() => {
-                showNotification('¡Texto copiado al portapapeles!');
-            }).catch(() => {
-                el.select();
-                document.execCommand('copy');
-                showNotification('¡Texto copiado al portapapeles!');
-            });
+    function descargarTXT() {
+        const texto = document.getElementById('output').value;
+        
+        if (!texto) {
+            showNotification('No hay texto para descargar', 'error');
+            return;
         }
+        
+        const blob = new Blob([texto], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        
+        const fecha = new Date().toISOString().split('T')[0];
+        const hora = new Date().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' }).replace(':', '-');
+        a.download = `cerado-maquinas_${fecha}_${hora}.txt`;
+        
+        a.click();
+        URL.revokeObjectURL(url);
+        showNotification('Archivo descargado correctamente');
+    }
 
-        function showNotification(message, type = 'success') {
-            const notification = document.getElementById('notification');
-            document.getElementById('notification-text').textContent = message;
-            notification.classList.remove('hidden', 'bg-red-100', 'text-red-800');
-            if (type === 'error') {
-                notification.classList.add('bg-red-100', 'text-red-800');
-            } else {
-                notification.classList.add('bg-green-100', 'text-green-800');
-            }
-            setTimeout(() => notification.classList.add('hidden'), 3000);
+    function showNotification(message, type = 'success') {
+        const notification = document.getElementById('notification');
+        if (!notification) return;
+        
+        document.getElementById('notification-text').textContent = message;
+        notification.classList.remove('hidden');
+        
+        if (type === 'error') {
+            notification.classList.remove('bg-green-100', 'text-green-800');
+            notification.classList.add('bg-red-100', 'text-red-800');
+        } else {
+            notification.classList.remove('bg-red-100', 'text-red-800');
+            notification.classList.add('bg-green-100', 'text-green-800');
         }
+        
+        // Auto-ocultar después de 3 segundos
+        clearTimeout(notification._timeout);
+        notification._timeout = setTimeout(() => {
+            notification.classList.add('hidden');
+        }, 3000);
+    }
 
-        window.onload = () => volverAlInicio();
-    </script>
+    // ==================== INICIALIZACIÓN ====================
+    window.onload = () => {
+        volverAlInicio();
+        actualizarContador();
+    };
+</script>
 </body>
 </html>

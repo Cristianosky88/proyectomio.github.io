@@ -16,7 +16,7 @@
 
     <div class="max-w-6xl mx-auto bg-white rounded-xl shadow-xl overflow-hidden border border-slate-200">
         <!-- Header -->
-        <div class="bg-slate-900 p-5 text-white flex justify-between items-center">
+        <div class="bg-slate-900 p-5 text-white flex justify-between items-center rounded-t-xl mb-1 shadow-md">
             <div class="flex items-center gap-3">
                 <div class="bg-indigo-600 p-2 rounded-lg">
                     <i data-lucide="trophy" class="w-6 h-6 text-white"></i>
@@ -26,9 +26,14 @@
                     <p class="text-slate-400 text-xs uppercase tracking-wider">Planilla de Reporte Jackpot</p>
                 </div>
             </div>
-            <div class="text-right">
-                <div class="text-xs text-slate-400">Fecha</div>
-                <div class="font-mono font-bold text-lg" id="fechaActual">--/--/--</div>
+            <div class="flex items-center justify-end gap-3 text-right">
+                <div>
+                    <div class="text-xs text-slate-400">Fecha</div>
+                    <div class="font-mono font-bold text-lg text-white" id="fechaActual">--/--/--</div>
+                </div>
+                <a id="btnInicioHeader" href="index.html" class="p-2 hover:bg-slate-700 rounded-lg transition text-white" title="Volver a Inicio">
+                    <i data-lucide="home" class="w-5 h-5 text-white"></i>
+                </a>
             </div>
         </div>
 
@@ -160,9 +165,6 @@
                     </button>
                     <button type="button" id="btnLimpiar" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold rounded border border-slate-300 transition flex items-center gap-2">
                         <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Limpiar
-                    </button>
-                    <button type="button" id="btnVolverInicio" class="px-4 py-2 bg-sky-500 hover:bg-sky-600 text-white text-sm font-semibold rounded shadow-sm transition flex items-center gap-2">
-                        <i data-lucide="home" class="w-4 h-4"></i> Inicio
                     </button>
                 </div>
                 </form>

@@ -97,32 +97,29 @@
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-5xl overflow-hidden border border-slate-200">
         
         <!-- Header Mejorado -->
-        <header class="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white p-5 md:px-8">
-            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div class="flex items-center gap-4">
-                    <div class="bg-indigo-600 p-2.5 rounded-xl shadow-lg">
-                        <i data-lucide="shield-check" class="w-6 h-6 text-white"></i>
-                    </div>
-                    <div>
-                        <h1 class="text-xl md:text-2xl font-bold">Ingresos Adicional Policial</h1>
-                        <p class="text-slate-400 text-xs mt-0.5">Sistema de Registro CCTV • v2.0</p>
-                    </div>
+        <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white p-4 flex items-center justify-between relative shadow-lg">
+            <div class="flex items-center gap-3">
+                <div class="bg-indigo-600 p-2 rounded-lg">
+                    <i data-lucide="shield-check" class="w-6 h-6 text-white"></i>
                 </div>
-                
-                <div class="flex items-center gap-2">
-                    <!-- Indicador de hora actual -->
-                    <div class="hidden sm:flex items-center gap-2 text-xs bg-slate-700 px-3 py-1.5 rounded-lg">
-                        <i data-lucide="clock" class="w-3.5 h-3.5 text-indigo-400"></i>
-                        <span id="horaActual" class="text-slate-300"></span>
-                    </div>
-                    
-                    <a href="ingreso.html" class="flex items-center gap-2 bg-slate-700 hover:bg-slate-600 px-4 py-2.5 rounded-xl transition-all duration-200 border border-slate-600 focus:ring-2 focus:ring-slate-500 shadow-md hover:shadow-lg">
-                        <i data-lucide="arrow-left" class="w-4 h-4"></i>
-                        <span class="text-sm font-medium hidden sm:inline">Volver</span>
-                    </a>
+                <div>
+                    <h1 class="text-xl font-bold">Ingresos Adicional Policial</h1>
+                    <p class="text-slate-400 text-xs uppercase tracking-wider">Sistema de Registro CCTV • v2.0</p>
                 </div>
             </div>
-        </header>
+               
+            <div class="flex gap-2">
+                <!-- Indicador de hora actual -->
+                <div class="hidden sm:flex items-center gap-2 text-xs bg-slate-700 px-3 py-1.5 rounded-lg border border-slate-600">
+                    <i data-lucide="clock" class="w-4 h-4 text-indigo-400"></i>
+                    <span id="horaActual" class="text-slate-300 font-medium"></span>
+                </div>
+                   
+                <a href="index.html" class="p-2 hover:bg-slate-700 rounded-lg transition inline-flex items-center justify-center flex-shrink-0" title="Volver a Inicio">
+                    <i data-lucide="home" class="w-5 h-5"></i>
+                </a>
+            </div>
+        </div>
 
         <!-- Contenido Principal -->
         <div class="p-6 md:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -325,15 +322,9 @@
                     </button>
                     
                     <button id="btnCopiar" 
-                            class="w-full sm:w-2/4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg transition-all duration-200 flex items-center justify-center gap-2 active:scale-95 focus:ring-4 focus:ring-indigo-300 hover:shadow-xl">
+                            class="w-full sm:w-3/4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg transition-all duration-200 flex items-center justify-center gap-2 active:scale-95 focus:ring-4 focus:ring-indigo-300 hover:shadow-xl">
                         <i data-lucide="copy" class="w-4 h-4"></i>
                         <span>Copiar Registro</span>
-                    </button>
-                    
-                    <button id="btnDescargar" 
-                            class="w-full sm:w-1/4 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg transition-all duration-200 flex items-center justify-center gap-2 active:scale-95 focus:ring-4 focus:ring-green-300 hover:shadow-xl">
-                        <i data-lucide="file-down" class="w-4 h-4"></i>
-                        <span class="hidden sm:inline">TXT</span>
                     </button>
                 </div>
             </div>
@@ -409,7 +400,6 @@
         const btnLimpiar = document.getElementById('btnLimpiar');
         const btnRestaurar = document.getElementById('btnRestaurar');
         const btnPrevisualizar = document.getElementById('btnPrevisualizar');
-        const btnDescargar = document.getElementById('btnDescargar');
         const resultado = document.getElementById('resultado');
         const contenedorTiempos = document.getElementById('contenedorTiempos');
         const duracionInfo = document.getElementById('duracionInfo');
@@ -713,24 +703,6 @@
             }
         }
         
-        // Descargar como TXT
-        function descargarTexto() {
-            if (!resultado.value.trim()) {
-                showToast('No hay texto para descargar', 'warning');
-                return;
-            }
-            
-            const blob = new Blob([resultado.value], { type: 'text/plain;charset=utf-8' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `registro-policial-${new Date().toISOString().split('T')[0]}.txt`;
-            a.click();
-            URL.revokeObjectURL(url);
-            
-            showToast('Archivo descargado', 'success');
-        }
-        
         // Previsualizar
         function previsualizar() {
             if (!resultado.value.trim()) {
@@ -838,18 +810,12 @@
                 showToast('Texto restaurado', 'info');
             });
             btnPrevisualizar.addEventListener('click', previsualizar);
-            btnDescargar.addEventListener('click', descargarTexto);
             
             // Atajos de teclado
             document.addEventListener('keydown', (e) => {
                 if (e.ctrlKey && e.key === 'c' && document.activeElement !== resultado) {
                     e.preventDefault();
                     copiarTexto();
-                }
-                
-                if (e.ctrlKey && e.key === 's') {
-                    e.preventDefault();
-                    descargarTexto();
                 }
             });
             

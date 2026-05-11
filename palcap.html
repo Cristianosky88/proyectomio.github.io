@@ -17,7 +17,7 @@
     <div class="max-w-5xl mx-auto bg-white rounded-xl shadow-xl overflow-hidden border border-slate-200">
         
         <!-- Header -->
-        <div class="bg-slate-900 p-5 text-white flex justify-between items-center">
+        <div class="bg-slate-900 p-5 text-white flex justify-between items-center rounded-t-xl mb-1 shadow-md">
             <div class="flex items-center gap-3">
                 <div class="bg-indigo-600 p-2 rounded-lg">
                     <i data-lucide="camera" class="w-6 h-6 text-white"></i>
@@ -27,9 +27,14 @@
                     <p class="text-slate-400 text-xs uppercase tracking-wider">CCTV - Módulo de Caja</p>
                 </div>
             </div>
-            <div class="text-right">
-                <div class="text-xs text-slate-400">Fecha Operativa</div>
-                <div class="font-mono font-bold text-lg" id="fechaActual">--/--/--</div>
+            <div class="flex items-center justify-end gap-3 flex-wrap">
+                <div class="text-right">
+                    <div class="text-xs text-slate-400">Fecha Operativa</div>
+                    <div class="font-mono font-bold text-lg" id="fechaActual">--/--/--</div>
+                </div>
+                <a href="index.html" class="no-print text-indigo-400 hover:text-indigo-300 transition-colors flex items-center justify-center p-2" title="Volver a Inicio">
+                    <i data-lucide="home" class="w-6 h-6"></i>
+                </a>
             </div>
         </div>
 
@@ -157,9 +162,6 @@
                 <div class="flex gap-3 pt-2">
                     <button onclick="limpiarFormulario()" class="px-4 py-2 text-sm text-slate-600 hover:text-red-600 font-medium transition flex items-center gap-2">
                         <i data-lucide="trash-2" class="w-4 h-4"></i> Reset
-                    </button>
-                    <button onclick="window.location.href='index.html'" class="px-4 py-2 text-sm bg-slate-800 hover:bg-slate-700 text-white font-semibold rounded transition flex items-center gap-2">
-                        <i data-lucide="home" class="w-4 h-4"></i> Inicio
                     </button>
                 </div>
             </div>
