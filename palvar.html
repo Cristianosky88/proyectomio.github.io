@@ -95,19 +95,30 @@
                             <input type="time" id="horaPrimeraOperacion" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-slate-500 mb-1">⏰ Hora Redención</label>
+                            <label class="block text-xs font-semibold text-slate-500 mb-1">⏰ Hora Segunda Operación</label>
                             <input type="time" id="horaSegundaOperacion" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-500 mb-1">⏰ Hora Última Operación</label>
-                            <input type="time" id="horaUltimaFila" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                            <input type="time" id="horaUltimaOperacion" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-3 gap-4">
                         <div>
                             <label class="block text-xs font-semibold text-slate-500 mb-1">🎯 Cargo</label>
                             <input type="text" id="tipoCargo" required list="cargos-list" placeholder="Seleccionar cargo..." class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-500 mb-1">💸 Deja Propina?</label>
+                            <select id="dejaPropina" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                                <option value="no">No</option>
+                                <option value="si">Sí</option>
+                            </select>
+                        </div>
+                        <div id="montoPropinaContainer" class="hidden">
+                            <label class="block text-xs font-semibold text-slate-500 mb-1">💵 Monto Propina</label>
+                            <input type="text" id="montoPropina" placeholder="0.000,000" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
                         </div>
                     </div>
 
@@ -340,6 +351,26 @@
         input.addEventListener('input', actualizarDeuda);
     });
 
+    const dejaPropinaSelect = document.getElementById('dejaPropina');
+    const montoPropinaContainer = document.getElementById('montoPropinaContainer');
+    const montoPropinaInput = document.getElementById('montoPropina');
+
+    dejaPropinaSelect.addEventListener('change', (e) => {
+        if (e.target.value === 'si') {
+            montoPropinaContainer.classList.remove('hidden');
+        } else {
+            montoPropinaContainer.classList.add('hidden');
+            montoPropinaInput.value = '';
+        }
+    });
+
+    montoPropinaInput.addEventListener('blur', e => {
+        if (e.target.value) {
+            const num = parseNumberAR(e.target.value);
+            e.target.value = toNumberStringAR(num);
+        }
+    });
+
     // Contador de caracteres
     observaciones.addEventListener('input', () => {
         const length = observaciones.value.length;
@@ -404,6 +435,8 @@
         const horaPrimera = document.getElementById('horaPrimeraOperacion').value;
         const horaSegunda = document.getElementById('horaSegundaOperacion').value;
         const horaUltima = document.getElementById('horaUltimaFila').value;
+        const dejaPropina = document.getElementById('dejaPropina').value;
+        const montoPropinaText = document.getElementById('montoPropina').value.trim();
 
         if (!nombre || !cantidad || !total || !pagado || !cargo) {
             showNotification('Complete todos los campos obligatorios', 'error');
@@ -420,9 +453,14 @@
         
         const clienteCompleto = nombreCliente ? `${clienteGenero} ${nombreCliente}` : clienteGenero;
 
+        let propinaTexto = '';
+        if (dejaPropina === 'si' && montoPropinaText) {
+            propinaTexto = `, el mismo deja en concepto de propina $${montoPropinaText}`;
+        }
+
         let reportText = `A las ${horaPrimeraLinea} Hs. CCTV recibe llamada de ${cargo} ${nombre}, informa que recibió de ${clienteCompleto}, ${cantidad} tickets para cambio por valor de ${formatCurrencyAR(total)}.-
 A las ${horaSegundaLinea} Hs. ${cargo} ${nombre} redime ${cantidad} tickets.-
-A las ${horaTerceraLinea} Hs. ${cargo} ${nombre} cancela en ventanilla de caja ${formatCurrencyAR(pagado)} a ${clienteCompleto}.-
+A las ${horaTerceraLinea} Hs. ${cargo} ${nombre} cancela en ventanilla de caja ${formatCurrencyAR(pagado)} a ${clienteCompleto}${propinaTexto}.-
 ${obs ? `Observaciones: ${obs}` : ''}`;
 
         reporteDiv.textContent = reportText;
@@ -439,7 +477,8 @@ ${obs ? `Observaciones: ${obs}` : ''}`;
             cantidad: cantidad,
             total: total,
             pagado: pagado,
-            saldo: saldo
+            saldo: saldo,
+            propina: (dejaPropina === 'si' && montoPropinaText) ? parseNumberAR(montoPropinaText) : 0
         };
         
         historial.unshift(nuevoReporte);
@@ -551,6 +590,7 @@ ${obs ? `Observaciones: ${obs}` : ''}`;
         const totalTickets = historial.reduce((sum, h) => sum + (h.cantidad || 0), 0);
         const totalValor = historial.reduce((sum, h) => sum + (h.total || 0), 0);
         const deudaPendiente = historial.reduce((sum, h) => sum + ((h.saldo || 0) > 0 ? (h.saldo || 0) : 0), 0);
+        const totalPropina = historial.reduce((sum, h) => sum + (h.propina || 0), 0);
         
         const content = document.getElementById('statsContent');
         content.innerHTML = `
@@ -564,17 +604,23 @@ ${obs ? `Observaciones: ${obs}` : ''}`;
                         <div class="text-xs text-slate-500">Total Pagado</div>
                         <div class="text-lg font-bold text-green-600">${formatCurrencyAR(totalPagado)}</div>
                     </div>
+                    <div class="bg-emerald-50 p-3 rounded-lg">
+                        <div class="text-xs text-slate-500">Total Propinas</div>
+                        <div class="text-lg font-bold text-emerald-600">${formatCurrencyAR(totalPropina)}</div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3 mt-3">
                     <div class="bg-blue-50 p-3 rounded-lg">
                         <div class="text-xs text-slate-500">Total Tickets</div>
                         <div class="text-lg font-bold text-blue-600">${totalTickets}</div>
                     </div>
-                </div>
-                <div class="bg-purple-50 p-3 rounded-lg">
-                    <div class="text-xs text-slate-500">Valor Total Procesado</div>
-                    <div class="text-xl font-bold text-purple-600">${formatCurrencyAR(totalValor)}</div>
+                    <div class="bg-purple-50 p-3 rounded-lg">
+                        <div class="text-xs text-slate-500">Valor Total Procesado</div>
+                        <div class="text-lg font-bold text-purple-600">${formatCurrencyAR(totalValor)}</div>
+                    </div>
                 </div>
                 ${deudaPendiente > 0 ? `
-                <div class="bg-yellow-50 p-3 rounded-lg">
+                <div class="bg-yellow-50 p-3 rounded-lg mt-3">
                     <div class="text-xs text-slate-500">Deuda Pendiente Acumulada</div>
                     <div class="text-xl font-bold text-yellow-600">${formatCurrencyAR(deudaPendiente)}</div>
                 </div>
