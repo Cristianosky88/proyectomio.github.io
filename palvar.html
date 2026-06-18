@@ -434,7 +434,8 @@
         const obs = observaciones.value.trim();
         const horaPrimera = document.getElementById('horaPrimeraOperacion').value;
         const horaSegunda = document.getElementById('horaSegundaOperacion').value;
-        const horaUltima = document.getElementById('horaUltimaFila').value;
+        const horaUltimaInput = document.getElementById('horaUltimaOperacion');
+        const horaUltima = horaUltimaInput ? horaUltimaInput.value : '';
         const dejaPropina = document.getElementById('dejaPropina').value;
         const montoPropinaText = document.getElementById('montoPropina').value.trim();
 
