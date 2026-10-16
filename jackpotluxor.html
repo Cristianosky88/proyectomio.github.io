@@ -88,23 +88,12 @@
             </div>
 
             <div class="flex flex-wrap items-center gap-2">
-                <!-- Botón de Historial / Pagos en Simultáneo -->
-                <button type="button" onclick="toggleHistoryDrawer()" class="px-3.5 py-2 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 text-sky-400 border border-slate-700 transition-all flex items-center gap-1.5">
+                <a href="index.html" title="Volver al inicio" class="px-3 py-2 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition-all flex items-center gap-1.5">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 10.5L12 3l9 7.5M5.5 9v10.5h13V9M9 19.5v-6h6v6" />
                     </svg>
-                    <span>Historial / En Curso</span>
-                    <span id="historyCountBadge" class="px-1.5 py-0.2 rounded-full bg-sky-500/20 text-sky-300 font-mono text-[10px]">0</span>
-                </button>
-
-                <!-- Botón para Archivar en Historial y Empezar Otro -->
-                <button type="button" onclick="saveReportToHistory()" title="Guardar este Jackpot en el historial del turno" class="px-3.5 py-2 rounded-lg text-xs font-medium bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 transition-all flex items-center gap-1.5">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-                    </svg>
-                    <span class="hidden sm:inline">Guardar en Turno</span>
-                </button>
-
+                    <span class="hidden sm:inline">Inicio</span>
+                </a>
                 <button type="button" onclick="confirmReset()" class="px-3 py-2 rounded-lg text-xs font-medium bg-slate-800 hover:bg-rose-500/20 text-slate-300 hover:text-rose-300 border border-slate-700 hover:border-rose-500/30 transition-all flex items-center gap-1.5">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -648,12 +637,6 @@
                             </svg>
                             Copiar al Portapapeles
                         </button>
-                        <button type="button" onclick="saveAndStartNew()" class="py-2.5 px-4 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-emerald-500/20 text-emerald-400 border border-slate-700 hover:border-emerald-500/30 transition-all flex items-center justify-center gap-1.5">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-                            </svg>
-                            Archivar y Nuevo Jackpot
-                        </button>
                     </div>
                 </div>
 
@@ -675,37 +658,6 @@
         </div>
 
     </main>
-
-    <!-- PANEL LATERAL (DRAWER) DE HISTORIAL DEL TURNO Y PAGOS SIMULTÁNEOS (PUNTO 2) -->
-    <div id="historyDrawerBackdrop" onclick="toggleHistoryDrawer()" class="fixed inset-0 z-40 bg-slate-950/70 backdrop-blur-sm hidden"></div>
-    <aside id="historyDrawer" class="fixed top-0 right-0 z-50 h-full w-full max-w-md bg-slate-900 border-l border-slate-800 shadow-2xl transform translate-x-full transition-transform duration-300 flex flex-col">
-        <div class="p-4 border-b border-slate-800 flex items-center justify-between">
-            <div>
-                <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-sky-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    Historial de Turno / En Curso
-                </h3>
-                <p class="text-[11px] text-slate-400">Cambia entre varios Jackpots sin perder datos</p>
-            </div>
-            <button type="button" onclick="toggleHistoryDrawer()" class="p-1.5 rounded-lg bg-slate-800 text-slate-400 hover:text-white">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-            </button>
-        </div>
-
-        <div class="p-3 border-b border-slate-800 bg-slate-950/50 flex items-center justify-between gap-2">
-            <button type="button" onclick="saveReportToHistory()" class="flex-1 py-2 px-3 rounded-lg bg-sky-500 hover:bg-sky-400 text-slate-950 font-semibold text-xs flex items-center justify-center gap-1.5">
-                + Guardar Formulario Actual aquí
-            </button>
-        </div>
-
-        <div id="historyListContainer" class="flex-1 overflow-y-auto p-4 space-y-3">
-            <p class="text-xs text-slate-500 text-center py-8">No hay reportes archivados en este turno todavía.</p>
-        </div>
-    </aside>
 
     <!-- MODAL DE CATÁLOGO DE MÁQUINAS Y PERSONAL (PUNTO 4) -->
     <div id="catalogModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4">
@@ -761,7 +713,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Estado de la aplicación y bases de datos
         let currentGender = 'M';
@@ -774,7 +726,6 @@
             "14200": "88 Fortunes"
         };
         let frequentStaff = ["Gómez", "Rodríguez", "Fernández", "López", "Martínez", "Pérez"];
-        let shiftHistory = [];
 
         // Variables de Firebase
         let db = null;
@@ -808,7 +759,6 @@
                     currentUser = user;
                     if (!user) return;
                     await loadCatalogAndDraft();
-                    subscribeToShiftHistory();
                 });
             } catch (err) {
                 console.warn("Modo sesión activa:", err);
@@ -848,25 +798,6 @@
             } catch (e) {
                 console.warn("Error cargando datos iniciales:", e);
             }
-        }
-
-        /**
-         * Escucha cambios en el historial de Jackpots del turno
-         */
-        function subscribeToShiftHistory() {
-            if (!currentUser || !db) return;
-            const histCol = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'shiftHistory');
-            onSnapshot(histCol, (snapshot) => {
-                const items = [];
-                snapshot.forEach(docSnap => {
-                    items.push({ id: docSnap.id, ...docSnap.data() });
-                });
-                items.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-                shiftHistory = items;
-                renderHistoryList();
-            }, (err) => {
-                console.warn("Error en listener de historial:", err);
-            });
         }
 
         /**
@@ -1637,142 +1568,6 @@
             triggerDraftAutoSave();
         }
 
-        /**
-         * Gestión del Historial de Turno / Jackpots en simultáneo (Punto 2)
-         */
-        function toggleHistoryDrawer() {
-            const drawer = document.getElementById('historyDrawer');
-            const backdrop = document.getElementById('historyDrawerBackdrop');
-            const isOpen = !drawer.classList.contains('translate-x-full');
-
-            if (isOpen) {
-                drawer.classList.add('translate-x-full');
-                backdrop.classList.add('hidden');
-            } else {
-                drawer.classList.remove('translate-x-full');
-                backdrop.classList.remove('hidden');
-                renderHistoryList();
-            }
-        }
-
-        async function saveReportToHistory() {
-            const state = collectFormState();
-            const maq = state.maquina || 'S/N';
-            const premio = state.valorPremio || '0,00';
-            const cliente = state.nombreCliente || 'Sin nombre';
-            const reportId = `jp_${Date.now()}`;
-
-            const record = {
-                id: reportId,
-                timestamp: Date.now(),
-                timeLabel: new Date().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' }),
-                maquina: maq,
-                valorPremio: premio,
-                nombreCliente: cliente,
-                juego: state.juego || '',
-                rawText: document.getElementById('rawReportText').value,
-                stateJson: JSON.stringify(state)
-            };
-
-            autoRememberMachine();
-            rememberStaffName(state.nombreGlobal);
-
-            if (currentUser && db) {
-                try {
-                    const docRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'shiftHistory', reportId);
-                    await setDoc(docRef, record);
-                    showToast(`Jackpot Máq. ${maq} guardado en el turno`);
-                } catch (e) {
-                    shiftHistory.unshift(record);
-                    renderHistoryList();
-                    showToast(`Guardado en historial de sesión`);
-                }
-            } else {
-                shiftHistory.unshift(record);
-                renderHistoryList();
-                showToast(`Jackpot Máq. ${maq} guardado en el turno`);
-            }
-        }
-
-        async function saveAndStartNew() {
-            await saveReportToHistory();
-            executeReset(true);
-            showToast('Guardado en el turno. Listo para nuevo Jackpot.');
-        }
-
-        function renderHistoryList() {
-            const badge = document.getElementById('historyCountBadge');
-            if (badge) badge.textContent = String(shiftHistory.length);
-
-            const container = document.getElementById('historyListContainer');
-            if (!container) return;
-
-            if (shiftHistory.length === 0) {
-                container.innerHTML = `<p class="text-xs text-slate-500 text-center py-8">No hay reportes archivados en este turno todavía.<br><span class="text-[11px]">Usa "Guardar en Turno" si tienes 2 pagos al mismo tiempo.</span></p>`;
-                return;
-            }
-
-            container.innerHTML = shiftHistory.map((item) => `
-                <div class="bg-slate-950 border border-slate-800 rounded-xl p-3.5 space-y-2 hover:border-sky-500/40 transition-colors">
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs font-bold text-sky-400 font-mono">Máq. ${item.maquina} ${item.juego ? `• ${item.juego}` : ''}</span>
-                        <span class="text-[11px] font-mono text-slate-500">${item.timeLabel || ''} Hs</span>
-                    </div>
-                    <div class="flex items-center justify-between text-xs">
-                        <span class="text-slate-300 truncate max-w-[180px]">👤 ${item.nombreCliente}</span>
-                        <span class="font-mono font-semibold text-emerald-400">$ ${item.valorPremio}</span>
-                    </div>
-                    <div class="pt-2 border-t border-slate-900 flex items-center gap-2">
-                        <button type="button" onclick="loadFromHistory('${item.id}')" class="flex-1 py-1.5 px-2.5 rounded-lg bg-sky-500/15 hover:bg-sky-500/25 text-sky-300 text-xs font-semibold transition-colors">
-                            Retomar / Editar
-                        </button>
-                        <button type="button" onclick="copyHistoryItem('${item.id}')" class="py-1.5 px-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs transition-colors">
-                            Copiar Acta
-                        </button>
-                        <button type="button" onclick="deleteHistoryItem('${item.id}')" class="py-1.5 px-2 rounded-lg bg-slate-900 hover:bg-rose-500/20 text-rose-400 text-xs transition-colors">
-                            ✕
-                        </button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function loadFromHistory(id) {
-            const found = shiftHistory.find(x => x.id === id);
-            if (!found || !found.stateJson) return;
-            const parsed = JSON.parse(found.stateJson);
-            applyStateToForm(parsed);
-            toggleHistoryDrawer();
-            showToast(`Cargado Jackpot de Máq. ${found.maquina}`);
-        }
-
-        function copyHistoryItem(id) {
-            const found = shiftHistory.find(x => x.id === id);
-            if (!found) return;
-            const textarea = document.getElementById('rawReportText');
-            const prev = textarea.value;
-            textarea.value = found.rawText || '';
-            textarea.classList.remove('sr-only');
-            textarea.select();
-            document.execCommand('copy');
-            textarea.classList.add('sr-only');
-            textarea.value = prev;
-            window.getSelection().removeAllRanges();
-            showToast(`Acta de Máq. ${found.maquina} copiada`);
-        }
-
-        async function deleteHistoryItem(id) {
-            shiftHistory = shiftHistory.filter(x => x.id !== id);
-            renderHistoryList();
-            if (currentUser && db) {
-                try {
-                    await deleteDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'shiftHistory', id));
-                } catch (e) {
-                    console.warn("Error borrando item:", e);
-                }
-            }
-        }
-
         function toggleCatalogModal() {
             const modal = document.getElementById('catalogModal');
             if (modal.classList.contains('hidden')) {
@@ -1899,12 +1694,6 @@
             formatJackpotInput,
             onJackpotAmountInput,
             handleVariantChange,
-            toggleHistoryDrawer,
-            saveReportToHistory,
-            saveAndStartNew,
-            loadFromHistory,
-            copyHistoryItem,
-            deleteHistoryItem,
             toggleCatalogModal
         });
 
