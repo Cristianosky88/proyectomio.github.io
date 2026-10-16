@@ -1,0 +1,1920 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Reporte Jackpot - CCTV</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        slate: {
+                            850: '#151e2e',
+                            900: '#0f172a',
+                            950: '#020617',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Estilos personalizados para barras de desplazamiento e inputs numéricos */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e293b; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #475569; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64748b; 
+        }
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .highlight-var {
+            background-color: rgba(56, 189, 248, 0.15);
+            color: #38bdf8;
+            padding: 0 4px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+        /* Animación suave para alertas */
+        @keyframes pulse-subtle {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.75; }
+        }
+        .animate-pulse-subtle {
+            animation: pulse-subtle 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans min-h-screen selection:bg-sky-500 selection:text-white">
+
+    <header class="sticky top-0 z-30 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-4 py-3 sm:px-6">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-500 to-blue-600 flex items-center justify-center shadow-lg shadow-sky-500/20">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h1 class="text-lg font-bold tracking-tight text-white">CCTV Reportes</h1>
+                        <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-sky-500/10 text-sky-400 border border-sky-500/20">Jackpot Pro</span>
+                        <span id="cloudStatusBadge" class="hidden sm:inline-flex items-center gap-1.5 text-[11px] font-medium px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                            <span id="cloudStatusText">Autoguardado activo</span>
+                        </span>
+                    </div>
+                    <p class="text-xs text-slate-400">Automatización avanzada con validación de arqueo, memoria de máquinas y control horario</p>
+                </div>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2">
+                <!-- Botón de Historial / Pagos en Simultáneo -->
+                <button type="button" onclick="toggleHistoryDrawer()" class="px-3.5 py-2 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 text-sky-400 border border-slate-700 transition-all flex items-center gap-1.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>Historial / En Curso</span>
+                    <span id="historyCountBadge" class="px-1.5 py-0.2 rounded-full bg-sky-500/20 text-sky-300 font-mono text-[10px]">0</span>
+                </button>
+
+                <!-- Botón para Archivar en Historial y Empezar Otro -->
+                <button type="button" onclick="saveReportToHistory()" title="Guardar este Jackpot en el historial del turno" class="px-3.5 py-2 rounded-lg text-xs font-medium bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 transition-all flex items-center gap-1.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                    </svg>
+                    <span class="hidden sm:inline">Guardar en Turno</span>
+                </button>
+
+                <button type="button" onclick="confirmReset()" class="px-3 py-2 rounded-lg text-xs font-medium bg-slate-800 hover:bg-rose-500/20 text-slate-300 hover:text-rose-300 border border-slate-700 hover:border-rose-500/30 transition-all flex items-center gap-1.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                    <span class="hidden md:inline">Limpiar</span>
+                </button>
+
+                <button type="button" onclick="copyReport()" class="px-4 py-2 rounded-lg text-xs font-semibold bg-sky-500 hover:bg-sky-400 text-slate-950 shadow-lg shadow-sky-500/20 transition-all flex items-center gap-1.5 active:scale-95">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                    </svg>
+                    Copiar Reporte
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Datalists para Autocompletado Inteligente (Punto 4) -->
+    <datalist id="machinesList"></datalist>
+    <datalist id="gamesList"></datalist>
+    <datalist id="staffList"></datalist>
+
+    <main class="max-w-7xl mx-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- COLUMNA IZQUIERDA: FORMULARIO DE CARGA (7 Columnas en Desktop) -->
+        <div class="lg:col-span-7 space-y-6">
+            
+            <!-- SECCIÓN 1: DATOS DE LA MÁQUINA Y PREMIO + MEMORIA DE MÁQUINAS -->
+            <section class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
+                <div class="flex flex-wrap items-center justify-between gap-2 mb-4 pb-3 border-b border-slate-800">
+                    <div class="flex items-center gap-2">
+                        <span class="flex items-center justify-center w-6 h-6 rounded-full bg-sky-500/20 text-sky-400 text-xs font-bold">1</span>
+                        <h2 class="text-sm font-semibold text-white uppercase tracking-wider">Datos de Máquina y Premio</h2>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span id="machineMemoryBadge" class="hidden text-[11px] px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                            ✓ Juego autocompletado
+                        </span>
+                        <button type="button" onclick="saveMachineAssociation()" title="Recordar qué juego tiene esta máquina para futuros reportes" class="text-xs px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-sky-400 border border-slate-700 transition-colors flex items-center gap-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            Asociar Máq/Juego
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-1 flex justify-between">
+                            <span>N° de Máquina</span>
+                            <span id="savedMachinesCount" class="text-[10px] text-slate-500">0 guardadas</span>
+                        </label>
+                        <input type="text" id="maquina" list="machinesList" placeholder="Ej: 12045" oninput="onMachineInput()"
+                            class="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 rounded-xl px-3.5 py-2 text-sm text-white placeholder-slate-600 outline-none transition-all font-mono">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-1 flex justify-between">
+                            <span>Monto del Jackpot ($)</span>
+                            <button type="button" onclick="formatJackpotInput()" class="text-[10px] text-sky-400 hover:underline">Formatear miles</button>
+                        </label>
+                        <div class="relative">
+                            <span class="absolute left-3.5 top-2 text-slate-500 font-mono">$</span>
+                            <input type="text" id="valorPremio" placeholder="Ej: 1.250.000,00" oninput="onJackpotAmountInput()"
+                                class="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 rounded-xl pl-8 pr-3.5 py-2 text-sm text-emerald-400 font-mono placeholder-slate-600 outline-none transition-all">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-1">Nombre del Juego</label>
+                        <input type="text" id="juego" list="gamesList" placeholder="Ej: Buffalo Gold / Link King" oninput="updateReport()" onblur="autoRememberMachine()"
+                            class="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 rounded-xl px-3.5 py-2 text-sm text-white placeholder-slate-600 outline-none transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-1">Orden de Pago</label>
+                        <input type="text" id="ordenPago" placeholder="Ej: 0004582" oninput="updateReport()"
+                            class="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 rounded-xl px-3.5 py-2 text-sm text-white placeholder-slate-600 outline-none transition-all font-mono">
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECCIÓN ESPECIAL (PUNTO 6): VARIANTES DEL PROCEDIMIENTO -->
+            <section class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
+                <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
+                    <div class="flex items-center gap-2">
+                        <span class="flex items-center justify-center w-6 h-6 rounded-full bg-violet-500/20 text-violet-400 text-xs font-bold">★</span>
+                        <h2 class="text-sm font-semibold text-white uppercase tracking-wider">Modalidad y Variantes del Procedimiento</h2>
+                    </div>
+                    <span class="text-[11px] text-slate-400">Ajusta el acta según el caso</span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <!-- Variante 1: Documentación DDJJ / PEP -->
+                    <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
+                        <label class="block text-[11px] font-semibold text-slate-400 uppercase mb-1.5">Documentación (Paso 5)</label>
+                        <select id="varDocMode" onchange="handleVariantChange()" class="w-full bg-slate-900 border border-slate-700 focus:border-sky-500 rounded-lg px-2.5 py-1.5 text-xs text-white outline-none">
+                            <option value="ddjj_pep" selected>Completa DDJJ y PEP (Estándar)</option>
+                            <option value="solo_ddjj">Solo completa DDJJ</option>
+                            <option value="sin_ddjj">Sin DDJJ ni PEP (No supera tope)</option>
+                        </select>
+                    </div>
+
+                    <!-- Variante 2: Lugar de firma / entrega -->
+                    <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
+                        <label class="block text-[11px] font-semibold text-slate-400 uppercase mb-1.5">Lugar de Gestión / Pago</label>
+                        <select id="varUbicacion" onchange="handleVariantChange()" class="w-full bg-slate-900 border border-slate-700 focus:border-sky-500 rounded-lg px-2.5 py-1.5 text-xs text-white outline-none">
+                            <option value="ventanilla" selected>Ventanilla de Caja (Estándar)</option>
+                            <option value="maquina">En la misma Máquina / Sala</option>
+                            <option value="vip">Sector VIP / Exclusivo</option>
+                        </select>
+                    </div>
+
+                    <!-- Variante 3: Medio de Pago / Retenciones -->
+                    <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
+                        <label class="block text-[11px] font-semibold text-slate-400 uppercase mb-1.5">Ajuste / Medio de Pago</label>
+                        <select id="varMedioPago" onchange="handleVariantChange()" class="w-full bg-slate-900 border border-slate-700 focus:border-sky-500 rounded-lg px-2.5 py-1.5 text-xs text-white outline-none">
+                            <option value="efectivo" selected>100% Efectivo (Estándar)</option>
+                            <option value="redondeo">Efectivo (Redondeo de centavos)</option>
+                            <option value="retencion">Efectivo c/ Descuento o Retención</option>
+                            <option value="transferencia">Pago por Transferencia / Cheque</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Campo extra condicional si hay Retención o Nota aclaratoria -->
+                <div id="retencionBox" class="hidden mt-3 pt-3 border-t border-slate-800/80 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-medium text-amber-300 mb-1">Monto Retenido / Diferencia ($)</label>
+                        <input type="text" id="montoRetencion" placeholder="Ej: 15.000,00" oninput="calculateBills()"
+                            class="w-full bg-slate-950 border border-amber-500/40 rounded-lg px-3 py-1.5 text-xs font-mono text-white outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-amber-300 mb-1">Observación adicional (opcional)</label>
+                        <input type="text" id="obsVariante" placeholder="Ej: CBU verificado / Descuento ley provincial" oninput="updateReport()"
+                            class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-white outline-none">
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECCIÓN 2: DATOS DEL CLIENTE -->
+            <section class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
+                <div class="flex items-center gap-2 mb-4 pb-3 border-b border-slate-800">
+                    <span class="flex items-center justify-center w-6 h-6 rounded-full bg-sky-500/20 text-sky-400 text-xs font-bold">2</span>
+                    <h2 class="text-sm font-semibold text-white uppercase tracking-wider">Datos del Cliente</h2>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-12 gap-4">
+                    <div class="sm:col-span-4">
+                        <label class="block text-xs font-medium text-slate-400 mb-1">Género / Trato</label>
+                        <div class="grid grid-cols-2 gap-2 bg-slate-950 p-1 rounded-xl border border-slate-800">
+                            <button type="button" id="btnGenM" onclick="setGender('M')" class="py-1.5 px-2 rounded-lg text-xs font-semibold bg-sky-500 text-slate-950 transition-all">
+                                Cliente (Sr.)
+                            </button>
+                            <button type="button" id="btnGenF" onclick="setGender('F')" class="py-1.5 px-2 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition-all">
+                                Clienta (Sra.)
+                            </button>
+                        </div>
+                    </div>
+                    <div class="sm:col-span-8">
+                        <label class="block text-xs font-medium text-slate-400 mb-1">Nombre y Apellido Completo</label>
+                        <input type="text" id="nombreCliente" placeholder="Ej: Juan Carlos Pérez" oninput="updateReport()"
+                            class="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 rounded-xl px-3.5 py-2 text-sm text-white placeholder-slate-600 outline-none transition-all">
+                    </div>
+                    <div class="sm:col-span-12">
+                        <label class="block text-xs font-medium text-slate-400 mb-1">Vestimenta / Descripción física ("viste de...")</label>
+                        <input type="text" id="vestimenta" placeholder="Ej: camisa a cuadros azul, pantalón de jean negro y zapatillas blancas" oninput="updateReport()"
+                            class="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 rounded-xl px-3.5 py-2 text-sm text-white placeholder-slate-600 outline-none transition-all">
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECCIÓN 3: CRONOLOGÍA, PERSONAL Y CONTROL HORARIO (PUNTOS 4 y 5) -->
+            <section class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
+                <div class="flex flex-wrap items-center justify-between gap-2 mb-4 pb-3 border-b border-slate-800">
+                    <div class="flex items-center gap-2">
+                        <span class="flex items-center justify-center w-6 h-6 rounded-full bg-sky-500/20 text-sky-400 text-xs font-bold">3</span>
+                        <h2 class="text-sm font-semibold text-white uppercase tracking-wider">Cronología y Personal (Horarios)</h2>
+                    </div>
+                    <label class="flex items-center gap-2 text-xs text-slate-300 cursor-pointer select-none bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800">
+                        <input type="checkbox" id="syncStaff" checked onchange="handleStaffSync()" class="rounded bg-slate-900 border-slate-700 text-sky-500 focus:ring-sky-500">
+                        <span>Mismo personal en todo el procedimiento</span>
+                    </label>
+                </div>
+
+                <!-- Alerta de inconsistencia cronológica (Punto 5) -->
+                <div id="timeWarningBanner" class="hidden mb-4 p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs flex items-start gap-2.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-amber-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <div class="flex-1">
+                        <span class="font-bold block text-amber-200">Atención en la secuencia de horarios:</span>
+                        <ul id="timeWarningList" class="list-disc list-inside mt-1 space-y-0.5 text-[11px]"></ul>
+                    </div>
+                </div>
+
+                <!-- Selector de Personal Unificado (Visible por defecto) -->
+                <div id="unifiedStaffBox" class="mb-5 p-3.5 bg-sky-950/20 border border-sky-500/20 rounded-xl grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
+                    <div class="sm:col-span-4">
+                        <label class="block text-xs font-medium text-sky-300 mb-1">Cargo del Personal</label>
+                        <select id="rolGlobal" onchange="syncAllStaff()" class="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 rounded-lg px-3 py-2 text-xs text-white outline-none">
+                            <option value="Enc.">Enc. (Encargado/a)</option>
+                            <option value="As.">As. (Asistente)</option>
+                            <option value="Op." selected>Op. (Operador/a)</option>
+                        </select>
+                    </div>
+                    <div class="sm:col-span-6">
+                        <label class="block text-xs font-medium text-sky-300 mb-1">Nombre / Apellido del Personal</label>
+                        <input type="text" id="nombreGlobal" list="staffList" placeholder="Ej: Gómez / Rodríguez" oninput="syncAllStaff()" onblur="rememberStaffName(this.value)"
+                            class="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 rounded-lg px-3 py-2 text-xs text-white placeholder-slate-600 outline-none">
+                    </div>
+                    <div class="sm:col-span-2">
+                        <button type="button" onclick="saveCurrentStaffManual()" title="Guardar apellido en lista frecuente" class="w-full py-2 px-2 bg-slate-800 hover:bg-slate-700 text-sky-400 rounded-lg text-xs font-medium border border-slate-700 transition-colors">
+                            + Guardar
+                        </button>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <!-- Evento 1: Llamada inicial -->
+                    <div id="rowHora1" class="p-3 bg-slate-950/60 border border-slate-800/80 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-colors">
+                        <div class="space-y-0.5">
+                            <span class="text-xs font-semibold text-sky-400">1. Llamada a CCTV (Aviso de Jackpot)</span>
+                            <p class="text-[11px] text-slate-400">Hora en que CCTV recibe el aviso desde sala.</p>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <div class="staff-individual hidden flex items-center gap-1.5">
+                                <select id="rol1" onchange="updateReport()" class="bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white">
+                                    <option value="Enc.">Enc.</option>
+                                    <option value="As.">As.</option>
+                                    <option value="Op." selected>Op.</option>
+                                </select>
+                                <input type="text" id="nom1" list="staffList" placeholder="Apellido" oninput="updateReport()" onblur="rememberStaffName(this.value)" class="w-24 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white">
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <button type="button" onclick="adjustTime('hora1', -1)" title="Restar 1 minuto" class="px-2 py-1.5 bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-700 rounded-lg text-[11px] font-mono">-1m</button>
+                                <input type="time" id="hora1" oninput="updateReport()" class="bg-slate-900 border border-slate-700 focus:border-sky-500 rounded-lg px-2 py-1.5 text-xs font-mono text-white outline-none">
+                                <button type="button" onclick="adjustTime('hora1', 1)" title="Sumar 1 minuto" class="px-2 py-1.5 bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-700 rounded-lg text-[11px] font-mono">+1m</button>
+                                <button type="button" onclick="setNow('hora1')" title="Poner hora actual" class="px-2.5 py-1.5 bg-sky-500/15 hover:bg-sky-500/25 text-sky-400 border border-sky-500/30 rounded-lg text-xs font-semibold transition-colors">Ahora</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Evento 2: Revisión (Cuando sale el premio) -->
+                    <div id="rowHora2" class="p-3 bg-slate-950/60 border border-slate-800/80 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-colors">
+                        <div class="space-y-0.5">
+                            <span class="text-xs font-semibold text-amber-400">2. Hora de salida del Premio (Revisión CCTV)</span>
+                            <p class="text-[11px] text-slate-400">Hora en que la grabación muestra que salió el premio (suele ser ≤ a la llamada).</p>
+                        </div>
+                        <div class="flex items-center gap-1 self-end sm:self-center">
+                            <button type="button" onclick="adjustTime('hora2', -1)" title="Restar 1 minuto" class="px-2 py-1.5 bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-700 rounded-lg text-[11px] font-mono">-1m</button>
+                            <input type="time" id="hora2" oninput="updateReport()" class="bg-slate-900 border border-slate-700 focus:border-sky-500 rounded-lg px-2 py-1.5 text-xs font-mono text-white outline-none">
+                            <button type="button" onclick="adjustTime('hora2', 1)" title="Sumar 1 minuto" class="px-2 py-1.5 bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-700 rounded-lg text-[11px] font-mono">+1m</button>
+                            <button type="button" onclick="setNow('hora2')" class="px-2.5 py-1.5 bg-sky-500/15 hover:bg-sky-500/25 text-sky-400 border border-sky-500/30 rounded-lg text-xs font-semibold transition-colors">Ahora</button>
+                        </div>
+                    </div>
+
+                    <!-- Evento 3: Confirmación de verificación -->
+                    <div id="rowHora3" class="p-3 bg-slate-950/60 border border-slate-800/80 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-colors">
+                        <div class="space-y-0.5">
+                            <span class="text-xs font-semibold text-sky-400">3. Confirmación de Verificación</span>
+                            <p class="text-[11px] text-slate-400">CCTV confirma verificación de cliente al personal.</p>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <div class="staff-individual hidden flex items-center gap-1.5">
+                                <select id="rol3" onchange="updateReport()" class="bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white">
+                                    <option value="Enc.">Enc.</option>
+                                    <option value="As.">As.</option>
+                                    <option value="Op." selected>Op.</option>
+                                </select>
+                                <input type="text" id="nom3" list="staffList" placeholder="Apellido" oninput="updateReport()" onblur="rememberStaffName(this.value)" class="w-24 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white">
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <button type="button" onclick="adjustTime('hora3', -1)" class="px-2 py-1.5 bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-700 rounded-lg text-[11px] font-mono">-1m</button>
+                                <input type="time" id="hora3" oninput="updateReport()" class="bg-slate-900 border border-slate-700 focus:border-sky-500 rounded-lg px-2 py-1.5 text-xs font-mono text-white outline-none">
+                                <button type="button" onclick="adjustTime('hora3', 1)" class="px-2 py-1.5 bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-700 rounded-lg text-[11px] font-mono">+1m</button>
+                                <button type="button" onclick="setNow('hora3')" class="px-2.5 py-1.5 bg-sky-500/15 hover:bg-sky-500/25 text-sky-400 border border-sky-500/30 rounded-lg text-xs font-semibold transition-colors">Ahora</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Evento 4: Registro y Descarga -->
+                    <div id="rowHora4" class="p-3 bg-slate-950/60 border border-slate-800/80 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-colors">
+                        <div class="space-y-0.5">
+                            <span class="text-xs font-semibold text-sky-400">4. Registro y Descarga del Premio</span>
+                            <p class="text-[11px] text-slate-400">Personal registra y descarga el premio de la máquina.</p>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <div class="staff-individual hidden flex items-center gap-1.5">
+                                <select id="rol4" onchange="updateReport()" class="bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white">
+                                    <option value="Enc.">Enc.</option>
+                                    <option value="As.">As.</option>
+                                    <option value="Op." selected>Op.</option>
+                                </select>
+                                <input type="text" id="nom4" list="staffList" placeholder="Apellido" oninput="updateReport()" onblur="rememberStaffName(this.value)" class="w-24 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white">
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <button type="button" onclick="adjustTime('hora4', -1)" class="px-2 py-1.5 bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-700 rounded-lg text-[11px] font-mono">-1m</button>
+                                <input type="time" id="hora4" oninput="updateReport()" class="bg-slate-900 border border-slate-700 focus:border-sky-500 rounded-lg px-2 py-1.5 text-xs font-mono text-white outline-none">
+                                <button type="button" onclick="adjustTime('hora4', 1)" class="px-2 py-1.5 bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-700 rounded-lg text-[11px] font-mono">+1m</button>
+                                <button type="button" onclick="setNow('hora4')" class="px-2.5 py-1.5 bg-sky-500/15 hover:bg-sky-500/25 text-sky-400 border border-sky-500/30 rounded-lg text-xs font-semibold transition-colors">Ahora</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Evento 5: Firma de DDJJ y PEP -->
+                    <div id="rowHora5" class="p-3 bg-slate-950/60 border border-slate-800/80 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-colors">
+                        <div class="space-y-0.5">
+                            <span id="labelStep5Title" class="text-xs font-semibold text-sky-400">5. Completado de DDJJ y PEP</span>
+                            <p id="labelStep5Desc" class="text-[11px] text-slate-400">Cliente completa documentación al costado de ventanilla de caja.</p>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <div class="staff-individual hidden flex items-center gap-1.5">
+                                <select id="rol5" onchange="updateReport()" class="bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white">
+                                    <option value="Enc.">Enc.</option>
+                                    <option value="As.">As.</option>
+                                    <option value="Op." selected>Op.</option>
+                                </select>
+                                <input type="text" id="nom5" list="staffList" placeholder="Apellido" oninput="updateReport()" onblur="rememberStaffName(this.value)" class="w-24 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white">
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <button type="button" onclick="adjustTime('hora5', -1)" class="px-2 py-1.5 bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-700 rounded-lg text-[11px] font-mono">-1m</button>
+                                <input type="time" id="hora5" oninput="updateReport()" class="bg-slate-900 border border-slate-700 focus:border-sky-500 rounded-lg px-2 py-1.5 text-xs font-mono text-white outline-none">
+                                <button type="button" onclick="adjustTime('hora5', 1)" class="px-2 py-1.5 bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-700 rounded-lg text-[11px] font-mono">+1m</button>
+                                <button type="button" onclick="setNow('hora5')" class="px-2.5 py-1.5 bg-sky-500/15 hover:bg-sky-500/25 text-sky-400 border border-sky-500/30 rounded-lg text-xs font-semibold transition-colors">Ahora</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Evento 6: Entrega por ventanilla de caja -->
+                    <div id="rowHora6" class="p-3 bg-slate-950/60 border border-slate-800/80 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-colors">
+                        <div class="space-y-0.5">
+                            <span class="text-xs font-semibold text-sky-400">6. Entrega de Billetes por Ventanilla</span>
+                            <p class="text-[11px] text-slate-400">Informa entrega de efectivo desde ventanilla de caja.</p>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <div class="staff-individual hidden flex items-center gap-1.5">
+                                <select id="rol6" onchange="updateReport()" class="bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white">
+                                    <option value="Enc.">Enc.</option>
+                                    <option value="As.">As.</option>
+                                    <option value="Op." selected>Op.</option>
+                                </select>
+                                <input type="text" id="nom6" list="staffList" placeholder="Apellido" oninput="updateReport()" onblur="rememberStaffName(this.value)" class="w-24 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white">
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <button type="button" onclick="adjustTime('hora6', -1)" class="px-2 py-1.5 bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-700 rounded-lg text-[11px] font-mono">-1m</button>
+                                <input type="time" id="hora6" oninput="updateReport()" class="bg-slate-900 border border-slate-700 focus:border-sky-500 rounded-lg px-2 py-1.5 text-xs font-mono text-white outline-none">
+                                <button type="button" onclick="adjustTime('hora6', 1)" class="px-2 py-1.5 bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-700 rounded-lg text-[11px] font-mono">+1m</button>
+                                <button type="button" onclick="setNow('hora6')" class="px-2.5 py-1.5 bg-sky-500/15 hover:bg-sky-500/25 text-sky-400 border border-sky-500/30 rounded-lg text-xs font-semibold transition-colors">Ahora</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Evento 7: Entrega de efectivo en mano al cliente -->
+                    <div id="rowHora7" class="p-3 bg-slate-950/60 border border-slate-800/80 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-colors">
+                        <div class="space-y-0.5">
+                            <span class="text-xs font-semibold text-emerald-400">7. Entrega de Efectivo al Cliente</span>
+                            <p class="text-[11px] text-slate-400">Personal entrega el dinero directamente al cliente.</p>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <div class="staff-individual hidden flex items-center gap-1.5">
+                                <select id="rol7" onchange="updateReport()" class="bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white">
+                                    <option value="Enc.">Enc.</option>
+                                    <option value="As.">As.</option>
+                                    <option value="Op." selected>Op.</option>
+                                </select>
+                                <input type="text" id="nom7" list="staffList" placeholder="Apellido" oninput="updateReport()" onblur="rememberStaffName(this.value)" class="w-24 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white">
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <button type="button" onclick="adjustTime('hora7', -1)" class="px-2 py-1.5 bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-700 rounded-lg text-[11px] font-mono">-1m</button>
+                                <input type="time" id="hora7" oninput="updateReport()" class="bg-slate-900 border border-slate-700 focus:border-sky-500 rounded-lg px-2 py-1.5 text-xs font-mono text-white outline-none">
+                                <button type="button" onclick="adjustTime('hora7', 1)" class="px-2 py-1.5 bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-700 rounded-lg text-[11px] font-mono">+1m</button>
+                                <button type="button" onclick="setNow('hora7')" class="px-2.5 py-1.5 bg-sky-500/15 hover:bg-sky-500/25 text-sky-400 border border-sky-500/30 rounded-lg text-xs font-semibold transition-colors">Ahora</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECCIÓN 4: DESGLOSE DE BILLETES + VALIDACIÓN DE DIFERENCIA (PUNTO 1) -->
+            <section class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
+                <div class="flex flex-wrap items-center justify-between gap-2 mb-4 pb-3 border-b border-slate-800">
+                    <div class="flex items-center gap-2">
+                        <span class="flex items-center justify-center w-6 h-6 rounded-full bg-sky-500/20 text-sky-400 text-xs font-bold">4</span>
+                        <h2 class="text-sm font-semibold text-white uppercase tracking-wider">Arqueo de Billetes y Validación de Monto</h2>
+                    </div>
+                    <label class="flex items-center gap-2 text-xs text-slate-300 cursor-pointer select-none bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800">
+                        <input type="checkbox" id="omitZeroBills" onchange="updateReport()" class="rounded bg-slate-900 border-slate-700 text-sky-500 focus:ring-sky-500">
+                        <span>Omitir billetes en 0 del texto</span>
+                    </label>
+                </div>
+
+                <!-- Opcional: Billetes nuevos de $20.000 y $10.000 por si los necesitan -->
+                <div class="mb-3 flex items-center justify-between bg-slate-950/50 px-3 py-2 rounded-lg border border-slate-800/60">
+                    <span class="text-xs text-slate-400">¿Incluir denominaciones de $20.000 y $10.000?</span>
+                    <input type="checkbox" id="includeHighDenom" onchange="toggleHighDenom()" class="rounded bg-slate-900 border-slate-700 text-sky-500 focus:ring-sky-500">
+                </div>
+
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+                    <!-- Billetes de alta denominación -->
+                    <div id="box20000" class="hidden bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="font-bold text-amber-400">$ 20.000</span>
+                            <span id="sub20000" class="text-slate-500 font-mono text-[11px]">$0</span>
+                        </div>
+                        <input type="number" id="b20000" min="0" placeholder="000" oninput="calculateBills()"
+                            class="w-full bg-slate-900 border border-slate-700 focus:border-sky-500 rounded-lg px-2.5 py-1.5 text-sm font-mono text-white outline-none">
+                    </div>
+                    <div id="box10000" class="hidden bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="font-bold text-amber-400">$ 10.000</span>
+                            <span id="sub10000" class="text-slate-500 font-mono text-[11px]">$0</span>
+                        </div>
+                        <input type="number" id="b10000" min="0" placeholder="000" oninput="calculateBills()"
+                            class="w-full bg-slate-900 border border-slate-700 focus:border-sky-500 rounded-lg px-2.5 py-1.5 text-sm font-mono text-white outline-none">
+                    </div>
+
+                    <!-- Denominaciones estándar de la plantilla -->
+                    <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="font-semibold text-emerald-400">$ 2.000</span>
+                            <span id="sub2000" class="text-slate-500 font-mono text-[11px]">$0</span>
+                        </div>
+                        <input type="number" id="b2000" min="0" placeholder="000" oninput="calculateBills()"
+                            class="w-full bg-slate-900 border border-slate-700 focus:border-sky-500 rounded-lg px-2.5 py-1.5 text-sm font-mono text-white outline-none">
+                    </div>
+
+                    <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="font-semibold text-emerald-400">$ 1.000</span>
+                            <span id="sub1000" class="text-slate-500 font-mono text-[11px]">$0</span>
+                        </div>
+                        <input type="number" id="b1000" min="0" placeholder="000" oninput="calculateBills()"
+                            class="w-full bg-slate-900 border border-slate-700 focus:border-sky-500 rounded-lg px-2.5 py-1.5 text-sm font-mono text-white outline-none">
+                    </div>
+
+                    <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="font-semibold text-emerald-400">$ 500</span>
+                            <span id="sub500" class="text-slate-500 font-mono text-[11px]">$0</span>
+                        </div>
+                        <input type="number" id="b500" min="0" placeholder="000" oninput="calculateBills()"
+                            class="w-full bg-slate-900 border border-slate-700 focus:border-sky-500 rounded-lg px-2.5 py-1.5 text-sm font-mono text-white outline-none">
+                    </div>
+
+                    <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="font-semibold text-emerald-400">$ 200</span>
+                            <span id="sub200" class="text-slate-500 font-mono text-[11px]">$0</span>
+                        </div>
+                        <input type="number" id="b200" min="0" placeholder="000" oninput="calculateBills()"
+                            class="w-full bg-slate-900 border border-slate-700 focus:border-sky-500 rounded-lg px-2.5 py-1.5 text-sm font-mono text-white outline-none">
+                    </div>
+
+                    <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="font-semibold text-emerald-400">$ 100</span>
+                            <span id="sub100" class="text-slate-500 font-mono text-[11px]">$0</span>
+                        </div>
+                        <input type="number" id="b100" min="0" placeholder="000" oninput="calculateBills()"
+                            class="w-full bg-slate-900 border border-slate-700 focus:border-sky-500 rounded-lg px-2.5 py-1.5 text-sm font-mono text-white outline-none">
+                    </div>
+
+                    <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="font-semibold text-emerald-400">$ 50</span>
+                            <span id="sub50" class="text-slate-500 font-mono text-[11px]">$0</span>
+                        </div>
+                        <input type="number" id="b50" min="0" placeholder="000" oninput="calculateBills()"
+                            class="w-full bg-slate-900 border border-slate-700 focus:border-sky-500 rounded-lg px-2.5 py-1.5 text-sm font-mono text-white outline-none">
+                    </div>
+
+                    <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="font-semibold text-emerald-400">$ 20</span>
+                            <span id="sub20" class="text-slate-500 font-mono text-[11px]">$0</span>
+                        </div>
+                        <input type="number" id="b20" min="0" placeholder="000" oninput="calculateBills()"
+                            class="w-full bg-slate-900 border border-slate-700 focus:border-sky-500 rounded-lg px-2.5 py-1.5 text-sm font-mono text-white outline-none">
+                    </div>
+
+                    <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="font-semibold text-emerald-400">$ 10</span>
+                            <span id="sub10" class="text-slate-500 font-mono text-[11px]">$0</span>
+                        </div>
+                        <input type="number" id="b10" min="0" placeholder="000" oninput="calculateBills()"
+                            class="w-full bg-slate-900 border border-slate-700 focus:border-sky-500 rounded-lg px-2.5 py-1.5 text-sm font-mono text-white outline-none">
+                    </div>
+                </div>
+
+                <!-- Barra de Total Calculado y Validador de Diferencia (Punto 1) -->
+                <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 space-y-3">
+                    <div class="flex flex-wrap items-center justify-between gap-3">
+                        <div>
+                            <span class="text-xs text-slate-400 block">Total arqueado en billetes:</span>
+                            <span id="totalBilletesTexto" class="text-lg font-bold font-mono text-emerald-400">$ 0,00</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button type="button" onclick="useCalculatedAsJackpot()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs font-medium text-sky-400 rounded-lg border border-slate-700 transition-colors">
+                                Copiar al Monto del Premio
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Semáforo comparador Premio vs Billetes -->
+                    <div id="validationBox" class="p-3 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-between gap-2 text-xs">
+                        <div class="flex items-center gap-2">
+                            <span id="validationDot" class="w-2.5 h-2.5 rounded-full bg-slate-500 shrink-0"></span>
+                            <span id="validationText" class="text-slate-400">Ingresa el Monto del Jackpot y los billetes para verificar coincidencia.</span>
+                        </div>
+                        <span id="validationDiffBadge" class="font-mono font-bold text-slate-400"></span>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+
+        <!-- COLUMNA DERECHA: VISTA PREVIA EN TIEMPO REAL (5 Columnas en Desktop) -->
+        <div class="lg:col-span-5">
+            <div class="sticky top-20 space-y-4">
+                
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-2xl flex flex-col">
+                    <div class="flex items-center justify-between mb-3 pb-3 border-b border-slate-800">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                            <h2 class="text-sm font-semibold text-white uppercase tracking-wider">Vista Previa del Acta</h2>
+                        </div>
+                        <span id="lastSavedIndicator" class="text-[11px] font-mono text-slate-400">Listo</span>
+                    </div>
+
+                    <!-- Contenedor de texto formateado para lectura fácil -->
+                    <div id="previewVisual" class="bg-slate-950 border border-slate-800/80 rounded-xl p-4 text-xs sm:text-sm leading-relaxed text-slate-200 font-mono whitespace-pre-wrap select-all min-h-[360px] max-h-[60vh] overflow-y-auto"></div>
+
+                    <!-- Textarea oculto para copiado limpio -->
+                    <textarea id="rawReportText" class="sr-only" readonly></textarea>
+
+                    <!-- Botones de acción rápida en el panel de vista previa -->
+                    <div class="mt-4 pt-3 border-t border-slate-800 grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        <button type="button" onclick="copyReport()" class="py-2.5 px-4 rounded-xl text-xs font-bold bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white shadow-lg shadow-sky-500/20 transition-all flex items-center justify-center gap-2 active:scale-98">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                            </svg>
+                            Copiar al Portapapeles
+                        </button>
+                        <button type="button" onclick="saveAndStartNew()" class="py-2.5 px-4 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-emerald-500/20 text-emerald-400 border border-slate-700 hover:border-emerald-500/30 transition-all flex items-center justify-center gap-1.5">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                            </svg>
+                            Archivar y Nuevo Jackpot
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tarjeta de Base de Conocimiento (Punto 4) -->
+                <div class="bg-slate-900/70 border border-slate-800/80 rounded-xl p-4 text-xs text-slate-400 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="font-semibold text-slate-300 flex items-center gap-1.5">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-sky-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                            </svg>
+                            Memoria Inteligente de Sala
+                        </span>
+                        <button type="button" onclick="toggleCatalogModal()" class="text-sky-400 hover:underline text-[11px]">Ver / Editar</button>
+                    </div>
+                    <p class="text-[11px]">Al escribir un N° de Máquina y su Juego, el sistema los vincula automáticamente para autocompletarlos la próxima vez.</p>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <!-- PANEL LATERAL (DRAWER) DE HISTORIAL DEL TURNO Y PAGOS SIMULTÁNEOS (PUNTO 2) -->
+    <div id="historyDrawerBackdrop" onclick="toggleHistoryDrawer()" class="fixed inset-0 z-40 bg-slate-950/70 backdrop-blur-sm hidden"></div>
+    <aside id="historyDrawer" class="fixed top-0 right-0 z-50 h-full w-full max-w-md bg-slate-900 border-l border-slate-800 shadow-2xl transform translate-x-full transition-transform duration-300 flex flex-col">
+        <div class="p-4 border-b border-slate-800 flex items-center justify-between">
+            <div>
+                <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-sky-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Historial de Turno / En Curso
+                </h3>
+                <p class="text-[11px] text-slate-400">Cambia entre varios Jackpots sin perder datos</p>
+            </div>
+            <button type="button" onclick="toggleHistoryDrawer()" class="p-1.5 rounded-lg bg-slate-800 text-slate-400 hover:text-white">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        <div class="p-3 border-b border-slate-800 bg-slate-950/50 flex items-center justify-between gap-2">
+            <button type="button" onclick="saveReportToHistory()" class="flex-1 py-2 px-3 rounded-lg bg-sky-500 hover:bg-sky-400 text-slate-950 font-semibold text-xs flex items-center justify-center gap-1.5">
+                + Guardar Formulario Actual aquí
+            </button>
+        </div>
+
+        <div id="historyListContainer" class="flex-1 overflow-y-auto p-4 space-y-3">
+            <p class="text-xs text-slate-500 text-center py-8">No hay reportes archivados en este turno todavía.</p>
+        </div>
+    </aside>
+
+    <!-- MODAL DE CATÁLOGO DE MÁQUINAS Y PERSONAL (PUNTO 4) -->
+    <div id="catalogModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-5 shadow-2xl space-y-4 max-h-[85vh] flex flex-col">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="text-sm font-bold text-white">Base de Datos de Máquinas y Personal</h3>
+                <button type="button" onclick="toggleCatalogModal()" class="text-slate-400 hover:text-white text-xs">Cerrar ✕</button>
+            </div>
+            <div class="flex-1 overflow-y-auto space-y-4 pr-1">
+                <div>
+                    <h4 class="text-xs font-semibold text-sky-400 uppercase mb-2">Máquinas Asociadas a Juegos</h4>
+                    <div id="catalogMachinesList" class="space-y-1.5 text-xs"></div>
+                </div>
+                <div class="border-t border-slate-800 pt-3">
+                    <h4 class="text-xs font-semibold text-emerald-400 uppercase mb-2">Personal Frecuente Guardado</h4>
+                    <div id="catalogStaffList" class="flex flex-wrap gap-1.5 text-xs"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- NOTIFICACIÓN TOAST -->
+    <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+        <div class="bg-emerald-500 text-slate-950 px-4 py-3 rounded-xl shadow-2xl flex items-center gap-2.5 font-semibold text-xs">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+            </svg>
+            <span id="toastMsg">¡Reporte copiado al portapapeles!</span>
+        </div>
+    </div>
+
+    <!-- MODAL DE CONFIRMACIÓN PARA LIMPIAR -->
+    <div id="resetModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-sm w-full p-5 shadow-2xl space-y-4">
+            <div class="flex items-center gap-3 text-rose-400">
+                <div class="w-10 h-10 rounded-full bg-rose-500/10 flex items-center justify-center shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-sm font-bold text-white">¿Limpiar todos los datos?</h3>
+                    <p class="text-xs text-slate-400">Se borrarán todos los campos del formulario actual.</p>
+                </div>
+            </div>
+            <div class="flex justify-end gap-2 pt-2">
+                <button type="button" onclick="closeResetModal()" class="px-3.5 py-2 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-300">Cancelar</button>
+                <button type="button" onclick="executeReset()" class="px-3.5 py-2 rounded-lg text-xs font-semibold bg-rose-500 hover:bg-rose-400 text-slate-950">Sí, limpiar</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Estado de la aplicación y bases de datos
+        let currentGender = 'M';
+        let calculatedTotalAmount = 0;
+        let machineGameMap = {
+            "12045": "Link King",
+            "10422": "Buffalo Gold",
+            "11890": "Lightning Link",
+            "15012": "Dragon Link",
+            "14200": "88 Fortunes"
+        };
+        let frequentStaff = ["Gómez", "Rodríguez", "Fernández", "López", "Martínez", "Pérez"];
+        let shiftHistory = [];
+
+        // Variables de Firebase
+        let db = null;
+        let auth = null;
+        let currentUser = null;
+        let saveDraftTimeout = null;
+        let isRestoringDraft = false;
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'cctv-jackpot-app';
+
+        /**
+         * Inicializa la conexión para persistencia de borrador, historial y catálogo
+         */
+        async function initCloudStorage() {
+            try {
+                if (typeof __firebase_config === 'undefined' || !__firebase_config) {
+                    renderDatalists();
+                    return;
+                }
+                const firebaseConfig = JSON.parse(__firebase_config);
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+                onAuthStateChanged(auth, async (user) => {
+                    currentUser = user;
+                    if (!user) return;
+                    await loadCatalogAndDraft();
+                    subscribeToShiftHistory();
+                });
+            } catch (err) {
+                console.warn("Modo sesión activa:", err);
+                renderDatalists();
+            }
+        }
+
+        /**
+         * Carga el borrador actual y el catálogo de máquinas/personal guardado
+         */
+        async function loadCatalogAndDraft() {
+            if (! currentUser || !db) return;
+            try {
+                // 1. Cargar catálogo de máquinas y personal
+                const catalogRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'settings', 'catalog');
+                const catalogSnap = await getDoc(catalogRef);
+                if (catalogSnap.exists()) {
+                    const data = catalogSnap.data();
+                    if (data.machinesJson) {
+                        machineGameMap = { ...machineGameMap, ...JSON.parse(data.machinesJson) };
+                    }
+                    if (Array.isArray(data.staffList)) {
+                        frequentStaff = Array.from(new Set([...frequentStaff, ...data.staffList]));
+                    }
+                }
+                renderDatalists();
+
+                // 2. Cargar borrador en curso para no perder nada al refrescar
+                const draftRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'drafts', 'activeDraft');
+                const draftSnap = await getDoc(draftRef);
+                if (draftSnap.exists()) {
+                    isRestoringDraft = true;
+                    applyStateToForm(draftSnap.data());
+                    isRestoringDraft = false;
+                    document.getElementById('lastSavedIndicator').textContent = 'Borrador recuperado';
+                }
+            } catch (e) {
+                console.warn("Error cargando datos iniciales:", e);
+            }
+        }
+
+        /**
+         * Escucha cambios en el historial de Jackpots del turno
+         */
+        function subscribeToShiftHistory() {
+            if (!currentUser || !db) return;
+            const histCol = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'shiftHistory');
+            onSnapshot(histCol, (snapshot) => {
+                const items = [];
+                snapshot.forEach(docSnap => {
+                    items.push({ id: docSnap.id, ...docSnap.data() });
+                });
+                items.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+                shiftHistory = items;
+                renderHistoryList();
+            }, (err) => {
+                console.warn("Error en listener de historial:", err);
+            });
+        }
+
+        /**
+         * Guarda automáticamente el borrador con debounce
+         */
+        function triggerDraftAutoSave() {
+            if (isRestoringDraft) return;
+            const indicator = document.getElementById('lastSavedIndicator');
+            if (indicator) indicator.textContent = 'Guardando...';
+
+            if (saveDraftTimeout) clearTimeout(saveDraftTimeout);
+            saveDraftTimeout = setTimeout(async () => {
+                const state = collectFormState();
+                if (currentUser && db) {
+                    try {
+                        const draftRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'drafts', 'activeDraft');
+                        await setDoc(draftRef, state);
+                        if (indicator) indicator.textContent = 'Autoguardado ✓';
+                    } catch (e) {
+                        if (indicator) indicator.textContent = 'En memoria';
+                    }
+                } else {
+                    if (indicator) indicator.textContent = 'Actualizado';
+                }
+            }, 600);
+        }
+
+        /**
+         * Persiste el catálogo de máquinas y personal frecuente
+         */
+        async function persistCatalog() {
+            renderDatalists();
+            if (!currentUser || !db) return;
+            try {
+                const catalogRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'settings', 'catalog');
+                await setDoc(catalogRef, {
+                    machinesJson: JSON.stringify(machineGameMap),
+                    staffList: frequentStaff
+                });
+            } catch (e) {
+                console.warn("No se pudo guardar catálogo:", e);
+            }
+        }
+
+        /**
+         * Recolecta todos los valores actuales del formulario en un objeto JSON
+         */
+        function collectFormState() {
+            const billDenoms = [20000, 10000, 2000, 1000, 500, 200, 100, 50, 20, 10];
+            const bills = {};
+            billDenoms.forEach(d => {
+                bills[`b${d}`] = document.getElementById(`b${d}`)?.value || '';
+            });
+
+            const hours = {};
+            const staffRoles = {};
+            const staffNames = {};
+            for (let i = 1; i <= 7; i++) {
+                hours[`hora${i}`] = document.getElementById(`hora${i}`)?.value || '';
+                if (i !== 2) {
+                    staffRoles[`rol${i}`] = document.getElementById(`rol${i}`)?.value || 'Op.';
+                    staffNames[`nom${i}`] = document.getElementById(`nom${i}`)?.value || '';
+                }
+            }
+
+            return {
+                maquina: document.getElementById('maquina').value,
+                valorPremio: document.getElementById('valorPremio').value,
+                juego: document.getElementById('juego').value,
+                ordenPago: document.getElementById('ordenPago').value,
+                gender: currentGender,
+                nombreCliente: document.getElementById('nombreCliente').value,
+                vestimenta: document.getElementById('vestimenta').value,
+                syncStaff: document.getElementById('syncStaff').checked,
+                rolGlobal: document.getElementById('rolGlobal').value,
+                nombreGlobal: document.getElementById('nombreGlobal').value,
+                varDocMode: document.getElementById('varDocMode').value,
+                varUbicacion: document.getElementById('varUbicacion').value,
+                varMedioPago: document.getElementById('varMedioPago').value,
+                montoRetencion: document.getElementById('montoRetencion').value,
+                obsVariante: document.getElementById('obsVariante').value,
+                includeHighDenom: document.getElementById('includeHighDenom').checked,
+                omitZeroBills: document.getElementById('omitZeroBills').checked,
+                billsJson: JSON.stringify(bills),
+                hoursJson: JSON.stringify(hours),
+                staffRolesJson: JSON.stringify(staffRoles),
+                staffNamesJson: JSON.stringify(staffNames),
+                updatedAt: Date.now()
+            };
+        }
+
+        /**
+         * Carga un estado guardado dentro del formulario
+         */
+        function applyStateToForm(state) {
+            if (!state) return;
+            document.getElementById('maquina').value = state.maquina || '';
+            document.getElementById('valorPremio').value = state.valorPremio || '';
+            document.getElementById('juego').value = state.juego || '';
+            document.getElementById('ordenPago').value = state.ordenPago || '';
+            document.getElementById('nombreCliente').value = state.nombreCliente || '';
+            document.getElementById('vestimenta').value = state.vestimenta || '';
+            document.getElementById('syncStaff').checked = state.syncStaff !== false;
+            document.getElementById('rolGlobal').value = state.rolGlobal || 'Op.';
+            document.getElementById('nombreGlobal').value = state.nombreGlobal || '';
+
+            document.getElementById('varDocMode').value = state.varDocMode || 'ddjj_pep';
+            document.getElementById('varUbicacion').value = state.varUbicacion || 'ventanilla';
+            document.getElementById('varMedioPago').value = state.varMedioPago || 'efectivo';
+            document.getElementById('montoRetencion').value = state.montoRetencion || '';
+            document.getElementById('obsVariante').value = state.obsVariante || '';
+
+            document.getElementById('includeHighDenom').checked = !!state.includeHighDenom;
+            document.getElementById('omitZeroBills').checked = !!state.omitZeroBills;
+
+            if (state.billsJson) {
+                const bills = JSON.parse(state.billsJson);
+                Object.keys(bills).forEach(k => {
+                    const el = document.getElementById(k);
+                    if (el) el.value = bills[k];
+                });
+            }
+
+            if (state.hoursJson) {
+                const hours = JSON.parse(state.hoursJson);
+                Object.keys(hours).forEach(k => {
+                    const el = document.getElementById(k);
+                    if (el) el.value = hours[k];
+                });
+            }
+
+            if (state.staffRolesJson) {
+                const roles = JSON.parse(state.staffRolesJson);
+                Object.keys(roles).forEach(k => {
+                    const el = document.getElementById(k);
+                    if (el) el.value = roles[k];
+                });
+            }
+
+            if (state.staffNamesJson) {
+                const names = JSON.parse(state.staffNamesJson);
+                Object.keys(names).forEach(k => {
+                    const el = document.getElementById(k);
+                    if (el) el.value = names[k];
+                });
+            }
+
+            setGender(state.gender || 'M');
+            toggleHighDenom();
+            handleStaffSync();
+            handleVariantChange();
+            calculateBills();
+        }
+
+        /**
+         * Renderiza los datalists de autocompletado y el modal de catálogo (Punto 4)
+         */
+        function renderDatalists() {
+            const machinesDl = document.getElementById('machinesList');
+            const gamesDl = document.getElementById('gamesList');
+            const staffDl = document.getElementById('staffList');
+
+            const machineKeys = Object.keys(machineGameMap);
+            const uniqueGames = Array.from(new Set(Object.values(machineGameMap)));
+
+            machinesDl.innerHTML = machineKeys.map(m => `<option value="${m}">${machineGameMap[m]}</option>`).join('');
+            gamesDl.innerHTML = uniqueGames.map(g => `<option value="${g}"></option>`).join('');
+            staffDl.innerHTML = frequentStaff.map(s => `<option value="${s}"></option>`).join('');
+
+            const countEl = document.getElementById('savedMachinesCount');
+            if (countEl) countEl.textContent = `${machineKeys.length} en memoria`;
+
+            // Poblar modal de catálogo
+            const catMach = document.getElementById('catalogMachinesList');
+            if (catMach) {
+                catMach.innerHTML = machineKeys.length > 0
+                    ? machineKeys.map(m => `
+                        <div class="flex items-center justify-between bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800">
+                            <span><strong class="text-sky-400 font-mono">Máq. ${m}</strong> → ${machineGameMap[m]}</span>
+                            <button type="button" onclick="deleteMachineFromCatalog('${m}')" class="text-rose-400 hover:underline text-[11px]">Borrar</button>
+                        </div>
+                    `).join('')
+                    : '<p class="text-slate-500">Sin máquinas guardadas.</p>';
+            }
+
+            const catStaff = document.getElementById('catalogStaffList');
+            if (catStaff) {
+                catStaff.innerHTML = frequentStaff.map(s => `
+                    <span class="inline-flex items-center gap-1.5 bg-slate-950 px-2.5 py-1 rounded-lg border border-slate-800 text-slate-300">
+                        ${s}
+                        <button type="button" onclick="deleteStaffFromCatalog('${s}')" class="text-rose-400 hover:text-rose-300">×</button>
+                    </span>
+                `).join('');
+            }
+        }
+
+        /**
+         * Detecta cuando el usuario escribe un N° de máquina y autocompleta el Juego si existe (Punto 4)
+         */
+        function onMachineInput() {
+            const maq = document.getElementById('maquina').value.trim();
+            const badge = document.getElementById('machineMemoryBadge');
+            if (machineGameMap[maq]) {
+                document.getElementById('juego').value = machineGameMap[maq];
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+            updateReport();
+        }
+
+        /**
+         * Guarda automáticamente la relación Máquina -> Juego cuando se completan ambos
+         */
+        function autoRememberMachine() {
+            const maq = document.getElementById('maquina').value.trim();
+            const juego = document.getElementById('juego').value.trim();
+            if (maq && juego && machineGameMap[maq] !== juego) {
+                machineGameMap[maq] = juego;
+                persistCatalog();
+            }
+        }
+
+        function saveMachineAssociation() {
+            const maq = document.getElementById('maquina').value.trim();
+            const juego = document.getElementById('juego').value.trim();
+            if (!maq || !juego) {
+                showToast('Ingresa N° de Máquina y Juego para asociarlos');
+                return;
+            }
+            machineGameMap[maq] = juego;
+            persistCatalog();
+            showToast(`Máq. ${maq} asociada a "${juego}"`);
+        }
+
+        function rememberStaffName(name) {
+            const clean = (name || '').trim();
+            if (clean && clean.length >= 2 && !frequentStaff.includes(clean)) {
+                frequentStaff.push(clean);
+                persistCatalog();
+            }
+        }
+
+        function saveCurrentStaffManual() {
+            const val = document.getElementById('nombreGlobal').value.trim();
+            if (!val) {
+                showToast('Escribe un apellido primero');
+                return;
+            }
+            rememberStaffName(val);
+            showToast(`Personal "${val}" guardado en autocompletado`);
+        }
+
+        function deleteMachineFromCatalog(m) {
+            delete machineGameMap[m];
+            persistCatalog();
+        }
+
+        function deleteStaffFromCatalog(s) {
+            frequentStaff = frequentStaff.filter(item => item !== s);
+            persistCatalog();
+        }
+
+        /**
+         * Convierte un string de moneda formato argentino ("1.250.000,50") a número flotante
+         */
+        function parseCurrencyAR(str) {
+            if (!str) return 0;
+            const cleaned = String(str)
+                .replace(/\$/g, '')
+                .replace(/\s/g, '')
+                .replace(/\./g, '')
+                .replace(',', '.');
+            const num = parseFloat(cleaned);
+            return isNaN(num) ? 0 : num;
+        }
+
+        /**
+         * Formatea el campo Monto del Jackpot a miles y decimales argentinos bajo demanda
+         */
+        function formatJackpotInput() {
+            const input = document.getElementById('valorPremio');
+            const num = parseCurrencyAR(input.value);
+            if (num > 0) {
+                input.value = formatCurrencyAR(num);
+                calculateBills();
+            }
+        }
+
+        function onJackpotAmountInput() {
+            calculateBills();
+        }
+
+        /**
+         * Cambia el género del cliente y actualiza el estilo de los botones y el texto
+         */
+        function setGender(gender) {
+            currentGender = gender;
+            const btnM = document.getElementById('btnGenM');
+            const btnF = document.getElementById('btnGenF');
+
+            if (gender === 'M') {
+                btnM.className = "py-1.5 px-2 rounded-lg text-xs font-semibold bg-sky-500 text-slate-950 transition-all";
+                btnF.className = "py-1.5 px-2 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition-all";
+            } else {
+                btnF.className = "py-1.5 px-2 rounded-lg text-xs font-semibold bg-sky-500 text-slate-950 transition-all";
+                btnM.className = "py-1.5 px-2 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition-all";
+            }
+            updateReport();
+        }
+
+        /**
+         * Coloca la hora actual (HH:MM) en el campo de tiempo indicado
+         */
+        function setNow(inputId) {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            document.getElementById(inputId).value = `${hours}:${minutes}`;
+            updateReport();
+        }
+
+        /**
+         * Suma o resta minutos rápidamente a cualquier reloj (Punto 5)
+         */
+        function adjustTime(inputId, deltaMinutes) {
+            const input = document.getElementById(inputId);
+            let hours, minutes;
+
+            if (!input.value) {
+                const now = new Date();
+                hours = now.getHours();
+                minutes = now.getMinutes();
+            } else {
+                const parts = input.value.split(':').map(Number);
+                hours = parts[0];
+                minutes = parts[1];
+            }
+
+            let totalMins = hours * 60 + minutes + deltaMinutes;
+            if (totalMins < 0) totalMins += 1440;
+            totalMins = totalMins % 1440;
+
+            const newH = String(Math.floor(totalMins / 60)).padStart(2, '0');
+            const newM = String(totalMins % 60).padStart(2, '0');
+            input.value = `${newH}:${newM}`;
+            updateReport();
+        }
+
+        /**
+         * Verifica que la secuencia horaria sea lógica y avisa si hay saltos hacia atrás (Punto 5)
+         */
+        function validateChronology() {
+            const warnings = [];
+            for (let i = 1; i <= 7; i++) {
+                const row = document.getElementById(`rowHora${i}`);
+                if (row) {
+                    row.classList.remove('border-amber-500/60', 'bg-amber-950/20');
+                    row.classList.add('border-slate-800/80');
+                }
+            }
+
+            const toMins = (val) => {
+                if (!val || !val.includes(':')) return null;
+                const [h, m] = val.split(':').map(Number);
+                return h * 60 + m;
+            };
+
+            const t1 = toMins(document.getElementById('hora1').value);
+            const t2 = toMins(document.getElementById('hora2').value);
+            const t3 = toMins(document.getElementById('hora3').value);
+            const t4 = toMins(document.getElementById('hora4').value);
+            const t5 = toMins(document.getElementById('hora5').value);
+            const t6 = toMins(document.getElementById('hora6').value);
+            const t7 = toMins(document.getElementById('hora7').value);
+
+            // Función auxiliar que contempla cruce de medianoche (ej. 23:55 a 00:05 es válido)
+            const isAfter = (early, late) => {
+                if (early === null || late === null) return false;
+                const diff = early - late;
+                // Si early es mayor que late por entre 1 y 360 min, hubo retroceso involuntario
+                return diff > 0 && diff < 360;
+            };
+
+            // 1. La salida del premio en grabación (Paso 2) no debería ser posterior al aviso telefónico (Paso 1)
+            if (isAfter(t2, t1)) {
+                warnings.push('La hora de salida del premio (Paso 2) figura posterior a la llamada de aviso a CCTV (Paso 1).');
+                highlightTimeRow(2);
+            }
+
+            // 2. Secuencia cronológica normal entre pasos 1 -> 3 -> 4 -> 5 -> 6 -> 7
+            const seq = [
+                { step: 1, val: t1, name: 'Llamada a CCTV (1)' },
+                { step: 3, val: t3, name: 'Confirmación CCTV (3)' },
+                { step: 4, val: t4, name: 'Descarga de Premio (4)' },
+                { step: 5, val: t5, name: 'Documentación (5)' },
+                { step: 6, val: t6, name: 'Arqueo Ventanilla (6)' },
+                { step: 7, val: t7, name: 'Entrega al Cliente (7)' }
+            ];
+
+            for (let i = 0; i < seq.length - 1; i++) {
+                const curr = seq[i];
+                const next = seq[i + 1];
+                if (curr.val !== null && next.val !== null && isAfter(curr.val, next.val)) {
+                    warnings.push(`El horario de "${next.name}" es anterior a "${curr.name}".`);
+                    highlightTimeRow(next.step);
+                }
+            }
+
+            const banner = document.getElementById('timeWarningBanner');
+            const list = document.getElementById('timeWarningList');
+            if (warnings.length > 0) {
+                list.innerHTML = warnings.map(w => `<li>${w}</li>`).join('');
+                banner.classList.remove('hidden');
+            } else {
+                banner.classList.add('hidden');
+            }
+        }
+
+        function highlightTimeRow(stepNum) {
+            const row = document.getElementById(`rowHora${stepNum}`);
+            if (row) {
+                row.classList.remove('border-slate-800/80');
+                row.classList.add('border-amber-500/60', 'bg-amber-950/20');
+            }
+        }
+
+        /**
+         * Maneja cambios en las Variantes de Procedimiento (Punto 6)
+         */
+        function handleVariantChange() {
+            const medio = document.getElementById('varMedioPago').value;
+            const docMode = document.getElementById('varDocMode').value;
+            const retBox = document.getElementById('retencionBox');
+
+            if (medio === 'retencion' || medio === 'transferencia') {
+                retBox.classList.remove('hidden');
+            } else {
+                retBox.classList.add('hidden');
+            }
+
+            const step5Title = document.getElementById('labelStep5Title');
+            const step5Desc = document.getElementById('labelStep5Desc');
+            if (docMode === 'sin_ddjj') {
+                step5Title.textContent = '5. Verificación de Identidad (Sin DDJJ/PEP)';
+                step5Desc.textContent = 'Se omite línea de DDJJ/PEP o se deja constancia de identidad.';
+            } else if (docMode === 'solo_ddjj') {
+                step5Title.textContent = '5. Completado de DDJJ';
+                step5Desc.textContent = 'Cliente completa únicamente DDJJ.';
+            } else {
+                step5Title.textContent = '5. Completado de DDJJ y PEP';
+                step5Desc.textContent = 'Cliente completa documentación correspondiente.';
+            }
+
+            calculateBills();
+        }
+
+        /**
+         * Alterna entre usar el mismo personal para todos los pasos o personalizar por paso
+         */
+        function handleStaffSync() {
+            const isSynced = document.getElementById('syncStaff').checked;
+            const unifiedBox = document.getElementById('unifiedStaffBox');
+            const individualBoxes = document.querySelectorAll('.staff-individual');
+
+            if (isSynced) {
+                unifiedBox.classList.remove('hidden');
+                individualBoxes.forEach(box => box.classList.add('hidden'));
+                syncAllStaff();
+            } else {
+                unifiedBox.classList.add('hidden');
+                individualBoxes.forEach(box => box.classList.remove('hidden'));
+                updateReport();
+            }
+        }
+
+        /**
+         * Sincroniza los valores del personal global en todos los selectores individuales
+         */
+        function syncAllStaff() {
+            const rolGlobal = document.getElementById('rolGlobal').value;
+            const nomGlobal = document.getElementById('nombreGlobal').value;
+            const steps = [1, 3, 4, 5, 6, 7];
+
+            steps.forEach(step => {
+                document.getElementById(`rol${step}`).value = rolGlobal;
+                document.getElementById(`nom${step}`).value = nomGlobal;
+            });
+            updateReport();
+        }
+
+        /**
+         * Muestra u oculta billetes de $20.000 y $10.000
+         */
+        function toggleHighDenom() {
+            const includeHigh = document.getElementById('includeHighDenom').checked;
+            const box20k = document.getElementById('box20000');
+            const box10k = document.getElementById('box10000');
+
+            if (includeHigh) {
+                box20k.classList.remove('hidden');
+                box10k.classList.remove('hidden');
+            } else {
+                box20k.classList.add('hidden');
+                box10k.classList.add('hidden');
+                document.getElementById('b20000').value = '';
+                document.getElementById('b10000').value = '';
+            }
+            calculateBills();
+        }
+
+        /**
+         * Formatea un número al formato moneda argentina (Ej: 1.250.000,00)
+         */
+        function formatCurrencyAR(number) {
+            return new Intl.NumberFormat('es-AR', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(number);
+        }
+
+        /**
+         * Calcula los subtotales, el total general y valida diferencias contra el premio (Punto 1)
+         */
+        function calculateBills() {
+            const denoms = [20000, 10000, 2000, 1000, 500, 200, 100, 50, 20, 10];
+            let total = 0;
+
+            denoms.forEach(d => {
+                const inputEl = document.getElementById(`b${d}`);
+                const subEl = document.getElementById(`sub${d}`);
+                const count = parseInt(inputEl.value, 10) || 0;
+                const sub = count * d;
+                total += sub;
+
+                if (subEl) {
+                    subEl.textContent = count > 0 ? `$${sub.toLocaleString('es-AR')}` : '$0';
+                }
+            });
+
+            calculatedTotalAmount = total;
+            document.getElementById('totalBilletesTexto').textContent = `$ ${formatCurrencyAR(total)}`;
+
+            validateAmountComparison();
+            updateReport();
+        }
+
+        /**
+         * Compara en vivo el Monto del Jackpot vs Suma de Billetes (+ Retenciones si aplica) (Punto 1)
+         */
+        function validateAmountComparison() {
+            const jackpotRaw = document.getElementById('valorPremio').value.trim();
+            const jackpotVal = parseCurrencyAR(jackpotRaw);
+            const retencionVal = parseCurrencyAR(document.getElementById('montoRetencion')?.value || '0');
+            const medioPago = document.getElementById('varMedioPago').value;
+
+            const box = document.getElementById('validationBox');
+            const dot = document.getElementById('validationDot');
+            const text = document.getElementById('validationText');
+            const badge = document.getElementById('validationDiffBadge');
+
+            if (jackpotVal <= 0 && calculatedTotalAmount <= 0) {
+                box.className = "p-3 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-between gap-2 text-xs";
+                dot.className = "w-2.5 h-2.5 rounded-full bg-slate-500 shrink-0";
+                text.className = "text-slate-400";
+                text.textContent = "Ingresa el Monto del Jackpot y los billetes para verificar coincidencia.";
+                badge.textContent = "";
+                return;
+            }
+
+            const targetCash = medioPago === 'retencion' ? Math.max(0, jackpotVal - retencionVal) : jackpotVal;
+            const diff = calculatedTotalAmount - targetCash;
+            const absDiff = Math.abs(diff);
+
+            if (absDiff < 0.01 && targetCash > 0) {
+                box.className = "p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-between gap-2 text-xs";
+                dot.className = "w-2.5 h-2.5 rounded-full bg-emerald-400 shrink-0";
+                text.className = "text-emerald-300 font-medium";
+                text.textContent = "✓ ¡Arqueo exacto! Los billetes coinciden con el monto a abonar.";
+                badge.className = "font-mono font-bold text-emerald-400";
+                badge.textContent = "DIF: $ 0,00";
+            } else if (absDiff > 0 && absDiff < 10 && targetCash > 0) {
+                // Diferencia de centavos o redondeo menor a $10
+                box.className = "p-3 rounded-lg bg-sky-500/10 border border-sky-500/30 flex items-center justify-between gap-2 text-xs";
+                dot.className = "w-2.5 h-2.5 rounded-full bg-sky-400 shrink-0";
+                text.className = "text-sky-300 font-medium";
+                text.textContent = `Diferencia por centavos/redondeo (${diff > 0 ? 'a favor' : 'sin cambio chico'}).`;
+                badge.className = "font-mono font-bold text-sky-400";
+                badge.textContent = `${diff > 0 ? '+' : '-'} $ ${formatCurrencyAR(absDiff)}`;
+            } else if (diff < 0) {
+                box.className = "p-3 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-between gap-2 text-xs";
+                dot.className = "w-2.5 h-2.5 rounded-full bg-amber-400 shrink-0 animate-pulse";
+                text.className = "text-amber-300 font-medium";
+                text.textContent = `Faltan cargar billetes para alcanzar el monto del premio.`;
+                badge.className = "font-mono font-bold text-amber-400";
+                badge.textContent = `Faltan $ ${formatCurrencyAR(absDiff)}`;
+            } else {
+                box.className = "p-3 rounded-lg bg-rose-500/10 border border-rose-500/30 flex items-center justify-between gap-2 text-xs";
+                dot.className = "w-2.5 h-2.5 rounded-full bg-rose-400 shrink-0 animate-pulse";
+                text.className = "text-rose-300 font-medium";
+                text.textContent = `Atención: La suma de billetes supera el monto declarado del Jackpot.`;
+                badge.className = "font-mono font-bold text-rose-400";
+                badge.textContent = `Sobran $ ${formatCurrencyAR(absDiff)}`;
+            }
+        }
+
+        /**
+         * Copia el total calculado de billetes hacia el campo de "Monto del Jackpot"
+         */
+        function useCalculatedAsJackpot() {
+            if (calculatedTotalAmount > 0) {
+                document.getElementById('valorPremio').value = formatCurrencyAR(calculatedTotalAmount);
+                validateAmountComparison();
+                updateReport();
+                showToast('Monto actualizado con el total de billetes');
+            } else {
+                showToast('Carga billetes primero para calcular el monto');
+            }
+        }
+
+        /**
+         * Obtiene el texto formateado del personal para un evento dado
+         */
+        function getStaffText(stepNumber) {
+            const rol = document.getElementById(`rol${stepNumber}`).value;
+            const nom = document.getElementById(`nom${stepNumber}`).value.trim();
+            return nom ? `${rol} ${nom}` : `${rol}`;
+        }
+
+        /**
+         * Construye y actualiza el reporte completo en tiempo real (Con soporte para Variantes Punto 6)
+         */
+        function updateReport() {
+            validateChronology();
+
+            const maq = document.getElementById('maquina').value.trim() || '000000';
+            const valorPremio = document.getElementById('valorPremio').value.trim() || '000.000,00';
+            const juego = document.getElementById('juego').value.trim();
+            const ordenPago = document.getElementById('ordenPago').value.trim();
+
+            const nombreCliente = document.getElementById('nombreCliente').value.trim() || 'XXXXXX';
+            const vestimenta = document.getElementById('vestimenta').value.trim() || '...............';
+
+            // Variantes seleccionadas
+            const varDocMode = document.getElementById('varDocMode').value;
+            const varUbicacion = document.getElementById('varUbicacion').value;
+            const varMedioPago = document.getElementById('varMedioPago').value;
+            const montoRetencion = document.getElementById('montoRetencion').value.trim();
+            const obsVariante = document.getElementById('obsVariante').value.trim();
+
+            // Textos según género
+            const strCliente = currentGender === 'M' ? 'cliente' : 'clienta';
+            const strTitulo = currentGender === 'M' ? 'Sr.' : 'Sra.';
+            const strAlTitulo = currentGender === 'M' ? 'al Sr.' : 'a la Sra.';
+
+            // Ubicación de firma/gestión
+            let strLugarDoc = 'al costado de ventanilla de caja';
+            let strLugarEntrega = 'por ventanilla de caja';
+            if (varUbicacion === 'maquina') {
+                strLugarDoc = `en sector de Máq. ${maq}`;
+                strLugarEntrega = `en sector de sala`;
+            } else if (varUbicacion === 'vip') {
+                strLugarDoc = 'en sector VIP';
+                strLugarEntrega = 'por caja VIP';
+            }
+
+            // Horarios
+            const h1 = document.getElementById('hora1').value || ' : ';
+            const h2 = document.getElementById('hora2').value || ' : ';
+            const h3 = document.getElementById('hora3').value || ' : ';
+            const h4 = document.getElementById('hora4').value || ' : ';
+            const h5 = document.getElementById('hora5').value || ' : ';
+            const h6 = document.getElementById('hora6').value || ' : ';
+            const h7 = document.getElementById('hora7').value || ' : ';
+
+            // Personal
+            const staff1 = getStaffText(1);
+            const staff3 = getStaffText(3);
+            const staff4 = getStaffText(4);
+            const staff5 = getStaffText(5);
+            const staff6 = getStaffText(6);
+            const staff7 = getStaffText(7);
+
+            // Armado del detalle de billetes
+            const includeHigh = document.getElementById('includeHighDenom').checked;
+            const omitZeros = document.getElementById('omitZeroBills').checked;
+
+            const billConfigs = [];
+            if (includeHigh) {
+                billConfigs.push({ denom: 20000, label: '$ 20.000' });
+                billConfigs.push({ denom: 10000, label: '$ 10.000' });
+            }
+            billConfigs.push(
+                { denom: 2000, label: '$ 2.000' },
+                { denom: 1000, label: '$ 1.000' },
+                { denom: 500,  label: '$500' },
+                { denom: 200,  label: '$200' },
+                { denom: 100,  label: '$100' },
+                { denom: 50,   label: '$50' },
+                { denom: 20,   label: '$20' },
+                { denom: 10,   label: '$10' }
+            );
+
+            const billParts = [];
+            billConfigs.forEach(item => {
+                const rawVal = document.getElementById(`b${item.denom}`).value.trim();
+                const numVal = parseInt(rawVal, 10) || 0;
+
+                if (omitZeros && numVal === 0) {
+                    return;
+                }
+
+                const qtyStr = rawVal !== '' ? String(numVal) : '000';
+                billParts.push(`${qtyStr} billetes de valor ${item.label}`);
+            });
+
+            const finalBillsString = billParts.length > 0 
+                ? billParts.join(' , ') 
+                : '000 billetes de valor $ 2.000 , 000 billetes de valor $ 1.000 , 000 billetes de valor $500 , 000 billetes de valor $200 , 000 billetes de valor $100 , 000 billetes de valor $50 , 000 billetes de valor $20 , 000 billetes de valor $10';
+
+            const totalBilletesStr = calculatedTotalAmount > 0 
+                ? formatCurrencyAR(calculatedTotalAmount) 
+                : (valorPremio !== '000.000,00' ? valorPremio : '000.000,00');
+
+            // Construcción dinámica de líneas respetando plantilla oficial y variantes
+            const lines = [
+                `A las ${h1} Hs. CCTV recibe llamada de ${staff1} , informa Jackpot en Máq. ${maq} por un valor de $${valorPremio} reclamado por ${strCliente} que viste de ${vestimenta} .-`,
+                `(A las ${h2} Hs.) Revisión muestra que ${strCliente} juega en Máq. ${maq} al salir el premio.-`,
+                `A las ${h3} Hs. CCTV confirma verificación de ${strCliente} a ${staff3} .-`,
+                `A las ${h4} Hs. ${staff4} , registra y descarga premio de Máq. ${maq}.-`
+            ];
+
+            // Línea 5 según modalidad de documentación
+            if (varDocMode === 'ddjj_pep') {
+                lines.push(`A las ${h5} Hs. ${staff5} , informa que ${strCliente} ${strTitulo} ${nombreCliente} completa DDJJ y PEP ${strLugarDoc}.-`);
+            } else if (varDocMode === 'solo_ddjj') {
+                lines.push(`A las ${h5} Hs. ${staff5} , informa que ${strCliente} ${strTitulo} ${nombreCliente} completa DDJJ ${strLugarDoc}.-`);
+            } else if (varDocMode === 'sin_ddjj' && document.getElementById('hora5').value) {
+                lines.push(`A las ${h5} Hs. ${staff5} , verifica datos de ${strCliente} ${strTitulo} ${nombreCliente} (monto exento de DDJJ/PEP).-`);
+            }
+
+            // Línea 6 y 7 según medio de pago
+            if (varMedioPago === 'transferencia') {
+                lines.push(`A las ${h6} Hs. ${staff6} , informa gestión de pago mediante transferencia/cheque por un total de $ ${valorPremio} ${obsVariante ? `(${obsVariante})` : ''}.-`);
+                lines.push(`A las ${h7} Hs. ${staff7} , entrega comprobante de pago ${strAlTitulo} ${nombreCliente} .-`);
+            } else {
+                let extraNote = '';
+                if (varMedioPago === 'retencion' && montoRetencion) {
+                    extraNote = ` (aplicada retención/descuento de $${montoRetencion}${obsVariante ? ` - ${obsVariante}` : ''})`;
+                } else if (varMedioPago === 'redondeo') {
+                    extraNote = ` (con redondeo de centavos)`;
+                }
+                lines.push(`A las ${h6} Hs. ${staff6} , informa que entrega ${strLugarEntrega} ${finalBillsString} siendo un total de $ ${totalBilletesStr}${extraNote} .-`);
+                lines.push(`A las ${h7} Hs. ${staff7} , entrega efectivo ${strAlTitulo} ${nombreCliente} .-`);
+            }
+
+            lines.push(
+                ``,
+                `Máquina: ${maq !== '000000' ? maq : ''}`,
+                `Juego: ${juego}`,
+                `Orden de Pago: ${ordenPago}`
+            );
+
+            const fullText = lines.join('\n');
+            document.getElementById('rawReportText').value = fullText;
+            document.getElementById('previewVisual').textContent = fullText;
+
+            triggerDraftAutoSave();
+        }
+
+        /**
+         * Gestión del Historial de Turno / Jackpots en simultáneo (Punto 2)
+         */
+        function toggleHistoryDrawer() {
+            const drawer = document.getElementById('historyDrawer');
+            const backdrop = document.getElementById('historyDrawerBackdrop');
+            const isOpen = !drawer.classList.contains('translate-x-full');
+
+            if (isOpen) {
+                drawer.classList.add('translate-x-full');
+                backdrop.classList.add('hidden');
+            } else {
+                drawer.classList.remove('translate-x-full');
+                backdrop.classList.remove('hidden');
+                renderHistoryList();
+            }
+        }
+
+        async function saveReportToHistory() {
+            const state = collectFormState();
+            const maq = state.maquina || 'S/N';
+            const premio = state.valorPremio || '0,00';
+            const cliente = state.nombreCliente || 'Sin nombre';
+            const reportId = `jp_${Date.now()}`;
+
+            const record = {
+                id: reportId,
+                timestamp: Date.now(),
+                timeLabel: new Date().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' }),
+                maquina: maq,
+                valorPremio: premio,
+                nombreCliente: cliente,
+                juego: state.juego || '',
+                rawText: document.getElementById('rawReportText').value,
+                stateJson: JSON.stringify(state)
+            };
+
+            autoRememberMachine();
+            rememberStaffName(state.nombreGlobal);
+
+            if (currentUser && db) {
+                try {
+                    const docRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'shiftHistory', reportId);
+                    await setDoc(docRef, record);
+                    showToast(`Jackpot Máq. ${maq} guardado en el turno`);
+                } catch (e) {
+                    shiftHistory.unshift(record);
+                    renderHistoryList();
+                    showToast(`Guardado en historial de sesión`);
+                }
+            } else {
+                shiftHistory.unshift(record);
+                renderHistoryList();
+                showToast(`Jackpot Máq. ${maq} guardado en el turno`);
+            }
+        }
+
+        async function saveAndStartNew() {
+            await saveReportToHistory();
+            executeReset(true);
+            showToast('Guardado en el turno. Listo para nuevo Jackpot.');
+        }
+
+        function renderHistoryList() {
+            const badge = document.getElementById('historyCountBadge');
+            if (badge) badge.textContent = String(shiftHistory.length);
+
+            const container = document.getElementById('historyListContainer');
+            if (!container) return;
+
+            if (shiftHistory.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-500 text-center py-8">No hay reportes archivados en este turno todavía.<br><span class="text-[11px]">Usa "Guardar en Turno" si tienes 2 pagos al mismo tiempo.</span></p>`;
+                return;
+            }
+
+            container.innerHTML = shiftHistory.map((item) => `
+                <div class="bg-slate-950 border border-slate-800 rounded-xl p-3.5 space-y-2 hover:border-sky-500/40 transition-colors">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-sky-400 font-mono">Máq. ${item.maquina} ${item.juego ? `• ${item.juego}` : ''}</span>
+                        <span class="text-[11px] font-mono text-slate-500">${item.timeLabel || ''} Hs</span>
+                    </div>
+                    <div class="flex items-center justify-between text-xs">
+                        <span class="text-slate-300 truncate max-w-[180px]">👤 ${item.nombreCliente}</span>
+                        <span class="font-mono font-semibold text-emerald-400">$ ${item.valorPremio}</span>
+                    </div>
+                    <div class="pt-2 border-t border-slate-900 flex items-center gap-2">
+                        <button type="button" onclick="loadFromHistory('${item.id}')" class="flex-1 py-1.5 px-2.5 rounded-lg bg-sky-500/15 hover:bg-sky-500/25 text-sky-300 text-xs font-semibold transition-colors">
+                            Retomar / Editar
+                        </button>
+                        <button type="button" onclick="copyHistoryItem('${item.id}')" class="py-1.5 px-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs transition-colors">
+                            Copiar Acta
+                        </button>
+                        <button type="button" onclick="deleteHistoryItem('${item.id}')" class="py-1.5 px-2 rounded-lg bg-slate-900 hover:bg-rose-500/20 text-rose-400 text-xs transition-colors">
+                            ✕
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function loadFromHistory(id) {
+            const found = shiftHistory.find(x => x.id === id);
+            if (!found || !found.stateJson) return;
+            const parsed = JSON.parse(found.stateJson);
+            applyStateToForm(parsed);
+            toggleHistoryDrawer();
+            showToast(`Cargado Jackpot de Máq. ${found.maquina}`);
+        }
+
+        function copyHistoryItem(id) {
+            const found = shiftHistory.find(x => x.id === id);
+            if (!found) return;
+            const textarea = document.getElementById('rawReportText');
+            const prev = textarea.value;
+            textarea.value = found.rawText || '';
+            textarea.classList.remove('sr-only');
+            textarea.select();
+            document.execCommand('copy');
+            textarea.classList.add('sr-only');
+            textarea.value = prev;
+            window.getSelection().removeAllRanges();
+            showToast(`Acta de Máq. ${found.maquina} copiada`);
+        }
+
+        async function deleteHistoryItem(id) {
+            shiftHistory = shiftHistory.filter(x => x.id !== id);
+            renderHistoryList();
+            if (currentUser && db) {
+                try {
+                    await deleteDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'shiftHistory', id));
+                } catch (e) {
+                    console.warn("Error borrando item:", e);
+                }
+            }
+        }
+
+        function toggleCatalogModal() {
+            const modal = document.getElementById('catalogModal');
+            if (modal.classList.contains('hidden')) {
+                renderDatalists();
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            } else {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
+
+        /**
+         * Copia el texto generado al portapapeles usando document.execCommand('copy')
+         */
+        function copyReport() {
+            autoRememberMachine();
+            rememberStaffName(document.getElementById('nombreGlobal').value);
+
+            const textarea = document.getElementById('rawReportText');
+            textarea.classList.remove('sr-only');
+            textarea.select();
+            textarea.setSelectionRange(0, 99999);
+            
+            try {
+                document.execCommand('copy');
+                showToast('¡Reporte copiado al portapapeles!');
+            } catch (err) {
+                showToast('Error al copiar, selecciona manualmente.');
+            }
+            
+            textarea.classList.add('sr-only');
+            window.getSelection().removeAllRanges();
+        }
+
+        /**
+         * Muestra una notificación emergente temporal
+         */
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMsg').textContent = message;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 2600);
+        }
+
+        /**
+         * Abre el modal de confirmación para limpiar el formulario
+         */
+        function confirmReset() {
+            const modal = document.getElementById('resetModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        /**
+         * Cierra el modal de confirmación
+         */
+        function closeResetModal() {
+            const modal = document.getElementById('resetModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        /**
+         * Resetea todos los campos del formulario a su estado inicial
+         */
+        function executeReset(silent = false) {
+            const textInputs = ['maquina', 'valorPremio', 'juego', 'ordenPago', 'nombreCliente', 'vestimenta', 'montoRetencion', 'obsVariante'];
+            textInputs.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = '';
+            });
+
+            for (let i = 1; i <= 7; i++) {
+                const h = document.getElementById(`hora${i}`);
+                if (h) h.value = '';
+            }
+
+            const denoms = [20000, 10000, 2000, 1000, 500, 200, 100, 50, 20, 10];
+            denoms.forEach(d => {
+                const el = document.getElementById(`b${d}`);
+                if (el) el.value = '';
+            });
+
+            document.getElementById('varDocMode').value = 'ddjj_pep';
+            document.getElementById('varUbicacion').value = 'ventanilla';
+            document.getElementById('varMedioPago').value = 'efectivo';
+            document.getElementById('machineMemoryBadge').classList.add('hidden');
+
+            setGender('M');
+            handleVariantChange();
+            calculateBills();
+            closeResetModal();
+            if (!silent) showToast('Formulario reiniciado');
+        }
+
+        // Exponer funciones al ámbito global para los atributos onclick/oninput del HTML
+        Object.assign(window, {
+            setGender,
+            setNow,
+            adjustTime,
+            handleStaffSync,
+            syncAllStaff,
+            toggleHighDenom,
+            calculateBills,
+            useCalculatedAsJackpot,
+            updateReport,
+            copyReport,
+            confirmReset,
+            closeResetModal,
+            executeReset,
+            onMachineInput,
+            autoRememberMachine,
+            saveMachineAssociation,
+            rememberStaffName,
+            saveCurrentStaffManual,
+            deleteMachineFromCatalog,
+            deleteStaffFromCatalog,
+            formatJackpotInput,
+            onJackpotAmountInput,
+            handleVariantChange,
+            toggleHistoryDrawer,
+            saveReportToHistory,
+            saveAndStartNew,
+            loadFromHistory,
+            copyHistoryItem,
+            deleteHistoryItem,
+            toggleCatalogModal
+        });
+
+        // Inicializar aplicación al cargar la página
+        window.onload = function () {
+            renderDatalists();
+            syncAllStaff();
+            calculateBills();
+            initCloudStorage();
+        };
+    </script>
+</body>
+</html>
