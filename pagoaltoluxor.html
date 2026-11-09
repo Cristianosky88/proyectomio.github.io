@@ -30,6 +30,202 @@
         }
     </script>
     <style>
+        body {
+            background-color: #f8fafc !important;
+            color: #1e293b !important;
+            font-family: 'Segoe UI', sans-serif !important;
+            padding: 1rem;
+        }
+
+        @media (min-width: 768px) {
+            body {
+                padding: 2rem;
+            }
+        }
+
+        header {
+            max-width: 90rem;
+            margin: 0 auto;
+            border: 1px solid #1e293b !important;
+            border-radius: 0.75rem 0.75rem 0 0;
+            background: #0f172a !important;
+        }
+
+        header > div {
+            max-width: none !important;
+            padding: 1.25rem !important;
+        }
+
+        main {
+            max-width: 90rem !important;
+            margin: 0 auto;
+            padding: 0 !important;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-top: 0;
+            border-radius: 0 0 0.75rem 0.75rem;
+            overflow: hidden;
+        }
+
+        main > div {
+            gap: 0 !important;
+        }
+
+        main .lg\:col-span-7 {
+            padding: 1.5rem;
+            background: #f8fafc;
+        }
+
+        main .lg\:col-span-5 {
+            padding: 1.5rem;
+            background: #ffffff;
+        }
+
+        main .bg-slate-900 {
+            background: #ffffff !important;
+            border-color: #e2e8f0 !important;
+            border-radius: 0.75rem !important;
+            box-shadow: 0 10px 15px -3px rgb(15 23 42 / 0.1) !important;
+        }
+
+        main .border-slate-800 {
+            border-color: #e2e8f0 !important;
+        }
+
+        main label {
+            color: #475569 !important;
+            font-weight: 600 !important;
+        }
+
+        main input,
+        main select,
+        main textarea {
+            background: #ffffff !important;
+            color: #1e293b !important;
+            border-color: #cbd5e1 !important;
+            border-radius: 0.25rem !important;
+        }
+
+        main input::placeholder {
+            color: #94a3b8 !important;
+        }
+
+        main .bg-slate-950 {
+            background: #ffffff !important;
+        }
+
+        main .bg-slate-800 {
+            background: #f1f5f9 !important;
+            color: #475569 !important;
+            border-color: #cbd5e1 !important;
+        }
+
+        main .text-slate-100,
+        main .text-slate-200,
+        main .text-slate-300,
+        main .text-white {
+            color: #1e293b !important;
+        }
+
+        main .text-slate-400,
+        main .text-slate-500,
+        main .text-slate-600 {
+            color: #64748b !important;
+        }
+
+        main .hover\:bg-slate-700:hover {
+            background: #e2e8f0 !important;
+        }
+
+        main h2 {
+            color: #4f46e5 !important;
+        }
+
+        main button:not([class*="bg-blue"]):not([class*="bg-emerald"]):not([class*="bg-amber"]):not([class*="bg-pink"]) {
+            border-radius: 0.25rem !important;
+        }
+
+        main p,
+        main span,
+        main button,
+        main label {
+            font-size: 0.8125rem;
+        }
+
+        main label,
+        main h2,
+        main h3 {
+            color: #1e293b !important;
+            text-shadow: none;
+        }
+
+        main h2 {
+            font-size: 0.9rem;
+            font-weight: 700 !important;
+        }
+
+        main input,
+        main select,
+        main textarea {
+            font-size: 0.875rem !important;
+            font-weight: 500;
+        }
+
+        main input::placeholder,
+        main textarea::placeholder {
+            color: #64748b !important;
+            opacity: 1;
+        }
+
+        main .text-slate-400,
+        main .text-slate-500,
+        main .text-slate-600 {
+            color: #475569 !important;
+        }
+
+        main .text-slate-300,
+        main .text-slate-200,
+        main .text-slate-100,
+        main .text-white {
+            color: #1e293b !important;
+        }
+
+        main #propinaInputContainer {
+            background: #f1f5f9 !important;
+            border-color: #86efac !important;
+        }
+
+        main #propinaInputContainer label,
+        main #propinaInputContainer .text-emerald-300,
+        main #propinaInputContainer .text-emerald-400 {
+            color: #047857 !important;
+        }
+
+        main #visualPreview {
+            background: #ffffff !important;
+            color: #1e293b !important;
+            border-color: #cbd5e1 !important;
+            font-size: 0.875rem;
+            line-height: 1.65;
+            min-height: 14rem;
+        }
+
+        main #rawOutput {
+            background: #ffffff !important;
+            color: #1e293b !important;
+            border-color: #cbd5e1 !important;
+            font-size: 0.8125rem !important;
+            min-height: 10rem;
+        }
+
+        main .bg-blue-600 {
+            color: #ffffff !important;
+        }
+
+        main .bg-slate-800 {
+            color: #334155 !important;
+        }
+
         /* Custom scrollbar */
         ::-webkit-scrollbar {
             width: 8px;
@@ -90,6 +286,10 @@
                     <i class="fa-solid fa-rotate-left"></i>
                     <span class="hidden sm:inline">Reiniciar</span>
                 </button>
+                <a href="index.html" class="p-2 hover:bg-slate-700 rounded-lg transition flex items-center gap-1.5" title="Ir al inicio">
+                    <i class="fa-solid fa-house"></i>
+                    <span class="hidden sm:inline">Inicio</span>
+                </a>
             </div>
         </div>
     </header>
