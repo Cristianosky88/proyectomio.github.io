@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pal Var Sala Luxor</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter & JetBrains Mono -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+        .highlight-var {
+            background-color: rgba(59, 130, 246, 0.2);
+            color: #93c5fd;
+            padding: 1px 4px;
+            border-radius: 4px;
+            font-weight: 600;
+            border-bottom: 1px dashed #60a5fa;
+        }
+        .light .highlight-var {
+            background-color: rgba(37, 99, 235, 0.12);
+            color: #1d4ed8;
+            border-bottom: 1px dashed #2563eb;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans transition-colors duration-200 selection:bg-blue-500 selection:text-white">
+
+    <!-- Navbar / Header -->
+    <header class="border-b border-slate-800 bg-slate-900/70 backdrop-blur-md sticky top-0 z-30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400 shadow-inner">
+                    <i class="fa-solid fa-video text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-base sm:text-lg tracking-tight text-white flex items-center gap-2">
+                        Pal Var Sala Luxor
+                        <span class="text-xs font-mono uppercase px-2 py-0.5 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-full">CCTV</span>
+                    </h1>
+                    <p class="text-xs text-slate-400 hidden sm:block">Automatización de redención y cancelación de tickets (Enc. / Op.)</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <!-- Reloj en tiempo real -->
+                <div class="hidden md:flex items-center gap-2 bg-slate-800/80 border border-slate-700 px-3 py-1.5 rounded-lg text-xs font-mono text-slate-300">
+                    <i class="fa-regular fa-clock text-blue-400 animate-pulse"></i>
+                    <span id="liveClock">00:00:00</span>
+                </div>
+
+                <!-- Botón Limpiar Todo -->
+                <button onclick="resetForm()" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition flex items-center gap-1.5" title="Reiniciar formulario">
+                    <i class="fa-solid fa-rotate-left"></i>
+                    <span class="hidden sm:inline">Reiniciar</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+            <!-- Columna Izquierda: Formulario de Carga (7 columnas en desktop) -->
+            <div class="lg:col-span-7 space-y-6">
+                
+                <!-- Card 1: Horarios y Personal -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
+                    <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
+                        <h2 class="text-sm font-semibold uppercase tracking-wider text-blue-400 flex items-center gap-2">
+                            <i class="fa-solid fa-user-tie"></i> <span>1. Horarios y Personal (Enc. / Op.)</span>
+                        </h2>
+                        <span class="text-xs text-slate-500">Datos del informante</span>
+                    </div>
+
+                    <!-- Horarios (3 tiempos: Llamada, Redime, Cancela) -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
+                        <!-- 1. Hora Llamada -->
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1.5">
+                                1° Hora Llamada
+                            </label>
+                            <div class="flex gap-1">
+                                <input type="time" id="horaM2Llamada" class="w-full bg-slate-950 border border-slate-700 focus:border-blue-500 rounded-xl px-2.5 py-2 text-sm font-mono text-white outline-none transition">
+                                <button type="button" onclick="setNow('horaM2Llamada')" class="px-2.5 py-2 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30 rounded-xl text-xs font-medium transition shrink-0" title="Hora actual">
+                                    <i class="fa-solid fa-bolt"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 2. Hora Redime -->
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1.5">
+                                2° Hora Redime
+                            </label>
+                            <div class="flex gap-1">
+                                <input type="time" id="horaM2Redime" class="w-full bg-slate-950 border border-slate-700 focus:border-blue-500 rounded-xl px-2.5 py-2 text-sm font-mono text-white outline-none transition">
+                                <button type="button" onclick="setNow('horaM2Redime')" class="px-2.5 py-2 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30 rounded-xl text-xs font-medium transition shrink-0" title="Hora actual">
+                                    <i class="fa-solid fa-bolt"></i>
+                                </button>
+                                <button type="button" onclick="addMinutesM2('redime', 1)" class="px-2 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded-xl text-[11px] font-mono transition shrink-0" title="+1 min respecto a llamada">
+                                    +1m
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 3. Hora Cancela -->
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1.5">
+                                3° Hora Cancela (Caja)
+                            </label>
+                            <div class="flex gap-1">
+                                <input type="time" id="horaM2Cancela" class="w-full bg-slate-950 border border-slate-700 focus:border-blue-500 rounded-xl px-2.5 py-2 text-sm font-mono text-white outline-none transition">
+                                <button type="button" onclick="setNow('horaM2Cancela')" class="px-2.5 py-2 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30 rounded-xl text-xs font-medium transition shrink-0" title="Hora actual">
+                                    <i class="fa-solid fa-bolt"></i>
+                                </button>
+                                <button type="button" onclick="addMinutesM2('cancela', 2)" class="px-2 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded-xl text-[11px] font-mono transition shrink-0" title="+2 min respecto a redención">
+                                    +2m
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Personal (Enc. / Op.) -->
+                    <div class="grid grid-cols-1 sm:grid-cols-12 gap-4">
+                        <div class="sm:col-span-5">
+                            <label class="block text-xs font-medium text-slate-300 mb-1.5">Cargo del Personal</label>
+                            <select id="cargoEncOp" class="w-full bg-slate-950 border border-slate-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-xl px-3 py-2.5 text-sm text-white outline-none transition">
+                                <option value="Enc.">Enc. (Encargado/a)</option>
+                                <option value="Op.">Op. (Operador/a)</option>
+                                <option value="As. de Sala">As. de Sala</option>
+                                <option value="Jefe de Caja">Jefe de Caja</option>
+                                <option value="Cajero">Cajero</option>
+                                <option value="Cajera">Cajera</option>
+                            </select>
+                        </div>
+
+                        <div class="sm:col-span-7">
+                            <label class="block text-xs font-medium text-slate-300 mb-1.5">
+                                Nombre / Apellido del Personal <span class="text-slate-500 font-normal">(Opcional)</span>
+                            </label>
+                            <div class="relative">
+                                <input type="text" id="nombreEncOp" placeholder="Ej: Martínez (o dejar vacío para solo el cargo)" class="w-full bg-slate-950 border border-slate-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-xl pl-3 pr-8 py-2 text-sm text-white placeholder-slate-600 outline-none transition">
+                                <button onclick="clearInput('nombreEncOp')" class="absolute right-2.5 top-2.5 text-slate-500 hover:text-slate-300 text-xs">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 2: Datos del Cliente -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
+                    <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
+                        <h2 class="text-sm font-semibold uppercase tracking-wider text-emerald-400 flex items-center gap-2">
+                            <i class="fa-solid fa-user-check"></i> 2. Datos del Cliente
+                        </h2>
+                        <span class="text-xs text-slate-500">Género e identificación</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-12 gap-4">
+                        <!-- Trato / Género -->
+                        <div class="sm:col-span-5">
+                            <label class="block text-xs font-medium text-slate-300 mb-1.5">Tipo de Cliente</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button type="button" id="btnClienteSr" onclick="setClienteGenero('M')" class="py-2 px-3 rounded-xl border text-xs font-semibold flex items-center justify-center gap-1.5 transition bg-blue-600/20 border-blue-500 text-blue-300">
+                                    <i class="fa-solid fa-person text-sm"></i> <span>cliente</span>
+                                </button>
+                                <button type="button" id="btnClienteSra" onclick="setClienteGenero('F')" class="py-2 px-3 rounded-xl border text-xs font-semibold flex items-center justify-center gap-1.5 transition bg-slate-950 border-slate-800 text-slate-400 hover:bg-slate-800">
+                                    <i class="fa-solid fa-person-dress text-sm"></i> <span>clienta</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Nombre del Cliente -->
+                        <div class="sm:col-span-7">
+                            <label class="block text-xs font-medium text-slate-300 mb-1.5">
+                                Nombre / Identificación <span class="text-slate-500 font-normal">(Opcional)</span>
+                            </label>
+                            <div class="relative">
+                                <input type="text" id="nombreCliente" placeholder="Dejar vacío para solo 'cliente / clienta'" class="w-full bg-slate-950 border border-slate-700 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl pl-3 pr-8 py-2 text-sm text-white placeholder-slate-600 outline-none transition">
+                                <button onclick="clearInput('nombreCliente')" class="absolute right-2.5 top-2.5 text-slate-500 hover:text-slate-300 text-xs">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 3: Valores y Tickets -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
+                    <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
+                        <h2 class="text-sm font-semibold uppercase tracking-wider text-amber-400 flex items-center gap-2">
+                            <i class="fa-solid fa-money-bill-transfer"></i> <span>3. Tickets, Verificación de Pago y Propina</span>
+                        </h2>
+                        <span class="text-xs text-slate-500">Formato automático ,00</span>
+                    </div>
+
+                    <!-- Controles (Redención de Tickets -> Pago en Ventanilla -> Verificación) -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <!-- Cantidad de Tickets Recibidos / Redimidos -->
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1.5">Cantidad de Tickets</label>
+                            <input type="number" id="m2CantidadTickets" min="1" max="999" placeholder="0" oninput="updatePreview()" class="w-full bg-slate-950 border border-slate-700 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 rounded-xl px-3 py-2 text-sm font-mono text-white placeholder-slate-600 outline-none transition">
+                            <div class="flex flex-wrap gap-1 mt-2">
+                                <button type="button" onclick="setQuickM2Tickets(1)" class="text-[11px] font-mono bg-slate-800 hover:bg-slate-700 text-slate-300 px-2 py-0.5 rounded border border-slate-700 transition">1</button>
+                                <button type="button" onclick="setQuickM2Tickets(2)" class="text-[11px] font-mono bg-slate-800 hover:bg-slate-700 text-slate-300 px-2 py-0.5 rounded border border-slate-700 transition">2</button>
+                                <button type="button" onclick="setQuickM2Tickets(5)" class="text-[11px] font-mono bg-slate-800 hover:bg-slate-700 text-slate-300 px-2 py-0.5 rounded border border-slate-700 transition">5</button>
+                                <button type="button" onclick="setQuickM2Tickets(10)" class="text-[11px] font-mono bg-slate-800 hover:bg-slate-700 text-slate-300 px-2 py-0.5 rounded border border-slate-700 transition">10</button>
+                            </div>
+                        </div>
+
+                        <!-- Valor Total para Cambio / Cancelación ($) -->
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1.5">Valor Total de Cambio ($)</label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-2 text-slate-400 font-mono text-sm">$</span>
+                                <input type="text" id="m2ValorCambio" placeholder="000.000" oninput="handleMoneyInput(this, 'cambio')" class="w-full bg-slate-950 border border-slate-700 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 rounded-xl pl-7 pr-3 py-2 text-sm font-mono text-white placeholder-slate-600 outline-none transition">
+                            </div>
+                            <div class="flex flex-wrap gap-1 mt-2">
+                                <button type="button" onclick="setQuickMoney(250000)" class="text-[11px] font-mono bg-slate-800 hover:bg-slate-700 text-slate-300 px-2 py-0.5 rounded border border-slate-700 transition">250k</button>
+                                <button type="button" onclick="setQuickMoney(500000)" class="text-[11px] font-mono bg-slate-800 hover:bg-slate-700 text-slate-300 px-2 py-0.5 rounded border border-slate-700 transition">500k</button>
+                                <button type="button" onclick="setQuickMoney(1000000)" class="text-[11px] font-mono bg-slate-800 hover:bg-slate-700 text-slate-300 px-2 py-0.5 rounded border border-slate-700 transition">1M</button>
+                                <button type="button" onclick="setQuickMoney(2000000)" class="text-[11px] font-mono bg-slate-800 hover:bg-slate-700 text-slate-300 px-2 py-0.5 rounded border border-slate-700 transition">2M</button>
+                            </div>
+                        </div>
+
+                        <!-- Cuadro Comparador: Monto Contado / Pagado en Ventanilla -->
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1.5 flex items-center justify-between">
+                                <span>Verificar Pago ($)</span>
+                                <button type="button" onclick="equalizePayment()" class="text-[10px] text-blue-400 hover:text-blue-300 underline" title="Igualar al valor de cambio">Igualar</button>
+                            </label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-2 text-slate-400 font-mono text-sm">$</span>
+                                <input type="text" id="m2ValorVerificado" placeholder="Monto pagado..." oninput="handleMoneyInput(this, 'verificado')" class="w-full bg-slate-950 border border-slate-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-xl pl-7 pr-8 py-2 text-sm font-mono text-white placeholder-slate-600 outline-none transition">
+                                <button onclick="clearVerified()" class="absolute right-2.5 top-2.5 text-slate-500 hover:text-slate-300 text-xs" title="Limpiar verificación">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </button>
+                            </div>
+                            <p class="text-[11px] text-slate-500 mt-2">Compara contra el valor de cambio.</p>
+                        </div>
+                    </div>
+
+                    <!-- Alerta Visual de Comparación de Pago -->
+                    <div id="paymentStatusAlert" class="hidden mt-4 rounded-xl p-3 border text-xs font-medium flex items-center justify-between gap-3 transition-all">
+                        <!-- Se completa dinámicamente por JS -->
+                    </div>
+
+                    <!-- Sección de Propina -->
+                    <div class="mt-5 pt-4 border-t border-slate-800/80">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <div>
+                                <label class="text-xs font-semibold text-slate-200 flex items-center gap-2">
+                                    <i class="fa-solid fa-hand-holding-dollar text-emerald-400"></i>
+                                    ¿El cliente deja propina?
+                                </label>
+                                <p class="text-[11px] text-slate-400">Si seleccionas "SÍ", se agregará al final del 3° párrafo de cancelación en caja.</p>
+                            </div>
+
+                            <!-- Botones SÍ / NO -->
+                            <div class="flex items-center gap-2 shrink-0">
+                                <button type="button" id="btnPropinaNo" onclick="setDejaPropina(false)" class="px-4 py-1.5 rounded-xl border text-xs font-bold transition bg-rose-600/20 border-rose-500 text-rose-300">
+                                    NO
+                                </button>
+                                <button type="button" id="btnPropinaSi" onclick="setDejaPropina(true)" class="px-4 py-1.5 rounded-xl border text-xs font-bold transition bg-slate-950 border-slate-800 text-slate-400 hover:bg-slate-800">
+                                    SÍ, DEJA PROPINA
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Contenedor desplegable si deja propina = SÍ -->
+                        <div id="propinaInputContainer" class="hidden mt-3 bg-slate-950/80 border border-emerald-500/30 rounded-xl p-3.5">
+                            <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
+                                <div class="sm:col-span-6">
+                                    <label class="block text-xs font-medium text-emerald-300 mb-1">Monto de Propina en Efectivo ($)</label>
+                                    <div class="relative">
+                                        <span class="absolute left-3 top-2 text-emerald-400 font-mono text-sm">$</span>
+                                        <input type="text" id="m2ValorPropina" placeholder="0.000" oninput="handleMoneyInput(this, 'propina')" class="w-full bg-slate-900 border border-emerald-500/40 focus:border-emerald-400 rounded-xl pl-7 pr-8 py-1.5 text-sm font-mono text-white placeholder-slate-600 outline-none transition">
+                                        <button onclick="clearPropina()" class="absolute right-2.5 top-2 text-slate-500 hover:text-slate-300 text-xs">
+                                            <i class="fa-solid fa-xmark"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="sm:col-span-6">
+                                    <span class="block text-[11px] text-slate-400 mb-1">Valores rápidos de propina:</span>
+                                    <div class="flex flex-wrap gap-1.5">
+                                        <button type="button" onclick="setQuickPropina(1000)" class="text-[11px] font-mono bg-slate-800 hover:bg-slate-700 text-emerald-300 px-2.5 py-1 rounded-lg border border-slate-700 transition">$1.000</button>
+                                        <button type="button" onclick="setQuickPropina(2000)" class="text-[11px] font-mono bg-slate-800 hover:bg-slate-700 text-emerald-300 px-2.5 py-1 rounded-lg border border-slate-700 transition">$2.000</button>
+                                        <button type="button" onclick="setQuickPropina(5000)" class="text-[11px] font-mono bg-slate-800 hover:bg-slate-700 text-emerald-300 px-2.5 py-1 rounded-lg border border-slate-700 transition">$5.000</button>
+                                        <button type="button" onclick="setQuickPropina(10000)" class="text-[11px] font-mono bg-slate-800 hover:bg-slate-700 text-emerald-300 px-2.5 py-1 rounded-lg border border-slate-700 transition">$10.000</button>
+                                        <button type="button" onclick="setQuickPropina(20000)" class="text-[11px] font-mono bg-slate-800 hover:bg-slate-700 text-emerald-300 px-2.5 py-1 rounded-lg border border-slate-700 transition">$20.000</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Opciones de Formato de Texto -->
+                    <div class="mt-5 pt-4 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-4 text-xs text-slate-400">
+                        <div class="flex flex-wrap items-center gap-4">
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" id="padZeroTickets" onchange="updatePreview()" class="rounded bg-slate-800 border-slate-700 text-blue-500 focus:ring-0">
+                                <span>Cero a la izquierda en tickets (ej: <b>05</b>)</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" id="repeatClientName" onchange="updatePreview()" class="rounded bg-slate-800 border-slate-700 text-blue-500 focus:ring-0">
+                                <span>Incluir nombre del cliente al final</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Columna Derecha: Vista Previa, Copiado y Bitácora (5 columnas en desktop) -->
+            <div class="lg:col-span-5 space-y-6 lg:sticky lg:top-22">
+                
+                <!-- Card Vista Previa del Texto -->
+                <div class="bg-slate-900 border-2 border-blue-500/30 rounded-2xl p-5 shadow-2xl relative overflow-hidden">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-semibold uppercase tracking-wider text-blue-400 flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-blue-400 animate-ping"></span>
+                            Vista Previa del Acta
+                        </span>
+                        <span class="text-[11px] font-mono text-slate-400 bg-slate-800 px-2 py-0.5 rounded">Listo para copiar</span>
+                    </div>
+
+                    <!-- Visualizador con resaltado de variables -->
+                    <div id="visualPreview" class="bg-slate-950 border border-slate-800 rounded-xl p-4 font-mono text-sm leading-relaxed text-slate-200 space-y-3 select-all">
+                        <!-- Se llena por JS -->
+                    </div>
+
+                    <!-- Textarea oculto o editable para copia exacta -->
+                    <div class="mt-3">
+                        <label class="block text-[11px] text-slate-400 mb-1 flex justify-between">
+                            <span>Texto plano final (puedes editar manualmente si lo deseas):</span>
+                        </label>
+                        <textarea id="rawOutput" rows="5" class="w-full bg-slate-950/60 border border-slate-800 rounded-xl p-3 font-mono text-xs text-slate-300 focus:border-blue-500 outline-none resize-none"></textarea>
+                    </div>
+
+                    <!-- Botones de Acción Principal -->
+                    <div class="space-y-2.5 mt-4">
+                        <button onclick="copyToClipboard('all')" class="w-full py-3 px-4 bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white font-semibold rounded-xl shadow-lg shadow-blue-600/25 transition flex items-center justify-center gap-2 text-sm">
+                            <i class="fa-regular fa-copy"></i>
+                            <span>Copiar Todo + Guardar en Historial</span>
+                        </button>
+
+                        <!-- Botones de líneas individuales (3 líneas) -->
+                        <div class="grid grid-cols-3 gap-2">
+                            <button onclick="copyToClipboard('p1')" class="py-2 px-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium rounded-xl border border-slate-700 transition flex items-center justify-center gap-1 text-xs" title="Copiar línea 1 (Llamada)">
+                                <i class="fa-solid fa-phone-volume text-blue-400"></i> 1° Llamada
+                            </button>
+                            <button onclick="copyToClipboard('p2')" class="py-2 px-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium rounded-xl border border-slate-700 transition flex items-center justify-center gap-1 text-xs" title="Copiar línea 2 (Redime)">
+                                <i class="fa-solid fa-ticket text-amber-400"></i> 2° Redime
+                            </button>
+                            <button onclick="copyToClipboard('p3')" class="py-2 px-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium rounded-xl border border-slate-700 transition flex items-center justify-center gap-1 text-xs" title="Copiar línea 3 (Cancela en caja)">
+                                <i class="fa-solid fa-cash-register text-emerald-400"></i> 3° Cancela
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Historial de Novedades Generadas -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
+                    <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-800">
+                        <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-2">
+                            <i class="fa-solid fa-clock-rotate-left"></i> Historial Reciente de Turno
+                        </h3>
+                        <button onclick="clearHistory()" class="text-[11px] text-rose-400 hover:text-rose-300 transition">
+                            Vaciar
+                        </button>
+                    </div>
+
+                    <div id="historyContainer" class="space-y-2.5 max-h-60 overflow-y-auto pr-1">
+                        <p class="text-xs text-slate-500 text-center py-4 italic">Los reportes que copies se guardarán aquí durante tu turno.</p>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Notificación Toast Flotante -->
+    <div id="toast" class="fixed bottom-5 right-5 transform translate-y-20 opacity-0 transition-all duration-300 z-50 pointer-events-none">
+        <div class="bg-emerald-600 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 border border-emerald-400/30">
+            <i class="fa-solid fa-circle-check text-lg"></i>
+            <div>
+                <p id="toastTitle" class="text-xs font-bold uppercase tracking-wider">¡Copiado al portapapeles!</p>
+                <p id="toastDesc" class="text-xs text-emerald-100">El reporte está listo para pegar (Ctrl + V).</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Estado actual del formulario
+        let state = {
+            clienteGenero: 'M', // 'M' -> cliente | 'F' -> clienta
+            rawM2ValorCambio: 0,
+            rawM2ValorVerificado: 0,
+            dejaPropina: false,
+            rawM2ValorPropina: 0,
+            history: []
+        };
+
+        // Inicialización al cargar la página
+        window.onload = function() {
+            // Iniciar reloj en vivo
+            updateClock();
+            setInterval(updateClock, 1000);
+
+            // Poner horas iniciales
+            setNow('horaM2Llamada');
+            addMinutesM2('redime', 1);
+            addMinutesM2('cancela', 2);
+
+            // Listeners para cambios en inputs generales
+            ['horaM2Llamada', 'horaM2Redime', 'horaM2Cancela', 'nombreEncOp', 'nombreCliente'].forEach(id => {
+                document.getElementById(id).addEventListener('input', updatePreview);
+            });
+            document.getElementById('cargoEncOp').addEventListener('change', updatePreview);
+
+            // Cargar historial desde localStorage si existe
+            try {
+                const savedHistory = localStorage.getItem('cctv_luxor_history');
+                if (savedHistory) {
+                    state.history = JSON.parse(savedHistory);
+                    renderHistory();
+                }
+            } catch (e) {
+                console.warn('No se pudo leer localStorage');
+            }
+
+            // Actualizar vista previa inicial
+            updatePreview();
+        };
+
+        // Reloj de la barra superior
+        function updateClock() {
+            const now = new Date();
+            const h = String(now.getHours()).padStart(2, '0');
+            const m = String(now.getMinutes()).padStart(2, '0');
+            const s = String(now.getSeconds()).padStart(2, '0');
+            document.getElementById('liveClock').textContent = `${h}:${m}:${s} Hs.`;
+        }
+
+        // Asignar la hora actual a un campo time
+        function setNow(inputId) {
+            const now = new Date();
+            const h = String(now.getHours()).padStart(2, '0');
+            const m = String(now.getMinutes()).padStart(2, '0');
+            document.getElementById(inputId).value = `${h}:${m}`;
+            updatePreview();
+        }
+
+        // Sumar minutos (Redime respecto a Llamada, Cancela respecto a Redime)
+        function addMinutesM2(step, mins) {
+            const refId = step === 'redime' ? 'horaM2Llamada' : 'horaM2Redime';
+            const targetId = step === 'redime' ? 'horaM2Redime' : 'horaM2Cancela';
+            const refVal = document.getElementById(refId).value;
+
+            let baseDate = new Date();
+            if (refVal) {
+                const [h, m] = refVal.split(':').map(Number);
+                baseDate.setHours(h, m + mins, 0);
+            } else {
+                baseDate.setMinutes(baseDate.getMinutes() + mins);
+            }
+            const h = String(baseDate.getHours()).padStart(2, '0');
+            const m = String(baseDate.getMinutes()).padStart(2, '0');
+            document.getElementById(targetId).value = `${h}:${m}`;
+            updatePreview();
+        }
+
+        // Cambiar género de cliente (cliente / clienta)
+        function setClienteGenero(gen) {
+            state.clienteGenero = gen;
+            const btnSr = document.getElementById('btnClienteSr');
+            const btnSra = document.getElementById('btnClienteSra');
+
+            if (gen === 'M') {
+                btnSr.className = "py-2 px-3 rounded-xl border text-xs font-semibold flex items-center justify-center gap-1.5 transition bg-blue-600/20 border-blue-500 text-blue-300";
+                btnSra.className = "py-2 px-3 rounded-xl border text-xs font-semibold flex items-center justify-center gap-1.5 transition bg-slate-950 border-slate-800 text-slate-400 hover:bg-slate-800";
+            } else {
+                btnSra.className = "py-2 px-3 rounded-xl border text-xs font-semibold flex items-center justify-center gap-1.5 transition bg-pink-600/20 border-pink-500 text-pink-300";
+                btnSr.className = "py-2 px-3 rounded-xl border text-xs font-semibold flex items-center justify-center gap-1.5 transition bg-slate-950 border-slate-800 text-slate-400 hover:bg-slate-800";
+            }
+            updatePreview();
+        }
+
+        // Limpiar un input puntual
+        function clearInput(id) {
+            document.getElementById(id).value = '';
+            updatePreview();
+        }
+
+        // Formatear número con puntos de miles (ej: 1000000 -> "1.000.000")
+        function formatThousands(num) {
+            if (!num || isNaN(num)) return '';
+            return Math.round(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+
+        // Formatear para el texto del reporte (ej: 1000000 -> "1.000.000,00")
+        function formatCurrencyForReport(num, placeholder = "000.000,00") {
+            if (!num || num <= 0) return placeholder;
+            const hasDecimals = num % 1 !== 0;
+            if (hasDecimals) {
+                const parts = num.toFixed(2).split('.');
+                const intPart = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+                return `${intPart},${parts[1]}`;
+            } else {
+                return `${formatThousands(num)},00`;
+            }
+        }
+
+        // Manejar entrada de dinero con puntos automáticos (cambio, verificado o propina)
+        function handleMoneyInput(inputEl, type = 'cambio') {
+            const rawDigits = inputEl.value.replace(/\D/g, '');
+            const numericVal = rawDigits ? parseInt(rawDigits, 10) : 0;
+            inputEl.value = numericVal > 0 ? formatThousands(numericVal) : '';
+
+            if (type === 'cambio') {
+                state.rawM2ValorCambio = numericVal;
+                checkPaymentComparison();
+                updatePreview();
+            } else if (type === 'verificado') {
+                state.rawM2ValorVerificado = numericVal;
+                checkPaymentComparison();
+            } else if (type === 'propina') {
+                state.rawM2ValorPropina = numericVal;
+                updatePreview();
+            }
+        }
+
+        // Comparar el Valor Total de Cambio vs el Monto Pagado / Verificado
+        function checkPaymentComparison() {
+            const alertBox = document.getElementById('paymentStatusAlert');
+            const verificadoInput = document.getElementById('m2ValorVerificado').value.trim();
+
+            if (!verificadoInput || (state.rawM2ValorCambio === 0 && state.rawM2ValorVerificado === 0)) {
+                alertBox.className = "hidden mt-4 rounded-xl p-3 border text-xs font-medium flex items-center justify-between gap-3 transition-all";
+                return;
+            }
+
+            const diff = state.rawM2ValorVerificado - state.rawM2ValorCambio;
+
+            if (diff === 0 && state.rawM2ValorCambio > 0) {
+                alertBox.className = "mt-4 rounded-xl p-3 border bg-emerald-500/10 border-emerald-500/40 text-emerald-300 text-xs font-medium flex items-center justify-between gap-3 transition-all";
+                alertBox.innerHTML = `
+                    <div class="flex items-center gap-2.5">
+                        <i class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
+                        <div>
+                            <span class="font-bold uppercase tracking-wide block">¡Pago Correcto! Los montos coinciden</span>
+                            <span class="text-[11px] text-emerald-200/80">Se está pagando exactamente $${formatCurrencyForReport(state.rawM2ValorCambio)}.</span>
+                        </div>
+                    </div>
+                    <span class="font-mono font-bold bg-emerald-500/20 px-2.5 py-1 rounded-lg border border-emerald-500/30">Dif: $0,00</span>
+                `;
+            } else if (diff < 0) {
+                const faltante = Math.abs(diff);
+                alertBox.className = "mt-4 rounded-xl p-3 border bg-amber-500/10 border-amber-500/40 text-amber-300 text-xs font-medium flex items-center justify-between gap-3 transition-all";
+                alertBox.innerHTML = `
+                    <div class="flex items-center gap-2.5">
+                        <i class="fa-solid fa-triangle-exclamation text-amber-400 text-base"></i>
+                        <div>
+                            <span class="font-bold uppercase tracking-wide block">¡Atención! Se está pagando de MENOS</span>
+                            <span class="text-[11px] text-amber-200/80">Faltan entregar $${formatCurrencyForReport(faltante)} al cliente.</span>
+                        </div>
+                    </div>
+                    <span class="font-mono font-bold bg-amber-500/20 px-2.5 py-1 rounded-lg border border-amber-500/30 shrink-0">-$${formatThousands(faltante)}</span>
+                `;
+            } else {
+                const excedente = Math.abs(diff);
+                alertBox.className = "mt-4 rounded-xl p-3 border bg-rose-500/15 border-rose-500/50 text-rose-300 text-xs font-medium flex items-center justify-between gap-3 transition-all animate-pulse";
+                alertBox.innerHTML = `
+                    <div class="flex items-center gap-2.5">
+                        <i class="fa-solid fa-circle-exclamation text-rose-400 text-base"></i>
+                        <div>
+                            <span class="font-bold uppercase tracking-wide block">¡ALERTA! Se está pagando de MÁS (Sobrepago)</span>
+                            <span class="text-[11px] text-rose-200/90">Excedente de $${formatCurrencyForReport(excedente)} sobre el valor de los tickets.</span>
+                        </div>
+                    </div>
+                    <span class="font-mono font-bold bg-rose-500/25 px-2.5 py-1 rounded-lg border border-rose-500/40 shrink-0">+$${formatThousands(excedente)}</span>
+                `;
+            }
+        }
+
+        function equalizePayment() {
+            if (state.rawM2ValorCambio > 0) {
+                state.rawM2ValorVerificado = state.rawM2ValorCambio;
+                document.getElementById('m2ValorVerificado').value = formatThousands(state.rawM2ValorCambio);
+                checkPaymentComparison();
+            }
+        }
+
+        function clearVerified() {
+            state.rawM2ValorVerificado = 0;
+            document.getElementById('m2ValorVerificado').value = '';
+            checkPaymentComparison();
+        }
+
+        // Activar / Desactivar opción de propina
+        function setDejaPropina(deja) {
+            state.dejaPropina = deja;
+            const btnNo = document.getElementById('btnPropinaNo');
+            const btnSi = document.getElementById('btnPropinaSi');
+            const container = document.getElementById('propinaInputContainer');
+
+            if (deja) {
+                btnSi.className = "px-4 py-1.5 rounded-xl border text-xs font-bold transition bg-emerald-600/20 border-emerald-500 text-emerald-300";
+                btnNo.className = "px-4 py-1.5 rounded-xl border text-xs font-bold transition bg-slate-950 border-slate-800 text-slate-400 hover:bg-slate-800";
+                container.classList.remove('hidden');
+            } else {
+                btnNo.className = "px-4 py-1.5 rounded-xl border text-xs font-bold transition bg-rose-600/20 border-rose-500 text-rose-300";
+                btnSi.className = "px-4 py-1.5 rounded-xl border text-xs font-bold transition bg-slate-950 border-slate-800 text-slate-400 hover:bg-slate-800";
+                container.classList.add('hidden');
+            }
+            updatePreview();
+        }
+
+        function setQuickPropina(amount) {
+            state.rawM2ValorPropina = amount;
+            document.getElementById('m2ValorPropina').value = formatThousands(amount);
+            updatePreview();
+        }
+
+        function clearPropina() {
+            state.rawM2ValorPropina = 0;
+            document.getElementById('m2ValorPropina').value = '';
+            updatePreview();
+        }
+
+        // Botones rápidos de monto
+        function setQuickMoney(amount) {
+            state.rawM2ValorCambio = amount;
+            document.getElementById('m2ValorCambio').value = formatThousands(amount);
+            checkPaymentComparison();
+            updatePreview();
+        }
+
+        // Botones rápidos de cantidad de tickets
+        function setQuickM2Tickets(count) {
+            document.getElementById('m2CantidadTickets').value = count;
+            updatePreview();
+        }
+
+        // Construir los textos y actualizar vista previa
+        function getReportParts() {
+            const padZero = document.getElementById('padZeroTickets').checked;
+            const repeatCli = document.getElementById('repeatClientName').checked;
+            const nombreCli = document.getElementById('nombreCliente').value.trim();
+
+            const h1 = document.getElementById('horaM2Llamada').value || "00:00";
+            const h2 = document.getElementById('horaM2Redime').value || "00:00";
+            const h3 = document.getElementById('horaM2Cancela').value || "00:00";
+
+            const cargoEncOp = document.getElementById('cargoEncOp').value;
+            const nombreEncOp = document.getElementById('nombreEncOp').value.trim();
+            const encOpFull = nombreEncOp ? `${cargoEncOp} ${nombreEncOp}` : cargoEncOp;
+
+            const tratoBase = state.clienteGenero === 'M' ? 'cliente' : 'clienta';
+            const articuloCliente = state.clienteGenero === 'M' ? 'el' : 'la';
+            const tratoP1 = nombreCli !== '' ? `${tratoBase} ${nombreCli}` : tratoBase;
+            const tratoP3 = (repeatCli && nombreCli !== '') ? `${tratoBase} ${nombreCli}` : tratoBase;
+
+            const rawQtyM2 = document.getElementById('m2CantidadTickets').value.trim();
+            let qtyM2Str = padZero ? "00" : "0";
+            if (rawQtyM2 !== '' && parseInt(rawQtyM2, 10) > 0) {
+                qtyM2Str = padZero ? String(parseInt(rawQtyM2, 10)).padStart(2, '0') : String(parseInt(rawQtyM2, 10));
+            }
+
+            const valorCambioStr = formatCurrencyForReport(state.rawM2ValorCambio, "000.000,00");
+            const valorPropinaStr = formatCurrencyForReport(state.rawM2ValorPropina, "0.000,00");
+
+            const p1Plain = `A las ${h1} Hs. CCTV recibe llamada de ${encOpFull} , informa que recibió de ${tratoP1} ${qtyM2Str} tickets para cambio por valor de $${valorCambioStr}.-`;
+            const p2Plain = `A las ${h2} Hs. ${encOpFull} redime ${qtyM2Str} tickets.-`;
+
+            let p3Plain = `A las ${h3} Hs. ${encOpFull} cancela en ventanilla de caja $${valorCambioStr} a ${tratoP3}.-`;
+            if (state.dejaPropina) {
+                p3Plain = `A las ${h3} Hs. ${encOpFull} cancela en ventanilla de caja $${valorCambioStr} a ${tratoP3}, a su vez ${articuloCliente} ${tratoP3} deja en concepto de propina $${valorPropinaStr} en efectivo.-`;
+            }
+
+            const p1HTML = `A las <span class="highlight-var">${h1}</span> Hs. CCTV recibe llamada de <span class="highlight-var">${encOpFull}</span> , informa que recibió de <span class="highlight-var">${tratoP1}</span> <span class="highlight-var">${qtyM2Str}</span> tickets para cambio por valor de <span class="highlight-var">$${valorCambioStr}</span>.-`;
+            const p2HTML = `A las <span class="highlight-var">${h2}</span> Hs. <span class="highlight-var">${encOpFull}</span> redime <span class="highlight-var">${qtyM2Str}</span> tickets.-`;
+
+            let p3HTML = `A las <span class="highlight-var">${h3}</span> Hs. <span class="highlight-var">${encOpFull}</span> cancela en ventanilla de caja <span class="highlight-var">$${valorCambioStr}</span> a <span class="highlight-var">${tratoP3}</span>.-`;
+            if (state.dejaPropina) {
+                p3HTML = `A las <span class="highlight-var">${h3}</span> Hs. <span class="highlight-var">${encOpFull}</span> cancela en ventanilla de caja <span class="highlight-var">$${valorCambioStr}</span> a <span class="highlight-var">${tratoP3}</span>, a su vez ${articuloCliente} <span class="highlight-var">${tratoP3}</span> deja en concepto de propina <span class="highlight-var">$${valorPropinaStr}</span> en efectivo.-`;
+            }
+
+            const propinaTag = state.dejaPropina ? ` | Propina $${valorPropinaStr}` : '';
+
+            return {
+                p1Plain,
+                p2Plain,
+                p3Plain,
+                fullPlain: `${p1Plain}\n${p2Plain}\n${p3Plain}`,
+                htmlPreview: `<p>${p1HTML}</p><p>${p2HTML}</p><p>${p3HTML}</p>`,
+                summary: `[${encOpFull}] ${h1} Hs | Redime ${qtyM2Str} tks | $${valorCambioStr}${propinaTag}`
+            };
+        }
+
+        function updatePreview() {
+            const parts = getReportParts();
+            document.getElementById('visualPreview').innerHTML = parts.htmlPreview;
+            document.getElementById('rawOutput').value = parts.fullPlain;
+        }
+
+        // Copiar al portapapeles compatible con iframes
+        function copyToClipboard(mode) {
+            const parts = getReportParts();
+            let textToCopy = document.getElementById('rawOutput').value;
+            let toastMsg = "Reporte completo copiado.";
+
+            if (mode === 'p1') {
+                textToCopy = parts.p1Plain;
+                toastMsg = "1° Línea (Llamada) copiada.";
+            } else if (mode === 'p2') {
+                textToCopy = parts.p2Plain;
+                toastMsg = "2° Línea (Redime) copiada.";
+            } else if (mode === 'p3') {
+                textToCopy = parts.p3Plain;
+                toastMsg = "3° Línea (Cancela en caja) copiada.";
+            }
+
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = textToCopy;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            try {
+                document.execCommand('copy');
+                showToast("¡Copiado al portapapeles!", toastMsg);
+                if (mode === 'all') {
+                    saveToHistory(textToCopy, parts.summary);
+                }
+            } catch (err) {
+                console.error('Error al copiar:', err);
+            }
+            document.body.removeChild(tempTextArea);
+        }
+
+        // Guardar reporte en el historial del turno
+        function saveToHistory(fullText, summary) {
+            const item = {
+                id: Date.now(),
+                summary,
+                fullText
+            };
+            state.history.unshift(item);
+            if (state.history.length > 15) state.history.pop();
+
+            try {
+                localStorage.setItem('cctv_luxor_history', JSON.stringify(state.history));
+            } catch (e) {}
+
+            renderHistory();
+        }
+
+        function renderHistory() {
+            const container = document.getElementById('historyContainer');
+            if (state.history.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-500 text-center py-4 italic">Los reportes que copies se guardarán aquí durante tu turno.</p>`;
+                return;
+            }
+
+            container.innerHTML = state.history.map(item => `
+                <div class="bg-slate-950 border border-slate-800 rounded-xl p-3 flex items-center justify-between gap-2 hover:border-slate-700 transition">
+                    <div class="truncate">
+                        <p class="text-xs font-mono font-semibold text-blue-400 truncate">${item.summary}</p>
+                        <p class="text-[11px] text-slate-400 truncate mt-0.5">${item.fullText.replace(/\n/g, ' ')}</p>
+                    </div>
+                    <button onclick="copyHistoryItem(${item.id})" class="px-2.5 py-1.5 bg-slate-800 hover:bg-blue-600 text-slate-300 hover:text-white rounded-lg text-xs transition shrink-0" title="Volver a copiar">
+                        <i class="fa-regular fa-copy"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function copyHistoryItem(id) {
+            const item = state.history.find(i => i.id === id);
+            if (!item) return;
+
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = item.fullText;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            showToast("¡Copiado desde el historial!", item.summary);
+        }
+
+        function clearHistory() {
+            state.history = [];
+            try {
+                localStorage.removeItem('cctv_luxor_history');
+            } catch (e) {}
+            renderHistory();
+        }
+
+        // Reiniciar todo el formulario para un nuevo evento
+        function resetForm() {
+            setNow('horaM2Llamada');
+            addMinutesM2('redime', 1);
+            addMinutesM2('cancela', 2);
+
+            document.getElementById('nombreCliente').value = '';
+            document.getElementById('m2CantidadTickets').value = '';
+            document.getElementById('m2ValorCambio').value = '';
+            document.getElementById('m2ValorVerificado').value = '';
+            document.getElementById('m2ValorPropina').value = '';
+
+            state.rawM2ValorCambio = 0;
+            state.rawM2ValorVerificado = 0;
+            state.rawM2ValorPropina = 0;
+
+            setDejaPropina(false);
+            checkPaymentComparison();
+            updatePreview();
+            showToast("Formulario reiniciado", "Listo para cargar una nueva novedad.");
+        }
+
+        // Mostrar notificación Toast
+        let toastTimeout;
+        function showToast(title, desc) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastTitle').textContent = title;
+            document.getElementById('toastDesc').textContent = desc;
+
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+                toast.classList.remove('translate-y-0', 'opacity-100');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
