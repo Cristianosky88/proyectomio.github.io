@@ -1,13 +1,16 @@
 <!DOCTYPE html>
-<html lang="es" class="dark">
+<html lang="es" class="">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pago Alto Sala Luxor</title>
+    <title>Pago Alto Sala Luxor - CCTV</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts: Inter & JetBrains Mono -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
@@ -16,277 +19,132 @@
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
+                        sans: ['Inter', 'Segoe UI', 'sans-serif'],
                         mono: ['JetBrains Mono', 'monospace'],
-                    },
-                    colors: {
-                        brand: {
-                            500: '#3b82f6',
-                            600: '#2563eb',
-                        }
                     }
                 }
             }
-        }
+        };
     </script>
     <style>
-        body {
-            background-color: #f8fafc !important;
-            color: #1e293b !important;
-            font-family: 'Segoe UI', sans-serif !important;
-            padding: 1rem;
-        }
-
-        @media (min-width: 768px) {
-            body {
-                padding: 2rem;
-            }
-        }
-
-        header {
-            max-width: 90rem;
-            margin: 0 auto;
-            border: 1px solid #1e293b !important;
-            border-radius: 0.75rem 0.75rem 0 0;
-            background: #0f172a !important;
-        }
-
-        header > div {
-            max-width: none !important;
-            padding: 1.25rem !important;
-        }
-
-        main {
-            max-width: 90rem !important;
-            margin: 0 auto;
-            padding: 0 !important;
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-top: 0;
-            border-radius: 0 0 0.75rem 0.75rem;
-            overflow: hidden;
-        }
-
-        main > div {
-            gap: 0 !important;
-        }
-
-        main .lg\:col-span-7 {
-            padding: 1.5rem;
-            background: #f8fafc;
-        }
-
-        main .lg\:col-span-5 {
-            padding: 1.5rem;
-            background: #ffffff;
-        }
-
-        main .bg-slate-900 {
-            background: #ffffff !important;
-            border-color: #e2e8f0 !important;
-            border-radius: 0.75rem !important;
-            box-shadow: 0 10px 15px -3px rgb(15 23 42 / 0.1) !important;
-        }
-
-        main .border-slate-800 {
-            border-color: #e2e8f0 !important;
-        }
-
-        main label {
-            color: #475569 !important;
-            font-weight: 600 !important;
-        }
-
-        main input,
-        main select,
-        main textarea {
-            background: #ffffff !important;
-            color: #1e293b !important;
-            border-color: #cbd5e1 !important;
-            border-radius: 0.25rem !important;
-        }
-
-        main input::placeholder {
-            color: #94a3b8 !important;
-        }
-
-        main .bg-slate-950 {
-            background: #ffffff !important;
-        }
-
-        main .bg-slate-800 {
-            background: #f1f5f9 !important;
-            color: #475569 !important;
-            border-color: #cbd5e1 !important;
-        }
-
-        main .text-slate-100,
-        main .text-slate-200,
-        main .text-slate-300,
-        main .text-white {
-            color: #1e293b !important;
-        }
-
-        main .text-slate-400,
-        main .text-slate-500,
-        main .text-slate-600 {
-            color: #64748b !important;
-        }
-
-        main .hover\:bg-slate-700:hover {
-            background: #e2e8f0 !important;
-        }
-
-        main h2 {
-            color: #4f46e5 !important;
-        }
-
-        main button:not([class*="bg-blue"]):not([class*="bg-emerald"]):not([class*="bg-amber"]):not([class*="bg-pink"]) {
-            border-radius: 0.25rem !important;
-        }
-
-        main p,
-        main span,
-        main button,
-        main label {
-            font-size: 0.8125rem;
-        }
-
-        main label,
-        main h2,
-        main h3 {
-            color: #1e293b !important;
-            text-shadow: none;
-        }
-
-        main h2 {
-            font-size: 0.9rem;
-            font-weight: 700 !important;
-        }
-
-        main input,
-        main select,
-        main textarea {
-            font-size: 0.875rem !important;
-            font-weight: 500;
-        }
-
-        main input::placeholder,
-        main textarea::placeholder {
-            color: #64748b !important;
-            opacity: 1;
-        }
-
-        main .text-slate-400,
-        main .text-slate-500,
-        main .text-slate-600 {
-            color: #475569 !important;
-        }
-
-        main .text-slate-300,
-        main .text-slate-200,
-        main .text-slate-100,
-        main .text-white {
-            color: #1e293b !important;
-        }
-
-        main #propinaInputContainer {
-            background: #f1f5f9 !important;
-            border-color: #86efac !important;
-        }
-
-        main #propinaInputContainer label,
-        main #propinaInputContainer .text-emerald-300,
-        main #propinaInputContainer .text-emerald-400 {
-            color: #047857 !important;
-        }
-
-        main #visualPreview {
-            background: #ffffff !important;
-            color: #1e293b !important;
-            border-color: #cbd5e1 !important;
-            font-size: 0.875rem;
-            line-height: 1.65;
-            min-height: 14rem;
-        }
-
-        main #rawOutput {
-            background: #ffffff !important;
-            color: #1e293b !important;
-            border-color: #cbd5e1 !important;
-            font-size: 0.8125rem !important;
-            min-height: 10rem;
-        }
-
-        main .bg-blue-600 {
-            color: #ffffff !important;
-        }
-
-        main .bg-slate-800 {
-            color: #334155 !important;
-        }
-
-        /* Custom scrollbar */
+        /* Scrollbar sutil */
         ::-webkit-scrollbar {
             width: 8px;
             height: 8px;
         }
+
         ::-webkit-scrollbar-track {
-            background: #1e293b;
+            background: #f1f5f9;
         }
+
+        .dark ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+
         ::-webkit-scrollbar-thumb {
-            background: #475569;
+            background: #cbd5e1;
             border-radius: 4px;
         }
+
+        .dark ::-webkit-scrollbar-thumb {
+            background: #334155;
+        }
+
         ::-webkit-scrollbar-thumb:hover {
-            background: #64748b;
+            background: #94a3b8;
         }
+
+        .dark ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+
+        /* Resaltado legible tanto en Modo Claro como en Modo Oscuro */
         .highlight-var {
-            background-color: rgba(59, 130, 246, 0.2);
-            color: #93c5fd;
-            padding: 1px 4px;
-            border-radius: 4px;
-            font-weight: 600;
-            border-bottom: 1px dashed #60a5fa;
-        }
-        .light .highlight-var {
             background-color: rgba(37, 99, 235, 0.12);
             color: #1d4ed8;
+            padding: 1px 5px;
+            border-radius: 4px;
+            font-weight: 600;
             border-bottom: 1px dashed #2563eb;
         }
+
+        .dark .highlight-var {
+            background-color: rgba(59, 130, 246, 0.22);
+            color: #93c5fd;
+            border-bottom: 1px dashed #60a5fa;
+        }
+
+        .highlight-warn {
+            background-color: rgba(245, 158, 11, 0.18);
+            color: #b45309;
+            padding: 1px 5px;
+            border-radius: 4px;
+            font-weight: 700;
+            border-bottom: 1px dashed #d97706;
+        }
+
+        .dark .highlight-warn {
+            background-color: rgba(245, 158, 11, 0.22);
+            color: #fcd34d;
+            border-bottom: 1px dashed #f59e0b;
+        }
     </style>
+    <script>
+        (function () {
+            try {
+                if (localStorage.getItem('luxor_theme') === 'dark') {
+                    document.documentElement.classList.add('dark');
+                }
+            } catch (e) { }
+        })();
+    </script>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen font-sans transition-colors duration-200 selection:bg-blue-500 selection:text-white">
+
+<body class="bg-slate-100 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen font-sans transition-colors duration-200 selection:bg-blue-500 selection:text-white">
 
     <!-- Navbar / Header -->
-    <header class="border-b border-slate-800 bg-slate-900/70 backdrop-blur-md sticky top-0 z-30">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 rounded-xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400 shadow-inner">
+    <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-30 shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400 shadow-inner shrink-0">
                     <i class="fa-solid fa-video text-lg"></i>
                 </div>
                 <div>
                     <h1 class="font-bold text-base sm:text-lg tracking-tight text-white flex items-center gap-2">
-                        Pal Var Sala Luxor
-                        <span class="text-xs font-mono uppercase px-2 py-0.5 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-full">CCTV</span>
+                        Pago Alto Sala Luxor
+                        <span class="text-xs font-mono uppercase px-2 py-0.5 bg-blue-500/15 text-blue-300 border border-blue-500/30 rounded-full">CCTV</span>
                     </h1>
-                    <p class="text-xs text-slate-400 hidden sm:block">REPORTE DE PAGOS ALTOS</p>
+                    <p class="text-xs text-slate-400 hidden sm:block">REPORTE DE PAGOS ALTOS Y REDENCIÓN DE TICKETS</p>
                 </div>
             </div>
 
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2">
                 <!-- Reloj en tiempo real -->
-                <div class="hidden md:flex items-center gap-2 bg-slate-800/80 border border-slate-700 px-3 py-1.5 rounded-lg text-xs font-mono text-slate-300">
+                <div class="hidden md:flex items-center gap-2 bg-slate-800 border border-slate-700 px-3 py-1.5 rounded-lg text-xs font-mono text-slate-200">
                     <i class="fa-regular fa-clock text-blue-400 animate-pulse"></i>
-                    <span id="liveClock">00:00:00</span>
+                    <span id="liveClock">00:00:00 Hs.</span>
                 </div>
 
-                <!-- Botón Limpiar Todo -->
-                <button onclick="resetForm()" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition flex items-center gap-1.5" title="Reiniciar formulario">
+                <!-- Volver a Pal Var -->
+                <a href="palvar.html" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-indigo-600 hover:bg-indigo-500 text-white transition flex items-center gap-1.5" title="Volver a Pal Var">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span class="hidden sm:inline">Pal Var</span>
+                </a>
+
+                <!-- Botón Reiniciar -->
+                <button type="button" onclick="resetForm()" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center gap-1.5 cursor-pointer" title="Reiniciar formulario">
                     <i class="fa-solid fa-rotate-left"></i>
                     <span class="hidden sm:inline">Reiniciar</span>
                 </button>
-                <a href="index.html" class="p-2 hover:bg-slate-700 rounded-lg transition flex items-center gap-1.5" title="Ir al inicio">
+
+                <!-- Botón Tema Claro / Oscuro -->
+                <button type="button" onclick="toggleTheme()" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition cursor-pointer" title="Cambiar modo claro / oscuro">
+                    <i class="fa-solid fa-sun text-amber-400 hidden dark:inline"></i>
+                    <i class="fa-solid fa-moon text-slate-300 inline dark:hidden"></i>
+                </button>
+
+                <!-- Ir al Menú Principal -->
+                <a href="index.html" class="px-2.5 py-1.5 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center gap-1.5" title="Ir al Menú Principal">
                     <i class="fa-solid fa-house"></i>
                     <span class="hidden sm:inline">Inicio</span>
                 </a>
@@ -298,28 +156,28 @@
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
-            <!-- Columna Izquierda: Formulario de Carga (7 columnas en desktop) -->
-            <div class="lg:col-span-7 space-y-6">
-                
+            <!-- Columna Izquierda: Formulario de Carga (7 columnas) -->
+            <div class="lg:col-span-7 space-y-5">
+
                 <!-- Card 1: Horarios y Personal -->
-                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
-                    <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
-                        <h2 class="text-sm font-semibold uppercase tracking-wider text-blue-400 flex items-center gap-2">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
+                    <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-100 dark:border-slate-800">
+                        <h2 class="text-sm font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 flex items-center gap-2">
                             <i class="fa-solid fa-user-tie"></i> <span>1. Horarios y Personal (Enc. / Op.)</span>
                         </h2>
-                        <span class="text-xs text-slate-500">Datos del informante</span>
+                        <span class="text-xs text-slate-500 dark:text-slate-400">Datos del informante</span>
                     </div>
 
                     <!-- Horarios (3 tiempos: Llamada, Redime, Cancela) -->
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3">
                         <!-- 1. Hora Llamada -->
                         <div>
-                            <label class="block text-xs font-medium text-slate-300 mb-1.5">
+                            <label for="horaM2Llamada" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
                                 1° Hora Llamada
                             </label>
                             <div class="flex gap-1">
-                                <input type="time" id="horaM2Llamada" class="w-full bg-slate-950 border border-slate-700 focus:border-blue-500 rounded-xl px-2.5 py-2 text-sm font-mono text-white outline-none transition">
-                                <button type="button" onclick="setNow('horaM2Llamada')" class="px-2.5 py-2 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30 rounded-xl text-xs font-medium transition shrink-0" title="Hora actual">
+                                <input type="time" id="horaM2Llamada" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-xl px-2.5 py-2 text-sm font-mono text-slate-900 dark:text-white outline-none transition">
+                                <button type="button" onclick="setNow('horaM2Llamada')" class="px-2.5 py-2 bg-blue-50 dark:bg-blue-600/20 hover:bg-blue-100 dark:hover:bg-blue-600/30 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-500/30 rounded-xl text-xs font-medium transition shrink-0 cursor-pointer" title="Poner hora actual">
                                     <i class="fa-solid fa-bolt"></i>
                                 </button>
                             </div>
@@ -327,15 +185,15 @@
 
                         <!-- 2. Hora Redime -->
                         <div>
-                            <label class="block text-xs font-medium text-slate-300 mb-1.5">
+                            <label for="horaM2Redime" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
                                 2° Hora Redime
                             </label>
                             <div class="flex gap-1">
-                                <input type="time" id="horaM2Redime" class="w-full bg-slate-950 border border-slate-700 focus:border-blue-500 rounded-xl px-2.5 py-2 text-sm font-mono text-white outline-none transition">
-                                <button type="button" onclick="setNow('horaM2Redime')" class="px-2.5 py-2 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30 rounded-xl text-xs font-medium transition shrink-0" title="Hora actual">
+                                <input type="time" id="horaM2Redime" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-xl px-2.5 py-2 text-sm font-mono text-slate-900 dark:text-white outline-none transition">
+                                <button type="button" onclick="setNow('horaM2Redime')" class="px-2.5 py-2 bg-blue-50 dark:bg-blue-600/20 hover:bg-blue-100 dark:hover:bg-blue-600/30 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-500/30 rounded-xl text-xs font-medium transition shrink-0 cursor-pointer" title="Poner hora actual">
                                     <i class="fa-solid fa-bolt"></i>
                                 </button>
-                                <button type="button" onclick="addMinutesM2('redime', 1)" class="px-2 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded-xl text-[11px] font-mono transition shrink-0" title="+1 min respecto a llamada">
+                                <button type="button" onclick="addMinutesM2('redime', 1)" class="px-2 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 rounded-xl text-[11px] font-mono font-semibold transition shrink-0 cursor-pointer" title="+1 min respecto a llamada">
                                     +1m
                                 </button>
                             </div>
@@ -343,26 +201,34 @@
 
                         <!-- 3. Hora Cancela -->
                         <div>
-                            <label class="block text-xs font-medium text-slate-300 mb-1.5">
+                            <label for="horaM2Cancela" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
                                 3° Hora Cancela (Caja)
                             </label>
                             <div class="flex gap-1">
-                                <input type="time" id="horaM2Cancela" class="w-full bg-slate-950 border border-slate-700 focus:border-blue-500 rounded-xl px-2.5 py-2 text-sm font-mono text-white outline-none transition">
-                                <button type="button" onclick="setNow('horaM2Cancela')" class="px-2.5 py-2 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30 rounded-xl text-xs font-medium transition shrink-0" title="Hora actual">
+                                <input type="time" id="horaM2Cancela" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-xl px-2.5 py-2 text-sm font-mono text-slate-900 dark:text-white outline-none transition">
+                                <button type="button" onclick="setNow('horaM2Cancela')" class="px-2.5 py-2 bg-blue-50 dark:bg-blue-600/20 hover:bg-blue-100 dark:hover:bg-blue-600/30 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-500/30 rounded-xl text-xs font-medium transition shrink-0 cursor-pointer" title="Poner hora actual">
                                     <i class="fa-solid fa-bolt"></i>
                                 </button>
-                                <button type="button" onclick="addMinutesM2('cancela', 2)" class="px-2 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded-xl text-[11px] font-mono transition shrink-0" title="+2 min respecto a redención">
+                                <button type="button" onclick="addMinutesM2('cancela', 2)" class="px-2 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 rounded-xl text-[11px] font-mono font-semibold transition shrink-0 cursor-pointer" title="+2 min respecto a redención">
                                     +2m
                                 </button>
                             </div>
                         </div>
                     </div>
 
+                    <!-- Aviso si las horas quedaron desordenadas -->
+                    <div id="timeOrderAlert" class="hidden mb-4 px-3 py-2 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/70 text-amber-800 dark:text-amber-200 text-xs flex items-center justify-between gap-2">
+                        <span><i class="fa-solid fa-clock-rotate-left mr-1.5"></i>Verifica la secuencia horaria: alguna operación posterior figura antes que la anterior.</span>
+                        <button type="button" onclick="syncSequentialTimes()" class="px-2.5 py-1 rounded-lg bg-amber-200/70 dark:bg-amber-800/60 hover:bg-amber-300/70 dark:hover:bg-amber-700 font-semibold text-amber-900 dark:text-amber-100 shrink-0 cursor-pointer transition">
+                            Ajustar +1m / +2m
+                        </button>
+                    </div>
+
                     <!-- Personal (Enc. / Op.) -->
-                    <div class="grid grid-cols-1 sm:grid-cols-12 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-12 gap-4 pt-2">
                         <div class="sm:col-span-5">
-                            <label class="block text-xs font-medium text-slate-300 mb-1.5">Cargo del Personal</label>
-                            <select id="cargoEncOp" class="w-full bg-slate-950 border border-slate-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-xl px-3 py-2.5 text-sm text-white outline-none transition">
+                            <label for="cargoEncOp" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Cargo del Personal</label>
+                            <select id="cargoEncOp" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-xl px-3 py-2 text-sm text-slate-900 dark:text-white outline-none transition">
                                 <option value="Enc.">Enc. (Encargado/a)</option>
                                 <option value="Op.">Op. (Operador/a)</option>
                                 <option value="As. de Sala">As. de Sala</option>
@@ -373,12 +239,12 @@
                         </div>
 
                         <div class="sm:col-span-7">
-                            <label class="block text-xs font-medium text-slate-300 mb-1.5">
-                                Nombre / Apellido del Personal <span class="text-slate-500 font-normal">(Opcional)</span>
+                            <label for="nombreEncOp" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                                Nombre / Apellido del Personal <span class="text-slate-400 dark:text-slate-500 font-normal">(Opcional)</span>
                             </label>
                             <div class="relative">
-                                <input type="text" id="nombreEncOp" placeholder="Ej: Martínez (o dejar vacío para solo el cargo)" class="w-full bg-slate-950 border border-slate-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-xl pl-3 pr-8 py-2 text-sm text-white placeholder-slate-600 outline-none transition">
-                                <button onclick="clearInput('nombreEncOp')" class="absolute right-2.5 top-2.5 text-slate-500 hover:text-slate-300 text-xs">
+                                <input type="text" id="nombreEncOp" placeholder="Ej: Martínez (o vacío para solo el cargo)" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-xl pl-3 pr-8 py-2 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 outline-none transition">
+                                <button type="button" onclick="clearInput('nombreEncOp')" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xs cursor-pointer" title="Limpiar nombre">
                                     <i class="fa-solid fa-xmark"></i>
                                 </button>
                             </div>
@@ -387,23 +253,23 @@
                 </div>
 
                 <!-- Card 2: Datos del Cliente -->
-                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
-                    <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
-                        <h2 class="text-sm font-semibold uppercase tracking-wider text-emerald-400 flex items-center gap-2">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
+                    <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-100 dark:border-slate-800">
+                        <h2 class="text-sm font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 flex items-center gap-2">
                             <i class="fa-solid fa-user-check"></i> 2. Datos del Cliente
                         </h2>
-                        <span class="text-xs text-slate-500">Género e identificación</span>
+                        <span class="text-xs text-slate-500 dark:text-slate-400">Género e identificación</span>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-12 gap-4">
                         <!-- Trato / Género -->
                         <div class="sm:col-span-5">
-                            <label class="block text-xs font-medium text-slate-300 mb-1.5">Tipo de Cliente</label>
+                            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Tipo de Cliente</label>
                             <div class="grid grid-cols-2 gap-2">
-                                <button type="button" id="btnClienteSr" onclick="setClienteGenero('M')" class="py-2 px-3 rounded-xl border text-xs font-semibold flex items-center justify-center gap-1.5 transition bg-blue-600/20 border-blue-500 text-blue-300">
+                                <button type="button" id="btnClienteSr" onclick="setClienteGenero('M')" class="py-2 px-3 rounded-xl border text-xs font-semibold flex items-center justify-center gap-1.5 transition cursor-pointer">
                                     <i class="fa-solid fa-person text-sm"></i> <span>cliente</span>
                                 </button>
-                                <button type="button" id="btnClienteSra" onclick="setClienteGenero('F')" class="py-2 px-3 rounded-xl border text-xs font-semibold flex items-center justify-center gap-1.5 transition bg-slate-950 border-slate-800 text-slate-400 hover:bg-slate-800">
+                                <button type="button" id="btnClienteSra" onclick="setClienteGenero('F')" class="py-2 px-3 rounded-xl border text-xs font-semibold flex items-center justify-center gap-1.5 transition cursor-pointer">
                                     <i class="fa-solid fa-person-dress text-sm"></i> <span>clienta</span>
                                 </button>
                             </div>
@@ -411,12 +277,12 @@
 
                         <!-- Nombre del Cliente -->
                         <div class="sm:col-span-7">
-                            <label class="block text-xs font-medium text-slate-300 mb-1.5">
-                                Nombre / Identificación <span class="text-slate-500 font-normal">(Opcional)</span>
+                            <label for="nombreCliente" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                                Nombre / Identificación <span class="text-slate-400 dark:text-slate-500 font-normal">(Opcional)</span>
                             </label>
                             <div class="relative">
-                                <input type="text" id="nombreCliente" placeholder="Dejar vacío para solo 'cliente / clienta'" class="w-full bg-slate-950 border border-slate-700 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl pl-3 pr-8 py-2 text-sm text-white placeholder-slate-600 outline-none transition">
-                                <button onclick="clearInput('nombreCliente')" class="absolute right-2.5 top-2.5 text-slate-500 hover:text-slate-300 text-xs">
+                                <input type="text" id="nombreCliente" placeholder="Dejar vacío para solo 'cliente / clienta'" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl pl-3 pr-8 py-2 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 outline-none transition">
+                                <button type="button" onclick="clearInput('nombreCliente')" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xs cursor-pointer" title="Limpiar cliente">
                                     <i class="fa-solid fa-xmark"></i>
                                 </button>
                             </div>
@@ -425,108 +291,108 @@
                 </div>
 
                 <!-- Card 3: Valores y Tickets -->
-                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
-                    <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
-                        <h2 class="text-sm font-semibold uppercase tracking-wider text-amber-400 flex items-center gap-2">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
+                    <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-100 dark:border-slate-800">
+                        <h2 class="text-sm font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 flex items-center gap-2">
                             <i class="fa-solid fa-money-bill-transfer"></i> <span>3. Tickets, Verificación de Pago y Propina</span>
                         </h2>
-                        <span class="text-xs text-slate-500">Formato automático ,00</span>
+                        <span class="text-xs text-slate-500 dark:text-slate-400">Soporta enteros y centavos (,00)</span>
                     </div>
 
-                    <!-- Controles (Redención de Tickets -> Pago en Ventanilla -> Verificación) -->
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        <!-- Cantidad de Tickets Recibidos / Redimidos -->
+                        <!-- Cantidad de Tickets -->
                         <div>
-                            <label class="block text-xs font-medium text-slate-300 mb-1.5">Cantidad de Tickets</label>
-                            <input type="number" id="m2CantidadTickets" min="1" max="999" placeholder="0" oninput="updatePreview()" class="w-full bg-slate-950 border border-slate-700 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 rounded-xl px-3 py-2 text-sm font-mono text-white placeholder-slate-600 outline-none transition">
+                            <label for="m2CantidadTickets" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Cantidad de Tickets</label>
+                            <input type="number" id="m2CantidadTickets" min="1" max="999" placeholder="0" oninput="onFormControlChange()" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 rounded-xl px-3 py-2 text-sm font-mono text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 outline-none transition">
                             <div class="flex flex-wrap gap-1 mt-2">
-                                <button type="button" onclick="setQuickM2Tickets(1)" class="text-[11px] font-mono bg-slate-800 hover:bg-slate-700 text-slate-300 px-2 py-0.5 rounded border border-slate-700 transition">1</button>
-                                <button type="button" onclick="setQuickM2Tickets(2)" class="text-[11px] font-mono bg-slate-800 hover:bg-slate-700 text-slate-300 px-2 py-0.5 rounded border border-slate-700 transition">2</button>
-                                <button type="button" onclick="setQuickM2Tickets(5)" class="text-[11px] font-mono bg-slate-800 hover:bg-slate-700 text-slate-300 px-2 py-0.5 rounded border border-slate-700 transition">5</button>
-                                <button type="button" onclick="setQuickM2Tickets(10)" class="text-[11px] font-mono bg-slate-800 hover:bg-slate-700 text-slate-300 px-2 py-0.5 rounded border border-slate-700 transition">10</button>
+                                <button type="button" onclick="setQuickM2Tickets(1)" class="text-[11px] font-mono font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 px-2.5 py-0.5 rounded-lg border border-slate-300 dark:border-slate-700 transition cursor-pointer">1</button>
+                                <button type="button" onclick="setQuickM2Tickets(2)" class="text-[11px] font-mono font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 px-2.5 py-0.5 rounded-lg border border-slate-300 dark:border-slate-700 transition cursor-pointer">2</button>
+                                <button type="button" onclick="setQuickM2Tickets(5)" class="text-[11px] font-mono font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 px-2.5 py-0.5 rounded-lg border border-slate-300 dark:border-slate-700 transition cursor-pointer">5</button>
+                                <button type="button" onclick="setQuickM2Tickets(10)" class="text-[11px] font-mono font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 px-2.5 py-0.5 rounded-lg border border-slate-300 dark:border-slate-700 transition cursor-pointer">10</button>
                             </div>
                         </div>
 
-                        <!-- Valor Total para Cambio / Cancelación ($) -->
+                        <!-- Valor Total para Cambio ($) -->
                         <div>
-                            <label class="block text-xs font-medium text-slate-300 mb-1.5">Valor Total de Cambio ($)</label>
+                            <label for="m2ValorCambio" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Valor Total de Cambio ($)</label>
                             <div class="relative">
-                                <span class="absolute left-3 top-2 text-slate-400 font-mono text-sm">$</span>
-                                <input type="text" id="m2ValorCambio" placeholder="000.000" oninput="handleMoneyInput(this, 'cambio')" class="w-full bg-slate-950 border border-slate-700 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 rounded-xl pl-7 pr-3 py-2 text-sm font-mono text-white placeholder-slate-600 outline-none transition">
-                            </div>
-                            <div class="flex flex-wrap gap-1 mt-2">
-                                <button type="button" onclick="setQuickMoney(250000)" class="text-[11px] font-mono bg-slate-800 hover:bg-slate-700 text-slate-300 px-2 py-0.5 rounded border border-slate-700 transition">250k</button>
-                                <button type="button" onclick="setQuickMoney(500000)" class="text-[11px] font-mono bg-slate-800 hover:bg-slate-700 text-slate-300 px-2 py-0.5 rounded border border-slate-700 transition">500k</button>
-                                <button type="button" onclick="setQuickMoney(1000000)" class="text-[11px] font-mono bg-slate-800 hover:bg-slate-700 text-slate-300 px-2 py-0.5 rounded border border-slate-700 transition">1M</button>
-                                <button type="button" onclick="setQuickMoney(2000000)" class="text-[11px] font-mono bg-slate-800 hover:bg-slate-700 text-slate-300 px-2 py-0.5 rounded border border-slate-700 transition">2M</button>
-                            </div>
-                        </div>
-
-                        <!-- Cuadro Comparador: Monto Contado / Pagado en Ventanilla -->
-                        <div>
-                            <label class="block text-xs font-medium text-slate-300 mb-1.5 flex items-center justify-between">
-                                <span>Verificar Pago ($)</span>
-                                <button type="button" onclick="equalizePayment()" class="text-[10px] text-blue-400 hover:text-blue-300 underline" title="Igualar al valor de cambio">Igualar</button>
-                            </label>
-                            <div class="relative">
-                                <span class="absolute left-3 top-2 text-slate-400 font-mono text-sm">$</span>
-                                <input type="text" id="m2ValorVerificado" placeholder="Monto pagado..." oninput="handleMoneyInput(this, 'verificado')" class="w-full bg-slate-950 border border-slate-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-xl pl-7 pr-8 py-2 text-sm font-mono text-white placeholder-slate-600 outline-none transition">
-                                <button onclick="clearVerified()" class="absolute right-2.5 top-2.5 text-slate-500 hover:text-slate-300 text-xs" title="Limpiar verificación">
+                                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-mono text-sm">$</span>
+                                <input type="text" id="m2ValorCambio" inputmode="decimal" placeholder="000.000,00" oninput="handleMoneyInput(this, 'cambio')" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 rounded-xl pl-7 pr-8 py-2 text-sm font-mono text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 outline-none transition">
+                                <button type="button" onclick="clearCambio()" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xs cursor-pointer" title="Limpiar monto">
                                     <i class="fa-solid fa-xmark"></i>
                                 </button>
                             </div>
-                            <p class="text-[11px] text-slate-500 mt-2">Compara contra el valor de cambio.</p>
+                            <div class="flex flex-wrap gap-1 mt-2">
+                                <button type="button" onclick="setQuickMoney(250000)" class="text-[11px] font-mono font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded-lg border border-slate-300 dark:border-slate-700 transition cursor-pointer">250k</button>
+                                <button type="button" onclick="setQuickMoney(500000)" class="text-[11px] font-mono font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded-lg border border-slate-300 dark:border-slate-700 transition cursor-pointer">500k</button>
+                                <button type="button" onclick="setQuickMoney(1000000)" class="text-[11px] font-mono font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded-lg border border-slate-300 dark:border-slate-700 transition cursor-pointer">1M</button>
+                                <button type="button" onclick="setQuickMoney(2000000)" class="text-[11px] font-mono font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded-lg border border-slate-300 dark:border-slate-700 transition cursor-pointer">2M</button>
+                            </div>
+                        </div>
+
+                        <!-- Verificar Pago ($) -->
+                        <div>
+                            <label for="m2ValorVerificado" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5 flex items-center justify-between">
+                                <span>Verificar Pago ($)</span>
+                                <button type="button" onclick="equalizePayment()" class="text-[11px] text-blue-600 dark:text-blue-400 hover:underline font-semibold cursor-pointer" title="Igualar al valor de cambio">Igualar</button>
+                            </label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-mono text-sm">$</span>
+                                <input type="text" id="m2ValorVerificado" inputmode="decimal" placeholder="Monto pagado..." oninput="handleMoneyInput(this, 'verificado')" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-xl pl-7 pr-8 py-2 text-sm font-mono text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 outline-none transition">
+                                <button type="button" onclick="clearVerified()" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xs cursor-pointer" title="Limpiar verificación">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </button>
+                            </div>
+                            <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-2">Compara contra el valor de cambio.</p>
                         </div>
                     </div>
 
                     <!-- Alerta Visual de Comparación de Pago -->
-                    <div id="paymentStatusAlert" class="hidden mt-4 rounded-xl p-3 border text-xs font-medium flex items-center justify-between gap-3 transition-all">
-                        <!-- Se completa dinámicamente por JS -->
-                    </div>
+                    <div id="paymentStatusAlert" class="hidden mt-4 rounded-xl p-3.5 border text-xs font-medium flex items-center justify-between gap-3 transition-all"></div>
 
                     <!-- Sección de Propina -->
-                    <div class="mt-5 pt-4 border-t border-slate-800/80">
+                    <div class="mt-5 pt-4 border-t border-slate-100 dark:border-slate-800">
                         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                             <div>
-                                <label class="text-xs font-semibold text-slate-200 flex items-center gap-2">
-                                    <i class="fa-solid fa-hand-holding-dollar text-emerald-400"></i>
+                                <span class="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
+                                    <i class="fa-solid fa-hand-holding-dollar text-emerald-600 dark:text-emerald-400"></i>
                                     ¿El cliente deja propina?
-                                </label>
-                                <p class="text-[11px] text-slate-400">Si seleccionas "SÍ", se agregará al final del 3° párrafo de cancelación en caja.</p>
+                                </span>
+                                <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Si seleccionas "SÍ", se agregará al final del 3° párrafo de cancelación en caja.</p>
                             </div>
 
                             <!-- Botones SÍ / NO -->
                             <div class="flex items-center gap-2 shrink-0">
-                                <button type="button" id="btnPropinaNo" onclick="setDejaPropina(false)" class="px-4 py-1.5 rounded-xl border text-xs font-bold transition bg-rose-600/20 border-rose-500 text-rose-300">
+                                <button type="button" id="btnPropinaNo" onclick="setDejaPropina(false)" class="px-4 py-1.5 rounded-xl border text-xs font-bold transition cursor-pointer">
                                     NO
                                 </button>
-                                <button type="button" id="btnPropinaSi" onclick="setDejaPropina(true)" class="px-4 py-1.5 rounded-xl border text-xs font-bold transition bg-slate-950 border-slate-800 text-slate-400 hover:bg-slate-800">
+                                <button type="button" id="btnPropinaSi" onclick="setDejaPropina(true)" class="px-4 py-1.5 rounded-xl border text-xs font-bold transition cursor-pointer">
                                     SÍ, DEJA PROPINA
                                 </button>
                             </div>
                         </div>
 
                         <!-- Contenedor desplegable si deja propina = SÍ -->
-                        <div id="propinaInputContainer" class="hidden mt-3 bg-slate-950/80 border border-emerald-500/30 rounded-xl p-3.5">
+                        <div id="propinaInputContainer" class="hidden mt-3 bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/60 rounded-xl p-3.5">
                             <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
                                 <div class="sm:col-span-6">
-                                    <label class="block text-xs font-medium text-emerald-300 mb-1">Monto de Propina en Efectivo ($)</label>
+                                    <label for="m2ValorPropina" class="block text-xs font-semibold text-emerald-800 dark:text-emerald-300 mb-1">Monto de Propina en Efectivo ($)</label>
                                     <div class="relative">
-                                        <span class="absolute left-3 top-2 text-emerald-400 font-mono text-sm">$</span>
-                                        <input type="text" id="m2ValorPropina" placeholder="0.000" oninput="handleMoneyInput(this, 'propina')" class="w-full bg-slate-900 border border-emerald-500/40 focus:border-emerald-400 rounded-xl pl-7 pr-8 py-1.5 text-sm font-mono text-white placeholder-slate-600 outline-none transition">
-                                        <button onclick="clearPropina()" class="absolute right-2.5 top-2 text-slate-500 hover:text-slate-300 text-xs">
+                                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-emerald-600 dark:text-emerald-400 font-mono text-sm">$</span>
+                                        <input type="text" id="m2ValorPropina" inputmode="decimal" placeholder="0.000,00" oninput="handleMoneyInput(this, 'propina')" class="w-full bg-white dark:bg-slate-900 border border-emerald-300 dark:border-emerald-600/50 focus:border-emerald-500 rounded-xl pl-7 pr-8 py-1.5 text-sm font-mono text-slate-900 dark:text-white placeholder-slate-400 outline-none transition">
+                                        <button type="button" onclick="clearPropina()" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xs cursor-pointer" title="Limpiar propina">
                                             <i class="fa-solid fa-xmark"></i>
                                         </button>
                                     </div>
                                 </div>
                                 <div class="sm:col-span-6">
-                                    <span class="block text-[11px] text-slate-400 mb-1">Valores rápidos de propina:</span>
+                                    <span class="block text-[11px] font-medium text-emerald-800/80 dark:text-slate-400 mb-1">Valores rápidos de propina:</span>
                                     <div class="flex flex-wrap gap-1.5">
-                                        <button type="button" onclick="setQuickPropina(1000)" class="text-[11px] font-mono bg-slate-800 hover:bg-slate-700 text-emerald-300 px-2.5 py-1 rounded-lg border border-slate-700 transition">$1.000</button>
-                                        <button type="button" onclick="setQuickPropina(2000)" class="text-[11px] font-mono bg-slate-800 hover:bg-slate-700 text-emerald-300 px-2.5 py-1 rounded-lg border border-slate-700 transition">$2.000</button>
-                                        <button type="button" onclick="setQuickPropina(5000)" class="text-[11px] font-mono bg-slate-800 hover:bg-slate-700 text-emerald-300 px-2.5 py-1 rounded-lg border border-slate-700 transition">$5.000</button>
-                                        <button type="button" onclick="setQuickPropina(10000)" class="text-[11px] font-mono bg-slate-800 hover:bg-slate-700 text-emerald-300 px-2.5 py-1 rounded-lg border border-slate-700 transition">$10.000</button>
-                                        <button type="button" onclick="setQuickPropina(20000)" class="text-[11px] font-mono bg-slate-800 hover:bg-slate-700 text-emerald-300 px-2.5 py-1 rounded-lg border border-slate-700 transition">$20.000</button>
+                                        <button type="button" onclick="setQuickPropina(1000)" class="text-[11px] font-mono font-semibold bg-white dark:bg-slate-800 hover:bg-emerald-100 dark:hover:bg-slate-700 text-emerald-700 dark:text-emerald-300 px-2.5 py-1 rounded-lg border border-emerald-200 dark:border-slate-700 transition cursor-pointer">$1.000</button>
+                                        <button type="button" onclick="setQuickPropina(2000)" class="text-[11px] font-mono font-semibold bg-white dark:bg-slate-800 hover:bg-emerald-100 dark:hover:bg-slate-700 text-emerald-700 dark:text-emerald-300 px-2.5 py-1 rounded-lg border border-emerald-200 dark:border-slate-700 transition cursor-pointer">$2.000</button>
+                                        <button type="button" onclick="setQuickPropina(5000)" class="text-[11px] font-mono font-semibold bg-white dark:bg-slate-800 hover:bg-emerald-100 dark:hover:bg-slate-700 text-emerald-700 dark:text-emerald-300 px-2.5 py-1 rounded-lg border border-emerald-200 dark:border-slate-700 transition cursor-pointer">$5.000</button>
+                                        <button type="button" onclick="setQuickPropina(10000)" class="text-[11px] font-mono font-semibold bg-white dark:bg-slate-800 hover:bg-emerald-100 dark:hover:bg-slate-700 text-emerald-700 dark:text-emerald-300 px-2.5 py-1 rounded-lg border border-emerald-200 dark:border-slate-700 transition cursor-pointer">$10.000</button>
+                                        <button type="button" onclick="setQuickPropina(20000)" class="text-[11px] font-mono font-semibold bg-white dark:bg-slate-800 hover:bg-emerald-100 dark:hover:bg-slate-700 text-emerald-700 dark:text-emerald-300 px-2.5 py-1 rounded-lg border border-emerald-200 dark:border-slate-700 transition cursor-pointer">$20.000</button>
                                     </div>
                                 </div>
                             </div>
@@ -534,15 +400,15 @@
                     </div>
 
                     <!-- Opciones de Formato de Texto -->
-                    <div class="mt-5 pt-4 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-4 text-xs text-slate-400">
+                    <div class="mt-5 pt-4 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-4 text-xs text-slate-600 dark:text-slate-400">
                         <div class="flex flex-wrap items-center gap-4">
-                            <label class="flex items-center gap-2 cursor-pointer">
-                                <input type="checkbox" id="padZeroTickets" onchange="updatePreview()" class="rounded bg-slate-800 border-slate-700 text-blue-500 focus:ring-0">
+                            <label class="flex items-center gap-2 cursor-pointer select-none">
+                                <input type="checkbox" id="padZeroTickets" onchange="onFormControlChange()" class="rounded border-slate-300 dark:border-slate-700 text-blue-600 focus:ring-blue-500">
                                 <span>Cero a la izquierda en tickets (ej: <b>05</b>)</span>
                             </label>
-                            <label class="flex items-center gap-2 cursor-pointer">
-                                <input type="checkbox" id="repeatClientName" onchange="updatePreview()" class="rounded bg-slate-800 border-slate-700 text-blue-500 focus:ring-0">
-                                <span>Incluir nombre del cliente al final</span>
+                            <label class="flex items-center gap-2 cursor-pointer select-none">
+                                <input type="checkbox" id="repeatClientName" onchange="onFormControlChange()" class="rounded border-slate-300 dark:border-slate-700 text-blue-600 focus:ring-blue-500">
+                                <span>Incluir nombre del cliente al cancelar</span>
                             </label>
                         </div>
                     </div>
@@ -550,67 +416,73 @@
 
             </div>
 
-            <!-- Columna Derecha: Vista Previa, Copiado y Bitácora (5 columnas en desktop) -->
-            <div class="lg:col-span-5 space-y-6 lg:sticky lg:top-22">
-                
+            <!-- Columna Derecha: Vista Previa, Copiado e Historial (5 columnas, sticky funcional) -->
+            <div class="lg:col-span-5 space-y-5 lg:sticky lg:top-20">
+
                 <!-- Card Vista Previa del Texto -->
-                <div class="bg-slate-900 border-2 border-blue-500/30 rounded-2xl p-5 shadow-2xl relative overflow-hidden">
+                <div class="bg-white dark:bg-slate-900 border-2 border-blue-500/30 rounded-2xl p-5 shadow-md">
                     <div class="flex items-center justify-between mb-3">
-                        <span class="text-xs font-semibold uppercase tracking-wider text-blue-400 flex items-center gap-2">
-                            <span class="w-2 h-2 rounded-full bg-blue-400 animate-ping"></span>
+                        <span class="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-blue-500 animate-ping"></span>
                             Vista Previa del Acta
                         </span>
-                        <span class="text-[11px] font-mono text-slate-400 bg-slate-800 px-2 py-0.5 rounded">Listo para copiar</span>
+                        <span id="previewStatusBadge" class="text-[11px] font-mono font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2.5 py-0.5 rounded-md">
+                            Automático
+                        </span>
                     </div>
 
                     <!-- Visualizador con resaltado de variables -->
-                    <div id="visualPreview" class="bg-slate-950 border border-slate-800 rounded-xl p-4 font-mono text-sm leading-relaxed text-slate-200 space-y-3 select-all">
-                        <!-- Se llena por JS -->
+                    <div id="visualPreview" class="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-4 font-mono text-xs sm:text-sm leading-relaxed text-slate-800 dark:text-slate-200 space-y-2.5 select-all">
                     </div>
 
-                    <!-- Textarea oculto o editable para copia exacta -->
+                    <!-- Textarea editable sincronizado -->
                     <div class="mt-3">
-                        <label class="block text-[11px] text-slate-400 mb-1 flex justify-between">
-                            <span>Texto plano final (puedes editar manualmente si lo deseas):</span>
-                        </label>
-                        <textarea id="rawOutput" rows="5" class="w-full bg-slate-950/60 border border-slate-800 rounded-xl p-3 font-mono text-xs text-slate-300 focus:border-blue-500 outline-none resize-none"></textarea>
+                        <div class="flex items-center justify-between mb-1">
+                            <label for="rawOutput" class="text-[11px] font-medium text-slate-500 dark:text-slate-400">
+                                Texto plano final (editable manualmente):
+                            </label>
+                            <button type="button" id="restoreAutoBtn" onclick="restoreAutoPreview()" class="hidden text-[11px] font-semibold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer">
+                                Restaurar automático
+                            </button>
+                        </div>
+                        <textarea id="rawOutput" rows="5" oninput="handleManualTextEdit()" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl p-3 font-mono text-xs text-slate-800 dark:text-slate-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none resize-y"></textarea>
                     </div>
 
                     <!-- Botones de Acción Principal -->
                     <div class="space-y-2.5 mt-4">
-                        <button onclick="copyToClipboard('all')" class="w-full py-3 px-4 bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white font-semibold rounded-xl shadow-lg shadow-blue-600/25 transition flex items-center justify-center gap-2 text-sm">
+                        <button type="button" onclick="copyToClipboard('all')" class="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold rounded-xl shadow-sm transition flex items-center justify-center gap-2 text-sm cursor-pointer">
                             <i class="fa-regular fa-copy"></i>
                             <span>Copiar Todo + Guardar en Historial</span>
                         </button>
 
-                        <!-- Botones de líneas individuales (3 líneas) -->
+                        <!-- Botones de líneas individuales -->
                         <div class="grid grid-cols-3 gap-2">
-                            <button onclick="copyToClipboard('p1')" class="py-2 px-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium rounded-xl border border-slate-700 transition flex items-center justify-center gap-1 text-xs" title="Copiar línea 1 (Llamada)">
-                                <i class="fa-solid fa-phone-volume text-blue-400"></i> 1° Llamada
+                            <button type="button" onclick="copyToClipboard('p1')" class="py-2 px-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold rounded-xl border border-slate-200 dark:border-slate-700 transition flex items-center justify-center gap-1 text-xs cursor-pointer" title="Copiar línea 1 (Llamada)">
+                                <i class="fa-solid fa-phone-volume text-blue-600 dark:text-blue-400"></i> 1° Llamada
                             </button>
-                            <button onclick="copyToClipboard('p2')" class="py-2 px-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium rounded-xl border border-slate-700 transition flex items-center justify-center gap-1 text-xs" title="Copiar línea 2 (Redime)">
-                                <i class="fa-solid fa-ticket text-amber-400"></i> 2° Redime
+                            <button type="button" onclick="copyToClipboard('p2')" class="py-2 px-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold rounded-xl border border-slate-200 dark:border-slate-700 transition flex items-center justify-center gap-1 text-xs cursor-pointer" title="Copiar línea 2 (Redime)">
+                                <i class="fa-solid fa-ticket text-amber-600 dark:text-amber-400"></i> 2° Redime
                             </button>
-                            <button onclick="copyToClipboard('p3')" class="py-2 px-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium rounded-xl border border-slate-700 transition flex items-center justify-center gap-1 text-xs" title="Copiar línea 3 (Cancela en caja)">
-                                <i class="fa-solid fa-cash-register text-emerald-400"></i> 3° Cancela
+                            <button type="button" onclick="copyToClipboard('p3')" class="py-2 px-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold rounded-xl border border-slate-200 dark:border-slate-700 transition flex items-center justify-center gap-1 text-xs cursor-pointer" title="Copiar línea 3 (Cancela en caja)">
+                                <i class="fa-solid fa-cash-register text-emerald-600 dark:text-emerald-400"></i> 3° Cancela
                             </button>
                         </div>
                     </div>
                 </div>
 
                 <!-- Historial de Novedades Generadas -->
-                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
-                    <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-800">
-                        <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-2">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
+                    <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-100 dark:border-slate-800">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 flex items-center gap-2">
                             <i class="fa-solid fa-clock-rotate-left"></i> Historial Reciente de Turno
                         </h3>
-                        <button onclick="clearHistory()" class="text-[11px] text-rose-400 hover:text-rose-300 transition">
-                            Vaciar
+                        <button type="button" onclick="clearHistory()" class="text-[11px] font-semibold text-rose-600 dark:text-rose-400 hover:underline transition cursor-pointer">
+                            Vaciar todo
                         </button>
                     </div>
 
                     <div id="historyContainer" class="space-y-2.5 max-h-60 overflow-y-auto pr-1">
-                        <p class="text-xs text-slate-500 text-center py-4 italic">Los reportes que copies se guardarán aquí durante tu turno.</p>
+                        <p class="text-xs text-slate-400 dark:text-slate-500 text-center py-4 italic">Los reportes que copies se guardarán aquí durante tu turno.</p>
                     </div>
                 </div>
 
@@ -619,61 +491,87 @@
         </div>
     </main>
 
+    <!-- Textarea oculto de respaldo para copiar al portapapeles -->
+    <textarea id="clipboardFallback" class="fixed -top-96 left-0 opacity-0 pointer-events-none" aria-hidden="true"></textarea>
+
     <!-- Notificación Toast Flotante -->
     <div id="toast" class="fixed bottom-5 right-5 transform translate-y-20 opacity-0 transition-all duration-300 z-50 pointer-events-none">
-        <div class="bg-emerald-600 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 border border-emerald-400/30">
-            <i class="fa-solid fa-circle-check text-lg"></i>
+        <div id="toastBox" class="bg-emerald-600 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 border border-emerald-400/30">
+            <i id="toastIcon" class="fa-solid fa-circle-check text-lg"></i>
             <div>
                 <p id="toastTitle" class="text-xs font-bold uppercase tracking-wider">¡Copiado al portapapeles!</p>
-                <p id="toastDesc" class="text-xs text-emerald-100">El reporte está listo para pegar (Ctrl + V).</p>
+                <p id="toastDesc" class="text-xs text-white/90">El reporte está listo para pegar (Ctrl + V).</p>
             </div>
         </div>
     </div>
 
     <script>
-        // Estado actual del formulario
         let state = {
             clienteGenero: 'M', // 'M' -> cliente | 'F' -> clienta
             rawM2ValorCambio: 0,
             rawM2ValorVerificado: 0,
             dejaPropina: false,
             rawM2ValorPropina: 0,
+            isManualEdited: false,
             history: []
         };
 
-        // Inicialización al cargar la página
-        window.onload = function() {
-            // Iniciar reloj en vivo
+        let toastTimeout;
+
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function toggleTheme() {
+            const isDark = document.documentElement.classList.toggle('dark');
+            try {
+                localStorage.setItem('luxor_theme', isDark ? 'dark' : 'light');
+            } catch (e) { }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
             updateClock();
             setInterval(updateClock, 1000);
 
-            // Poner horas iniciales
-            setNow('horaM2Llamada');
-            addMinutesM2('redime', 1);
-            addMinutesM2('cancela', 2);
+            setNow('horaM2Llamada', true);
+            addMinutesM2('redime', 1, true);
+            addMinutesM2('cancela', 2, true);
 
-            // Listeners para cambios en inputs generales
+            setClienteGenero('M', true);
+            setDejaPropina(false, true);
+
             ['horaM2Llamada', 'horaM2Redime', 'horaM2Cancela', 'nombreEncOp', 'nombreCliente'].forEach(id => {
-                document.getElementById(id).addEventListener('input', updatePreview);
+                document.getElementById(id).addEventListener('input', onFormControlChange);
             });
-            document.getElementById('cargoEncOp').addEventListener('change', updatePreview);
+            document.getElementById('cargoEncOp').addEventListener('change', onFormControlChange);
 
-            // Cargar historial desde localStorage si existe
             try {
                 const savedHistory = localStorage.getItem('cctv_luxor_history');
                 if (savedHistory) {
-                    state.history = JSON.parse(savedHistory);
-                    renderHistory();
+                    const parsed = JSON.parse(savedHistory);
+                    if (Array.isArray(parsed)) {
+                        state.history = parsed;
+                        renderHistory();
+                    }
                 }
             } catch (e) {
                 console.warn('No se pudo leer localStorage');
             }
 
-            // Actualizar vista previa inicial
             updatePreview();
-        };
+        });
 
-        // Reloj de la barra superior
+        function onFormControlChange() {
+            state.isManualEdited = false;
+            checkTimeSequence();
+            updatePreview();
+        }
+
         function updateClock() {
             const now = new Date();
             const h = String(now.getHours()).padStart(2, '0');
@@ -682,143 +580,223 @@
             document.getElementById('liveClock').textContent = `${h}:${m}:${s} Hs.`;
         }
 
-        // Asignar la hora actual a un campo time
-        function setNow(inputId) {
+        function setNow(inputId, skipPreview = false) {
             const now = new Date();
             const h = String(now.getHours()).padStart(2, '0');
             const m = String(now.getMinutes()).padStart(2, '0');
             document.getElementById(inputId).value = `${h}:${m}`;
-            updatePreview();
+            if (!skipPreview) onFormControlChange();
         }
 
-        // Sumar minutos (Redime respecto a Llamada, Cancela respecto a Redime)
-        function addMinutesM2(step, mins) {
+        function addMinutesM2(step, mins, skipPreview = false) {
             const refId = step === 'redime' ? 'horaM2Llamada' : 'horaM2Redime';
             const targetId = step === 'redime' ? 'horaM2Redime' : 'horaM2Cancela';
             const refVal = document.getElementById(refId).value;
 
-            let baseDate = new Date();
+            const baseDate = new Date();
             if (refVal) {
                 const [h, m] = refVal.split(':').map(Number);
-                baseDate.setHours(h, m + mins, 0);
+                baseDate.setHours(h, m + mins, 0, 0);
             } else {
                 baseDate.setMinutes(baseDate.getMinutes() + mins);
             }
             const h = String(baseDate.getHours()).padStart(2, '0');
             const m = String(baseDate.getMinutes()).padStart(2, '0');
             document.getElementById(targetId).value = `${h}:${m}`;
-            updatePreview();
+            if (!skipPreview) onFormControlChange();
         }
 
-        // Cambiar género de cliente (cliente / clienta)
-        function setClienteGenero(gen) {
+        function syncSequentialTimes() {
+            addMinutesM2('redime', 1, true);
+            addMinutesM2('cancela', 2, false);
+        }
+
+        function timeStrToMin(val) {
+            if (!val || !val.includes(':')) return null;
+            const [h, m] = val.split(':').map(Number);
+            if (isNaN(h) || isNaN(m)) return null;
+            return h * 60 + m;
+        }
+
+        function checkTimeSequence() {
+            const t1 = timeStrToMin(document.getElementById('horaM2Llamada').value);
+            const t2 = timeStrToMin(document.getElementById('horaM2Redime').value);
+            const t3 = timeStrToMin(document.getElementById('horaM2Cancela').value);
+            const alertEl = document.getElementById('timeOrderAlert');
+
+            if (t1 === null || t2 === null || t3 === null) {
+                alertEl.classList.add('hidden');
+                return;
+            }
+
+            // Permitir cruce natural de medianoche (ej. 23:58 -> 00:01) de hasta 3 horas
+            const diff12 = (t2 - t1 + 1440) % 1440;
+            const diff23 = (t3 - t2 + 1440) % 1440;
+            const outOfOrder = diff12 > 180 || diff23 > 180;
+
+            alertEl.classList.toggle('hidden', !outOfOrder);
+        }
+
+        function setClienteGenero(gen, skipPreview = false) {
             state.clienteGenero = gen;
             const btnSr = document.getElementById('btnClienteSr');
             const btnSra = document.getElementById('btnClienteSra');
 
+            const inactiveCls = 'py-2 px-3 rounded-xl border text-xs font-semibold flex items-center justify-center gap-1.5 transition cursor-pointer bg-slate-50 dark:bg-slate-950 border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800';
+
             if (gen === 'M') {
-                btnSr.className = "py-2 px-3 rounded-xl border text-xs font-semibold flex items-center justify-center gap-1.5 transition bg-blue-600/20 border-blue-500 text-blue-300";
-                btnSra.className = "py-2 px-3 rounded-xl border text-xs font-semibold flex items-center justify-center gap-1.5 transition bg-slate-950 border-slate-800 text-slate-400 hover:bg-slate-800";
+                btnSr.className = 'py-2 px-3 rounded-xl border text-xs font-semibold flex items-center justify-center gap-1.5 transition cursor-pointer bg-blue-50 dark:bg-blue-600/20 border-blue-500 text-blue-700 dark:text-blue-300 shadow-sm';
+                btnSra.className = inactiveCls;
             } else {
-                btnSra.className = "py-2 px-3 rounded-xl border text-xs font-semibold flex items-center justify-center gap-1.5 transition bg-pink-600/20 border-pink-500 text-pink-300";
-                btnSr.className = "py-2 px-3 rounded-xl border text-xs font-semibold flex items-center justify-center gap-1.5 transition bg-slate-950 border-slate-800 text-slate-400 hover:bg-slate-800";
+                btnSra.className = 'py-2 px-3 rounded-xl border text-xs font-semibold flex items-center justify-center gap-1.5 transition cursor-pointer bg-pink-50 dark:bg-pink-600/20 border-pink-500 text-pink-700 dark:text-pink-300 shadow-sm';
+                btnSr.className = inactiveCls;
             }
-            updatePreview();
+            if (!skipPreview) onFormControlChange();
         }
 
-        // Limpiar un input puntual
         function clearInput(id) {
-            document.getElementById(id).value = '';
-            updatePreview();
+            const el = document.getElementById(id);
+            el.value = '';
+            el.focus();
+            onFormControlChange();
         }
 
-        // Formatear número con puntos de miles (ej: 1000000 -> "1.000.000")
-        function formatThousands(num) {
-            if (!num || isNaN(num)) return '';
-            return Math.round(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        function formatThousandsInt(intStr) {
+            const cleaned = intStr.replace(/^0+(?=\d)/, '');
+            return cleaned.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
         }
 
-        // Formatear para el texto del reporte (ej: 1000000 -> "1.000.000,00")
-        function formatCurrencyForReport(num, placeholder = "000.000,00") {
+        function formatNumberInputDisplay(num) {
+            if (!num || num <= 0) return '';
+            const totalCents = Math.round(num * 100);
+            const intPart = String(Math.floor(totalCents / 100)).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            const decPart = totalCents % 100;
+            return decPart > 0 ? `${intPart},${String(decPart).padStart(2, '0')}` : intPart;
+        }
+
+        function formatCurrencyForReport(num, placeholder = '000.000,00') {
             if (!num || num <= 0) return placeholder;
-            const hasDecimals = num % 1 !== 0;
-            if (hasDecimals) {
-                const parts = num.toFixed(2).split('.');
-                const intPart = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-                return `${intPart},${parts[1]}`;
-            } else {
-                return `${formatThousands(num)},00`;
-            }
+            const totalCents = Math.round(num * 100);
+            const intPart = String(Math.floor(totalCents / 100)).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            const decPart = String(totalCents % 100).padStart(2, '0');
+            return `${intPart},${decPart}`;
         }
 
-        // Manejar entrada de dinero con puntos automáticos (cambio, verificado o propina)
+        /**
+         * Parsea montos en formato argentino sin multiplicar por 100 al pegar valores con ",00"
+         * Soporta tanto tipeo en vivo ("500000", "500000,50") como pegado ("$500.000,00" o "500000.50")
+         */
+        function parseAndFormatArgentineInput(rawValue) {
+            let val = rawValue.replace(/[^\d.,]/g, '');
+            if (!val) return { numeric: 0, formatted: '' };
+
+            let intDigits = '';
+            let decDigits = null;
+
+            if (val.includes(',')) {
+                const parts = val.split(',');
+                intDigits = parts[0].replace(/\D/g, '');
+                decDigits = parts.slice(1).join('').replace(/\D/g, '').slice(0, 2);
+            } else {
+                // Si tiene un único punto seguido de 1 o 2 dígitos al final (ej. pegado "250000.50"), tratar como decimal
+                const dotParts = val.split('.');
+                if (dotParts.length === 2 && dotParts[1].length <= 2 && dotParts[0].length >= 4) {
+                    intDigits = dotParts[0].replace(/\D/g, '');
+                    decDigits = dotParts[1].replace(/\D/g, '');
+                } else {
+                    intDigits = val.replace(/\D/g, '');
+                }
+            }
+
+            if (!intDigits && decDigits === null) {
+                return { numeric: 0, formatted: '' };
+            }
+
+            const intFormatted = intDigits ? formatThousandsInt(intDigits) : '0';
+            const intNum = intDigits ? parseInt(intDigits, 10) : 0;
+            const decNum = decDigits ? parseInt(decDigits.padEnd(2, '0'), 10) / 100 : 0;
+            const numeric = intNum + decNum;
+
+            const formatted = decDigits !== null ? `${intFormatted},${decDigits}` : (intNum > 0 ? intFormatted : '');
+            return { numeric, formatted };
+        }
+
         function handleMoneyInput(inputEl, type = 'cambio') {
-            const rawDigits = inputEl.value.replace(/\D/g, '');
-            const numericVal = rawDigits ? parseInt(rawDigits, 10) : 0;
-            inputEl.value = numericVal > 0 ? formatThousands(numericVal) : '';
+            const { numeric, formatted } = parseAndFormatArgentineInput(inputEl.value);
+            inputEl.value = formatted;
 
             if (type === 'cambio') {
-                state.rawM2ValorCambio = numericVal;
+                state.rawM2ValorCambio = numeric;
                 checkPaymentComparison();
-                updatePreview();
+                onFormControlChange();
             } else if (type === 'verificado') {
-                state.rawM2ValorVerificado = numericVal;
+                state.rawM2ValorVerificado = numeric;
                 checkPaymentComparison();
             } else if (type === 'propina') {
-                state.rawM2ValorPropina = numericVal;
-                updatePreview();
+                state.rawM2ValorPropina = numeric;
+                onFormControlChange();
             }
         }
 
-        // Comparar el Valor Total de Cambio vs el Monto Pagado / Verificado
         function checkPaymentComparison() {
             const alertBox = document.getElementById('paymentStatusAlert');
             const verificadoInput = document.getElementById('m2ValorVerificado').value.trim();
 
-            if (!verificadoInput || (state.rawM2ValorCambio === 0 && state.rawM2ValorVerificado === 0)) {
-                alertBox.className = "hidden mt-4 rounded-xl p-3 border text-xs font-medium flex items-center justify-between gap-3 transition-all";
+            if (!verificadoInput || state.rawM2ValorVerificado <= 0) {
+                alertBox.className = 'hidden mt-4 rounded-xl p-3.5 border text-xs font-medium flex items-center justify-between gap-3 transition-all';
                 return;
             }
 
-            const diff = state.rawM2ValorVerificado - state.rawM2ValorCambio;
-
-            if (diff === 0 && state.rawM2ValorCambio > 0) {
-                alertBox.className = "mt-4 rounded-xl p-3 border bg-emerald-500/10 border-emerald-500/40 text-emerald-300 text-xs font-medium flex items-center justify-between gap-3 transition-all";
+            // Si aún no se ingresó Valor Total de Cambio, mostrar aviso informativo en vez de falso "Sobrepago"
+            if (state.rawM2ValorCambio <= 0) {
+                alertBox.className = 'mt-4 rounded-xl p-3.5 border bg-blue-50 dark:bg-blue-950/40 border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-200 text-xs font-medium flex items-center justify-between gap-3 transition-all';
                 alertBox.innerHTML = `
                     <div class="flex items-center gap-2.5">
-                        <i class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
+                        <i class="fa-solid fa-circle-info text-blue-600 dark:text-blue-400 text-base"></i>
+                        <span>Ingresa el <b>Valor Total de Cambio</b> para comparar contra este monto verificado.</span>
+                    </div>
+                `;
+                return;
+            }
+
+            const diffCents = Math.round(state.rawM2ValorVerificado * 100) - Math.round(state.rawM2ValorCambio * 100);
+            const absDiff = Math.abs(diffCents) / 100;
+
+            if (diffCents === 0) {
+                alertBox.className = 'mt-4 rounded-xl p-3.5 border bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-700 text-emerald-900 dark:text-emerald-200 text-xs font-medium flex items-center justify-between gap-3 transition-all';
+                alertBox.innerHTML = `
+                    <div class="flex items-center gap-2.5">
+                        <i class="fa-solid fa-circle-check text-emerald-600 dark:text-emerald-400 text-base"></i>
                         <div>
                             <span class="font-bold uppercase tracking-wide block">¡Pago Correcto! Los montos coinciden</span>
-                            <span class="text-[11px] text-emerald-200/80">Se está pagando exactamente $${formatCurrencyForReport(state.rawM2ValorCambio)}.</span>
+                            <span class="text-[11px] text-emerald-700 dark:text-emerald-300">Se está pagando exactamente $${formatCurrencyForReport(state.rawM2ValorCambio)}.</span>
                         </div>
                     </div>
-                    <span class="font-mono font-bold bg-emerald-500/20 px-2.5 py-1 rounded-lg border border-emerald-500/30">Dif: $0,00</span>
+                    <span class="font-mono font-bold bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-200 px-2.5 py-1 rounded-lg border border-emerald-300 dark:border-emerald-700 shrink-0">Dif: $0,00</span>
                 `;
-            } else if (diff < 0) {
-                const faltante = Math.abs(diff);
-                alertBox.className = "mt-4 rounded-xl p-3 border bg-amber-500/10 border-amber-500/40 text-amber-300 text-xs font-medium flex items-center justify-between gap-3 transition-all";
+            } else if (diffCents < 0) {
+                alertBox.className = 'mt-4 rounded-xl p-3.5 border bg-amber-50 dark:bg-amber-950/40 border-amber-300 dark:border-amber-700 text-amber-900 dark:text-amber-200 text-xs font-medium flex items-center justify-between gap-3 transition-all';
                 alertBox.innerHTML = `
                     <div class="flex items-center gap-2.5">
-                        <i class="fa-solid fa-triangle-exclamation text-amber-400 text-base"></i>
+                        <i class="fa-solid fa-triangle-exclamation text-amber-600 dark:text-amber-400 text-base"></i>
                         <div>
                             <span class="font-bold uppercase tracking-wide block">¡Atención! Se está pagando de MENOS</span>
-                            <span class="text-[11px] text-amber-200/80">Faltan entregar $${formatCurrencyForReport(faltante)} al cliente.</span>
+                            <span class="text-[11px] text-amber-800 dark:text-amber-300">Faltan entregar $${formatCurrencyForReport(absDiff)} al cliente.</span>
                         </div>
                     </div>
-                    <span class="font-mono font-bold bg-amber-500/20 px-2.5 py-1 rounded-lg border border-amber-500/30 shrink-0">-$${formatThousands(faltante)}</span>
+                    <span class="font-mono font-bold bg-amber-100 dark:bg-amber-900/60 text-amber-900 dark:text-amber-200 px-2.5 py-1 rounded-lg border border-amber-300 dark:border-amber-700 shrink-0">-$${formatCurrencyForReport(absDiff)}</span>
                 `;
             } else {
-                const excedente = Math.abs(diff);
-                alertBox.className = "mt-4 rounded-xl p-3 border bg-rose-500/15 border-rose-500/50 text-rose-300 text-xs font-medium flex items-center justify-between gap-3 transition-all animate-pulse";
+                alertBox.className = 'mt-4 rounded-xl p-3.5 border bg-rose-50 dark:bg-rose-950/50 border-rose-300 dark:border-rose-700 text-rose-900 dark:text-rose-200 text-xs font-medium flex items-center justify-between gap-3 transition-all';
                 alertBox.innerHTML = `
                     <div class="flex items-center gap-2.5">
-                        <i class="fa-solid fa-circle-exclamation text-rose-400 text-base"></i>
+                        <i class="fa-solid fa-circle-exclamation text-rose-600 dark:text-rose-400 text-base"></i>
                         <div>
                             <span class="font-bold uppercase tracking-wide block">¡ALERTA! Se está pagando de MÁS (Sobrepago)</span>
-                            <span class="text-[11px] text-rose-200/90">Excedente de $${formatCurrencyForReport(excedente)} sobre el valor de los tickets.</span>
+                            <span class="text-[11px] text-rose-800 dark:text-rose-300">Excedente de $${formatCurrencyForReport(absDiff)} sobre el valor de los tickets.</span>
                         </div>
                     </div>
-                    <span class="font-mono font-bold bg-rose-500/25 px-2.5 py-1 rounded-lg border border-rose-500/40 shrink-0">+$${formatThousands(excedente)}</span>
+                    <span class="font-mono font-bold bg-rose-100 dark:bg-rose-900/60 text-rose-900 dark:text-rose-200 px-2.5 py-1 rounded-lg border border-rose-300 dark:border-rose-700 shrink-0">+$${formatCurrencyForReport(absDiff)}</span>
                 `;
             }
         }
@@ -826,9 +804,18 @@
         function equalizePayment() {
             if (state.rawM2ValorCambio > 0) {
                 state.rawM2ValorVerificado = state.rawM2ValorCambio;
-                document.getElementById('m2ValorVerificado').value = formatThousands(state.rawM2ValorCambio);
+                document.getElementById('m2ValorVerificado').value = formatNumberInputDisplay(state.rawM2ValorCambio);
                 checkPaymentComparison();
+            } else {
+                showToast('Sin monto de cambio', 'Primero ingresa el Valor Total de Cambio ($).', 'warn');
             }
+        }
+
+        function clearCambio() {
+            state.rawM2ValorCambio = 0;
+            document.getElementById('m2ValorCambio').value = '';
+            checkPaymentComparison();
+            onFormControlChange();
         }
 
         function clearVerified() {
@@ -837,60 +824,58 @@
             checkPaymentComparison();
         }
 
-        // Activar / Desactivar opción de propina
-        function setDejaPropina(deja) {
+        function setDejaPropina(deja, skipPreview = false) {
             state.dejaPropina = deja;
             const btnNo = document.getElementById('btnPropinaNo');
             const btnSi = document.getElementById('btnPropinaSi');
             const container = document.getElementById('propinaInputContainer');
 
+            const inactiveCls = 'px-4 py-1.5 rounded-xl border text-xs font-bold transition cursor-pointer bg-slate-50 dark:bg-slate-950 border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800';
+
             if (deja) {
-                btnSi.className = "px-4 py-1.5 rounded-xl border text-xs font-bold transition bg-emerald-600/20 border-emerald-500 text-emerald-300";
-                btnNo.className = "px-4 py-1.5 rounded-xl border text-xs font-bold transition bg-slate-950 border-slate-800 text-slate-400 hover:bg-slate-800";
+                btnSi.className = 'px-4 py-1.5 rounded-xl border text-xs font-bold transition cursor-pointer bg-emerald-50 dark:bg-emerald-600/20 border-emerald-500 text-emerald-700 dark:text-emerald-300 shadow-sm';
+                btnNo.className = inactiveCls;
                 container.classList.remove('hidden');
             } else {
-                btnNo.className = "px-4 py-1.5 rounded-xl border text-xs font-bold transition bg-rose-600/20 border-rose-500 text-rose-300";
-                btnSi.className = "px-4 py-1.5 rounded-xl border text-xs font-bold transition bg-slate-950 border-slate-800 text-slate-400 hover:bg-slate-800";
+                btnNo.className = 'px-4 py-1.5 rounded-xl border text-xs font-bold transition cursor-pointer bg-rose-50 dark:bg-rose-600/20 border-rose-500 text-rose-700 dark:text-rose-300 shadow-sm';
+                btnSi.className = inactiveCls;
                 container.classList.add('hidden');
             }
-            updatePreview();
+            if (!skipPreview) onFormControlChange();
         }
 
         function setQuickPropina(amount) {
             state.rawM2ValorPropina = amount;
-            document.getElementById('m2ValorPropina').value = formatThousands(amount);
-            updatePreview();
+            document.getElementById('m2ValorPropina').value = formatNumberInputDisplay(amount);
+            onFormControlChange();
         }
 
         function clearPropina() {
             state.rawM2ValorPropina = 0;
             document.getElementById('m2ValorPropina').value = '';
-            updatePreview();
+            onFormControlChange();
         }
 
-        // Botones rápidos de monto
         function setQuickMoney(amount) {
             state.rawM2ValorCambio = amount;
-            document.getElementById('m2ValorCambio').value = formatThousands(amount);
+            document.getElementById('m2ValorCambio').value = formatNumberInputDisplay(amount);
             checkPaymentComparison();
-            updatePreview();
+            onFormControlChange();
         }
 
-        // Botones rápidos de cantidad de tickets
         function setQuickM2Tickets(count) {
             document.getElementById('m2CantidadTickets').value = count;
-            updatePreview();
+            onFormControlChange();
         }
 
-        // Construir los textos y actualizar vista previa
         function getReportParts() {
             const padZero = document.getElementById('padZeroTickets').checked;
             const repeatCli = document.getElementById('repeatClientName').checked;
             const nombreCli = document.getElementById('nombreCliente').value.trim();
 
-            const h1 = document.getElementById('horaM2Llamada').value || "00:00";
-            const h2 = document.getElementById('horaM2Redime').value || "00:00";
-            const h3 = document.getElementById('horaM2Cancela').value || "00:00";
+            const h1 = document.getElementById('horaM2Llamada').value || '00:00';
+            const h2 = document.getElementById('horaM2Redime').value || '00:00';
+            const h3 = document.getElementById('horaM2Cancela').value || '00:00';
 
             const cargoEncOp = document.getElementById('cargoEncOp').value;
             const nombreEncOp = document.getElementById('nombreEncOp').value.trim();
@@ -902,82 +887,169 @@
             const tratoP3 = (repeatCli && nombreCli !== '') ? `${tratoBase} ${nombreCli}` : tratoBase;
 
             const rawQtyM2 = document.getElementById('m2CantidadTickets').value.trim();
-            let qtyM2Str = padZero ? "00" : "0";
-            if (rawQtyM2 !== '' && parseInt(rawQtyM2, 10) > 0) {
-                qtyM2Str = padZero ? String(parseInt(rawQtyM2, 10)).padStart(2, '0') : String(parseInt(rawQtyM2, 10));
-            }
+            const qtyNum = rawQtyM2 !== '' ? Math.max(0, parseInt(rawQtyM2, 10) || 0) : 0;
+            const qtyM2Str = qtyNum > 0
+                ? (padZero ? String(qtyNum).padStart(2, '0') : String(qtyNum))
+                : (padZero ? '00' : '0');
 
-            const valorCambioStr = formatCurrencyForReport(state.rawM2ValorCambio, "000.000,00");
-            const valorPropinaStr = formatCurrencyForReport(state.rawM2ValorPropina, "0.000,00");
+            const palabraTickets = qtyNum === 1 ? 'ticket' : 'tickets';
 
-            const p1Plain = `A las ${h1} Hs. CCTV recibe llamada de ${encOpFull} , informa que recibió de ${tratoP1} ${qtyM2Str} tickets para cambio por valor de $${valorCambioStr}.-`;
-            const p2Plain = `A las ${h2} Hs. ${encOpFull} redime ${qtyM2Str} tickets.-`;
+            const valorCambioStr = formatCurrencyForReport(state.rawM2ValorCambio, '000.000,00');
+            const valorPropinaStr = formatCurrencyForReport(state.rawM2ValorPropina, '0.000,00');
+
+            // Texto plano sin espacio antes de la coma y con concordancia singular/plural y sin duplicar el nombre en propina
+            const p1Plain = `A las ${h1} Hs. CCTV recibe llamada de ${encOpFull}, informa que recibió de ${tratoP1} ${qtyM2Str} ${palabraTickets} para cambio por valor de $${valorCambioStr}.-`;
+            const p2Plain = `A las ${h2} Hs. ${encOpFull} redime ${qtyM2Str} ${palabraTickets}.-`;
 
             let p3Plain = `A las ${h3} Hs. ${encOpFull} cancela en ventanilla de caja $${valorCambioStr} a ${tratoP3}.-`;
             if (state.dejaPropina) {
-                p3Plain = `A las ${h3} Hs. ${encOpFull} cancela en ventanilla de caja $${valorCambioStr} a ${tratoP3}, a su vez ${articuloCliente} ${tratoP3} deja en concepto de propina $${valorPropinaStr} en efectivo.-`;
+                p3Plain = `A las ${h3} Hs. ${encOpFull} cancela en ventanilla de caja $${valorCambioStr} a ${tratoP3}, a su vez ${articuloCliente} ${tratoBase} deja en concepto de propina $${valorPropinaStr} en efectivo.-`;
             }
 
-            const p1HTML = `A las <span class="highlight-var">${h1}</span> Hs. CCTV recibe llamada de <span class="highlight-var">${encOpFull}</span> , informa que recibió de <span class="highlight-var">${tratoP1}</span> <span class="highlight-var">${qtyM2Str}</span> tickets para cambio por valor de <span class="highlight-var">$${valorCambioStr}</span>.-`;
-            const p2HTML = `A las <span class="highlight-var">${h2}</span> Hs. <span class="highlight-var">${encOpFull}</span> redime <span class="highlight-var">${qtyM2Str}</span> tickets.-`;
+            // Vista previa escapando HTML de entradas de usuario y marcando campos pendientes
+            const qtyClass = qtyNum > 0 ? 'highlight-var' : 'highlight-warn';
+            const cambioClass = state.rawM2ValorCambio > 0 ? 'highlight-var' : 'highlight-warn';
+            const propinaClass = state.rawM2ValorPropina > 0 ? 'highlight-var' : 'highlight-warn';
 
-            let p3HTML = `A las <span class="highlight-var">${h3}</span> Hs. <span class="highlight-var">${encOpFull}</span> cancela en ventanilla de caja <span class="highlight-var">$${valorCambioStr}</span> a <span class="highlight-var">${tratoP3}</span>.-`;
+            const safeH1 = escapeHtml(h1);
+            const safeH2 = escapeHtml(h2);
+            const safeH3 = escapeHtml(h3);
+            const safeEncOp = escapeHtml(encOpFull);
+            const safeTratoP1 = escapeHtml(tratoP1);
+            const safeTratoP3 = escapeHtml(tratoP3);
+
+            const p1HTML = `A las <span class="highlight-var">${safeH1}</span> Hs. CCTV recibe llamada de <span class="highlight-var">${safeEncOp}</span>, informa que recibió de <span class="highlight-var">${safeTratoP1}</span> <span class="${qtyClass}">${qtyM2Str}</span> ${palabraTickets} para cambio por valor de <span class="${cambioClass}">$${valorCambioStr}</span>.-`;
+            const p2HTML = `A las <span class="highlight-var">${safeH2}</span> Hs. <span class="highlight-var">${safeEncOp}</span> redime <span class="${qtyClass}">${qtyM2Str}</span> ${palabraTickets}.-`;
+
+            let p3HTML = `A las <span class="highlight-var">${safeH3}</span> Hs. <span class="highlight-var">${safeEncOp}</span> cancela en ventanilla de caja <span class="${cambioClass}">$${valorCambioStr}</span> a <span class="highlight-var">${safeTratoP3}</span>.-`;
             if (state.dejaPropina) {
-                p3HTML = `A las <span class="highlight-var">${h3}</span> Hs. <span class="highlight-var">${encOpFull}</span> cancela en ventanilla de caja <span class="highlight-var">$${valorCambioStr}</span> a <span class="highlight-var">${tratoP3}</span>, a su vez ${articuloCliente} <span class="highlight-var">${tratoP3}</span> deja en concepto de propina <span class="highlight-var">$${valorPropinaStr}</span> en efectivo.-`;
+                p3HTML = `A las <span class="highlight-var">${safeH3}</span> Hs. <span class="highlight-var">${safeEncOp}</span> cancela en ventanilla de caja <span class="${cambioClass}">$${valorCambioStr}</span> a <span class="highlight-var">${safeTratoP3}</span>, a su vez ${articuloCliente} <span class="highlight-var">${tratoBase}</span> deja en concepto de propina <span class="${propinaClass}">$${valorPropinaStr}</span> en efectivo.-`;
             }
 
             const propinaTag = state.dejaPropina ? ` | Propina $${valorPropinaStr}` : '';
 
             return {
+                qtyNum,
                 p1Plain,
                 p2Plain,
                 p3Plain,
                 fullPlain: `${p1Plain}\n${p2Plain}\n${p3Plain}`,
                 htmlPreview: `<p>${p1HTML}</p><p>${p2HTML}</p><p>${p3HTML}</p>`,
-                summary: `[${encOpFull}] ${h1} Hs | Redime ${qtyM2Str} tks | $${valorCambioStr}${propinaTag}`
+                summary: `[${encOpFull}] ${h1} Hs | Redime ${qtyM2Str} ${qtyNum === 1 ? 'tk' : 'tks'} | $${valorCambioStr}${propinaTag}`
             };
+        }
+
+        function updatePreviewBadge() {
+            const badge = document.getElementById('previewStatusBadge');
+            const restoreBtn = document.getElementById('restoreAutoBtn');
+            if (state.isManualEdited) {
+                badge.textContent = 'Editado manual';
+                badge.className = 'text-[11px] font-mono font-semibold text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-amber-950/60 px-2.5 py-0.5 rounded-md';
+                restoreBtn.classList.remove('hidden');
+            } else {
+                badge.textContent = 'Automático';
+                badge.className = 'text-[11px] font-mono font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2.5 py-0.5 rounded-md';
+                restoreBtn.classList.add('hidden');
+            }
         }
 
         function updatePreview() {
             const parts = getReportParts();
             document.getElementById('visualPreview').innerHTML = parts.htmlPreview;
-            document.getElementById('rawOutput').value = parts.fullPlain;
+            if (!state.isManualEdited) {
+                document.getElementById('rawOutput').value = parts.fullPlain;
+            }
+            updatePreviewBadge();
         }
 
-        // Copiar al portapapeles compatible con iframes
-        function copyToClipboard(mode) {
-            const parts = getReportParts();
-            let textToCopy = document.getElementById('rawOutput').value;
-            let toastMsg = "Reporte completo copiado.";
+        function handleManualTextEdit() {
+            state.isManualEdited = true;
+            const rawLines = document.getElementById('rawOutput').value.split(/\r?\n/).filter(l => l.trim() !== '');
+            document.getElementById('visualPreview').innerHTML = rawLines.length > 0
+                ? rawLines.map(line => `<p>${escapeHtml(line)}</p>`).join('')
+                : '<p class="italic text-slate-400">Sin texto...</p>';
+            updatePreviewBadge();
+        }
 
-            if (mode === 'p1') {
-                textToCopy = parts.p1Plain;
-                toastMsg = "1° Línea (Llamada) copiada.";
-            } else if (mode === 'p2') {
-                textToCopy = parts.p2Plain;
-                toastMsg = "2° Línea (Redime) copiada.";
-            } else if (mode === 'p3') {
-                textToCopy = parts.p3Plain;
-                toastMsg = "3° Línea (Cancela en caja) copiada.";
+        function restoreAutoPreview() {
+            state.isManualEdited = false;
+            updatePreview();
+            showToast('Vista previa restaurada', 'Se volvió al texto generado automáticamente.');
+        }
+
+        async function writeTextClipboard(text) {
+            if (navigator.clipboard && window.isSecureContext) {
+                try {
+                    await navigator.clipboard.writeText(text);
+                    return true;
+                } catch (e) { }
+            }
+            const helper = document.getElementById('clipboardFallback');
+            helper.value = text;
+            helper.select();
+            helper.setSelectionRange(0, 999999);
+            try {
+                return document.execCommand('copy');
+            } catch (err) {
+                return false;
+            }
+        }
+
+        async function copyToClipboard(mode) {
+            const parts = getReportParts();
+
+            // Validar campos obligatorios cuando no es edición manual libre
+            if (!state.isManualEdited) {
+                if ((mode === 'all' || mode === 'p1' || mode === 'p2') && parts.qtyNum <= 0) {
+                    showToast('Falta cantidad de tickets', 'Ingresa al menos 1 ticket antes de copiar.', 'warn');
+                    document.getElementById('m2CantidadTickets').focus();
+                    return;
+                }
+                if ((mode === 'all' || mode === 'p1' || mode === 'p3') && state.rawM2ValorCambio <= 0) {
+                    showToast('Falta Valor Total de Cambio', 'Ingresa el monto total de cambio ($).', 'warn');
+                    document.getElementById('m2ValorCambio').focus();
+                    return;
+                }
+                if ((mode === 'all' || mode === 'p3') && state.dejaPropina && state.rawM2ValorPropina <= 0) {
+                    showToast('Falta monto de propina', 'Marcaste que deja propina pero el monto está en $0.', 'warn');
+                    document.getElementById('m2ValorPropina').focus();
+                    return;
+                }
             }
 
-            const tempTextArea = document.createElement('textarea');
-            tempTextArea.value = textToCopy;
-            document.body.appendChild(tempTextArea);
-            tempTextArea.select();
-            try {
-                document.execCommand('copy');
-                showToast("¡Copiado al portapapeles!", toastMsg);
+            const currentRaw = document.getElementById('rawOutput').value.trim();
+            const manualLines = currentRaw.split(/\r?\n/);
+
+            let textToCopy = currentRaw;
+            let toastMsg = 'Reporte completo copiado.';
+
+            if (mode === 'p1') {
+                textToCopy = state.isManualEdited ? (manualLines[0] || '') : parts.p1Plain;
+                toastMsg = '1° Línea (Llamada) copiada.';
+            } else if (mode === 'p2') {
+                textToCopy = state.isManualEdited ? (manualLines[1] || '') : parts.p2Plain;
+                toastMsg = '2° Línea (Redime) copiada.';
+            } else if (mode === 'p3') {
+                textToCopy = state.isManualEdited ? (manualLines.slice(2).join('\n') || '') : parts.p3Plain;
+                toastMsg = '3° Línea (Cancela en caja) copiada.';
+            }
+
+            if (!textToCopy) {
+                showToast('Texto vacío', 'No hay contenido en esa línea para copiar.', 'warn');
+                return;
+            }
+
+            const ok = await writeTextClipboard(textToCopy);
+            if (ok) {
+                showToast('¡Copiado al portapapeles!', toastMsg, 'success');
                 if (mode === 'all') {
                     saveToHistory(textToCopy, parts.summary);
                 }
-            } catch (err) {
-                console.error('Error al copiar:', err);
+            } else {
+                showToast('No se pudo copiar', 'Selecciona el texto manualmente y presiona Ctrl + C.', 'warn');
             }
-            document.body.removeChild(tempTextArea);
         }
 
-        // Guardar reporte en el historial del turno
         function saveToHistory(fullText, summary) {
             const item = {
                 id: Date.now(),
@@ -985,11 +1057,11 @@
                 fullText
             };
             state.history.unshift(item);
-            if (state.history.length > 15) state.history.pop();
+            if (state.history.length > 20) state.history.pop();
 
             try {
                 localStorage.setItem('cctv_luxor_history', JSON.stringify(state.history));
-            } catch (e) {}
+            } catch (e) { }
 
             renderHistory();
         }
@@ -997,73 +1069,99 @@
         function renderHistory() {
             const container = document.getElementById('historyContainer');
             if (state.history.length === 0) {
-                container.innerHTML = `<p class="text-xs text-slate-500 text-center py-4 italic">Los reportes que copies se guardarán aquí durante tu turno.</p>`;
+                container.innerHTML = `<p class="text-xs text-slate-400 dark:text-slate-500 text-center py-4 italic">Los reportes que copies se guardarán aquí durante tu turno.</p>`;
                 return;
             }
 
             container.innerHTML = state.history.map(item => `
-                <div class="bg-slate-950 border border-slate-800 rounded-xl p-3 flex items-center justify-between gap-2 hover:border-slate-700 transition">
+                <div class="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-3 flex items-center justify-between gap-2 hover:border-blue-300 dark:hover:border-slate-700 transition">
                     <div class="truncate">
-                        <p class="text-xs font-mono font-semibold text-blue-400 truncate">${item.summary}</p>
-                        <p class="text-[11px] text-slate-400 truncate mt-0.5">${item.fullText.replace(/\n/g, ' ')}</p>
+                        <p class="text-xs font-mono font-semibold text-blue-600 dark:text-blue-400 truncate">${escapeHtml(item.summary)}</p>
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400 truncate mt-0.5">${escapeHtml(item.fullText.replace(/\n/g, ' '))}</p>
                     </div>
-                    <button onclick="copyHistoryItem(${item.id})" class="px-2.5 py-1.5 bg-slate-800 hover:bg-blue-600 text-slate-300 hover:text-white rounded-lg text-xs transition shrink-0" title="Volver a copiar">
-                        <i class="fa-regular fa-copy"></i>
-                    </button>
+                    <div class="flex items-center gap-1 shrink-0">
+                        <button type="button" onclick="copyHistoryItem(${Number(item.id)})" class="px-2.5 py-1.5 bg-white dark:bg-slate-800 hover:bg-blue-600 dark:hover:bg-blue-600 text-slate-600 dark:text-slate-300 hover:text-white border border-slate-200 dark:border-slate-700 rounded-lg text-xs transition cursor-pointer" title="Volver a copiar">
+                            <i class="fa-regular fa-copy"></i>
+                        </button>
+                        <button type="button" onclick="deleteHistoryItem(${Number(item.id)})" class="px-2 py-1.5 bg-white dark:bg-slate-800 hover:bg-rose-600 dark:hover:bg-rose-600 text-slate-400 hover:text-white border border-slate-200 dark:border-slate-700 rounded-lg text-xs transition cursor-pointer" title="Eliminar este registro">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </div>
                 </div>
             `).join('');
         }
 
-        function copyHistoryItem(id) {
+        async function copyHistoryItem(id) {
             const item = state.history.find(i => i.id === id);
             if (!item) return;
 
-            const tempTextArea = document.createElement('textarea');
-            tempTextArea.value = item.fullText;
-            document.body.appendChild(tempTextArea);
-            tempTextArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(tempTextArea);
-
-            showToast("¡Copiado desde el historial!", item.summary);
+            const ok = await writeTextClipboard(item.fullText);
+            if (ok) {
+                showToast('¡Copiado desde el historial!', item.summary, 'success');
+            }
         }
 
-        function clearHistory() {
-            state.history = [];
+        function deleteHistoryItem(id) {
+            state.history = state.history.filter(i => i.id !== id);
             try {
-                localStorage.removeItem('cctv_luxor_history');
-            } catch (e) {}
+                localStorage.setItem('cctv_luxor_history', JSON.stringify(state.history));
+            } catch (e) { }
             renderHistory();
         }
 
-        // Reiniciar todo el formulario para un nuevo evento
-        function resetForm() {
-            setNow('horaM2Llamada');
-            addMinutesM2('redime', 1);
-            addMinutesM2('cancela', 2);
+        function clearHistory() {
+            if (state.history.length === 0) return;
+            state.history = [];
+            try {
+                localStorage.removeItem('cctv_luxor_history');
+            } catch (e) { }
+            renderHistory();
+            showToast('Historial vaciado', 'Se limpiaron los registros del turno.', 'success');
+        }
 
+        function resetForm() {
+            setNow('horaM2Llamada', true);
+            addMinutesM2('redime', 1, true);
+            addMinutesM2('cancela', 2, true);
+
+            document.getElementById('cargoEncOp').value = 'Enc.';
+            document.getElementById('nombreEncOp').value = '';
             document.getElementById('nombreCliente').value = '';
             document.getElementById('m2CantidadTickets').value = '';
             document.getElementById('m2ValorCambio').value = '';
             document.getElementById('m2ValorVerificado').value = '';
             document.getElementById('m2ValorPropina').value = '';
+            document.getElementById('padZeroTickets').checked = false;
+            document.getElementById('repeatClientName').checked = false;
 
             state.rawM2ValorCambio = 0;
             state.rawM2ValorVerificado = 0;
             state.rawM2ValorPropina = 0;
+            state.isManualEdited = false;
 
-            setDejaPropina(false);
+            setClienteGenero('M', true);
+            setDejaPropina(false, true);
+            checkTimeSequence();
             checkPaymentComparison();
             updatePreview();
-            showToast("Formulario reiniciado", "Listo para cargar una nueva novedad.");
+            showToast('Formulario reiniciado', 'Listo para cargar una nueva novedad.', 'success');
         }
 
-        // Mostrar notificación Toast
-        let toastTimeout;
-        function showToast(title, desc) {
+        function showToast(title, desc, type = 'success') {
             const toast = document.getElementById('toast');
+            const toastBox = document.getElementById('toastBox');
+            const toastIcon = document.getElementById('toastIcon');
+
             document.getElementById('toastTitle').textContent = title;
             document.getElementById('toastDesc').textContent = desc;
+
+            if (type === 'warn') {
+                toastBox.className = 'bg-amber-600 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 border border-amber-400/40';
+                toastIcon.className = 'fa-solid fa-triangle-exclamation text-lg';
+            } else {
+                toastBox.className = 'bg-emerald-600 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 border border-emerald-400/30';
+                toastIcon.className = 'fa-solid fa-circle-check text-lg';
+            }
 
             toast.classList.remove('translate-y-20', 'opacity-0');
             toast.classList.add('translate-y-0', 'opacity-100');
@@ -1072,8 +1170,9 @@
             toastTimeout = setTimeout(() => {
                 toast.classList.add('translate-y-20', 'opacity-0');
                 toast.classList.remove('translate-y-0', 'opacity-100');
-            }, 3000);
+            }, 3200);
         }
     </script>
 </body>
+
 </html>
