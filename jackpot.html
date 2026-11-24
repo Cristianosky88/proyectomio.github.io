@@ -1,191 +1,318 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro de Jackpot - Mejorado</title>
+    <title>Registro de Jackpot - Modelo N° 1</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'Segoe UI', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'Consolas', 'monospace'],
+                    }
+                }
+            }
+        };
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        body { background-color: #f8fafc; font-family: 'Segoe UI', sans-serif; }
-        .fade-in { animation: fadeIn 0.3s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-    </style>
-</head>
-<body class="p-4 md:p-8 text-slate-800">
+        body {
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+        }
 
-    <div class="max-w-5xl mx-auto bg-white rounded-xl shadow-xl overflow-hidden border border-slate-200">
+        .fade-in {
+            animation: fadeIn 0.25s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+
+        .dark ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        .dark ::-webkit-scrollbar-thumb {
+            background: #334155;
+        }
+
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            body {
+                background: #ffffff !important;
+                padding: 0 !important;
+            }
+        }
+    </style>
+    <script>
+        (function () {
+            try {
+                if (localStorage.getItem('jackpot-theme') === 'dark') {
+                    document.documentElement.classList.add('dark');
+                }
+            } catch (e) { }
+        })();
+    </script>
+</head>
+
+<body class="bg-slate-100 dark:bg-slate-950 p-3 sm:p-6 md:p-8 text-slate-800 dark:text-slate-100 min-h-screen transition-colors duration-200">
+
+    <div class="max-w-5xl mx-auto bg-white dark:bg-slate-900 rounded-2xl shadow-xl overflow-hidden border border-slate-200 dark:border-slate-800">
+
         <!-- Header -->
-        <div class="bg-slate-900 p-5 text-white flex justify-between items-center rounded-t-xl mb-1 shadow-md">
+        <header class="bg-slate-900 dark:bg-slate-950 border-b border-slate-800 p-4 sm:p-5 text-white flex flex-wrap justify-between items-center gap-3">
             <div class="flex items-center gap-3">
-                <div class="bg-indigo-600 p-2 rounded-lg">
+                <div class="bg-indigo-600 p-2.5 rounded-xl shadow-sm shrink-0">
                     <i data-lucide="wallet" class="w-6 h-6 text-white"></i>
                 </div>
                 <div>
-                    <h1 class="text-xl font-bold">Registro de Jackpot - Modelo N° 1</h1>
-                    <p class="text-slate-400 text-xs uppercase tracking-wider">Planilla de Reporte Jackpot</p>
+                    <h1 class="text-lg sm:text-xl font-bold leading-tight">Registro de Jackpot - Modelo N° 1</h1>
+                    <p class="text-slate-400 text-xs uppercase tracking-wider">Planilla de Reporte CCTV</p>
                 </div>
             </div>
-            <div class="flex items-center gap-4">
-                <a href="index.html" class="p-2 hover:bg-slate-700 rounded-lg transition inline-flex items-center justify-center flex-shrink-0 text-white" title="Volver a Inicio">
+
+            <div class="no-print flex flex-wrap items-center gap-2.5">
+                <button type="button" onclick="toggleTheme()" title="Cambiar modo claro/oscuro"
+                    class="p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl transition inline-flex items-center justify-center shrink-0 text-white cursor-pointer">
+                    <i data-lucide="sun" class="w-5 h-5 text-amber-400 hidden dark:block"></i>
+                    <i data-lucide="moon" class="w-5 h-5 text-slate-200 block dark:hidden"></i>
+                </button>
+
+                <a href="index.html" class="p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl transition inline-flex items-center justify-center shrink-0 text-white" title="Volver al Menú Principal">
                     <i data-lucide="home" class="w-5 h-5 text-white"></i>
                 </a>
-                <button type="button" id="btnJackpot2Header" class="px-4 py-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-white hover:from-yellow-500 hover:to-orange-600 rounded-lg font-bold text-sm transition shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center gap-2 border-2 border-yellow-300">
+
+                <a href="Jackpot2.html" id="btnJackpot2Header" class="px-3.5 py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:from-amber-600 hover:to-orange-600 rounded-xl font-bold text-xs sm:text-sm transition shadow-sm flex items-center gap-1.5">
                     <i data-lucide="zap" class="w-4 h-4"></i> Jackpot 2
-                </button>
-                <a href="jackpotluxor.html" class="px-4 py-2 bg-gradient-to-r from-rose-500 to-red-600 text-white hover:from-rose-600 hover:to-red-700 rounded-lg font-bold text-sm transition shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center gap-2 border-2 border-rose-300" title="Abrir Jackpot Luxor">
+                </a>
+
+                <a href="jackpotluxor.html" class="px-3.5 py-2 bg-gradient-to-r from-rose-500 to-red-600 text-white hover:from-rose-600 hover:to-red-700 rounded-xl font-bold text-xs sm:text-sm transition shadow-sm flex items-center gap-1.5" title="Abrir Jackpot Luxor">
                     <i data-lucide="shield-check" class="w-4 h-4"></i> Jackpot Luxor
                 </a>
-                <div class="text-right">
-                    <div class="text-xs text-slate-400">Fecha</div>
-                    <div class="font-mono font-bold text-lg" id="fechaActual">--/--/--</div>
+
+                <div class="text-right pl-2 border-l border-slate-700">
+                    <div class="text-[11px] text-slate-400 leading-none">Fecha</div>
+                    <div class="font-mono font-bold text-sm sm:text-base mt-0.5" id="fechaActual">--/--/----</div>
                 </div>
             </div>
-        </div>
+        </header>
 
-        <!-- Main Content -->
-        <div class="bg-white">
-            <form id="formJackpot" class="space-y-0" autocomplete="off" novalidate>
-                
-                <!-- 1. INFORMACION DE CONTACTO CCTV -->
-                <div class="border-b border-slate-200 p-6">
-                    <h3 class="font-bold text-slate-800 text-lg mb-4 flex items-center gap-2">
-                        <span class="bg-slate-200 text-slate-700 w-8 h-8 rounded-full flex items-center justify-center font-semibold">1</span>
-                        Informacion de Contacto CCTV
-                    </h3>
+        <!-- Contenido Principal -->
+        <div>
+            <form id="formJackpot" class="no-print divide-y divide-slate-200 dark:divide-slate-800" autocomplete="off" novalidate>
+
+                <!-- 1. INFORMACIÓN DE CONTACTO CCTV -->
+                <div class="p-5 sm:p-6">
+                    <h2 class="font-bold text-slate-800 dark:text-slate-100 text-base sm:text-lg mb-4 flex items-center gap-2.5">
+                        <span class="bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold">1</span>
+                        Información de Contacto CCTV
+                    </h2>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
-                            <label class="block text-xs font-semibold text-slate-600 mb-2">Hora de Aviso a CCTV <span class="text-red-500">*</span></label>
-                            <input type="time" id="hora_cctv" name="hora_cctv" required class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                            <label for="hora_cctv" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">Hora de Aviso a CCTV <span class="text-rose-500">*</span></label>
+                            <div class="flex gap-1.5">
+                                <input type="time" id="hora_cctv" name="hora_cctv" required class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm font-mono text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none">
+                                <button type="button" onclick="ponerHoraActual('hora_cctv')" title="Poner hora actual" class="px-3 bg-indigo-50 dark:bg-indigo-950/70 hover:bg-indigo-100 text-indigo-600 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 rounded-xl text-xs font-semibold cursor-pointer">⚡</button>
+                            </div>
                         </div>
+
                         <div>
-                            <label class="block text-xs font-semibold text-slate-600 mb-2">Quien Llama <span class="text-red-500">*</span></label>
-                            <select id="quien_llama" name="quien_llama" required class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                            <label for="quien_llama" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">Quién Llama <span class="text-rose-500">*</span></label>
+                            <select id="quien_llama" name="quien_llama" required class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none">
                                 <option value="">Seleccionar...</option>
                                 <option value="Encargado">Encargado</option>
                                 <option value="Encargada">Encargada</option>
                                 <option value="Supervisor">Supervisor</option>
                                 <option value="Asistente">Asistente</option>
                                 <option value="Operador">Operador</option>
-                                <option value="Otro">Otro</option>
+                                <option value="Operadora">Operadora</option>
+                                <option value="Otro">Otro (especificar)</option>
                             </select>
+                            <input type="text" id="quien_llama_otro" placeholder="Especificar cargo (ej. Jefe de Sala)" class="w-full p-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none mt-2 hidden">
                         </div>
+
                         <div>
-                            <label class="block text-xs font-semibold text-slate-600 mb-2">Nombre del Personal <span class="text-red-500">*</span></label>
-                            <input type="text" id="nombre_llama" name="nombre_llama" placeholder="Nombre completo" required class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                            <label for="nombre_llama" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">Nombre del Personal <span class="text-rose-500">*</span></label>
+                            <input type="text" id="nombre_llama" name="nombre_llama" placeholder="Nombre y apellido" required class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none">
                         </div>
                     </div>
                 </div>
 
-                <!-- 2. INFORMACION DEL JACKPOT -->
-                <div class="border-b border-slate-200 p-6">
-                    <h3 class="font-bold text-slate-800 text-lg mb-4 flex items-center gap-2">
-                        <span class="bg-slate-200 text-slate-700 w-8 h-8 rounded-full flex items-center justify-center font-semibold">2</span>
-                        Informacion del Jackpot
-                    </h3>
+                <!-- 2. INFORMACIÓN DEL JACKPOT -->
+                <div class="p-5 sm:p-6">
+                    <h2 class="font-bold text-slate-800 dark:text-slate-100 text-base sm:text-lg mb-4 flex items-center gap-2.5">
+                        <span class="bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold">2</span>
+                        Información del Jackpot
+                    </h2>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
-                            <label class="block text-xs font-semibold text-slate-600 mb-2">N° de Maquina (6 digitos) <span class="text-red-500">*</span></label>
-                            <input type="text" id="nro_maquina" name="nro_maquina" pattern="[0-9]{6}" maxlength="6" inputmode="numeric" placeholder="120305" required class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
-                            <small class="text-slate-500 text-xs mt-1">Exactamente 6 digitos</small>
+                            <label for="nro_maquina" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">N° de Máquina (6 dígitos) <span class="text-rose-500">*</span></label>
+                            <input type="text" id="nro_maquina" name="nro_maquina" maxlength="6" inputmode="numeric" placeholder="120305" required oninput="validarMaquinaInput(this)" class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm font-mono text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none">
+                            <small id="maqHelper" class="text-slate-500 dark:text-slate-400 text-xs mt-1 block">Exactamente 6 dígitos numéricos (0/6)</small>
                         </div>
+
                         <div>
-                            <label class="block text-xs font-semibold text-slate-600 mb-2">Importe Jackpot ($) <span class="text-red-500">*</span></label>
-                            <input type="text" id="importe" name="importe" placeholder="0,00" required class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none font-semibold text-green-700">
+                            <label for="importe" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">Importe Jackpot ($) <span class="text-rose-500">*</span></label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-emerald-600 dark:text-emerald-400 font-mono text-sm font-bold">$</span>
+                                <input type="text" id="importe" name="importe" inputmode="decimal" placeholder="0,00" required oninput="formatearImporteVivo(this)" class="w-full pl-7 pr-3 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm font-mono font-bold text-emerald-700 dark:text-emerald-400 focus:ring-2 focus:ring-indigo-500 outline-none">
+                            </div>
+                            <small class="text-slate-500 dark:text-slate-400 text-xs mt-1 block">Separador de miles automático · usa coma para centavos</small>
                         </div>
+
                         <div>
-                            <label class="block text-xs font-semibold text-slate-600 mb-2">Hora de Revision <span class="text-red-500">*</span></label>
-                            <input type="time" id="hora_revision" name="hora_revision" required class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
-                            <small class="text-red-500 text-xs mt-1 hidden" id="errorHora1">Debe ser mayor a hora CCTV</small>
+                            <label for="hora_revision" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">Hora de Salida / Revisión <span class="text-rose-500">*</span></label>
+                            <div class="flex gap-1.5">
+                                <input type="time" id="hora_revision" name="hora_revision" required class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm font-mono text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none">
+                                <button type="button" onclick="sumarMinutosDesde('hora_cctv', 'hora_revision', -1)" title="1 min antes del aviso CCTV" class="px-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-mono font-semibold cursor-pointer">-1m</button>
+                                <button type="button" onclick="ponerHoraActual('hora_revision')" title="Poner hora actual" class="px-2.5 bg-indigo-50 dark:bg-indigo-950/70 hover:bg-indigo-100 text-indigo-600 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 rounded-xl text-xs font-semibold cursor-pointer">⚡</button>
+                            </div>
+                            <small class="text-slate-500 dark:text-slate-400 text-xs mt-1 block">Hora en grabación al salir el premio</small>
                         </div>
                     </div>
                 </div>
 
-                <!-- 3. INFORMACION DEL CLIENTE -->
-                <div class="border-b border-slate-200 p-6">
-                    <h3 class="font-bold text-slate-800 text-lg mb-4 flex items-center gap-2">
-                        <span class="bg-slate-200 text-slate-700 w-8 h-8 rounded-full flex items-center justify-center font-semibold">3</span>
-                        Informacion del Cliente
-                    </h3>
+                <!-- 3. INFORMACIÓN DEL CLIENTE -->
+                <div class="p-5 sm:p-6">
+                    <h2 class="font-bold text-slate-800 dark:text-slate-100 text-base sm:text-lg mb-4 flex items-center gap-2.5">
+                        <span class="bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold">3</span>
+                        Información del Cliente
+                    </h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-xs font-semibold text-slate-600 mb-2">Genero <span class="text-red-500">*</span></label>
-                            <select id="tipo_cliente" name="tipo_cliente" required class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                            <label for="tipo_cliente" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">Género / Trato <span class="text-rose-500">*</span></label>
+                            <select id="tipo_cliente" name="tipo_cliente" required class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none">
                                 <option value="">Seleccionar...</option>
                                 <option value="Cliente">Sr. (Masculino)</option>
                                 <option value="Clienta">Sra. (Femenino)</option>
                             </select>
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-slate-600 mb-2">Nombre del Cliente <span class="text-red-500">*</span></label>
-                            <input type="text" id="nombre_cliente" name="nombre_cliente" placeholder="Nombre completo" required class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                            <label for="nombre_cliente" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">Nombre del Cliente <span class="text-rose-500">*</span></label>
+                            <input type="text" id="nombre_cliente" name="nombre_cliente" placeholder="Nombre completo del ganador/a" required class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none">
                         </div>
                     </div>
                 </div>
 
-                <!-- 4. INFORMACION DE PAGO -->
-                <div class="border-b border-slate-200 p-6">
-                    <h3 class="font-bold text-slate-800 text-lg mb-4 flex items-center gap-2">
-                        <span class="bg-slate-200 text-slate-700 w-8 h-8 rounded-full flex items-center justify-center font-semibold">4</span>
-                        Informacion de Pago
-                    </h3>
+                <!-- 4. INFORMACIÓN DE PAGO Y DESCARGA -->
+                <div class="p-5 sm:p-6">
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+                        <h2 class="font-bold text-slate-800 dark:text-slate-100 text-base sm:text-lg flex items-center gap-2.5">
+                            <span class="bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold">4</span>
+                            Información de Pago y Descarga
+                        </h2>
+                        <span id="duracionTotalBadge" class="text-xs font-mono bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-2.5 py-1 rounded-lg">
+                            Duración Aviso → Pago: -- min
+                        </span>
+                    </div>
+
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                         <div>
-                            <label class="block text-xs font-semibold text-slate-600 mb-2">Hora de Pago <span class="text-red-500">*</span></label>
-                            <input type="time" id="hora_pago" name="hora_pago" required class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
-                            <small class="text-red-500 text-xs mt-1 hidden" id="errorHora2">Debe ser mayor a hora Revision</small>
+                            <label for="hora_pago" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">Hora de Pago <span class="text-rose-500">*</span></label>
+                            <div class="flex gap-1">
+                                <input type="time" id="hora_pago" name="hora_pago" required class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm font-mono text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none">
+                                <button type="button" onclick="ponerHoraActual('hora_pago')" title="Hora actual" class="px-2.5 bg-indigo-50 dark:bg-indigo-950/70 hover:bg-indigo-100 text-indigo-600 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 rounded-xl text-xs font-semibold cursor-pointer">⚡</button>
+                            </div>
                         </div>
+
                         <div>
-                            <label class="block text-xs font-semibold text-slate-600 mb-2">Quien Paga <span class="text-red-500">*</span></label>
-                            <select id="quien_paga" name="quien_paga" required class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                            <label for="quien_paga" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">Quién Paga (Caja) <span class="text-rose-500">*</span></label>
+                            <select id="quien_paga" name="quien_paga" required class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none">
                                 <option value="">Seleccionar...</option>
                                 <option value="Jefe de Caja">Jefe de Caja</option>
                                 <option value="Asistente de Caja">Asistente de Caja</option>
                                 <option value="Cajero">Cajero</option>
                                 <option value="Cajera">Cajera</option>
                                 <option value="Supervisor">Supervisor</option>
-                                <option value="Otro">Otro</option>
+                                <option value="Otro">Otro (especificar)</option>
                             </select>
+                            <input type="text" id="quien_paga_otro" placeholder="Especificar cargo de pago" class="w-full p-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none mt-2 hidden">
                         </div>
+
                         <div>
-                            <label class="block text-xs font-semibold text-slate-600 mb-2">Nombre <span class="text-red-500">*</span></label>
-                            <input type="text" id="nombre_paga" name="nombre_paga" placeholder="Nombre personal" required class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                            <label for="nombre_paga" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">Nombre de Quién Paga <span class="text-rose-500">*</span></label>
+                            <input type="text" id="nombre_paga" name="nombre_paga" placeholder="Nombre del cajero/a" required class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none">
                         </div>
+
                         <div>
-                            <label class="block text-xs font-semibold text-slate-600 mb-2">Hora Descarga <span class="text-red-500">*</span></label>
-                            <input type="time" id="hora_descarga" name="hora_descarga" required class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                            <label for="hora_descarga" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">Hora Descarga <span class="text-rose-500">*</span></label>
+                            <div class="flex gap-1">
+                                <input type="time" id="hora_descarga" name="hora_descarga" required class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm font-mono text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none">
+                                <button type="button" onclick="ponerHoraActual('hora_descarga')" title="Hora actual" class="px-2.5 bg-indigo-50 dark:bg-indigo-950/70 hover:bg-indigo-100 text-indigo-600 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 rounded-xl text-xs font-semibold cursor-pointer">⚡</button>
+                            </div>
                         </div>
                     </div>
+
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                         <div>
-                            <label class="block text-xs font-semibold text-slate-600 mb-2">Quien Registra/Descarga <span class="text-red-500">*</span></label>
-                            <select id="quien_descarga" name="quien_descarga" required class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                            <div class="flex items-center justify-between mb-1.5">
+                                <label for="quien_descarga" class="text-xs font-semibold text-slate-600 dark:text-slate-300">Quién Registra / Descarga <span class="text-rose-500">*</span></label>
+                                <button type="button" onclick="copiarPersonalLlamadaADescarga()" class="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer">
+                                    Igual a quien llamó
+                                </button>
+                            </div>
+                            <select id="quien_descarga" name="quien_descarga" required class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none">
                                 <option value="">Seleccionar...</option>
                                 <option value="Encargado">Encargado</option>
                                 <option value="Encargada">Encargada</option>
                                 <option value="Supervisor">Supervisor</option>
                                 <option value="Asistente">Asistente</option>
                                 <option value="Operador">Operador</option>
-                                <option value="Otro">Otro</option>
+                                <option value="Operadora">Operadora</option>
+                                <option value="Otro">Otro (especificar)</option>
                             </select>
+                            <input type="text" id="quien_descarga_otro" placeholder="Especificar cargo de descarga" class="w-full p-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none mt-2 hidden">
                         </div>
+
                         <div>
-                            <label class="block text-xs font-semibold text-slate-600 mb-2">Nombre de quien Registra/Descarga <span class="text-red-500">*</span></label>
-                            <input type="text" id="nombre_descarga" name="nombre_descarga" placeholder="Nombre completo" required class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                            <label for="nombre_descarga" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">Nombre de Quién Registra / Descarga <span class="text-rose-500">*</span></label>
+                            <input type="text" id="nombre_descarga" name="nombre_descarga" placeholder="Nombre completo" required class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none">
                         </div>
                     </div>
                 </div>
 
-                <!-- 5. INFORMACION ADICIONAL -->
-                <div class="border-b border-slate-200 p-6">
-                    <h3 class="font-bold text-slate-800 text-lg mb-4 flex items-center gap-2">
-                        <span class="bg-slate-200 text-slate-700 w-8 h-8 rounded-full flex items-center justify-center font-semibold">5</span>
-                        Informacion Adicional
-                    </h3>
+                <!-- 5. INFORMACIÓN ADICIONAL Y OBSERVACIONES -->
+                <div class="p-5 sm:p-6 space-y-4">
+                    <h2 class="font-bold text-slate-800 dark:text-slate-100 text-base sm:text-lg flex items-center gap-2.5">
+                        <span class="bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold">5</span>
+                        Información Adicional de Máquina y Observaciones
+                    </h2>
+
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
-                            <label class="block text-xs font-semibold text-slate-600 mb-2">Juego</label>
-                            <select id="juego" name="juego" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                            <label for="juego" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">Juego</label>
+                            <select id="juego" name="juego" class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none">
                                 <option value="">Seleccionar...</option>
                                 <option value="88 FORTUNE">88 FORTUNE</option>
                                 <option value="BUFFALO">BUFFALO</option>
@@ -195,13 +322,14 @@
                                 <option value="GOLDEN GODDESS">GOLDEN GODDESS</option>
                                 <option value="CASH BURST">CASH BURST</option>
                                 <option value="LUCKY LUCKY">LUCKY LUCKY</option>
-                                <option value="OTRO">Otro</option>
+                                <option value="OTRO">Otro (especificar)</option>
                             </select>
-                            <input type="text" id="juego_personalizado" name="juego_personalizado" placeholder="Ingrese nombre del juego" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none mt-2 hidden" />
+                            <input type="text" id="juego_personalizado" name="juego_personalizado" placeholder="Ingrese nombre del juego" class="w-full p-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none mt-2 hidden">
                         </div>
+
                         <div>
-                            <label class="block text-xs font-semibold text-slate-600 mb-2">Marca de Maquina</label>
-                            <select id="maquina_independiente" name="maquina_independiente" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                            <label for="maquina_independiente" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">Marca de Máquina</label>
+                            <select id="maquina_independiente" name="maquina_independiente" class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none">
                                 <option value="">Seleccionar...</option>
                                 <option value="BALLY">BALLY</option>
                                 <option value="ARISTOCRAT">ARISTOCRAT</option>
@@ -210,289 +338,522 @@
                                 <option value="SCIENTIFIC GAMES">SCIENTIFIC GAMES</option>
                                 <option value="AINSWORTH">AINSWORTH</option>
                                 <option value="NOVOMATIC">NOVOMATIC</option>
-                                <option value="OTRO">Otro</option>
+                                <option value="OTRO">Otro (especificar)</option>
                             </select>
-                            <input type="text" id="maquina_personalizada" name="maquina_personalizada" placeholder="Ingrese marca de máquina" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none mt-2 hidden" />
+                            <input type="text" id="maquina_personalizada" name="maquina_personalizada" placeholder="Ingrese marca de máquina" class="w-full p-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none mt-2 hidden">
                         </div>
+
                         <div>
-                            <label class="block text-xs font-semibold text-slate-600 mb-2">Pago Manual</label>
-                            <input type="text" id="pago_manual" name="pago_manual" placeholder="00000" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                            <label for="pago_manual" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">N° Pago Manual</label>
+                            <input type="text" id="pago_manual" name="pago_manual" placeholder="Ej: 00125" class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm font-mono text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none">
                         </div>
+                    </div>
+
+                    <div>
+                        <div class="flex items-center justify-between mb-1">
+                            <label for="observaciones" class="text-xs font-semibold text-slate-600 dark:text-slate-300">Observaciones Adicionales <span class="font-normal text-slate-400">(Opcional)</span></label>
+                            <span class="text-[11px] font-mono text-slate-400"><span id="charCount">0</span>/250</span>
+                        </div>
+                        <textarea id="observaciones" name="observaciones" maxlength="250" rows="2" placeholder="Aclaraciones opcionales para agregar al final del informe..." class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none resize-y"></textarea>
                     </div>
                 </div>
 
-                <!-- 7. BOTONES DE ACCION -->
-                <div class="bg-slate-50 p-6 border-t border-slate-200">
+                <!-- 6. BOTONES DE ACCIÓN -->
+                <div class="bg-slate-50 dark:bg-slate-900/70 p-5 sm:p-6">
                     <div class="flex flex-wrap gap-3 justify-center items-center">
-                        <button type="button" id="btnGenerarResumen" class="px-4 py-2 bg-indigo-500 text-white hover:bg-indigo-600 rounded font-semibold text-sm transition flex items-center gap-2">
-                            <i data-lucide="file-text" class="w-4 h-4"></i> Generar Informe
+                        <button type="button" id="btnGenerarResumen" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold text-sm shadow-sm transition flex items-center gap-2 cursor-pointer">
+                            <i data-lucide="file-check-2" class="w-4 h-4"></i> Generar Informe
                         </button>
-                        <button type="button" id="btnLimpiarTodo" class="px-4 py-2 bg-slate-500 text-white hover:bg-slate-600 rounded font-semibold text-sm transition flex items-center gap-2">
-                            <i data-lucide="refresh-ccw" class="w-4 h-4"></i> Limpiar Informe
+                        <button type="button" id="btnCopiarDirecto" onclick="copiarInforme()" class="hidden px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-semibold text-sm shadow-sm transition flex items-center gap-2 cursor-pointer">
+                            <i data-lucide="copy" class="w-4 h-4"></i> Copiar Informe
+                        </button>
+                        <button type="button" id="btnLimpiarTodo" class="px-5 py-2.5 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl font-semibold text-sm transition flex items-center gap-2 cursor-pointer">
+                            <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Limpiar Formulario
                         </button>
                     </div>
                 </div>
             </form>
 
-            <!-- RESUMEN -->
-            <div id="resumen" class="hidden p-6 bg-indigo-50 border-t border-indigo-200 text-sm whitespace-pre-wrap font-mono leading-relaxed text-slate-700"></div>
+            <!-- PANEL DE INFORME GENERADO -->
+            <div id="resumenContainer" class="hidden border-t border-indigo-200 dark:border-slate-800 bg-indigo-50/70 dark:bg-slate-950/80 p-5 sm:p-6 space-y-3">
+                <div class="no-print flex flex-wrap items-center justify-between gap-2">
+                    <span class="text-xs font-bold uppercase tracking-wider text-indigo-700 dark:text-indigo-300 flex items-center gap-2">
+                        <i data-lucide="check-circle" class="w-4 h-4 text-emerald-500"></i>
+                        Informe Generado (Editable antes de copiar)
+                    </span>
+                    <div class="flex items-center gap-2">
+                        <button type="button" onclick="copiarInforme()" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer">
+                            <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copiar Todo
+                        </button>
+                        <button type="button" onclick="window.print()" class="px-3.5 py-1.5 bg-slate-700 hover:bg-slate-800 text-white rounded-lg text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer">
+                            <i data-lucide="printer" class="w-3.5 h-3.5"></i> Imprimir
+                        </button>
+                    </div>
+                </div>
+
+                <textarea id="resumen" rows="10" class="w-full p-4 bg-white dark:bg-slate-900 border border-indigo-200 dark:border-slate-700 rounded-xl text-xs sm:text-sm font-mono leading-relaxed text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-indigo-500 resize-y"></textarea>
+            </div>
+
+            <!-- HISTORIAL RECIENTE DE JACKPOTS DEL TURNO -->
+            <div id="historialSection" class="no-print hidden border-t border-slate-200 dark:border-slate-800 p-5 sm:p-6 bg-slate-50/50 dark:bg-slate-900/40">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 flex items-center gap-1.5">
+                        <i data-lucide="history" class="w-4 h-4"></i> Historial Reciente de Jackpots
+                    </h3>
+                    <button type="button" onclick="vaciarHistorial()" class="text-xs font-semibold text-rose-500 hover:underline cursor-pointer">Vaciar historial</button>
+                </div>
+                <div id="historialLista" class="grid grid-cols-1 md:grid-cols-2 gap-2.5"></div>
+            </div>
 
         </div>
     </div>
 
+    <textarea id="clipboardFallback" class="fixed -top-96 left-0 opacity-0 pointer-events-none" aria-hidden="true"></textarea>
+
     <!-- TOAST NOTIFICACIONES -->
-    <div id="notification" class="hidden fixed bottom-4 right-4 bg-green-100 text-green-800 px-4 py-3 rounded-lg shadow-lg flex items-center gap-2 fade-in z-40">
-        <i data-lucide="check-circle" class="w-4 h-4"></i>
-        <span id="notification-text">Operacion exitosa</span>
+    <div id="notification" class="no-print hidden fixed bottom-5 right-5 px-4 py-3 rounded-xl shadow-xl flex items-center gap-3 fade-in z-50 border">
+        <span id="notification-text" class="text-xs sm:text-sm font-medium">Operación exitosa</span>
     </div>
 
-<script>
-    lucide.createIcons();
+    <script>
+        const form = document.getElementById('formJackpot');
+        const inputsHora = ['hora_cctv', 'hora_revision', 'hora_pago', 'hora_descarga'];
+        const STORAGE_HIST_KEY = 'jackpot_m1_history';
+        let historialJackpots = [];
+        let notifTimeout = null;
 
-    // ===== VARIABLES GLOBALES =====
-    const form = document.getElementById('formJackpot');
-    const inputs_hora = ['hora_cctv', 'hora_revision', 'hora_pago', 'hora_descarga'];
-    let registrosFiltrados = [];
-
-    // ===== PERSONALIZACIÓN DE JUEGO Y MARCA =====
-    document.getElementById('juego').addEventListener('change', (e) => {
-        const personalizadoInput = document.getElementById('juego_personalizado');
-        if (e.target.value === 'OTRO') {
-            personalizadoInput.classList.remove('hidden');
-            personalizadoInput.required = true;
-        } else {
-            personalizadoInput.classList.add('hidden');
-            personalizadoInput.required = false;
-            personalizadoInput.value = '';
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
         }
-    });
 
-    document.getElementById('maquina_independiente').addEventListener('change', (e) => {
-        const personalizadoInput = document.getElementById('maquina_personalizada');
-        if (e.target.value === 'OTRO') {
-            personalizadoInput.classList.remove('hidden');
-            personalizadoInput.required = true;
-        } else {
-            personalizadoInput.classList.add('hidden');
-            personalizadoInput.required = false;
-            personalizadoInput.value = '';
+        // ===== MODO CLARO / OSCURO (compartido con Jackpot2.html) =====
+        function toggleTheme() {
+            const isDark = document.documentElement.classList.toggle('dark');
+            try {
+                localStorage.setItem('jackpot-theme', isDark ? 'dark' : 'light');
+            } catch (e) { }
         }
-    });
 
-    // ===== RECONOCER COMAS Y PUNTOS EN CAMPOS DECIMALES =====
-    ['importe'].forEach(id => {
-        const input = document.getElementById(id);
-        if (input) {
-            input.addEventListener('blur', (e) => {
-                let val = e.target.value;
-                if (!val) return;
-                
-                // Conservar solo dígitos, comas y puntos
-                val = val.replace(/[^\d.,]/g, '');
-
-                // Nueva lógica inteligente para no romper los números formateados como 200.400,10
-                // Contemos la cantidad de comas y puntos
-                const numPuntos = (val.match(/\./g) || []).length;
-                const numComas = (val.match(/,/g) || []).length;
-
-                if (numComas === 1 && numPuntos >= 1) {
-                    // Formato obvio: tiene ambas cosas, asumamos que puntos = miles, coma = decimal
-                    val = val.replace(/\./g, ''); // Quitamos los puntos de mil
-                    val = val.replace(',', '.');  // Pasamos la coma a punto nativo
-                } else if (numComas === 1 && numPuntos === 0) {
-                    // Formato con coma: 1000,50
-                    val = val.replace(',', '.');
-                } else if (numPuntos === 1 && numComas === 0) {
-                    // Formato con punto: 1000.50
-                    // Lo dejamos tal cual para que `Number` lo tome como decimal.
-                    // Nadie usa 1 solo separador de miles sin centavos. Y si lo hace (ej: 1.500), 
-                    // se transformará en 1,50 en vez de 1500, pero eso ya es un "tradeoff" si usamos pad numerico.
-                } else if (numPuntos > 1 && numComas === 0) {
-                    // Formato de varios puntos solos: 1.500.000 (sin centavos)
-                    val = val.replace(/\./g, '');
-                } else {
-                    // Cualquier otra ensalada extraña, quitamos todos, excepto si hay una coma en la ultima posicion
-                    val = val.replace(/\./g, '').replace(/,/g, '.');
-                }
-                
-                const n = Number(val);
-                if (!isNaN(n) && val !== '') {
-                    // Formateamos visualmente a formato Argentino con Intl.NumberFormat para respetar  el punto de mil
-                    e.target.value = new Intl.NumberFormat('es-AR', {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                    }).format(n);
-                }
+        // ===== FECHA ACTUAL =====
+        function actualizarFecha() {
+            const now = new Date();
+            document.getElementById('fechaActual').textContent = now.toLocaleDateString('es-AR', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
             });
         }
-    });
 
-    // ===== FUNCIONES AUXILIARES =====
-    function actualizarFecha() {
-        const now = new Date();
-        const opciones = { day: '2-digit', month: '2-digit', year: 'numeric' };
-        document.getElementById('fechaActual').textContent = now.toLocaleDateString('es-AR', opciones);
-    }
+        // ===== NOTIFICACIONES =====
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            document.getElementById('notification-text').textContent = message;
 
-    function showNotification(message, type = 'success') {
-        const notification = document.getElementById('notification');
-        document.getElementById('notification-text').textContent = message;
-        notification.classList.remove('hidden', 'bg-red-100', 'text-red-800');
-        if (type === 'error') {
-            notification.classList.add('bg-red-100', 'text-red-800');
-        } else {
-            notification.classList.add('bg-green-100', 'text-green-800');
-        }
-        setTimeout(() => notification.classList.add('hidden'), 3000);
-    }
+            if (type === 'error') {
+                notification.className = 'no-print fixed bottom-5 right-5 bg-rose-600 border-rose-400/40 text-white px-4 py-3 rounded-xl shadow-xl flex items-center gap-3 fade-in z-50 border';
+            } else {
+                notification.className = 'no-print fixed bottom-5 right-5 bg-emerald-600 border-emerald-400/40 text-white px-4 py-3 rounded-xl shadow-xl flex items-center gap-3 fade-in z-50 border';
+            }
 
-    // ===== VALIDACION DE HORAS =====
-    function validarHoras() {
-        const err1 = document.getElementById('errorHora1');
-        const err2 = document.getElementById('errorHora2');
-
-        // Se ocultaron los mensajes de error para permitir ingresar cualquier hora
-        if (err1) err1.classList.add('hidden');
-        if (err2) err2.classList.add('hidden');
-
-        return true;
-    }
-
-    // ===== CALCULAR DURACION =====
-    function calcularDuracion() {
-        const h1 = document.getElementById('hora_cctv').value;
-        const h2 = document.getElementById('hora_revision').value;
-        const h3 = document.getElementById('hora_pago').value;
-
-        function tiempoEnMinutos(hora) {
-            if (!hora) return null;
-            const [h, m] = hora.split(':');
-            return parseInt(h) * 60 + parseInt(m);
+            clearTimeout(notifTimeout);
+            notifTimeout = setTimeout(() => notification.classList.add('hidden'), 3200);
         }
 
-        const t1 = tiempoEnMinutos(h1);
-        const t2 = tiempoEnMinutos(h2);
-        const t3 = tiempoEnMinutos(h3);
+        // ===== DESPLEGABLES CON OPCIÓN "OTRO" =====
+        function vincularSelectOtro(selectId, inputOtroId, valorOtro = 'OTRO') {
+            const sel = document.getElementById(selectId);
+            const inp = document.getElementById(inputOtroId);
+            sel.addEventListener('change', () => {
+                const esOtro = sel.value.toUpperCase() === valorOtro.toUpperCase();
+                inp.classList.toggle('hidden', !esOtro);
+                inp.required = esOtro;
+                if (!esOtro) inp.value = '';
+                else inp.focus();
+            });
+        }
 
-        const dur1 = t1 && t2 ? (t2 - t1) : null;
-        const dur2 = t2 && t3 ? (t3 - t2) : null;
-        const dur3 = t1 && t3 ? (t3 - t1) : null;
+        vincularSelectOtro('juego', 'juego_personalizado', 'OTRO');
+        vincularSelectOtro('maquina_independiente', 'maquina_personalizada', 'OTRO');
+        vincularSelectOtro('quien_llama', 'quien_llama_otro', 'Otro');
+        vincularSelectOtro('quien_paga', 'quien_paga_otro', 'Otro');
+        vincularSelectOtro('quien_descarga', 'quien_descarga_otro', 'Otro');
 
-        if (document.getElementById('duracion1')) document.getElementById('duracion1').textContent = dur1 ? `${dur1} min` : '-- min';
-        if (document.getElementById('duracion2')) document.getElementById('duracion2').textContent = dur2 ? `${dur2} min` : '-- min';
-        if (document.getElementById('duracion3')) document.getElementById('duracion3').textContent = dur3 ? `${dur3} min` : '-- min';
-    }
+        // ===== VALIDACIÓN EN VIVO DE MÁQUINA (6 DÍGITOS) =====
+        function validarMaquinaInput(input) {
+            input.value = input.value.replace(/\D/g, '').slice(0, 6);
+            const len = input.value.length;
+            const helper = document.getElementById('maqHelper');
+            if (len === 6) {
+                helper.textContent = '✓ Número de máquina válido (6/6)';
+                helper.className = 'text-emerald-600 dark:text-emerald-400 text-xs mt-1 block font-medium';
+            } else {
+                helper.textContent = `Exactamente 6 dígitos numéricos (${len}/6)`;
+                helper.className = 'text-slate-500 dark:text-slate-400 text-xs mt-1 block';
+            }
+        }
 
-    // ===== CONTAR CARACTERES =====
-    document.getElementById('observaciones')?.addEventListener('input', (e) => {
-        document.getElementById('charCount').textContent = e.target.value.length;
-    });
+        // ===== FORMATEO SEGURO DE IMPORTE ARGENTINO (SIN ROMPER "250.000") =====
+        function parseImporteAR(rawValue) {
+            const val = String(rawValue || '').replace(/[^\d.,]/g, '');
+            if (!val) return { numeric: 0, formatted: '' };
 
-    // ===== CALCULAR DURACION EN TIEMPO REAL =====
-    inputs_hora.forEach(id => {
-        document.getElementById(id)?.addEventListener('change', () => {
-            validarHoras();
+            let intDigits = '';
+            let decDigits = null;
+
+            if (val.includes(',')) {
+                const parts = val.split(',');
+                intDigits = parts[0].replace(/\D/g, '');
+                decDigits = parts.slice(1).join('').replace(/\D/g, '').slice(0, 2);
+            } else {
+                const dotParts = val.split('.');
+                if (dotParts.length === 2 && dotParts[1].length <= 2 && dotParts[0].length >= 4) {
+                    intDigits = dotParts[0].replace(/\D/g, '');
+                    decDigits = dotParts[1].replace(/\D/g, '');
+                } else {
+                    intDigits = val.replace(/\D/g, '');
+                }
+            }
+
+            if (!intDigits && decDigits === null) return { numeric: 0, formatted: '' };
+
+            const cleanedInt = intDigits.replace(/^0+(?=\d)/, '');
+            const intFormatted = cleanedInt ? cleanedInt.replace(/\B(?=(\d{3})+(?!\d))/g, '.') : (decDigits !== null ? '0' : '');
+            const intNum = cleanedInt ? parseInt(cleanedInt, 10) : 0;
+            const decNum = decDigits ? parseInt(decDigits.padEnd(2, '0'), 10) / 100 : 0;
+            const numeric = intNum + decNum;
+
+            return {
+                numeric,
+                formatted: decDigits !== null ? `${intFormatted},${decDigits}` : intFormatted
+            };
+        }
+
+        function formatearImporteVivo(input) {
+            const { formatted } = parseImporteAR(input.value);
+            input.value = formatted;
+        }
+
+        function formatImporteParaReporte(num) {
+            const totalCents = Math.round((Number(num) || 0) * 100);
+            const intPart = String(Math.floor(totalCents / 100)).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            const decPart = String(totalCents % 100).padStart(2, '0');
+            return `${intPart},${decPart}`;
+        }
+
+        // ===== HORAS Y DURACIÓN (SOPORTA MEDIANOCHE 00:00) =====
+        function ponerHoraActual(id) {
+            const now = new Date();
+            document.getElementById(id).value = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
             calcularDuracion();
-        });
-    });
-
-    // ===== GENERAR RESUMEN =====
-    document.getElementById('btnGenerarResumen').addEventListener('click', function() {
-        if (!validarHoras()) {
-            showNotification('Error: Las horas no son validas', 'error');
-            return;
         }
 
-        // Recolectar valores
-        const hora_cctv      = document.getElementById('hora_cctv').value;
-        const quien_llama    = document.getElementById('quien_llama').value;
-        const nombre_llama   = document.getElementById('nombre_llama').value;
-        const nro_maquina    = document.getElementById('nro_maquina').value;
-        const importe        = document.getElementById('importe').value;
-        const hora_revision  = document.getElementById('hora_revision').value;
-        const tipo_cliente   = document.getElementById('tipo_cliente').value;
-        const nombre_cliente = document.getElementById('nombre_cliente').value;
-        const hora_pago      = document.getElementById('hora_pago').value;
-        const quien_paga     = document.getElementById('quien_paga').value;
-        const nombre_paga    = document.getElementById('nombre_paga').value;
-        const hora_descarga  = document.getElementById('hora_descarga').value;
-        const quien_descarga = document.getElementById('quien_descarga').value;
-        const nombre_descarga= document.getElementById('nombre_descarga').value;
-        const juegoSel       = document.getElementById('juego').value;
-        const juego          = juegoSel === 'OTRO' ? document.getElementById('juego_personalizado').value : juegoSel;
-        const maqSel         = document.getElementById('maquina_independiente').value;
-        const maquina        = maqSel === 'OTRO' ? document.getElementById('maquina_personalizada').value : maqSel;
-        const pago_manual    = document.getElementById('pago_manual').value;
-        const observaciones  = document.getElementById('observaciones')?.value || '';
+        function sumarMinutosDesde(refId, targetId, deltaMin) {
+            const refVal = document.getElementById(refId).value;
+            const d = new Date();
+            if (refVal && refVal.includes(':')) {
+                const [h, m] = refVal.split(':').map(Number);
+                d.setHours(h, m + deltaMin, 0, 0);
+            } else {
+                d.setMinutes(d.getMinutes() + deltaMin);
+            }
+            document.getElementById(targetId).value = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+            calcularDuracion();
+        }
 
-        // Abreviar roles de personal
+        function copiarPersonalLlamadaADescarga() {
+            const cargo = document.getElementById('quien_llama').value;
+            const cargoOtro = document.getElementById('quien_llama_otro').value;
+            const nombre = document.getElementById('nombre_llama').value;
+
+            if (!cargo && !nombre) {
+                showNotification('Completa primero los datos de quién llamó a CCTV', 'error');
+                return;
+            }
+
+            const selDesc = document.getElementById('quien_descarga');
+            const inpDescOtro = document.getElementById('quien_descarga_otro');
+            selDesc.value = cargo;
+            if (cargo === 'Otro') {
+                inpDescOtro.classList.remove('hidden');
+                inpDescOtro.required = true;
+                inpDescOtro.value = cargoOtro;
+            } else {
+                inpDescOtro.classList.add('hidden');
+                inpDescOtro.required = false;
+                inpDescOtro.value = '';
+            }
+            document.getElementById('nombre_descarga').value = nombre;
+            showNotification('Personal copiado a sección de descarga');
+        }
+
+        function calcularDuracion() {
+            const toMin = val => {
+                if (!val || !val.includes(':')) return null;
+                const [h, m] = val.split(':').map(Number);
+                return isNaN(h) || isNaN(m) ? null : h * 60 + m;
+            };
+
+            const tAviso = toMin(document.getElementById('hora_cctv').value);
+            const tPago = toMin(document.getElementById('hora_pago').value);
+            const badge = document.getElementById('duracionTotalBadge');
+
+            if (tAviso !== null && tPago !== null) {
+                const diff = (tPago - tAviso + 1440) % 1440;
+                badge.textContent = `Duración Aviso → Pago: ${diff} min`;
+            } else {
+                badge.textContent = 'Duración Aviso → Pago: -- min';
+            }
+        }
+
+        inputsHora.forEach(id => {
+            document.getElementById(id).addEventListener('input', calcularDuracion);
+            document.getElementById(id).addEventListener('change', calcularDuracion);
+        });
+
+        document.getElementById('observaciones').addEventListener('input', e => {
+            document.getElementById('charCount').textContent = String(e.target.value.length);
+        });
+
+        // ===== GENERAR Y VALIDAR INFORME =====
+        function resolverCargo(selectId, otroInputId) {
+            const val = document.getElementById(selectId).value.trim();
+            if (val === 'Otro') {
+                return document.getElementById(otroInputId).value.trim();
+            }
+            return val;
+        }
+
         function abreviarRol(rol) {
             const mapa = {
-                'Encargado':  'Enc.',
-                'Encargada':  'Enc.',
+                'Encargado': 'Enc.',
+                'Encargada': 'Enc.',
                 'Supervisor': 'Sup.',
-                'Asistente':  'Asist.',
-                'Operador':   'Op.',
+                'Asistente': 'Asist.',
+                'Operador': 'Op.',
+                'Operadora': 'Op.'
             };
             return mapa[rol] || rol;
         }
 
-        // Tratamiento del cliente según género
-        const esClienta        = tipo_cliente === 'Clienta';
-        const tipoWord         = esClienta ? 'clienta' : 'cliente';
-        const tratamiento      = esClienta ? 'a la Sra.' : 'al Sr.';
+        document.getElementById('btnGenerarResumen').addEventListener('click', () => {
+            const hora_cctv = document.getElementById('hora_cctv').value.trim();
+            const quien_llama = resolverCargo('quien_llama', 'quien_llama_otro');
+            const nombre_llama = document.getElementById('nombre_llama').value.trim();
+            const nro_maquina = document.getElementById('nro_maquina').value.trim();
+            const importeNum = parseImporteAR(document.getElementById('importe').value).numeric;
+            const hora_revision = document.getElementById('hora_revision').value.trim();
+            const tipo_cliente = document.getElementById('tipo_cliente').value.trim();
+            const nombre_cliente = document.getElementById('nombre_cliente').value.trim();
+            const hora_pago = document.getElementById('hora_pago').value.trim();
+            const quien_paga = resolverCargo('quien_paga', 'quien_paga_otro');
+            const nombre_paga = document.getElementById('nombre_paga').value.trim();
+            const hora_descarga = document.getElementById('hora_descarga').value.trim();
+            const quien_descarga = resolverCargo('quien_descarga', 'quien_descarga_otro');
+            const nombre_descarga = document.getElementById('nombre_descarga').value.trim();
 
-        // Construir líneas del informe
-        const lineas = [];
+            const juegoSel = document.getElementById('juego').value;
+            const juego = juegoSel === 'OTRO' ? document.getElementById('juego_personalizado').value.trim() : juegoSel;
+            const maqSel = document.getElementById('maquina_independiente').value;
+            const maquina = maqSel === 'OTRO' ? document.getElementById('maquina_personalizada').value.trim() : maqSel;
+            const pago_manual = document.getElementById('pago_manual').value.trim();
+            const observaciones = document.getElementById('observaciones').value.trim();
 
-        lineas.push(`A las ${hora_cctv} Hs. CCTV recibe llamada de ${abreviarRol(quien_llama)} ${nombre_llama}, informa Jackpot en Máq. ${nro_maquina} por un valor de $${importe}.-`);
-        lineas.push(`(A las ${hora_revision} Hs.) Revisión muestra que ${tipoWord} juega en Máq. ${nro_maquina} al salir el premio.-`);
-        lineas.push(`A las ${hora_pago} Hs. ${quien_paga} ${nombre_paga}, cancela en ventanilla de caja $${importe} ${tratamiento} ${nombre_cliente}.-`);
-        lineas.push(`A las ${hora_descarga} Hs. ${abreviarRol(quien_descarga)} ${nombre_descarga} registra y descarga el premio de Máq. ${nro_maquina}.-`);
-        lineas.push('');
-        if (maquina)     lineas.push(`Máquina:${maquina}.-`);
-        if (juego)       lineas.push(`Juego:${juego}.-`);
-        if (pago_manual) lineas.push(`Pago Manual:${pago_manual}.-`);
-        lineas.push('');
-        lineas.push('Apéndice 1: Fotos.-');
+            // Validaciones paso a paso con foco automático en el primer campo faltante
+            const checks = [
+                [!hora_cctv, 'hora_cctv', 'Ingresa la Hora de Aviso a CCTV'],
+                [!quien_llama, document.getElementById('quien_llama').value === 'Otro' ? 'quien_llama_otro' : 'quien_llama', 'Selecciona o especifica quién llama a CCTV'],
+                [!nombre_llama, 'nombre_llama', 'Ingresa el nombre del personal que llama'],
+                [!/^\d{6}$/.test(nro_maquina), 'nro_maquina', 'El N° de Máquina debe tener exactamente 6 dígitos'],
+                [importeNum <= 0, 'importe', 'Ingresa un Importe de Jackpot mayor a $0'],
+                [!hora_revision, 'hora_revision', 'Ingresa la Hora de Salida / Revisión'],
+                [!tipo_cliente, 'tipo_cliente', 'Selecciona el trato del cliente (Sr. / Sra.)'],
+                [!nombre_cliente, 'nombre_cliente', 'Ingresa el nombre del cliente'],
+                [!hora_pago, 'hora_pago', 'Ingresa la Hora de Pago'],
+                [!quien_paga, document.getElementById('quien_paga').value === 'Otro' ? 'quien_paga_otro' : 'quien_paga', 'Selecciona o especifica quién paga en caja'],
+                [!nombre_paga, 'nombre_paga', 'Ingresa el nombre de quién paga'],
+                [!hora_descarga, 'hora_descarga', 'Ingresa la Hora de Descarga'],
+                [!quien_descarga, document.getElementById('quien_descarga').value === 'Otro' ? 'quien_descarga_otro' : 'quien_descarga', 'Selecciona o especifica quién registra/descarga'],
+                [!nombre_descarga, 'nombre_descarga', 'Ingresa el nombre de quién registra/descarga'],
+                [juegoSel === 'OTRO' && !juego, 'juego_personalizado', 'Especifica el nombre del juego'],
+                [maqSel === 'OTRO' && !maquina, 'maquina_personalizada', 'Especifica la marca de la máquina']
+            ];
 
-        const resumenDiv = document.getElementById('resumen');
-        resumenDiv.textContent = lineas.join('\n');
-        resumenDiv.classList.remove('hidden');
-        resumenDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        showNotification('Informe generado');
-    });
+            for (const [failed, fieldId, msg] of checks) {
+                if (failed) {
+                    showNotification(msg, 'error');
+                    document.getElementById(fieldId)?.focus();
+                    return;
+                }
+            }
 
-    // ===== LIMPIAR FORMULARIO =====
-    document.getElementById('btnLimpiarTodo').addEventListener('click', () => {
-        form.reset();
-        document.getElementById('resumen').classList.add('hidden');
-        document.getElementById('charCount').textContent = '0';
-        ['duracion1', 'duracion2', 'duracion3'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.textContent = '-- min';
+            const importeFormateado = formatImporteParaReporte(importeNum);
+            document.getElementById('importe').value = importeFormateado;
+
+            const esClienta = tipo_cliente === 'Clienta';
+            const tipoWord = esClienta ? 'clienta' : 'cliente';
+            const tratamiento = esClienta ? 'a la Sra.' : 'al Sr.';
+
+            const lineas = [
+                `A las ${hora_cctv} Hs. CCTV recibe llamada de ${abreviarRol(quien_llama)} ${nombre_llama}, informa Jackpot en Máq. ${nro_maquina} por un valor de $${importeFormateado}.-`,
+                `(A las ${hora_revision} Hs.) Revisión muestra que ${tipoWord} juega en Máq. ${nro_maquina} al salir el premio.-`,
+                `A las ${hora_pago} Hs. ${quien_paga} ${nombre_paga}, cancela en ventanilla de caja $${importeFormateado} ${tratamiento} ${nombre_cliente}.-`,
+                `A las ${hora_descarga} Hs. ${abreviarRol(quien_descarga)} ${nombre_descarga} registra y descarga el premio de Máq. ${nro_maquina}.-`
+            ];
+
+            if (maquina || juego || pago_manual || observaciones) {
+                lineas.push('');
+                if (maquina) lineas.push(`Máquina: ${maquina}.-`);
+                if (juego) lineas.push(`Juego: ${juego}.-`);
+                if (pago_manual) lineas.push(`Pago Manual: ${pago_manual}.-`);
+                if (observaciones) lineas.push(`Observaciones: ${observaciones}`);
+            }
+
+            lineas.push('');
+            lineas.push('Apéndice 1: Fotos.-');
+
+            const textoFinal = lineas.join('\n');
+            const resumenArea = document.getElementById('resumen');
+            resumenArea.value = textoFinal;
+
+            document.getElementById('resumenContainer').classList.remove('hidden');
+            document.getElementById('btnCopiarDirecto').classList.remove('hidden');
+            document.getElementById('resumenContainer').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+            guardarEnHistorial({
+                id: Date.now(),
+                fechaHora: new Date().toLocaleString('es-AR'),
+                maquina: nro_maquina,
+                importe: `$${importeFormateado}`,
+                cliente: nombre_cliente,
+                texto: textoFinal
+            });
+
+            showNotification('Informe de Jackpot generado correctamente');
         });
-        showNotification('Formulario limpiado');
-    });
 
-    // ===== IR A JACKPOT 2 =====
-    document.getElementById('btnJackpot2Header').addEventListener('click', () => {
-        window.location.href = 'Jackpot2.html';
-    });
+        // ===== COPIAR AL PORTAPAPELES =====
+        async function copiarTextoSeguro(texto) {
+            if (navigator.clipboard && window.isSecureContext) {
+                try {
+                    await navigator.clipboard.writeText(texto);
+                    return true;
+                } catch (e) { }
+            }
+            const fb = document.getElementById('clipboardFallback');
+            fb.value = texto;
+            fb.select();
+            fb.setSelectionRange(0, 999999);
+            try {
+                return document.execCommand('copy');
+            } catch (e) {
+                return false;
+            }
+        }
 
-    // ===== VOLVER =====
-    document.getElementById('btnInicio').addEventListener('click', () => {
-        window.location.href = 'index.html';
-    });
+        async function copiarInforme() {
+            const texto = document.getElementById('resumen').value.trim();
+            if (!texto) {
+                showNotification('Primero genera el informe', 'error');
+                return;
+            }
+            const ok = await copiarTextoSeguro(texto);
+            if (ok) showNotification('¡Informe copiado al portapapeles!');
+            else showNotification('No se pudo copiar automáticamente', 'error');
+        }
 
-    // ===== INICIALIZACION =====
-    window.addEventListener('load', () => {
+        // ===== HISTORIAL LOCAL =====
+        function cargarHistorial() {
+            try {
+                const raw = localStorage.getItem(STORAGE_HIST_KEY);
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    if (Array.isArray(parsed)) historialJackpots = parsed;
+                }
+            } catch (e) {
+                historialJackpots = [];
+            }
+            renderizarHistorial();
+        }
+
+        function guardarEnHistorial(item) {
+            historialJackpots.unshift(item);
+            if (historialJackpots.length > 15) historialJackpots.pop();
+            try {
+                localStorage.setItem(STORAGE_HIST_KEY, JSON.stringify(historialJackpots));
+            } catch (e) { }
+            renderizarHistorial();
+        }
+
+        function renderizarHistorial() {
+            const sec = document.getElementById('historialSection');
+            const lista = document.getElementById('historialLista');
+            if (!historialJackpots.length) {
+                sec.classList.add('hidden');
+                return;
+            }
+            sec.classList.remove('hidden');
+            lista.innerHTML = historialJackpots.map(h => `
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 flex items-center justify-between gap-2 text-xs">
+                    <div class="min-w-0">
+                        <div class="font-bold text-slate-800 dark:text-slate-100 truncate">Máq. ${escapeHtml(h.maquina)} · <span class="text-emerald-600 dark:text-emerald-400 font-mono">${escapeHtml(h.importe)}</span></div>
+                        <div class="text-slate-500 dark:text-slate-400 truncate">${escapeHtml(h.cliente)} · ${escapeHtml(h.fechaHora)}</div>
+                    </div>
+                    <button type="button" onclick="copiarItemHistorial(${Number(h.id)})" class="px-2.5 py-1.5 bg-indigo-50 dark:bg-slate-800 hover:bg-indigo-600 text-indigo-700 dark:text-slate-200 hover:text-white rounded-lg font-semibold transition shrink-0 cursor-pointer">
+                        Copiar
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        async function copiarItemHistorial(id) {
+            const item = historialJackpots.find(x => x.id === id);
+            if (!item) return;
+            document.getElementById('resumen').value = item.texto;
+            document.getElementById('resumenContainer').classList.remove('hidden');
+            await copiarTextoSeguro(item.texto);
+            showNotification(`Copiado Jackpot de Máq. ${item.maquina}`);
+        }
+
+        function vaciarHistorial() {
+            if (!historialJackpots.length) return;
+            if (confirm('¿Vaciar el historial de Jackpots guardado?')) {
+                historialJackpots = [];
+                try { localStorage.removeItem(STORAGE_HIST_KEY); } catch (e) { }
+                renderizarHistorial();
+                showNotification('Historial vaciado');
+            }
+        }
+
+        // ===== LIMPIAR FORMULARIO =====
+        document.getElementById('btnLimpiarTodo').addEventListener('click', () => {
+            form.reset();
+            ['juego_personalizado', 'maquina_personalizada', 'quien_llama_otro', 'quien_paga_otro', 'quien_descarga_otro'].forEach(id => {
+                const el = document.getElementById(id);
+                el.classList.add('hidden');
+                el.required = false;
+                el.value = '';
+            });
+            document.getElementById('resumenContainer').classList.add('hidden');
+            document.getElementById('btnCopiarDirecto').classList.add('hidden');
+            document.getElementById('resumen').value = '';
+            document.getElementById('charCount').textContent = '0';
+            document.getElementById('maqHelper').textContent = 'Exactamente 6 dígitos numéricos (0/6)';
+            document.getElementById('maqHelper').className = 'text-slate-500 dark:text-slate-400 text-xs mt-1 block';
+            document.getElementById('duracionTotalBadge').textContent = 'Duración Aviso → Pago: -- min';
+            showNotification('Formulario limpiado');
+        });
+
+        // ===== INICIALIZACIÓN =====
+        lucide.createIcons();
         actualizarFecha();
-    });
-</script>
+        cargarHistorial();
+    </script>
 
 </body>
+
 </html>
-
-
-
