@@ -1,1376 +1,1959 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Números Profesional - Casino Slots</title>
-    <meta name="description" content="Calculadora profesional para casinos y slots con formato argentino, cotización de dólar y euro">
-    <meta name="theme-color" content="#1e1b4b">
+    <title>Calculadora</title>
+    <meta name="description"
+        content="Calculadora profesional para casinos y slots con formato argentino, arqueo de billetes y  cotización de divisas">
+    <meta name="theme-color" content="#0f172a">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'Segoe UI', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'Consolas', 'monospace'],
+                    }
+                }
+            }
+        };
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
-    
+
     <style>
-        /* Variables y temas */
-        :root {
-            --primary: #4f46e5;
-            --primary-dark: #4338ca;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        body {
+            font-family: 'Inter', 'Segoe UI', sans-serif;
         }
 
-        .dark {
-            --primary: #818cf8;
-            --primary-dark: #6366f1;
-        }
-
-        /* Animaciones */
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        @keyframes slideIn {
-            from { transform: translateX(100%); }
-            to { transform: translateX(0); }
-        }
-        
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+            from {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
-        .fade-in { animation: fadeIn 0.3s ease-out; }
-        .slide-in { animation: slideIn 0.3s ease-out; }
-        .pulse-animation { animation: pulse 0.5s ease-in-out; }
-        
-        /* Componentes */
-        .modal {
-            transition: opacity 0.3s ease, visibility 0.3s ease;
+        .fade-in {
+            animation: fadeIn 0.25s ease-out;
         }
-        
+
         .modal.hidden {
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
+            display: none;
         }
-        
+
         .number-tag {
             cursor: pointer;
-            transition: var(--transition);
+            transition: all 0.18s ease;
         }
-        
+
         .number-tag:hover {
-            transform: scale(1.05);
-            background-color: #e0e7ff;
+            transform: scale(1.04);
         }
-        
-        .spinner {
-            border: 2px solid #f3f3f3;
-            border-top: 2px solid var(--primary);
-            border-radius: 50%;
-            width: 14px;
-            height: 14px;
-            animation: spin 0.8s linear infinite;
-            display: inline-block;
-        }
-        
-        /* Drag & drop */
+
         .drag-over {
-            border: 2px dashed var(--primary);
-            background-color: #eef2ff;
-            transform: scale(1.01);
+            border: 2px dashed #4f46e5 !important;
+            background-color: rgba(79, 70, 229, 0.08) !important;
         }
-        
-        /* Tooltip */
-        .tooltip {
-            position: relative;
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
         }
-        
-        .tooltip:hover::after {
-            content: attr(data-tooltip);
-            position: absolute;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #1f2937;
-            color: white;
-            padding: 4px 8px;
+
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+
+        .dark ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
             border-radius: 4px;
-            font-size: 12px;
-            white-space: nowrap;
-            z-index: 10;
         }
-        
-        /* Dark mode styles */
-        .dark body {
-            background-color: #0f172a;
+
+        .dark ::-webkit-scrollbar-thumb {
+            background: #334155;
         }
-        
-        .dark .bg-white {
-            background-color: #1e293b;
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
         }
-        
-        .dark .bg-slate-50,
-        .dark .bg-slate-100 {
-            background-color: #0f172a;
+
+        .dark ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
         }
-        
-        .dark .border-slate-200,
-        .dark .border-slate-300 {
-            border-color: #334155;
-        }
-        
-        .dark .text-slate-600,
-        .dark .text-slate-700,
-        .dark .text-slate-800 {
-            color: #cbd5e1;
-        }
-        
-        .dark .text-slate-500 {
-            color: #94a3b8;
-        }
-        
-        .dark .bg-indigo-50 {
-            background-color: #1e1b4b;
-        }
-        
-        .dark .bg-slate-200 {
-            background-color: #334155;
-        }
-        
-        /* Tarjetas de cotización */
+
         .exchange-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            transition: transform 0.3s ease;
+            background: linear-gradient(135deg, #4f46e5 0%, #6d28d9 100%);
         }
-        
-        .exchange-card:hover {
-            transform: translateY(-2px);
-        }
-        
+
         .euro-card {
             background: linear-gradient(135deg, #059669 0%, #047857 100%);
         }
-        
-        /* Botones de tipo de cambio */
-        .exchange-type-btn {
-            transition: all 0.2s ease;
-        }
-        
-        .exchange-type-btn.active {
-            background-color: #4f46e5;
-            color: white;
-            box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);
-        }
-        
-        .dark .exchange-type-btn.active {
-            background-color: #6366f1;
-        }
-        
-        /* Input de cotización personalizada */
-        .custom-rate-input:focus {
-            border-color: #4f46e5;
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-        }
-        
-        /* Tabs */
-        .currency-tab {
-            transition: all 0.2s ease;
-        }
-        
-        .currency-tab.active {
-            background-color: #4f46e5;
-            color: white;
-        }
-        
-        .dark .currency-tab.active {
-            background-color: #6366f1;
-        }
     </style>
+    <script>
+        (function () {
+            try {
+                if (localStorage.getItem('calc2_theme') === 'dark') {
+                    document.documentElement.classList.add('dark');
+                }
+            } catch (e) { }
+        })();
+    </script>
 </head>
-<body class="p-4 md:p-8 text-slate-800">
-    
-    <div class="max-w-5xl mx-auto bg-white rounded-xl shadow-xl overflow-hidden border border-slate-200">
-        
+
+<body
+    class="bg-slate-100 dark:bg-slate-950 p-3 sm:p-6 md:p-8 text-slate-800 dark:text-slate-100 min-h-screen transition-colors duration-200">
+
+    <div
+        class="max-w-6xl mx-auto bg-white dark:bg-slate-900 rounded-2xl shadow-xl overflow-hidden border border-slate-200 dark:border-slate-800">
+
         <!-- Header -->
-        <div class="bg-slate-900 p-5 text-white flex justify-between items-center rounded-t-xl">
+        <header
+            class="bg-slate-900 dark:bg-slate-950 border-b border-slate-800 p-4 sm:p-5 text-white flex flex-wrap justify-between items-center gap-3">
             <div class="flex items-center gap-3">
-                <div class="bg-indigo-600 p-2 rounded-lg relative overflow-hidden group transition">
-                    <i data-lucide="calculator" class="w-6 h-6 text-white transition"></i>
+                <div class="bg-indigo-600 p-2.5 rounded-xl shadow-sm shrink-0">
+                    <i data-lucide="calculator" class="w-6 h-6 text-white"></i>
                 </div>
                 <div>
-                    <h1 class="text-xl font-bold">Calculadora Profesional</h1>
-                    <p class="text-slate-400 text-xs uppercase tracking-wider">Casino Slots - Herramientas Avanzadas</p>
+                    <h1 class="text-lg sm:text-xl font-bold leading-tight">Calculadora Profesional</h1>
+                    <p class="text-slate-400 text-xs uppercase tracking-wider">Casino Slots · Arqueo, Cuadre y Divisas
+                    </p>
                 </div>
             </div>
-            <div class="flex gap-2">
-                <a href="index.html" class="p-2 hover:bg-slate-700 rounded-lg transition inline-flex items-center justify-center" title="Volver a Inicio">
+
+            <div class="flex items-center gap-2">
+                <button type="button" onclick="toggleTheme()"
+                    class="p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl transition cursor-pointer"
+                    title="Cambiar modo claro / oscuro">
+                    <i data-lucide="sun" class="w-5 h-5 text-amber-400 hidden dark:block"></i>
+                    <i data-lucide="moon" class="w-5 h-5 text-slate-200 block dark:hidden"></i>
+                </button>
+                <a href="index.html"
+                    class="p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl transition inline-flex items-center justify-center"
+                    title="Volver al Menú Principal">
                     <i data-lucide="home" class="w-5 h-5 text-white"></i>
                 </a>
             </div>
-        </div>
-        
-        <div class="grid grid-cols-1 lg:grid-cols-12 bg-white">
-            
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12">
+
             <!-- COLUMNA IZQUIERDA -->
-            <div class="lg:col-span-7 p-6 space-y-6 bg-slate-50">
-                
+            <div class="lg:col-span-7 p-5 sm:p-6 space-y-5 bg-slate-50 dark:bg-slate-900/60">
+
                 <!-- 1. ENTRADA DE NÚMEROS -->
-                <div class="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
-                    <h3 class="font-bold text-slate-700 text-sm flex items-center gap-2 mb-4">
-                        <span class="bg-slate-200 text-slate-600 w-6 h-6 rounded-full flex items-center justify-center text-xs">1</span>
-                        Ingresa tus Números
-                    </h3>
-                    
-                    <label class="block text-xs font-semibold text-slate-500 mb-2">
-                        Arrastra un archivo .txt o pega números (Ctrl+Enter para calcular):
-                    </label>
-                    <textarea 
-                        id="numbers" 
-                        placeholder="Ejemplos:
-• 1.000 2.500,50 3.000
-• 20*20.000,75
-• 100.000+50.000,25
-• (1.500,50+500)*3"
-                        class="w-full h-32 p-3 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none resize-none bg-white text-slate-800"
-                    ></textarea>
-                    <div class="flex justify-between text-xs text-slate-500 mt-2">
-                        <span>📄 Formato argentino: 1.234.567,89</span>
-                        <span id="charCounter">0 caracteres</span>
-                    </div>
-                </div>
-                
-                <!-- 2. OPERACIONES BÁSICAS -->
-                <div class="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
-                    <h3 class="font-bold text-slate-700 text-sm flex items-center gap-2 mb-4">
-                        <span class="bg-slate-200 text-slate-600 w-6 h-6 rounded-full flex items-center justify-center text-xs">2</span>
-                        Operaciones Básicas
-                        <span class="ml-auto text-xs text-slate-400">Atajos: 1-6</span>
-                    </h3>
-                    
-                    <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
-                        <button onclick="calculateWithLoading('sum')" class="calc-btn px-3 py-2 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 rounded text-xs font-semibold transition">➕ Sumar</button>
-                        <button onclick="calculateWithLoading('multiply')" class="calc-btn px-3 py-2 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 rounded text-xs font-semibold transition">✖️ Multiplicar</button>
-                        <button onclick="calculateWithLoading('subtract')" class="calc-btn px-3 py-2 bg-slate-100 text-slate-700 hover:bg-slate-200 rounded text-xs font-semibold transition">➖ Restar</button>
-                        <button onclick="calculateWithLoading('divide')" class="calc-btn px-3 py-2 bg-slate-100 text-slate-700 hover:bg-slate-200 rounded text-xs font-semibold transition">➗ Dividir</button>
-                        <button onclick="calculateWithLoading('average')" class="calc-btn px-3 py-2 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 rounded text-xs font-semibold transition">📊 Promedio</button>
-                        <button onclick="calculateWithLoading('stats')" class="calc-btn px-3 py-2 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 rounded text-xs font-semibold transition">📈 Estadísticas</button>
-                    </div>
-                </div>
-                
-                <!-- 3. HERRAMIENTAS SLOTS -->
-                <div class="bg-gradient-to-r from-indigo-600 to-slate-900 p-4 rounded-lg text-white">
-                    <h3 class="font-bold text-sm flex items-center gap-2 mb-4">
-                        <i data-lucide="zap" class="w-5 h-5"></i>
-                        Herramientas Caja Slots
-                    </h3>
-                    
-                    <div class="grid grid-cols-2 gap-2">
-                        <button onclick="showBillCounter()" class="px-3 py-2 bg-white bg-opacity-20 hover:bg-opacity-30 rounded text-xs font-semibold transition">💰 Contador Billetes</button>
-                        <button onclick="showPaymentCalc()" class="px-3 py-2 bg-white bg-opacity-20 hover:bg-opacity-30 rounded text-xs font-semibold transition">💸 Cálculo Entrega</button>
-                        <button onclick="showCreditConverter()" class="px-3 py-2 bg-white bg-opacity-20 hover:bg-opacity-30 rounded text-xs font-semibold transition">🎫 Créditos ↔ Pesos</button>
-                        <button onclick="showShiftBalance()" class="px-3 py-2 bg-white bg-opacity-20 hover:bg-opacity-30 rounded text-xs font-semibold transition">📋 Cuadre Turno</button>
-                        <button onclick="showCurrencyConverter()" class="px-3 py-2 bg-white bg-opacity-20 hover:bg-opacity-30 rounded text-xs font-semibold transition col-span-2">💱 Conversor Divisas</button>
-                    </div>
-                </div>
-                
-                <div class="flex gap-3 pt-2">
-                    <button onclick="clearAll()" class="px-4 py-2 text-sm bg-slate-700 hover:bg-slate-800 text-white font-semibold rounded transition flex items-center gap-2">
-                        <i data-lucide="trash-2" class="w-4 h-4"></i> Reset
-                    </button>
-                    <button onclick="clearHistory()" class="px-4 py-2 text-sm bg-slate-600 hover:bg-slate-700 text-white font-semibold rounded transition flex items-center gap-2">
-                        <i data-lucide="clock" class="w-4 h-4"></i> Limpiar Historial
-                    </button>
-                </div>
-            </div>
-            
-            <!-- COLUMNA DERECHA: RESULTADOS -->
-            <div class="lg:col-span-5 bg-slate-100 border-l border-slate-200 flex flex-col">
-                <div class="p-6 sticky top-0 max-h-screen overflow-y-auto">
-                    
-                    <!-- TARJETA DE COTIZACIONES -->
-                    <div class="mb-6 space-y-3">
-                        <!-- Tarjeta Dólar -->
-                        <div class="exchange-card rounded-lg p-3 text-white shadow-lg">
-                            <div class="flex items-center justify-between mb-2">
-                                <div class="flex items-center gap-2">
-                                    <i data-lucide="dollar-sign" class="w-4 h-4"></i>
-                                    <h3 class="font-bold text-xs">Cotización Dólar</h3>
-                                </div>
-                                <button onclick="fetchDollarRate()" class="text-xs bg-white bg-opacity-20 hover:bg-opacity-30 px-2 py-0.5 rounded transition">
-                                    <i data-lucide="refresh-cw" class="w-3 h-3 inline"></i>
-                                </button>
-                            </div>
-                            <div class="grid grid-cols-3 gap-1 text-center text-xs">
-                                <div class="bg-white bg-opacity-10 rounded p-1">
-                                    <div class="opacity-80">Oficial</div>
-                                    <div class="font-bold" id="officialRate">$1.000</div>
-                                </div>
-                                <div class="bg-white bg-opacity-10 rounded p-1">
-                                    <div class="opacity-80">Blue</div>
-                                    <div class="font-bold" id="blueRate">$1.200</div>
-                                </div>
-                                <div class="bg-white bg-opacity-10 rounded p-1">
-                                    <div class="opacity-80">Personal</div>
-                                    <div class="font-bold" id="customDollarRateDisplay">$0</div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Tarjeta Euro -->
-                        <div class="euro-card rounded-lg p-3 text-white shadow-lg">
-                            <div class="flex items-center justify-between mb-2">
-                                <div class="flex items-center gap-2">
-                                    <i data-lucide="euro" class="w-4 h-4"></i>
-                                    <h3 class="font-bold text-xs">Cotización Euro</h3>
-                                </div>
-                                <button onclick="fetchEuroRate()" class="text-xs bg-white bg-opacity-20 hover:bg-opacity-30 px-2 py-0.5 rounded transition">
-                                    <i data-lucide="refresh-cw" class="w-3 h-3 inline"></i>
-                                </button>
-                            </div>
-                            <div class="grid grid-cols-3 gap-1 text-center text-xs">
-                                <div class="bg-white bg-opacity-10 rounded p-1">
-                                    <div class="opacity-80">Oficial</div>
-                                    <div class="font-bold" id="officialEuroRate">€1.050</div>
-                                </div>
-                                <div class="bg-white bg-opacity-10 rounded p-1">
-                                    <div class="opacity-80">Ref</div>
-                                    <div class="font-bold" id="blueEuroRate">€1.250</div>
-                                </div>
-                                <div class="bg-white bg-opacity-10 rounded p-1">
-                                    <div class="opacity-80">Personal</div>
-                                    <div class="font-bold" id="customEuroRateDisplay">€0</div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="text-center text-[10px] text-slate-500">
-                            Última actualización: <span id="lastUpdate">-</span>
-                        </div>
-                    </div>
-                    
-                    <!-- NÚMEROS DETECTADOS -->
-                    <div class="mb-6">
-                        <div class="flex items-center justify-between mb-4">
-                            <h2 class="font-bold text-slate-800">Números Detectados</h2>
-                            <div class="flex gap-2">
-                                <span id="numberCountBadge" class="text-xs bg-indigo-100 text-indigo-800 px-2 py-1 rounded-full font-medium">0</span>
-                                <button onclick="copyAllNumbers()" class="text-xs text-slate-500 hover:text-indigo-600 transition">📋 Copiar</button>
-                            </div>
-                        </div>
-                        
-                        <div id="numbersDisplay" class="bg-white rounded-lg shadow-sm border border-slate-300 p-4 min-h-24 hidden">
-                            <div id="numberTags" class="flex flex-wrap gap-2 mb-2"></div>
-                            <div class="text-xs text-slate-500 italic">Haz clic en un número para eliminarlo</div>
-                        </div>
-                        
-                        <div id="noNumbers" class="bg-slate-200 rounded-lg p-4 text-center text-slate-600 text-sm">
-                            📭 Los números detectados aparecerán aquí
-                        </div>
-                    </div>
-                    
-                    <!-- RESULTADOS -->
-                    <div id="results" class="hidden">
-                        <div class="flex items-center justify-between mb-4">
-                            <h3 class="font-bold text-slate-800 flex items-center gap-2">
-                                <i data-lucide="calculator" class="w-4 h-4"></i>
-                                Resultados
-                            </h3>
-                            <button onclick="copyAllResults()" class="text-xs bg-indigo-600 text-white hover:bg-indigo-700 px-2 py-1 rounded transition flex items-center gap-1">
-                                <i data-lucide="copy" class="w-3 h-3"></i> Copiar Todo
-                            </button>
-                        </div>
-                        <div id="resultsList" class="bg-white rounded-lg shadow-sm border border-slate-200 p-4 space-y-2"></div>
-                    </div>
-                    
-                    <!-- HISTORIAL -->
-                    <div id="historySection" class="hidden mt-6 pt-6 border-t border-slate-300">
-                        <div class="flex items-center justify-between mb-3">
-                            <h3 class="font-bold text-slate-800 flex items-center gap-2">
-                                <i data-lucide="history" class="w-4 h-4"></i>
-                                Historial (últimos 10)
-                            </h3>
-                        </div>
-                        <div id="historyList" class="space-y-2 max-h-64 overflow-y-auto"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- TOAST NOTIFICACIONES -->
-    <div id="toast" class="hidden fixed bottom-4 right-4 z-50"></div>
-    
-    <!-- MODAL CONTADOR BILLETES -->
-    <div id="billCounterModal" class="modal hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <div class="sticky top-0 bg-slate-900 text-white p-3 flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <i data-lucide="banknote" class="w-5 h-5"></i>
-                    <h3 class="font-bold">Contador de Billetes</h3>
-                </div>
-                <button onclick="closeBillModal()" class="hover:bg-slate-700 p-1 rounded">
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </button>
-            </div>
-            <div class="p-4 space-y-1" id="billsContainer"></div>
-            <div class="bg-gradient-to-r from-indigo-700 to-slate-900 text-white p-4">
-                <div class="text-center mb-2">
-                    <div class="text-xs opacity-80 mb-1">Total Arqueo</div>
-                    <div class="text-2xl font-bold">$<span id="arqueoTotal">0</span></div>
-                </div>
-                <input type="text" id="shouldHave" placeholder="Debería tener: $" oninput="checkDifference()" class="w-full px-3 py-2 rounded-lg bg-white bg-opacity-20 text-white placeholder-white placeholder-opacity-70 text-center font-semibold">
-                <div id="differenceResult" class="mt-2"></div>
-            </div>
-            <div class="p-3 border-t border-slate-200 flex gap-2">
-                <button onclick="resetBillCounter()" class="flex-1 px-4 py-2 bg-slate-200 hover:bg-slate-300 rounded-lg font-semibold text-slate-800">Resetear</button>
-                <button onclick="closeBillModal()" class="flex-1 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg font-semibold text-white">Cerrar</button>
-            </div>
-        </div>
-    </div>
-    
-    <!-- MODAL PAGO -->
-    <div id="paymentModal" class="modal hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md">
-            <div class="sticky top-0 bg-slate-900 text-white p-4 flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <i data-lucide="credit-card" class="w-5 h-5"></i>
-                    <h3 class="font-bold">Cálculo de Entrega</h3>
-                </div>
-                <button onclick="closePaymentModal()" class="hover:bg-slate-700 p-1 rounded">
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </button>
-            </div>
-            <div class="p-6">
-                <label class="block text-sm font-semibold text-slate-700 mb-2">Monto a entregar:</label>
-                <input type="text" id="paymentAmount" placeholder="Ej: 15750,50" oninput="formatArgentineInput(this); calculateBestPayment()" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-center font-semibold bg-white">
-                <div id="paymentBreakdown" class="mt-4"></div>
-            </div>
-            <div class="p-4 border-t border-slate-200">
-                <button onclick="closePaymentModal()" class="w-full px-4 py-2 bg-slate-200 hover:bg-slate-300 rounded font-semibold">Cerrar</button>
-            </div>
-        </div>
-    </div>
-    
-    <!-- MODAL CRÉDITOS -->
-    <div id="creditModal" class="modal hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md">
-            <div class="sticky top-0 bg-slate-900 text-white p-4 flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <i data-lucide="ticket" class="w-5 h-5"></i>
-                    <h3 class="font-bold">Conversión Créditos ↔ Pesos</h3>
-                </div>
-                <button onclick="closeCreditModal()" class="hover:bg-slate-700 p-1 rounded">
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </button>
-            </div>
-            <div class="p-6 space-y-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-500 mb-1">Valor del crédito: $</label>
-                    <input type="number" id="creditValue" value="0.25" step="0.01" oninput="convertCredits()" class="w-full px-3 py-2 border rounded-lg text-center bg-white">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-500 mb-1">Créditos:</label>
-                    <input type="number" id="credits" placeholder="0" oninput="convertCredits()" class="w-full px-3 py-2 border rounded-lg text-center bg-white">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-500 mb-1">Pesos: $</label>
-                    <input type="number" id="pesos" placeholder="0" oninput="convertPesos()" class="w-full px-3 py-2 border rounded-lg text-center bg-white">
-                </div>
-                <div id="conversionResult"></div>
-            </div>
-            <div class="p-4 border-t border-slate-200">
-                <button onclick="closeCreditModal()" class="w-full px-4 py-2 bg-slate-200 hover:bg-slate-300 rounded font-semibold">Cerrar</button>
-            </div>
-        </div>
-    </div>
-    
-    <!-- MODAL CUADRE -->
-    <div id="shiftModal" class="modal hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md">
-            <div class="sticky top-0 bg-slate-900 text-white p-4 flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <i data-lucide="clipboard-list" class="w-5 h-5"></i>
-                    <h3 class="font-bold">Cuadre de Turno</h3>
-                </div>
-                <button onclick="closeShiftModal()" class="hover:bg-slate-700 p-1 rounded">
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </button>
-            </div>
-            <div class="p-6 space-y-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-500 mb-1">Caja inicial: $</label>
-                    <input type="text" id="initialCash" placeholder="0" oninput="formatArgentineInput(this)" class="w-full px-3 py-2 border rounded-lg text-center bg-white">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-500 mb-1">Ventas del turno: $</label>
-                    <input type="text" id="salesAmount" placeholder="0" oninput="formatArgentineInput(this)" class="w-full px-3 py-2 border rounded-lg text-center bg-white">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-500 mb-1">Dinero en caja: $</label>
-                    <input type="text" id="cashInBox" placeholder="0" oninput="formatArgentineInput(this)" class="w-full px-3 py-2 border rounded-lg text-center bg-white">
-                </div>
-                <button onclick="calculateShiftBalance()" class="w-full px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded font-semibold transition">Calcular Cuadre</button>
-                <div id="shiftResult"></div>
-            </div>
-            <div class="p-4 border-t border-slate-200">
-                <button onclick="closeShiftModal()" class="w-full px-4 py-2 bg-slate-200 hover:bg-slate-300 rounded font-semibold">Cerrar</button>
-            </div>
-        </div>
-    </div>
-    
-    <!-- MODAL CONVERSOR DE DIVISAS -->
-    <div id="currencyModal" class="modal hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
-            <div class="sticky top-0 bg-gradient-to-r from-indigo-700 to-purple-700 text-white p-4 flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <i data-lucide="currency" class="w-5 h-5"></i>
-                    <h3 class="font-bold">Conversor de Divisas</h3>
-                </div>
-                <button onclick="closeCurrencyModal()" class="hover:bg-white/20 p-1 rounded">
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </button>
-            </div>
-            
-            <!-- Tabs para seleccionar divisa -->
-            <div class="grid grid-cols-2 gap-1 p-4 border-b border-slate-200">
-                <button id="usdTab" onclick="selectCurrency('usd')" class="currency-tab py-2 rounded-lg font-semibold transition bg-indigo-100 text-indigo-700 active">
-                    💵 Dólar USD
-                </button>
-                <button id="eurTab" onclick="selectCurrency('eur')" class="currency-tab py-2 rounded-lg font-semibold transition bg-slate-100 text-slate-700">
-                    💶 Euro EUR
-                </button>
-            </div>
-            
-            <div class="p-6 space-y-4">
-                <!-- Selector de tipo de cambio -->
-                <div class="grid grid-cols-3 gap-2">
-                    <button id="useOfficialCurrencyBtn" onclick="setCurrencyExchangeType('official')" class="exchange-type-btn px-2 py-2 rounded-lg font-semibold transition text-xs bg-indigo-100 text-indigo-700 active">
-                        💵 Oficial
-                    </button>
-                    <button id="useBlueCurrencyBtn" onclick="setCurrencyExchangeType('blue')" class="exchange-type-btn px-2 py-2 rounded-lg font-semibold transition text-xs bg-slate-100 text-slate-700">
-                        💙 Blue/Ref
-                    </button>
-                    <button id="useCustomCurrencyBtn" onclick="setCurrencyExchangeType('custom')" class="exchange-type-btn px-2 py-2 rounded-lg font-semibold transition text-xs bg-slate-100 text-slate-700">
-                        ✏️ Personal
-                    </button>
-                </div>
-                
-                <!-- Cotización actual -->
-                <div class="bg-slate-50 p-3 rounded-lg text-center">
-                    <div class="text-xs text-slate-500">Cotización seleccionada</div>
-                    <div class="text-2xl font-bold text-indigo-600" id="selectedCurrencyRate">$1.000,00</div>
-                    <div class="text-xs text-slate-500 mt-1" id="selectedCurrencyType">Dólar Oficial</div>
-                </div>
-                
-                <!-- Input para cotización personalizada -->
-                <div id="customCurrencyRateSection" class="hidden">
-                    <label class="block text-sm font-semibold text-slate-700 mb-2">
-                        💱 Ingresa tu cotización personal:
-                    </label>
-                    <div class="flex gap-2">
-                        <input type="text" id="customCurrencyRate" placeholder="Ej: 1.250,50" oninput="updateCustomCurrencyRate()" class="custom-rate-input flex-1 px-3 py-2 border border-slate-300 rounded-lg text-center font-semibold bg-white">
-                        <button onclick="setCustomCurrencyRate()" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition text-sm">
-                            Aplicar
+                <div
+                    class="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800">
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                        <h2 class="font-bold text-slate-800 dark:text-slate-100 text-sm flex items-center gap-2">
+                            <span
+                                class="bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">1</span>
+                            Ingresa o pega tus números / expresiones
+                        </h2>
+                        <button type="button" onclick="pasteToNumbers()"
+                            class="text-xs font-semibold px-2.5 py-1 bg-indigo-50 dark:bg-indigo-950/70 hover:bg-indigo-100 dark:hover:bg-indigo-900 text-indigo-700 dark:text-indigo-300 rounded-lg transition cursor-pointer flex items-center gap-1">
+                            <i data-lucide="clipboard-paste" class="w-3.5 h-3.5"></i> Pegar
                         </button>
                     </div>
-                    <div class="text-xs text-slate-500 mt-1">
-                        * Puedes usar formato argentino (ej: 1.250,50)
-                    </div>
-                </div>
-                
-                <!-- Monto en divisa -->
-                <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-2" id="currencyAmountLabel">
-                        💰 Monto en Dólares (USD):
+
+                    <label for="numbers" class="block text-xs text-slate-500 dark:text-slate-400 mb-2">
+                        Separa por espacios, saltos de línea o <code class="font-mono">;</code> · Arrastra un <code
+                            class="font-mono">.txt</code> · <b>Ctrl+Enter</b> para calcular:
                     </label>
-                    <input type="text" id="currencyAmount" placeholder="Ej: 100,50 o 1.000" oninput="convertCurrencyToPesos()" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-center font-semibold text-lg bg-white">
-                </div>
-                
-                <!-- Resultado en pesos -->
-                <div class="bg-gradient-to-r from-emerald-500 to-green-600 rounded-lg p-4 text-white">
-                    <div class="text-xs opacity-80 mb-1">Equivalente en Pesos Argentinos</div>
-                    <div class="text-3xl font-bold text-center" id="currencyPesosResult">$ 0,00</div>
-                    <div class="text-xs text-center mt-2 opacity-80">
-                        * El cajero debe entregar este monto
+                    <textarea id="numbers"
+                        placeholder="Ejemplos compatibles:&#10;• 1.000 2.500,50 3.000&#10;• $250.000,00  $125.500&#10;• 20*20.000,75&#10;• (1.500,50 + 500) * 3"
+                        class="w-full h-36 p-3.5 font-mono border border-slate-300 dark:border-slate-700 rounded-xl text-xs sm:text-sm focus:ring-2 focus:ring-indigo-500 outline-none resize-y bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 transition"></textarea>
+
+                    <div
+                        class="flex flex-wrap justify-between items-center gap-2 text-xs text-slate-500 dark:text-slate-400 mt-2">
+                        <span>Formato argentino: <b class="font-mono">1.234.567,89</b></span>
+                        <span id="charCounter" class="font-mono">0 caracteres</span>
+                    </div>
+
+                    <!-- Cinta Sumadora Instantánea en Vivo -->
+                    <div id="liveSummaryBar"
+                        class="hidden mt-3 pt-3 border-t border-slate-100 dark:border-slate-800 grid grid-cols-3 gap-2 text-center">
+                        <div class="bg-indigo-50/70 dark:bg-indigo-950/40 rounded-lg p-2">
+                            <div class="text-[10px] uppercase font-semibold text-slate-500 dark:text-slate-400">Suma en
+                                vivo</div>
+                            <div id="liveSumVal"
+                                class="text-xs sm:text-sm font-mono font-bold text-indigo-700 dark:text-indigo-300 mt-0.5">
+                                $0</div>
+                        </div>
+                        <div class="bg-slate-100 dark:bg-slate-800/70 rounded-lg p-2">
+                            <div class="text-[10px] uppercase font-semibold text-slate-500 dark:text-slate-400">Promedio
+                            </div>
+                            <div id="liveAvgVal"
+                                class="text-xs sm:text-sm font-mono font-bold text-slate-700 dark:text-slate-200 mt-0.5">
+                                $0</div>
+                        </div>
+                        <div class="bg-emerald-50/70 dark:bg-emerald-950/40 rounded-lg p-2">
+                            <div class="text-[10px] uppercase font-semibold text-slate-500 dark:text-slate-400">Valores
+                            </div>
+                            <div id="liveCountVal"
+                                class="text-xs sm:text-sm font-mono font-bold text-emerald-700 dark:text-emerald-300 mt-0.5">
+                                0</div>
+                        </div>
                     </div>
                 </div>
-                
-                <!-- Desglose de billetes sugerido -->
-                <div id="currencyBillBreakdown" class="hidden"></div>
-                
-                <!-- Botones de acción -->
-                <div class="flex gap-2">
-                    <button onclick="addCurrencyConversionToHistory()" class="flex-1 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold transition flex items-center justify-center gap-2">
-                        <i data-lucide="save" class="w-4 h-4"></i>
-                        Guardar
+
+                <!-- 2. OPERACIONES BÁSICAS -->
+                <div
+                    class="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800">
+                    <div class="flex items-center justify-between mb-3.5">
+                        <h3 class="font-bold text-slate-800 dark:text-slate-100 text-sm flex items-center gap-2">
+                            <span
+                                class="bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">2</span>
+                            Operaciones y Estadísticas
+                        </h3>
+                        <span class="text-[11px] text-slate-400 dark:text-slate-500">Atajos: <b>Alt+1</b> al
+                            <b>Alt+6</b></span>
+                    </div>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                        <button type="button" onclick="runCalculation('sum')"
+                            class="px-3 py-2.5 bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/70 border border-indigo-200/60 dark:border-indigo-800/60 rounded-xl text-xs font-semibold transition cursor-pointer">➕
+                            Sumar (1)</button>
+                        <button type="button" onclick="runCalculation('multiply')"
+                            class="px-3 py-2.5 bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/70 border border-indigo-200/60 dark:border-indigo-800/60 rounded-xl text-xs font-semibold transition cursor-pointer">✖️
+                            Multiplicar (2)</button>
+                        <button type="button" onclick="runCalculation('subtract')"
+                            class="px-3 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold transition cursor-pointer">➖
+                            Restar (3)</button>
+                        <button type="button" onclick="runCalculation('divide')"
+                            class="px-3 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold transition cursor-pointer">➗
+                            Dividir (4)</button>
+                        <button type="button" onclick="runCalculation('average')"
+                            class="px-3 py-2.5 bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/70 border border-indigo-200/60 dark:border-indigo-800/60 rounded-xl text-xs font-semibold transition cursor-pointer">📊
+                            Promedio (5)</button>
+                        <button type="button" onclick="runCalculation('stats')"
+                            class="px-3 py-2.5 bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/70 border border-indigo-200/60 dark:border-indigo-800/60 rounded-xl text-xs font-semibold transition cursor-pointer">📈
+                            Estadísticas (6)</button>
+                    </div>
+                </div>
+
+                <!-- 3. HERRAMIENTAS CAJA SLOTS -->
+                <div
+                    class="bg-gradient-to-br from-indigo-600 via-indigo-700 to-slate-900 p-5 rounded-xl text-white shadow-md">
+                    <h3 class="font-bold text-sm flex items-center gap-2 mb-3.5">
+                        <i data-lucide="zap" class="w-5 h-5 text-amber-300"></i>
+                        Herramientas Operativas de Caja y Slots
+                    </h3>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        <button type="button" onclick="showBillCounter()"
+                            class="px-3.5 py-2.5 bg-white/15 hover:bg-white/25 rounded-xl text-xs font-semibold transition flex items-center justify-between cursor-pointer">
+                            <span>💰 Contador de Billetes</span>
+                            <span id="billBadgeHeader"
+                                class="text-[10px] font-mono bg-black/25 px-2 py-0.5 rounded-md">$0</span>
+                        </button>
+                        <button type="button" onclick="showPaymentCalc()"
+                            class="px-3.5 py-2.5 bg-white/15 hover:bg-white/25 rounded-xl text-xs font-semibold transition text-left cursor-pointer">
+                            💸 Desglose de Entrega
+                        </button>
+                        <button type="button" onclick="showCreditConverter()"
+                            class="px-3.5 py-2.5 bg-white/15 hover:bg-white/25 rounded-xl text-xs font-semibold transition text-left cursor-pointer">
+                            🎫 Créditos ⇄ Pesos
+                        </button>
+                        <button type="button" onclick="showShiftBalance()"
+                            class="px-3.5 py-2.5 bg-white/15 hover:bg-white/25 rounded-xl text-xs font-semibold transition text-left cursor-pointer">
+                            📋 Cuadre de Turno
+                        </button>
+                        <button type="button" onclick="showCurrencyConverter()"
+                            class="px-3.5 py-2.5 bg-white/20 hover:bg-white/30 rounded-xl text-xs font-semibold transition sm:col-span-2 text-center cursor-pointer">
+                            💱 Conversor Bidireccional de Divisas (USD / EUR ⇄ ARS)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Botones de limpieza -->
+                <div class="flex flex-wrap gap-2.5">
+                    <button type="button" onclick="clearAll()"
+                        class="px-4 py-2 text-xs sm:text-sm bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-semibold rounded-xl transition flex items-center gap-2 cursor-pointer">
+                        <i data-lucide="eraser" class="w-4 h-4"></i> Limpiar Números
                     </button>
-                    <button onclick="clearCurrencyForm()" class="flex-1 px-4 py-2 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 rounded-lg font-semibold transition flex items-center justify-center gap-2">
-                        <i data-lucide="eraser" class="w-4 h-4"></i>
+                    <button type="button" onclick="clearHistory()"
+                        class="px-4 py-2 text-xs sm:text-sm bg-rose-50 dark:bg-rose-950/50 hover:bg-rose-100 dark:hover:bg-rose-900/50 text-rose-600 dark:text-rose-400 font-semibold rounded-xl transition flex items-center gap-2 cursor-pointer">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i> Vaciar Historial
+                    </button>
+                </div>
+            </div>
+
+            <!-- COLUMNA DERECHA: DIVISAS, NÚMEROS DETECTADOS, RESULTADOS E HISTORIAL -->
+            <div
+                class="lg:col-span-5 bg-slate-100/80 dark:bg-slate-950/60 border-t lg:border-t-0 lg:border-l border-slate-200 dark:border-slate-800 flex flex-col">
+                <div class="p-5 sm:p-6 space-y-5">
+
+                    <!-- TARJETAS DE COTIZACIONES -->
+                    <div class="space-y-3">
+                        <!-- Tarjeta Dólar -->
+                        <div class="exchange-card rounded-xl p-3.5 text-white shadow-md">
+                            <div class="flex items-center justify-between mb-2">
+                                <div class="flex items-center gap-1.5">
+                                    <i data-lucide="dollar-sign" class="w-4 h-4"></i>
+                                    <h3 class="font-bold text-xs uppercase tracking-wider">Dólar (ARS por USD)</h3>
+                                </div>
+                                <button type="button" onclick="refreshAllRates()"
+                                    class="text-xs bg-white/20 hover:bg-white/30 px-2 py-1 rounded-lg transition cursor-pointer"
+                                    title="Actualizar cotizaciones">
+                                    <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+                                </button>
+                            </div>
+                            <div class="grid grid-cols-3 gap-1.5 text-center text-xs">
+                                <div class="bg-black/20 rounded-lg p-1.5 cursor-pointer hover:bg-black/30 transition"
+                                    onclick="openConverterWith('usd', 'official')">
+                                    <div class="opacity-80 text-[11px]">Oficial</div>
+                                    <div class="font-mono font-bold mt-0.5" id="officialRate">$1.000</div>
+                                </div>
+                                <div class="bg-black/20 rounded-lg p-1.5 cursor-pointer hover:bg-black/30 transition"
+                                    onclick="openConverterWith('usd', 'blue')">
+                                    <div class="opacity-80 text-[11px]">Blue</div>
+                                    <div class="font-mono font-bold mt-0.5" id="blueRate">$1.200</div>
+                                </div>
+                                <div class="bg-black/20 rounded-lg p-1.5 cursor-pointer hover:bg-black/30 transition"
+                                    onclick="openConverterWith('usd', 'custom')">
+                                    <div class="opacity-80 text-[11px]">Personal</div>
+                                    <div class="font-mono font-bold mt-0.5" id="customDollarRateDisplay">Sin def.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tarjeta Euro -->
+                        <div class="euro-card rounded-xl p-3.5 text-white shadow-md">
+                            <div class="flex items-center justify-between mb-2">
+                                <div class="flex items-center gap-1.5">
+                                    <i data-lucide="euro" class="w-4 h-4"></i>
+                                    <h3 class="font-bold text-xs uppercase tracking-wider">Euro (ARS por EUR)</h3>
+                                </div>
+                                <span class="text-[10px] bg-white/15 px-2 py-0.5 rounded-full">Clic para
+                                    convertir</span>
+                            </div>
+                            <div class="grid grid-cols-3 gap-1.5 text-center text-xs">
+                                <div class="bg-black/20 rounded-lg p-1.5 cursor-pointer hover:bg-black/30 transition"
+                                    onclick="openConverterWith('eur', 'official')">
+                                    <div class="opacity-80 text-[11px]">Oficial</div>
+                                    <div class="font-mono font-bold mt-0.5" id="officialEuroRate">$1.050</div>
+                                </div>
+                                <div class="bg-black/20 rounded-lg p-1.5 cursor-pointer hover:bg-black/30 transition"
+                                    onclick="openConverterWith('eur', 'blue')">
+                                    <div class="opacity-80 text-[11px]">Ref. Blue</div>
+                                    <div class="font-mono font-bold mt-0.5" id="blueEuroRate">$1.250</div>
+                                </div>
+                                <div class="bg-black/20 rounded-lg p-1.5 cursor-pointer hover:bg-black/30 transition"
+                                    onclick="openConverterWith('eur', 'custom')">
+                                    <div class="opacity-80 text-[11px]">Personal</div>
+                                    <div class="font-mono font-bold mt-0.5" id="customEuroRateDisplay">Sin def.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-center text-[11px] text-slate-500 dark:text-slate-400">
+                            Actualizado: <span id="lastUpdate" class="font-mono">-</span>
+                        </div>
+                    </div>
+
+                    <!-- NÚMEROS DETECTADOS -->
+                    <div>
+                        <div class="flex items-center justify-between mb-2.5">
+                            <h2 class="font-bold text-sm text-slate-800 dark:text-slate-100">Números Detectados</h2>
+                            <div class="flex items-center gap-2">
+                                <span id="numberCountBadge"
+                                    class="text-xs bg-indigo-100 dark:bg-indigo-950 text-indigo-800 dark:text-indigo-300 px-2.5 py-0.5 rounded-full font-semibold">0</span>
+                                <button type="button" onclick="copyAllNumbers()"
+                                    class="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline transition cursor-pointer">Copiar
+                                    lista</button>
+                            </div>
+                        </div>
+
+                        <div id="numbersDisplay"
+                            class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-3.5 hidden">
+                            <div id="numberTags" class="flex flex-wrap gap-1.5 mb-2 max-h-40 overflow-y-auto"></div>
+                            <div class="text-[11px] text-slate-400 dark:text-slate-500 italic">Haz clic en cualquier
+                                etiqueta para quitar ese número y recalcular</div>
+                        </div>
+
+                        <div id="noNumbers"
+                            class="bg-white/60 dark:bg-slate-900/50 border border-dashed border-slate-300 dark:border-slate-800 rounded-xl p-4 text-center text-slate-500 dark:text-slate-400 text-xs">
+                            Los números e importes detectados aparecerán aquí en vivo.
+                        </div>
+                    </div>
+
+                    <!-- RESULTADOS -->
+                    <div id="results" class="hidden">
+                        <div class="flex items-center justify-between mb-2.5">
+                            <h3 class="font-bold text-sm text-slate-800 dark:text-slate-100 flex items-center gap-1.5">
+                                <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-500"></i>
+                                Resultado Calculado
+                            </h3>
+                            <button type="button" onclick="copyAllResults()"
+                                class="text-xs bg-indigo-600 text-white hover:bg-indigo-700 px-2.5 py-1 rounded-lg transition flex items-center gap-1 cursor-pointer">
+                                <i data-lucide="copy" class="w-3 h-3"></i> Copiar
+                            </button>
+                        </div>
+                        <div id="resultsList"
+                            class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-4 space-y-2">
+                        </div>
+                    </div>
+
+                    <!-- HISTORIAL -->
+                    <div id="historySection" class="hidden pt-4 border-t border-slate-200 dark:border-slate-800">
+                        <div class="flex items-center justify-between mb-2.5">
+                            <h3 class="font-bold text-sm text-slate-800 dark:text-slate-100 flex items-center gap-1.5">
+                                <i data-lucide="history" class="w-4 h-4 text-indigo-500"></i>
+                                Historial Reciente
+                            </h3>
+                            <span id="historyCountLabel" class="text-[11px] text-slate-400"></span>
+                        </div>
+                        <div id="historyList" class="space-y-2 max-h-60 overflow-y-auto pr-1"></div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICACIONES -->
+    <div id="toast" class="hidden fixed bottom-5 right-5 z-50"></div>
+
+    <!-- MODAL CONTADOR DE BILLETES -->
+    <div id="billCounterModal"
+        class="modal hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div
+            class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[92vh] overflow-y-auto border border-slate-200 dark:border-slate-800">
+            <div
+                class="sticky top-0 z-10 bg-slate-900 dark:bg-slate-950 text-white p-4 flex items-center justify-between border-b border-slate-800">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="banknote" class="w-5 h-5 text-emerald-400"></i>
+                    <div>
+                        <h3 class="font-bold text-sm sm:text-base">Contador de Billetes (Arqueo)</h3>
+                        <p class="text-[11px] text-slate-400">Se guarda automáticamente mientras cuentas</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeModal('billCounterModal')"
+                    class="hover:bg-slate-800 p-1.5 rounded-lg cursor-pointer">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div class="p-4 sm:p-5 space-y-1.5" id="billsContainer"></div>
+
+            <div class="bg-gradient-to-r from-indigo-700 to-slate-900 text-white p-4 sm:p-5 space-y-3">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div>
+                        <div class="text-xs opacity-80">Total Contado en Arqueo</div>
+                        <div class="text-2xl sm:text-3xl font-mono font-bold">$<span id="arqueoTotal">0</span></div>
+                    </div>
+                    <button type="button" onclick="copyBillArqueoReport()"
+                        class="px-3.5 py-2 bg-white/15 hover:bg-white/25 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 self-start sm:self-center cursor-pointer">
+                        <i data-lucide="copy" class="w-4 h-4"></i> Copiar Detalle de Arqueo
+                    </button>
+                </div>
+
+                <div>
+                    <label for="shouldHave" class="block text-xs opacity-85 mb-1">Monto esperado en sistema / caja
+                        ($):</label>
+                    <input type="text" id="shouldHave" inputmode="decimal" placeholder="Ej: 1.500.000"
+                        oninput="handleLiveArInput(this); checkDifference(); saveBillCounterState();"
+                        class="w-full px-3.5 py-2 rounded-xl bg-white/15 border border-white/25 text-white placeholder-white/60 text-center font-mono font-semibold outline-none focus:bg-white/20">
+                </div>
+                <div id="differenceResult"></div>
+            </div>
+
+            <div class="p-4 border-t border-slate-200 dark:border-slate-800 flex flex-wrap gap-2">
+                <button type="button" onclick="resetBillCounter()"
+                    class="flex-1 px-4 py-2 bg-rose-50 dark:bg-rose-950/50 hover:bg-rose-100 text-rose-600 dark:text-rose-400 rounded-xl font-semibold text-sm cursor-pointer">Poner
+                    en Cero</button>
+                <button type="button" onclick="sendArqueoToShiftModal()"
+                    class="flex-1 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-semibold text-sm cursor-pointer">Llevar
+                    a Cuadre de Turno</button>
+                <button type="button" onclick="closeModal('billCounterModal')"
+                    class="px-5 py-2 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 rounded-xl font-semibold text-sm text-slate-800 dark:text-slate-200 cursor-pointer">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DESGLOSE DE ENTREGA -->
+    <div id="paymentModal"
+        class="modal hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div
+            class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-md border border-slate-200 dark:border-slate-800 overflow-hidden">
+            <div class="bg-slate-900 dark:bg-slate-950 text-white p-4 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="wallet" class="w-5 h-5 text-indigo-400"></i>
+                    <h3 class="font-bold text-sm sm:text-base">Desglose Óptimo de Entrega</h3>
+                </div>
+                <button type="button" onclick="closeModal('paymentModal')"
+                    class="hover:bg-slate-800 p-1 rounded-lg cursor-pointer">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="p-5 space-y-4">
+                <div>
+                    <label for="paymentAmount"
+                        class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">Monto a pagar al
+                        cliente ($):</label>
+                    <input type="text" id="paymentAmount" inputmode="decimal" placeholder="Ej: 485.000"
+                        oninput="handleLiveArInput(this); calculateBestPayment();"
+                        class="w-full px-3.5 py-2.5 border border-slate-300 dark:border-slate-700 rounded-xl text-center font-mono font-semibold bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <div id="paymentBreakdown"></div>
+            </div>
+            <div class="p-4 border-t border-slate-200 dark:border-slate-800">
+                <button type="button" onclick="closeModal('paymentModal')"
+                    class="w-full px-4 py-2 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-xl font-semibold text-sm cursor-pointer">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL CONVERSIÓN CRÉDITOS ⇄ PESOS -->
+    <div id="creditModal"
+        class="modal hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div
+            class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-md border border-slate-200 dark:border-slate-800 overflow-hidden">
+            <div class="bg-slate-900 dark:bg-slate-950 text-white p-4 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="ticket" class="w-5 h-5 text-amber-400"></i>
+                    <h3 class="font-bold text-sm sm:text-base">Conversión Créditos ⇄ Pesos</h3>
+                </div>
+                <button type="button" onclick="closeModal('creditModal')"
+                    class="hover:bg-slate-800 p-1 rounded-lg cursor-pointer">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="p-5 space-y-4">
+                <div>
+                    <label for="creditValue"
+                        class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">Denominación de la
+                        máquina ($ por crédito):</label>
+                    <input type="number" id="creditValue" value="1" step="0.05" min="0.01" oninput="convertCredits()"
+                        class="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-xl text-center font-mono font-semibold bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500">
+                    <div class="flex flex-wrap gap-1.5 mt-2 justify-center">
+                        <button type="button" onclick="setDenom(0.10)"
+                            class="px-2 py-1 text-[11px] font-mono font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-indigo-100 rounded-lg border border-slate-200 dark:border-slate-700 cursor-pointer">$0,10</button>
+                        <button type="button" onclick="setDenom(0.25)"
+                            class="px-2 py-1 text-[11px] font-mono font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-indigo-100 rounded-lg border border-slate-200 dark:border-slate-700 cursor-pointer">$0,25</button>
+                        <button type="button" onclick="setDenom(0.50)"
+                            class="px-2 py-1 text-[11px] font-mono font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-indigo-100 rounded-lg border border-slate-200 dark:border-slate-700 cursor-pointer">$0,50</button>
+                        <button type="button" onclick="setDenom(1)"
+                            class="px-2 py-1 text-[11px] font-mono font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-indigo-100 rounded-lg border border-slate-200 dark:border-slate-700 cursor-pointer">$1</button>
+                        <button type="button" onclick="setDenom(5)"
+                            class="px-2 py-1 text-[11px] font-mono font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-indigo-100 rounded-lg border border-slate-200 dark:border-slate-700 cursor-pointer">$5</button>
+                        <button type="button" onclick="setDenom(10)"
+                            class="px-2 py-1 text-[11px] font-mono font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-indigo-100 rounded-lg border border-slate-200 dark:border-slate-700 cursor-pointer">$10</button>
+                        <button type="button" onclick="setDenom(50)"
+                            class="px-2 py-1 text-[11px] font-mono font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-indigo-100 rounded-lg border border-slate-200 dark:border-slate-700 cursor-pointer">$50</button>
+                        <button type="button" onclick="setDenom(100)"
+                            class="px-2 py-1 text-[11px] font-mono font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-indigo-100 rounded-lg border border-slate-200 dark:border-slate-700 cursor-pointer">$100</button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label for="credits"
+                            class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Cantidad de
+                            Créditos:</label>
+                        <input type="text" id="credits" inputmode="decimal" placeholder="0"
+                            oninput="handleLiveArInput(this); convertCredits();"
+                            class="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-xl text-center font-mono font-semibold bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label for="pesos"
+                            class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Importe en Pesos
+                            ($):</label>
+                        <input type="text" id="pesos" inputmode="decimal" placeholder="0"
+                            oninput="handleLiveArInput(this); convertPesos();"
+                            class="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-xl text-center font-mono font-semibold bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                </div>
+
+                <div id="conversionResult"
+                    class="bg-indigo-50 dark:bg-indigo-950/50 border border-indigo-200 dark:border-indigo-900 rounded-xl p-3 text-center text-xs text-indigo-800 dark:text-indigo-200 font-medium">
+                    Ingresa créditos o pesos para ver la equivalencia exacta.
+                </div>
+            </div>
+            <div class="p-4 border-t border-slate-200 dark:border-slate-800">
+                <button type="button" onclick="closeModal('creditModal')"
+                    class="w-full px-4 py-2 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-xl font-semibold text-sm cursor-pointer">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL CUADRE DE TURNO -->
+    <div id="shiftModal"
+        class="modal hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div
+            class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-md border border-slate-200 dark:border-slate-800 overflow-hidden">
+            <div class="bg-slate-900 dark:bg-slate-950 text-white p-4 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="clipboard-list" class="w-5 h-5 text-emerald-400"></i>
+                    <h3 class="font-bold text-sm sm:text-base">Cuadre de Caja / Turno</h3>
+                </div>
+                <button type="button" onclick="closeModal('shiftModal')"
+                    class="hover:bg-slate-800 p-1 rounded-lg cursor-pointer">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="p-5 space-y-3.5">
+                <div>
+                    <label for="initialCash"
+                        class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">1. Caja Inicial /
+                        Fondo Fijo ($):</label>
+                    <input type="text" id="initialCash" inputmode="decimal" placeholder="0"
+                        oninput="handleLiveArInput(this); calculateShiftBalance();"
+                        class="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-xl text-center font-mono font-semibold bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <div>
+                    <label for="salesAmount"
+                        class="block text-xs font-semibold text-emerald-700 dark:text-emerald-400 mb-1">2. (+) Ingresos
+                        / Ventas / Refuerzos ($):</label>
+                    <input type="text" id="salesAmount" inputmode="decimal" placeholder="0"
+                        oninput="handleLiveArInput(this); calculateShiftBalance();"
+                        class="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-xl text-center font-mono font-semibold bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500">
+                </div>
+                <div>
+                    <label for="payoutsAmount"
+                        class="block text-xs font-semibold text-rose-700 dark:text-rose-400 mb-1">3. (−) Pagos / Premios
+                        / Retiros ($):</label>
+                    <input type="text" id="payoutsAmount" inputmode="decimal" placeholder="0"
+                        oninput="handleLiveArInput(this); calculateShiftBalance();"
+                        class="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-xl text-center font-mono font-semibold bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-rose-500">
+                </div>
+                <div>
+                    <div class="flex items-center justify-between mb-1">
+                        <label for="cashInBox" class="text-xs font-semibold text-slate-600 dark:text-slate-300">4.
+                            Efectivo Real Contado ($):</label>
+                        <button type="button" onclick="pullFromBillCounter()"
+                            class="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer">
+                            Traer del Contador de Billetes
+                        </button>
+                    </div>
+                    <input type="text" id="cashInBox" inputmode="decimal" placeholder="0"
+                        oninput="handleLiveArInput(this); calculateShiftBalance();"
+                        class="w-full px-3 py-2 border border-indigo-300 dark:border-indigo-700 rounded-xl text-center font-mono font-semibold bg-indigo-50/40 dark:bg-slate-950 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+
+                <div id="shiftResult"></div>
+            </div>
+            <div class="p-4 border-t border-slate-200 dark:border-slate-800 flex gap-2">
+                <button type="button" onclick="clearShiftBalance()"
+                    class="flex-1 px-4 py-2 bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 rounded-xl font-semibold text-sm cursor-pointer">Limpiar</button>
+                <button type="button" onclick="closeModal('shiftModal')"
+                    class="flex-1 px-4 py-2 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-xl font-semibold text-sm cursor-pointer">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL CONVERSOR BIDIRECCIONAL DE DIVISAS -->
+    <div id="currencyModal"
+        class="modal hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div
+            class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-lg max-h-[92vh] overflow-y-auto border border-slate-200 dark:border-slate-800">
+            <div
+                class="sticky top-0 z-10 bg-gradient-to-r from-indigo-700 to-purple-700 text-white p-4 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="arrow-left-right" class="w-5 h-5"></i>
+                    <h3 class="font-bold text-sm sm:text-base">Conversor de Divisas</h3>
+                </div>
+                <button type="button" onclick="closeModal('currencyModal')"
+                    class="hover:bg-white/20 p-1 rounded-lg cursor-pointer">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Tabs USD / EUR -->
+            <div class="grid grid-cols-2 gap-2 p-4 border-b border-slate-200 dark:border-slate-800">
+                <button type="button" id="usdTab" onclick="selectCurrency('usd')"
+                    class="py-2 rounded-xl text-xs sm:text-sm font-semibold transition cursor-pointer bg-indigo-600 text-white">
+                    💵 Dólar (USD)
+                </button>
+                <button type="button" id="eurTab" onclick="selectCurrency('eur')"
+                    class="py-2 rounded-xl text-xs sm:text-sm font-semibold transition cursor-pointer bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                    💶 Euro (EUR)
+                </button>
+            </div>
+
+            <div class="p-5 space-y-4">
+                <!-- Selector de tipo de cambio -->
+                <div class="grid grid-cols-3 gap-2">
+                    <button type="button" id="useOfficialCurrencyBtn" onclick="setCurrencyExchangeType('official')"
+                        class="px-2 py-2 rounded-xl font-semibold transition text-xs cursor-pointer bg-indigo-600 text-white">
+                        Oficial
+                    </button>
+                    <button type="button" id="useBlueCurrencyBtn" onclick="setCurrencyExchangeType('blue')"
+                        class="px-2 py-2 rounded-xl font-semibold transition text-xs cursor-pointer bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                        Blue / Ref
+                    </button>
+                    <button type="button" id="useCustomCurrencyBtn" onclick="setCurrencyExchangeType('custom')"
+                        class="px-2 py-2 rounded-xl font-semibold transition text-xs cursor-pointer bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                        Personal
+                    </button>
+                </div>
+
+                <!-- Cotización activa -->
+                <div
+                    class="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-3 rounded-xl text-center">
+                    <div class="text-xs text-slate-500 dark:text-slate-400" id="selectedCurrencyType">Dólar Oficial
+                    </div>
+                    <div class="text-2xl font-mono font-bold text-indigo-600 dark:text-indigo-400 mt-0.5"
+                        id="selectedCurrencyRate">$1.000,00</div>
+                </div>
+
+                <!-- Input para cotización personalizada (sin borrar centavos al escribir) -->
+                <div id="customCurrencyRateSection"
+                    class="hidden bg-indigo-50/50 dark:bg-slate-950 p-3.5 rounded-xl border border-indigo-200 dark:border-slate-800">
+                    <label for="customCurrencyRate"
+                        class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                        Ingresa tu cotización personalizada (ARS por 1 unidad):
+                    </label>
+                    <div class="flex gap-2">
+                        <input type="text" id="customCurrencyRate" inputmode="decimal" placeholder="Ej: 1.250,50"
+                            oninput="handleLiveArInput(this)"
+                            class="flex-1 px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-xl text-center font-mono font-semibold bg-white dark:bg-slate-900 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500">
+                        <button type="button" onclick="setCustomCurrencyRate()"
+                            class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-semibold transition text-xs sm:text-sm cursor-pointer">
+                            Guardar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Dirección de conversión -->
+                <div class="flex items-center justify-between">
+                    <label for="currencyAmount"
+                        class="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200"
+                        id="currencyAmountLabel">
+                        Monto en Dólares (USD):
+                    </label>
+                    <button type="button" onclick="toggleConversionDirection()"
+                        class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 transition flex items-center gap-1 cursor-pointer">
+                        <i data-lucide="repeat" class="w-3.5 h-3.5"></i> Invertir dirección
+                    </button>
+                </div>
+
+                <input type="text" id="currencyAmount" inputmode="decimal" placeholder="Ej: 100 o 1.250,50"
+                    oninput="handleLiveArInput(this); convertCurrency();"
+                    class="w-full px-3.5 py-2.5 border border-slate-300 dark:border-slate-700 rounded-xl text-center font-mono font-semibold text-lg bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500">
+
+                <!-- Resultado -->
+                <div
+                    class="bg-gradient-to-r from-emerald-600 to-teal-600 rounded-xl p-4 text-white text-center shadow-sm">
+                    <div class="text-xs opacity-85 mb-1" id="currencyResultLabel">Equivalente en Pesos Argentinos (ARS)
+                    </div>
+                    <div class="text-2xl sm:text-3xl font-mono font-bold" id="currencyPesosResult">$ 0,00</div>
+                </div>
+
+                <!-- Desglose sugerido de billetes (cuando el resultado es en ARS) -->
+                <div id="currencyBillBreakdown" class="hidden"></div>
+
+                <!-- Acciones -->
+                <div class="flex gap-2">
+                    <button type="button" onclick="addCurrencyConversionToHistory()"
+                        class="flex-1 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold text-xs sm:text-sm transition flex items-center justify-center gap-1.5 cursor-pointer">
+                        <i data-lucide="save" class="w-4 h-4"></i> Guardar en Historial
+                    </button>
+                    <button type="button" onclick="clearCurrencyForm()"
+                        class="px-4 py-2 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-xl font-semibold text-xs sm:text-sm transition cursor-pointer">
                         Limpiar
                     </button>
                 </div>
             </div>
-            <div class="p-4 border-t border-slate-200 dark:border-slate-700">
-                <button onclick="closeCurrencyModal()" class="w-full px-4 py-2 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 rounded font-semibold transition">Cerrar</button>
-            </div>
         </div>
     </div>
-    
-</body>
 
-<script>
-    // ==================== CONSTANTES GLOBALES ====================
-    const CONSTANTS = {
-        BILL_DENOMINATIONS: [20000, 10000, 2000, 1000, 500, 200, 100, 50, 20, 10],
-        MAX_HISTORY_ITEMS: 10,
-        DEFAULT_CREDIT_VALUE: 0.25,
-        TOAST_DURATION: 3000,
-        MAX_BILLS_PER_DENOM: 999,
-        DEBOUNCE_DELAY: 300,
-        DOLLAR_API_URL: 'https://dolarapi.com/v1/dolares',
-        EURO_API_URL: 'https://dolarapi.com/v1/cotizaciones/eur',
-        CACHE_DURATION: 5 * 60 * 1000
-    };
-    
-    // ==================== ESTADO GLOBAL ====================
-    let numbers = [];
-    let history = [];
-    let isLoading = false;
-    
-    // Tasas de cambio
-    let dollarRates = {
-        official: { value: 1000, lastUpdate: null, nombre: 'Dólar Oficial' },
-        blue: { value: 1200, lastUpdate: null, nombre: 'Dólar Blue' },
-        custom: { value: 0, lastUpdate: null, nombre: 'Cotización Personal' }
-    };
-    
-    let euroRates = {
-        official: { value: 1050, lastUpdate: null, nombre: 'Euro Oficial' },
-        blue: { value: 1250, lastUpdate: null, nombre: 'Euro Referencia' },
-        custom: { value: 0, lastUpdate: null, nombre: 'Cotización Personal' }
-    };
-    
-    let currentCurrency = 'usd';
-    let currentExchangeType = 'official';
-    let customDollarRate = 0;
-    let customEuroRate = 0;
-    
-    // ==================== INICIALIZACIÓN ====================
-    async function init() {
-        loadHistory();
-        displayHistory();
-        setupEventListeners();
-        setupDragAndDrop();
-        setupShortcuts();
-        // setupTheme(); // Obsoleto en light mode forzado
-        generateBillInputs();
-        updateCharCounter();
-        lucide.createIcons();
-        
-        // Cargar cotizaciones guardadas
-        const savedDollarRate = localStorage.getItem('customDollarRate');
-        if (savedDollarRate) {
-            customDollarRate = parseFloat(savedDollarRate);
-            dollarRates.custom.value = customDollarRate;
-            document.getElementById('customDollarRateDisplay').innerHTML = customDollarRate > 0 ? `$${formatArgentineNumber(customDollarRate)}` : '$0';
-        }
-        
-        const savedEuroRate = localStorage.getItem('customEuroRate');
-        if (savedEuroRate) {
-            customEuroRate = parseFloat(savedEuroRate);
-            euroRates.custom.value = customEuroRate;
-            document.getElementById('customEuroRateDisplay').innerHTML = customEuroRate > 0 ? `€${formatArgentineNumber(customEuroRate)}` : '€0';
-        }
-        
-        await fetchDollarRate();
-        await fetchEuroRate();
-        
-        setInterval(fetchDollarRate, CONSTANTS.CACHE_DURATION);
-        setInterval(fetchEuroRate, CONSTANTS.CACHE_DURATION);
-    }
-    
-    // ==================== COTIZACIÓN DÓLAR ====================
-    async function fetchDollarRate() {
-        try {
-            const response = await fetch(CONSTANTS.DOLLAR_API_URL);
-            if (response.ok) {
-                const data = await response.json();
-                const official = data.find(d => d.nombre === 'Oficial');
-                const blue = data.find(d => d.nombre === 'Blue');
-                
-                if (official) {
-                    dollarRates.official.value = official.venta;
-                    document.getElementById('officialRate').innerHTML = `$${formatArgentineNumber(official.venta)}<br><span class="text-[9px]">C:${formatArgentineNumber(official.compra)}</span>`;
-                }
-                if (blue) {
-                    dollarRates.blue.value = blue.venta;
-                    document.getElementById('blueRate').innerHTML = `$${formatArgentineNumber(blue.venta)}<br><span class="text-[9px]">C:${formatArgentineNumber(blue.compra)}</span>`;
-                }
-                updateLastUpdateTime();
-                showToast('✅ Cotización dólar actualizada', 'success');
-            }
-        } catch (error) {
-            console.warn('Error fetching dollar rate:', error);
-        }
-    }
-    
-    // ==================== COTIZACIÓN EURO ====================
-    async function fetchEuroRate() {
-        try {
-            const response = await fetch(CONSTANTS.EURO_API_URL);
-            if (response.ok) {
-                const data = await response.json();
-                if (data) {
-                    euroRates.official.value = data.venta || data.compra || 1050;
-                    euroRates.blue.value = euroRates.official.value * 1.18;
-                    document.getElementById('officialEuroRate').innerHTML = `€${formatArgentineNumber(euroRates.official.value)}<br><span class="text-[9px]">C:${formatArgentineNumber(data.compra || euroRates.official.value * 0.98)}</span>`;
-                    document.getElementById('blueEuroRate').innerHTML = `€${formatArgentineNumber(euroRates.blue.value)}<br><span class="text-[9px]">Ref:${formatArgentineNumber(euroRates.blue.value * 0.98)}</span>`;
-                }
-            } else {
-                throw new Error('API no disponible');
-            }
-        } catch (error) {
-            console.warn('Error fetching euro rate:', error);
-        }
-    }
-    
-    function updateLastUpdateTime() {
-        document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString('es-AR');
-        localStorage.setItem('dollarRates', JSON.stringify({ official: dollarRates.official, blue: dollarRates.blue }));
-        localStorage.setItem('euroRates', JSON.stringify({ official: euroRates.official, blue: euroRates.blue }));
-    }
-    
-    // ==================== FUNCIONES DEL CONVERSOR ====================
-    function selectCurrency(currency) {
-        currentCurrency = currency;
-        
-        const usdTab = document.getElementById('usdTab');
-        const eurTab = document.getElementById('eurTab');
-        const amountLabel = document.getElementById('currencyAmountLabel');
-        
-        if (currency === 'usd') {
-            usdTab.classList.add('active', 'bg-indigo-100', 'text-indigo-700');
-            usdTab.classList.remove('bg-slate-100', 'text-slate-700');
-            eurTab.classList.remove('active', 'bg-indigo-100', 'text-indigo-700');
-            eurTab.classList.add('bg-slate-100', 'text-slate-700');
-            amountLabel.innerHTML = '💰 Monto en Dólares (USD):';
-        } else {
-            eurTab.classList.add('active', 'bg-indigo-100', 'text-indigo-700');
-            eurTab.classList.remove('bg-slate-100', 'text-slate-700');
-            usdTab.classList.remove('active', 'bg-indigo-100', 'text-indigo-700');
-            usdTab.classList.add('bg-slate-100', 'text-slate-700');
-            amountLabel.innerHTML = '💰 Monto en Euros (EUR):';
-        }
-        
-        setCurrencyExchangeType(currentExchangeType);
-        clearCurrencyForm();
-    }
-    
-    function setCurrencyExchangeType(type) {
-        currentExchangeType = type;
-        
-        const officialBtn = document.getElementById('useOfficialCurrencyBtn');
-        const blueBtn = document.getElementById('useBlueCurrencyBtn');
-        const customBtn = document.getElementById('useCustomCurrencyBtn');
-        const customSection = document.getElementById('customCurrencyRateSection');
-        
-        officialBtn.classList.remove('active');
-        blueBtn.classList.remove('active');
-        customBtn.classList.remove('active');
-        
-        if (type === 'official') {
-            officialBtn.classList.add('active');
-            customSection.classList.add('hidden');
-        } else if (type === 'blue') {
-            blueBtn.classList.add('active');
-            customSection.classList.add('hidden');
-        } else {
-            customBtn.classList.add('active');
-            customSection.classList.remove('hidden');
-            const currentRate = currentCurrency === 'usd' ? customDollarRate : customEuroRate;
-            if (currentRate > 0) {
-                document.getElementById('customCurrencyRate').value = formatArgentineNumber(currentRate);
-            } else {
-                document.getElementById('customCurrencyRate').value = '';
-            }
-        }
-        
-        updateSelectedCurrencyRate();
-        convertCurrencyToPesos();
-    }
-    
-    function updateSelectedCurrencyRate() {
-        let rate, rateName;
-        const rates = currentCurrency === 'usd' ? dollarRates : euroRates;
-        const currencySymbol = currentCurrency === 'usd' ? '$' : '€';
-        const currencyName = currentCurrency === 'usd' ? 'Dólar' : 'Euro';
-        
-        if (currentExchangeType === 'official') {
-            rate = rates.official.value;
-            rateName = `${currencyName} Oficial`;
-        } else if (currentExchangeType === 'blue') {
-            rate = rates.blue.value;
-            rateName = currentCurrency === 'usd' ? 'Dólar Blue' : 'Euro Referencia';
-        } else {
-            rate = currentCurrency === 'usd' ? customDollarRate : customEuroRate;
-            rateName = rate > 0 ? `Cotización Personal: ${currencySymbol}${formatArgentineNumber(rate)}` : `Cotización Personal (sin definir)`;
-        }
-        
-        document.getElementById('selectedCurrencyRate').innerHTML = `${currencySymbol} ${formatArgentineNumber(rate)}`;
-        document.getElementById('selectedCurrencyType').textContent = rateName;
-    }
-    
-    function updateCustomCurrencyRate() {
-        const input = document.getElementById('customCurrencyRate');
-        const value = input.value;
-        const parsed = parseArgentineNumber(value);
-        if (!isNaN(parsed) && parsed > 0) {
-            input.value = formatArgentineNumber(parsed);
-        }
-    }
-    
-    function setCustomCurrencyRate() {
-        const input = document.getElementById('customCurrencyRate');
-        const value = input.value;
-        let parsed = parseArgentineNumber(value);
-        
-        if (isNaN(parsed) || parsed <= 0) {
-            showToast('❌ Ingrese una cotización válida', 'error');
-            return;
-        }
-        
-        if (currentCurrency === 'usd') {
-            customDollarRate = parsed;
-            dollarRates.custom.value = parsed;
-            document.getElementById('customDollarRateDisplay').innerHTML = `$${formatArgentineNumber(parsed)}`;
-            localStorage.setItem('customDollarRate', parsed);
-        } else {
-            customEuroRate = parsed;
-            euroRates.custom.value = parsed;
-            document.getElementById('customEuroRateDisplay').innerHTML = `€${formatArgentineNumber(parsed)}`;
-            localStorage.setItem('customEuroRate', parsed);
-        }
-        
-        updateSelectedCurrencyRate();
-        convertCurrencyToPesos();
-        showToast(`✅ Cotización personalizada: ${currentCurrency === 'usd' ? '$' : '€'}${formatArgentineNumber(parsed)}`, 'success');
-    }
-    
-    function convertCurrencyToPesos() {
-        const amountText = document.getElementById('currencyAmount').value;
-        let amount = parseArgentineNumber(amountText);
-        
-        if (isNaN(amount) || amount <= 0) {
-            document.getElementById('currencyPesosResult').innerHTML = '$ 0,00';
-            document.getElementById('currencyBillBreakdown').classList.add('hidden');
-            return;
-        }
-        
-        let rate;
-        const rates = currentCurrency === 'usd' ? dollarRates : euroRates;
-        
-        if (currentExchangeType === 'official') {
-            rate = rates.official.value;
-        } else if (currentExchangeType === 'blue') {
-            rate = rates.blue.value;
-        } else {
-            rate = currentCurrency === 'usd' ? customDollarRate : customEuroRate;
-        }
-        
-        if (rate <= 0) {
-            document.getElementById('currencyPesosResult').innerHTML = '$ ---';
-            showToast('⚠️ Defina una cotización primero', 'warning');
-            return;
-        }
-        
-        const pesosAmount = amount * rate;
-        document.getElementById('currencyPesosResult').innerHTML = `$ ${formatArgentineNumber(pesosAmount)}`;
-        
-        showCurrencyBillBreakdown(pesosAmount);
-    }
-    
-    function showCurrencyBillBreakdown(pesosAmount) {
-        let remaining = Math.floor(pesosAmount);
-        const breakdown = {};
-        
-        CONSTANTS.BILL_DENOMINATIONS.forEach(bill => {
-            if (remaining >= bill) {
-                breakdown[bill] = Math.floor(remaining / bill);
-                remaining = remaining % bill;
-            }
-        });
-        
-        let html = `
-            <div class="bg-slate-50 dark:bg-slate-700 p-3 rounded-lg border border-slate-200 dark:border-slate-600 mt-3">
-                <h4 class="text-xs font-semibold text-slate-700 dark:text-slate-300 mb-2 flex items-center gap-1">
-                    <i data-lucide="banknote" class="w-3 h-3"></i>
-                    Sugerencia de billetes a entregar:
-                </h4>
-                <div class="space-y-1">
-        `;
-        
-        let hasBills = false;
-        CONSTANTS.BILL_DENOMINATIONS.forEach(bill => {
-            if (breakdown[bill] && breakdown[bill] > 0) {
-                hasBills = true;
-                html += `
-                    <div class="flex justify-between text-xs">
-                        <span class="text-slate-600 dark:text-slate-400">${breakdown[bill]} x $${formatArgentineNumber(bill)}</span>
-                        <span class="font-semibold text-indigo-600 dark:text-indigo-400">${formatArgentineNumber(breakdown[bill] * bill)}</span>
-                    </div>
-                `;
-            }
-        });
-        
-        if (hasBills) {
-            html += `
-                    <div class="border-t border-slate-300 dark:border-slate-600 mt-2 pt-2 flex justify-between font-semibold text-xs">
-                        <span class="text-slate-700 dark:text-slate-300">Total billetes:</span>
-                        <span class="text-indigo-600 dark:text-indigo-400">${formatArgentineNumber(pesosAmount - remaining)}</span>
-                    </div>
-            `;
-            if (remaining > 0) {
-                html += `<div class="text-xs text-yellow-600 dark:text-yellow-400 mt-1">💶 Faltante en monedas: ${formatArgentineNumber(remaining)}</div>`;
-            }
-        } else {
-            html += `<div class="text-xs text-slate-500 text-center py-2">Monto menor a $10, entregar en monedas</div>`;
-        }
-        
-        html += `</div></div>`;
-        document.getElementById('currencyBillBreakdown').innerHTML = html;
-        document.getElementById('currencyBillBreakdown').classList.remove('hidden');
-        lucide.createIcons();
-    }
-    
-    function clearCurrencyForm() {
-        document.getElementById('currencyAmount').value = '';
-        document.getElementById('currencyPesosResult').innerHTML = '$ 0,00';
-        document.getElementById('currencyBillBreakdown').classList.add('hidden');
-        if (currentExchangeType === 'custom') {
-            const currentRate = currentCurrency === 'usd' ? customDollarRate : customEuroRate;
-            if (currentRate > 0) {
-                document.getElementById('customCurrencyRate').value = formatArgentineNumber(currentRate);
-            }
-        }
-        showToast('🧹 Formulario limpiado', 'info');
-    }
-    
-    function addCurrencyConversionToHistory() {
-        const amountText = document.getElementById('currencyAmount').value;
-        let amount = parseArgentineNumber(amountText);
-        
-        if (isNaN(amount) || amount <= 0) {
-            showToast('❌ Ingrese un monto válido', 'error');
-            return;
-        }
-        
-        let rate, rateName;
-        const rates = currentCurrency === 'usd' ? dollarRates : euroRates;
-        const currencySymbol = currentCurrency === 'usd' ? 'USD' : 'EUR';
-        const currencyName = currentCurrency === 'usd' ? 'Dólar' : 'Euro';
-        
-        if (currentExchangeType === 'official') {
-            rate = rates.official.value;
-            rateName = `${currencyName} Oficial`;
-        } else if (currentExchangeType === 'blue') {
-            rate = rates.blue.value;
-            rateName = currentCurrency === 'usd' ? 'Dólar Blue' : 'Euro Referencia';
-        } else {
-            rate = currentCurrency === 'usd' ? customDollarRate : customEuroRate;
-            rateName = `Cotización Personal (${currencySymbol === 'USD' ? '$' : '€'}${formatArgentineNumber(rate)})`;
-        }
-        
-        const pesosAmount = amount * rate;
-        
-        const entry = {
-            id: Date.now(),
-            operation: `💱 ${currencySymbol} → ARS`,
-            value: `${currencySymbol} ${formatArgentineNumber(amount)} → $${formatArgentineNumber(pesosAmount)} (${rateName})`,
-            time: new Date().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
-            date: new Date().toLocaleDateString('es-AR')
+    <textarea id="clipboardFallback" class="fixed -top-96 left-0 opacity-0 pointer-events-none"
+        aria-hidden="true"></textarea>
+
+    <script>
+        const CONSTANTS = {
+            BILL_DENOMINATIONS: [20000, 10000, 2000, 1000, 500, 200, 100, 50, 20, 10],
+            MAX_HISTORY_ITEMS: 15,
+            TOAST_DURATION: 2800,
+            MAX_BILLS_PER_DENOM: 9999,
+            DOLLAR_API_URL: 'https://dolarapi.com/v1/dolares',
+            EURO_API_URL: 'https://dolarapi.com/v1/cotizaciones/eur',
+            CACHE_DURATION: 5 * 60 * 1000
         };
-        
-        history.unshift(entry);
-        if (history.length > CONSTANTS.MAX_HISTORY_ITEMS) history.pop();
-        saveHistory();
-        displayHistory();
-        
-        showToast(`✅ Conversión guardada`, 'success');
-    }
-    
-    // ==================== FUNCIONES EXISTENTES ====================
-    
-    function setupEventListeners() {
-        const textarea = document.getElementById('numbers');
-        const debouncedParse = debounce((text) => {
-            if (text.trim()) {
-                numbers = parseInput(text);
-                displayNumbers();
-            } else {
-                numbers = [];
-                displayNumbers();
-            }
-        }, CONSTANTS.DEBOUNCE_DELAY);
-        
-        textarea?.addEventListener('input', (e) => {
-            debouncedParse(e.target.value);
-            updateCharCounter();
-        });
-    }
-    
-    function updateCharCounter() {
-        const text = document.getElementById('numbers')?.value || '';
-        document.getElementById('charCounter').textContent = `${text.length} caracteres`;
-    }
-    
-    function debounce(func, wait) {
-        let timeout;
-        return function(...args) {
-            clearTimeout(timeout);
-            timeout = setTimeout(() => func(...args), wait);
+
+        let numbers = [];
+        let history = [];
+        let lastOperation = null;
+
+        let dollarRates = {
+            official: { value: 1000, compra: 980 },
+            blue: { value: 1200, compra: 1180 },
+            custom: { value: 0 }
         };
-    }
-    
-    function setupDragAndDrop() {
-        const dropZone = document.getElementById('numbers');
-        if (!dropZone) return;
-        
-        dropZone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            dropZone.classList.add('drag-over');
-        });
-        
-        dropZone.addEventListener('dragleave', () => {
-            dropZone.classList.remove('drag-over');
-        });
-        
-        dropZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            dropZone.classList.remove('drag-over');
-            const file = e.dataTransfer.files[0];
-            if (file && file.type === 'text/plain') {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    dropZone.value = e.target.result;
-                    dropZone.dispatchEvent(new Event('input'));
-                    showToast('✅ Archivo cargado', 'success');
-                };
-                reader.readAsText(file);
-            } else if (file) {
-                showToast('❌ Solo archivos .txt', 'error');
-            }
-        });
-    }
-    
-    function setupShortcuts() {
-        document.addEventListener('keydown', (e) => {
-            if ((e.ctrlKey || e.metaKey) && e.key === 'd' && confirm('¿Limpiar todo?')) clearAll();
-            if ((e.ctrlKey || e.metaKey) && e.key === 'h' && confirm('¿Limpiar historial?')) clearHistory();
-            if (e.key === 'Escape') document.querySelectorAll('.modal').forEach(m => m.classList.add('hidden'));
-        });
-    }
-    
-    function parseInput(text) {
-        if (!text) return [];
-        const results = [];
-        const lines = text.split(/[\n\r]+/);
-        for (let line of lines) {
-            const parts = line.trim().split(/[;]\s*|\s{2,}/);
-            for (let part of parts) {
-                if (!part) continue;
+
+        let euroRates = {
+            official: { value: 1050, compra: 1020 },
+            blue: { value: 1260, compra: 1230 },
+            custom: { value: 0 }
+        };
+
+        let currentCurrency = 'usd';
+        let currentExchangeType = 'official';
+        let conversionDirection = 'toArs'; // 'toArs' | 'fromArs'
+        let customDollarRate = 0;
+        let customEuroRate = 0;
+        let toastTimer = null;
+
+        // ==================== TEMA Y UTILIDADES ====================
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function toggleTheme() {
+            const isDark = document.documentElement.classList.toggle('dark');
+            try {
+                localStorage.setItem('calc2_theme', isDark ? 'dark' : 'light');
+            } catch (e) { }
+        }
+
+        async function copyTextSafe(text) {
+            if (navigator.clipboard && window.isSecureContext) {
                 try {
-                    if (/[+\-*/()]/.test(part)) {
-                        const expr = convertArgentineToJS(part);
-                        const res = evaluateExpressionSafe(expr);
-                        if (!isNaN(res) && isFinite(res)) results.push(res);
-                    } else {
-                        const num = parseArgentineNumber(part);
-                        if (!isNaN(num)) results.push(num);
-                    }
-                } catch(e) {
-                    results.push(...extractArgentineNumbers(part));
-                }
+                    await navigator.clipboard.writeText(text);
+                    return true;
+                } catch (e) { }
+            }
+            const fb = document.getElementById('clipboardFallback');
+            fb.value = text;
+            fb.select();
+            fb.setSelectionRange(0, 999999);
+            try {
+                return document.execCommand('copy');
+            } catch (e) {
+                return false;
             }
         }
-        return results;
-    }
-    
-    function parseArgentineNumber(str) {
-        if (!str) return NaN;
-        str = str.trim().replace(/\s/g, '');
-        if (!str) return NaN;
-        
-        const arFormat = /^(\d{1,3}(\.\d{3})*|\d+)(,\d{1,2})?$/;
-        if (!arFormat.test(str)) return NaN;
-        
-        if (!str.includes(',')) {
-            if (/^\d{1,3}(\.\d{3})*$/.test(str)) return parseFloat(str.replace(/\./g, ''));
-            if (/^\d+$/.test(str)) return parseFloat(str);
+
+        async function pasteToNumbers() {
+            const area = document.getElementById('numbers');
+            if (!navigator.clipboard || !navigator.clipboard.readText) {
+                area.focus();
+                showToast('Presiona Ctrl+V para pegar', 'info');
+                return;
+            }
+            try {
+                const txt = await navigator.clipboard.readText();
+                if (!txt) return;
+                area.value = area.value.trim() ? `${area.value.trim()}\n${txt}` : txt;
+                handleNumbersTextareaInput();
+                showToast('Números pegados', 'success');
+            } catch (e) {
+                area.focus();
+                showToast('Usa Ctrl+V en el cuadro de texto', 'info');
+            }
+        }
+
+        // ==================== PARSEO Y FORMATO ARGENTINO ====================
+        function formatArgentineNumber(num, minDecimals = 0) {
+            if (typeof num !== 'number' || isNaN(num) || !isFinite(num)) return '0';
+            return num.toLocaleString('es-AR', {
+                minimumFractionDigits: minDecimals,
+                maximumFractionDigits: 2
+            });
+        }
+
+        function parseArgentineNumber(rawStr) {
+            if (rawStr === null || rawStr === undefined) return NaN;
+            let s = String(rawStr).trim().replace(/[$€\s]/g, '');
+            if (!s) return NaN;
+
+            let sign = 1;
+            if (s.startsWith('-')) {
+                sign = -1;
+                s = s.slice(1);
+            } else if (s.startsWith('+')) {
+                s = s.slice(1);
+            }
+            if (!s) return NaN;
+
+            if (s.includes(',')) {
+                const parts = s.split(',');
+                if (parts.length !== 2) return NaN;
+                const intPart = parts[0].replace(/\./g, '');
+                const decPart = parts[1];
+                if ((intPart && !/^\d+$/.test(intPart)) || !/^\d{1,4}$/.test(decPart)) return NaN;
+                return sign * parseFloat(`${intPart || '0'}.${decPart}`);
+            }
+
+            // Si tiene un único punto seguido de 1 o 2 dígitos y la parte entera >= 4 dígitos (ej. 12500.50), tratar como decimal
+            const dotParts = s.split('.');
+            if (dotParts.length === 2 && dotParts[1].length <= 2 && dotParts[0].length >= 4 && /^\d+$/.test(dotParts[0]) && /^\d+$/.test(dotParts[1])) {
+                return sign * parseFloat(`${dotParts[0]}.${dotParts[1]}`);
+            }
+
+            // Formato miles argentino o entero puro
+            if (/^\d{1,3}(\.\d{3})*$/.test(s) || /^\d+$/.test(s)) {
+                return sign * parseFloat(s.replace(/\./g, ''));
+            }
+
             return NaN;
         }
-        
-        const parts = str.split(',');
-        if (parts.length !== 2) return NaN;
-        const integerPart = parts[0].replace(/\./g, '');
-        const decimalPart = parts[1].padEnd(2, '0');
-        if (!/^\d+$/.test(integerPart) || !/^\d{1,2}$/.test(parts[1])) return NaN;
-        return parseFloat(integerPart + '.' + decimalPart);
-    }
-    
-    function evaluateExpressionSafe(expr) {
-        if (!/^[0-9+\-*/().\s]+$/.test(expr) || expr.length > 500) throw new Error('Expresión inválida');
-        const result = new Function('return (' + expr + ')')();
-        if (typeof result !== 'number' || !isFinite(result) || Math.abs(result) > 1e15) throw new Error('Resultado inválido');
-        return result;
-    }
-    
-    function convertArgentineToJS(expr) {
-        return expr.replace(/\d{1,3}(?:\.\d{3})*(?:,\d+)?/g, m => parseArgentineNumber(m).toString());
-    }
-    
-    function extractArgentineNumbers(text) {
-        const nums = [];
-        const regex = /\d{1,3}(?:\.\d{3})*(?:,\d+)?|\d+,\d+|\d+/g;
-        const matches = text.match(regex);
-        if (matches) matches.forEach(m => { const n = parseArgentineNumber(m); if (!isNaN(n)) nums.push(n); });
-        return nums;
-    }
-    
-    function formatArgentineNumber(num) {
-        if (isNaN(num) || !isFinite(num)) return '0';
-        return num.toLocaleString('es-AR', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
-    }
-    
-    function formatArgentineInput(input) {
-        let value = input.value.trim().replace(/\s/g, '');
-        if (!value) return;
-        const commaCount = (value.match(/,/g) || []).length;
-        if (commaCount > 1) value = value.substring(0, value.lastIndexOf(',')) + value.substring(value.lastIndexOf(',') + 1);
-        let intPart = '', decPart = '';
-        if (value.includes(',')) {
-            const parts = value.split(',');
-            intPart = parts[0].replace(/\./g, '');
-            decPart = parts[1]?.substring(0, 2) || '';
-        } else {
-            intPart = value.replace(/\./g, '');
+
+        /**
+         * Formateador en vivo que respeta la coma decimal y ceros intermedios (",", ",0", ",05") mientras se escribe
+         */
+        function handleLiveArInput(input) {
+            const raw = input.value.replace(/[^\d.,]/g, '');
+            if (!raw) {
+                input.value = '';
+                return;
+            }
+
+            let intDigits = '';
+            let decDigits = null;
+
+            if (raw.includes(',')) {
+                const parts = raw.split(',');
+                intDigits = parts[0].replace(/\D/g, '');
+                decDigits = parts.slice(1).join('').replace(/\D/g, '').slice(0, 2);
+            } else {
+                intDigits = raw.replace(/\D/g, '');
+            }
+
+            const cleanedInt = intDigits.replace(/^0+(?=\d)/, '');
+            const intFormatted = cleanedInt ? cleanedInt.replace(/\B(?=(\d{3})+(?!\d))/g, '.') : (decDigits !== null ? '0' : '');
+
+            input.value = decDigits !== null ? `${intFormatted},${decDigits}` : intFormatted;
         }
-        if (intPart && !/^\d+$/.test(intPart)) return;
-        if (decPart && !/^\d*$/.test(decPart)) return;
-        const formatted = intPart ? intPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.') : '';
-        input.value = decPart ? formatted + ',' + decPart : formatted;
-    }
-    
-    function displayNumbers() {
-        const display = document.getElementById('numbersDisplay');
-        const tags = document.getElementById('numberTags');
-        const noNumbers = document.getElementById('noNumbers');
-        if (numbers.length) {
-            display?.classList.remove('hidden');
-            noNumbers?.classList.add('hidden');
-            if (tags) tags.innerHTML = numbers.map((n, i) => `<span class="number-tag inline-block bg-indigo-100 dark:bg-indigo-900/50 text-indigo-800 dark:text-indigo-200 px-3 py-1 rounded-full text-xs font-semibold cursor-pointer" onclick="deleteNumber(${i})">${formatArgentineNumber(n)}</span>`).join('');
-            document.getElementById('numberCountBadge').textContent = numbers.length;
-        } else {
-            display?.classList.add('hidden');
-            noNumbers?.classList.remove('hidden');
-            document.getElementById('numberCountBadge').textContent = '0';
+
+        function convertArgentineToJS(expr) {
+            return expr.replace(/\d{1,3}(?:\.\d{3})+(?:,\d+)?|\d+,\d+/g, match => {
+                const n = parseArgentineNumber(match);
+                return isNaN(n) ? match : String(n);
+            });
         }
-        lucide.createIcons();
-    }
-    
-    function deleteNumber(index) { numbers.splice(index, 1); displayNumbers(); if (!numbers.length) document.getElementById('results')?.classList.add('hidden'); showToast('🗑️ Número eliminado', 'info'); }
-    function copyAllNumbers() { navigator.clipboard.writeText(numbers.map(n => formatArgentineNumber(n)).join('\n')); showToast(`📋 ${numbers.length} números copiados`, 'success'); }
-    
-    async function calculateWithLoading(operation) {
-        if (isLoading) { showToast('⏳ Espere...', 'warning'); return; }
-        if (!numbers.length) { showToast('❌ No hay números', 'error'); return; }
-        isLoading = true;
-        await new Promise(r => setTimeout(r, 100));
-        try { calculate(operation); }
-        catch(e) { showToast('❌ Error', 'error'); }
-        finally { isLoading = false; }
-    }
-    
-    function calculate(operation) {
-        const resultsList = document.getElementById('resultsList');
-        let result = '', resultValue = null;
-        switch(operation) {
-            case 'sum': resultValue = numbers.reduce((a,b)=>a+b,0); result = createResultItem('Suma total:', resultValue, true); break;
-            case 'multiply': resultValue = numbers.reduce((a,b)=>a*b,1); result = createResultItem('Producto total:', resultValue, true); break;
-            case 'subtract': resultValue = numbers.reduce((a,b)=>a-b); result = createResultItem('Resta secuencial:', resultValue, true); break;
-            case 'divide': resultValue = numbers.reduce((a,b)=>a/b); result = createResultItem('División secuencial:', resultValue, true); break;
-            case 'average': resultValue = numbers.reduce((a,b)=>a+b,0)/numbers.length; result = createResultItem('Promedio:', resultValue, true); break;
-            case 'stats':
-                const sum = numbers.reduce((a,b)=>a+b,0), avg = sum/numbers.length, min = Math.min(...numbers), max = Math.max(...numbers);
-                result = `${createResultItem('Cantidad:', numbers.length, false)}${createResultItem('Suma:', sum, false)}${createResultItem('Promedio:', avg, false)}${createResultItem('Mínimo:', min, false, 'text-green-600')}${createResultItem('Máximo:', max, false, 'text-red-600')}`;
-                resultValue = sum; break;
+
+        function evaluateExpressionSafe(expr) {
+            if (!/^[0-9+\-*/().\s]+$/.test(expr) || expr.length > 500) {
+                throw new Error('Expresión inválida');
+            }
+            const result = new Function(`return (${expr})`)();
+            if (typeof result !== 'number' || !isFinite(result) || isNaN(result) || Math.abs(result) > 1e15) {
+                throw new Error('Resultado fuera de rango');
+            }
+            return Math.round(result * 10000) / 10000;
         }
-        if (resultsList) resultsList.innerHTML = result;
-        document.getElementById('results')?.classList.remove('hidden');
-        if (resultValue !== null) addToHistory(operation, resultValue);
-        lucide.createIcons();
-        showToast(`✅ ${operation} completada`, 'success');
-    }
-    
-    function createResultItem(label, value, isMain, colorClass = 'text-indigo-600') {
-        const formatted = formatArgentineNumber(value);
-        return `<div class="flex justify-between py-2 border-b border-slate-200 dark:border-slate-600 items-center group"><span class="font-semibold text-slate-700 dark:text-slate-300 ${isMain ? 'text-base' : 'text-sm'}">${label}</span><div class="flex items-center gap-2"><span class="font-mono font-bold ${colorClass} ${isMain ? 'text-lg' : 'text-sm'}">${formatted}</span><button onclick="copySingleResult('${formatted}')" class="opacity-0 group-hover:opacity-100 transition text-xs p-1 hover:bg-slate-200 dark:hover:bg-slate-600 rounded"><i data-lucide="copy" class="w-3 h-3"></i></button></div></div>`;
-    }
-    
-    function addToHistory(operation, value) {
-        const names = { sum:'Suma', multiply:'Multiplicación', subtract:'Resta', divide:'División', average:'Promedio', stats:'Estadísticas' };
-        history.unshift({ id:Date.now(), operation:names[operation], value:formatArgentineNumber(value), time:new Date().toLocaleTimeString('es-AR'), date:new Date().toLocaleDateString('es-AR') });
-        if (history.length > CONSTANTS.MAX_HISTORY_ITEMS) history.pop();
-        saveHistory(); displayHistory();
-    }
-    
-    function displayHistory() {
-        const section = document.getElementById('historySection');
-        const list = document.getElementById('historyList');
-        if (!history.length) { section?.classList.add('hidden'); return; }
-        section?.classList.remove('hidden');
-        if (list) list.innerHTML = history.map(e => `<div class="bg-slate-100 dark:bg-slate-700 p-2 rounded border border-slate-200 dark:border-slate-600 flex justify-between items-center text-xs hover:bg-slate-200 dark:hover:bg-slate-600 transition group"><div><span class="font-semibold">${e.operation}</span><span class="text-slate-500 ml-2">${e.time}</span><div class="text-slate-400 text-[10px]">${e.date}</div><div class="text-slate-600 text-[10px] truncate max-w-[150px]">${e.value}</div></div><button onclick="copySingleResult('${e.value}')" class="p-1 hover:bg-slate-300 rounded opacity-0 group-hover:opacity-100 transition"><i data-lucide="copy" class="w-3 h-3"></i></button></div>`).join('');
-        lucide.createIcons();
-    }
-    
-    function clearHistory() { if (confirm('¿Limpiar historial?')) { history = []; saveHistory(); displayHistory(); showToast('🗑️ Historial limpiado', 'success'); } }
-    function saveHistory() { localStorage.setItem('calcHistory', JSON.stringify(history)); }
-    function loadHistory() { const saved = localStorage.getItem('calcHistory'); if (saved) try { history = JSON.parse(saved); if (!Array.isArray(history)) history = []; } catch(e) { history = []; } }
-    
-    function showToast(message, type = 'success') {
-        const toast = document.getElementById('toast');
-        const colors = { success:'bg-green-100 dark:bg-green-900 text-green-800', error:'bg-red-100 dark:bg-red-900 text-red-800', warning:'bg-yellow-100 dark:bg-yellow-900 text-yellow-800', info:'bg-blue-100 dark:bg-blue-900 text-blue-800' };
-        const icons = { success:'✅', error:'❌', warning:'⚠️', info:'ℹ️' };
-        if (toast) {
-            toast.innerHTML = `<div class="${colors[type]} px-4 py-3 rounded-lg shadow-lg flex items-center gap-2 fade-in border">${icons[type]} ${message}</div>`;
-            toast.classList.remove('hidden');
-            setTimeout(() => toast.classList.add('hidden'), CONSTANTS.TOAST_DURATION);
+
+        /**
+         * Parser mejorado: soporta espacios simples ("1.000 2.500,50 3.000"), símbolos $, viñetas y expresiones con espacios
+         */
+        function parseInput(text) {
+            if (!text || !text.trim()) return [];
+            const results = [];
+            const lines = text.split(/\r?\n/);
+
+            for (const rawLine of lines) {
+                let line = rawLine.trim();
+                if (!line) continue;
+
+                // Quitar viñetas comunes al principio de la línea y símbolos de moneda
+                line = line.replace(/^[•·▪➢*]\s+/, '').replace(/^\-\s+(?=\d)/, '').replace(/[$€]/g, '');
+
+                const chunks = line.split(/[;\t]+/);
+                for (let chunk of chunks) {
+                    chunk = chunk.trim();
+                    if (!chunk) continue;
+
+                    // Unir espacios alrededor de operadores binarios (+, *, /, paréntesis, y '-' entre operandos)
+                    let normalized = chunk
+                        .replace(/\(\s+/g, '(')
+                        .replace(/\s+\)/g, ')')
+                        .replace(/\s*([+*/])\s*/g, '$1')
+                        .replace(/([\d)])\s*-\s*(?=[\d(])/g, '$1-');
+
+                    // Ahora cualquier espacio restante separa distintos valores/expresiones en la misma línea
+                    const tokens = normalized.split(/\s+/);
+
+                    for (const token of tokens) {
+                        if (!token) continue;
+
+                        const directNum = parseArgentineNumber(token);
+                        if (!isNaN(directNum)) {
+                            results.push(directNum);
+                            continue;
+                        }
+
+                        if (/[+\-*/()]/.test(token)) {
+                            try {
+                                const jsExpr = convertArgentineToJS(token);
+                                const val = evaluateExpressionSafe(jsExpr);
+                                results.push(val);
+                                continue;
+                            } catch (e) {
+                                // Si no es expresión válida, extraer números sueltos si existen
+                            }
+                        }
+
+                        const matches = token.match(/-?\d{1,3}(?:\.\d{3})*(?:,\d+)?|-?\d+,\d+|-?\d+/g);
+                        if (matches) {
+                            matches.forEach(m => {
+                                const n = parseArgentineNumber(m);
+                                if (!isNaN(n)) results.push(n);
+                            });
+                        }
+                    }
+                }
+            }
+            return results;
         }
-    }
-    
-    function copySingleResult(text) { navigator.clipboard.writeText(text.replace(/\./g, '').replace(',', '.')); showToast('📋 Copiado', 'success'); }
-    function copyAllResults() { const text = document.getElementById('resultsList')?.innerText; if (text) { navigator.clipboard.writeText(text); showToast('📋 Resultados copiados', 'success'); } }
-    
-    function generateBillInputs() {
-        const container = document.getElementById('billsContainer');
-        if (!container) return;
-        container.innerHTML = '';
-        CONSTANTS.BILL_DENOMINATIONS.forEach(denom => {
-            const div = document.createElement('div');
-            div.className = 'grid grid-cols-[1fr_auto_1fr] gap-3 items-center py-1 border-b border-slate-100 dark:border-slate-700';
-            div.innerHTML = `<label class="text-sm font-semibold">$${formatArgentineNumber(denom)}:</label><input type="number" id="bill${denom}" value="0" min="0" max="${CONSTANTS.MAX_BILLS_PER_DENOM}" oninput="calculateBillTotal()" class="w-20 px-2 py-1 border rounded text-center"><span class="text-sm font-bold text-indigo-600 text-right">= $<span id="total${denom}">0</span></span>`;
-            container.appendChild(div);
-        });
-    }
-    
-    function calculateBillTotal() {
-        let total = 0;
-        CONSTANTS.BILL_DENOMINATIONS.forEach(denom => {
-            const qty = parseInt(document.getElementById(`bill${denom}`)?.value || 0);
-            const subtotal = qty * denom;
-            if (document.getElementById(`total${denom}`)) document.getElementById(`total${denom}`).textContent = formatArgentineNumber(subtotal);
-            total += subtotal;
-        });
-        if (document.getElementById('arqueoTotal')) document.getElementById('arqueoTotal').textContent = formatArgentineNumber(total);
-        checkDifference();
-    }
-    
-    function resetBillCounter() {
-        CONSTANTS.BILL_DENOMINATIONS.forEach(denom => { if (document.getElementById(`bill${denom}`)) document.getElementById(`bill${denom}`).value = 0; });
-        calculateBillTotal();
-        if (document.getElementById('shouldHave')) document.getElementById('shouldHave').value = '';
-        if (document.getElementById('differenceResult')) document.getElementById('differenceResult').innerHTML = '';
-        showToast('🔄 Contador reiniciado', 'info');
-    }
-    
-    function checkDifference() {
-        const actual = parseArgentineNumber(document.getElementById('arqueoTotal')?.textContent || '0') || 0;
-        const shouldHave = parseArgentineNumber(document.getElementById('shouldHave')?.value || '0') || 0;
-        const diff = actual - shouldHave;
-        const resultDiv = document.getElementById('differenceResult');
-        if (!resultDiv) return;
-        if (!shouldHave) { resultDiv.innerHTML = ''; return; }
-        if (Math.abs(diff) < 0.01) resultDiv.innerHTML = '<div class="mt-2 p-2 bg-green-100 dark:bg-green-900 text-green-700 rounded text-xs text-center">✅ PERFECTO</div>';
-        else if (diff > 0) resultDiv.innerHTML = `<div class="mt-2 p-2 bg-yellow-100 dark:bg-yellow-900 text-yellow-700 rounded text-xs text-center">📈 SOBRANTE: ${formatArgentineNumber(Math.abs(diff))}</div>`;
-        else resultDiv.innerHTML = `<div class="mt-2 p-2 bg-red-100 dark:bg-red-900 text-red-700 rounded text-xs text-center">📉 FALTANTE: ${formatArgentineNumber(Math.abs(diff))}</div>`;
-    }
-    
-    function calculateBestPayment() {
-        const amount = parseArgentineNumber(document.getElementById('paymentAmount')?.value || '0') || 0;
-        const breakdownDiv = document.getElementById('paymentBreakdown');
-        if (!breakdownDiv) return;
-        if (!amount) { breakdownDiv.innerHTML = ''; return; }
-        let remaining = Math.floor(amount);
-        const breakdown = {};
-        CONSTANTS.BILL_DENOMINATIONS.forEach(b => { if (remaining >= b) { breakdown[b] = Math.floor(remaining / b); remaining %= b; } });
-        let html = '<div class="bg-slate-50 dark:bg-slate-700 p-3 rounded border"><h4 class="text-sm font-semibold mb-2">💸 Mejor forma:</h4>';
-        CONSTANTS.BILL_DENOMINATIONS.forEach(b => { if (breakdown[b]) html += `<div class="flex justify-between text-sm"><span>${breakdown[b]}x $${formatArgentineNumber(b)}:</span><span class="font-semibold">${formatArgentineNumber(breakdown[b] * b)}</span></div>`; });
-        const total = CONSTANTS.BILL_DENOMINATIONS.reduce((s,b)=>s+((breakdown[b]||0)*b),0);
-        html += `<div class="border-t mt-2 pt-2 flex justify-between font-semibold"><span>Total:</span><span>${formatArgentineNumber(total)}</span></div>`;
-        if (amount - total > 0) html += `<div class="mt-2 p-2 bg-yellow-100 rounded text-xs text-center">Falta (monedas): ${formatArgentineNumber(amount - total)}</div>`;
-        html += '</div>';
-        breakdownDiv.innerHTML = html;
-    }
-    
-    function convertCredits() {
-        const val = parseFloat(document.getElementById('creditValue')?.value || 0);
-        const credits = parseFloat(document.getElementById('credits')?.value || 0);
-        if (val > 0 && credits > 0 && document.getElementById('pesos')) document.getElementById('pesos').value = (credits * val).toFixed(2);
-    }
-    
-    function convertPesos() {
-        const val = parseFloat(document.getElementById('creditValue')?.value || 0);
-        const pesos = parseFloat(document.getElementById('pesos')?.value || 0);
-        if (val > 0 && pesos > 0 && document.getElementById('credits')) document.getElementById('credits').value = (pesos / val).toFixed(2);
-    }
-    
-    function calculateShiftBalance() {
-        const initial = parseArgentineNumber(document.getElementById('initialCash')?.value || '0') || 0;
-        const sales = parseArgentineNumber(document.getElementById('salesAmount')?.value || '0') || 0;
-        const cash = parseArgentineNumber(document.getElementById('cashInBox')?.value || '0') || 0;
-        const expected = initial + sales;
-        const diff = cash - expected;
-        const resultDiv = document.getElementById('shiftResult');
-        if (!resultDiv) return;
-        let html = `<div class="bg-slate-50 dark:bg-slate-700 p-3 rounded border mt-4"><h4 class="text-sm font-semibold mb-2">📊 Resultado:</h4><div class="space-y-1 text-sm"><div class="flex justify-between"><span>Caja inicial:</span><span class="font-semibold">$${formatArgentineNumber(initial)}</span></div><div class="flex justify-between"><span>Ventas:</span><span class="font-semibold">$${formatArgentineNumber(sales)}</span></div><div class="border-t pt-2 mt-1 flex justify-between font-semibold"><span>Debería tener:</span><span>$${formatArgentineNumber(expected)}</span></div><div class="flex justify-between"><span>Dinero real:</span><span class="font-semibold">$${formatArgentineNumber(cash)}</span></div><div class="border-t pt-2 mt-1 flex justify-between font-semibold"><span>Diferencia:</span><span style="color:${diff===0?'#10b981':'#ef4444'}">$${formatArgentineNumber(Math.abs(diff))} ${diff>0?'(Sobrante)':diff<0?'(Faltante)':''}</span></div></div>`;
-        if (Math.abs(diff) < 0.01) html += '<div class="mt-2 p-2 bg-green-100 rounded text-xs text-center">✅ CUADRE PERFECTO</div>';
-        else if (diff > 0) html += '<div class="mt-2 p-2 bg-yellow-100 rounded text-xs text-center">📈 SOBRANTE</div>';
-        else html += '<div class="mt-2 p-2 bg-red-100 rounded text-xs text-center">📉 FALTANTE</div>';
-        html += '</div>';
-        resultDiv.innerHTML = html;
-    }
-    
-    function openModal(id) { const m = document.getElementById(id); if (m) { m.classList.remove('hidden'); setTimeout(() => m.style.opacity = '1', 10); } }
-    function closeModal(id) { const m = document.getElementById(id); if (m) { m.style.opacity = '0'; setTimeout(() => m.classList.add('hidden'), 200); } }
-    function showBillCounter() { openModal('billCounterModal'); calculateBillTotal(); }
-    function closeBillModal() { closeModal('billCounterModal'); }
-    function showPaymentCalc() { openModal('paymentModal'); }
-    function closePaymentModal() { closeModal('paymentModal'); }
-    function showCreditConverter() { openModal('creditModal'); }
-    function closeCreditModal() { closeModal('creditModal'); }
-    function showShiftBalance() { openModal('shiftModal'); }
-    function closeShiftModal() { closeModal('shiftModal'); }
-    function showCurrencyConverter() { openModal('currencyModal'); updateSelectedCurrencyRate(); }
-    function closeCurrencyModal() { closeModal('currencyModal'); }
-    
-    function clearAll() {
-        if (confirm('⚠️ ¿Eliminar todo?')) {
-            if (document.getElementById('numbers')) document.getElementById('numbers').value = '';
-            numbers = [];
+
+        // ==================== ACTUALIZACIÓN EN VIVO Y OPERACIONES ====================
+        function handleNumbersTextareaInput() {
+            const text = document.getElementById('numbers').value;
+            document.getElementById('charCounter').textContent = `${text.length} caracteres`;
+            numbers = parseInput(text);
             displayNumbers();
-            if (document.getElementById('results')) document.getElementById('results').classList.add('hidden');
-            showToast('🗑️ Todo limpiado', 'success');
+            if (lastOperation && numbers.length > 0 && !document.getElementById('results').classList.contains('hidden')) {
+                calculate(lastOperation, false);
+            } else if (numbers.length === 0) {
+                document.getElementById('results').classList.add('hidden');
+            }
         }
-    }
-    
-    window.onclick = (e) => { if (e.target.classList?.contains('modal')) e.target.classList.add('hidden'); };
-    
-    init();
-</script>
+
+        function displayNumbers() {
+            const display = document.getElementById('numbersDisplay');
+            const tags = document.getElementById('numberTags');
+            const noNumbers = document.getElementById('noNumbers');
+            const liveBar = document.getElementById('liveSummaryBar');
+
+            document.getElementById('numberCountBadge').textContent = numbers.length;
+
+            if (numbers.length > 0) {
+                display.classList.remove('hidden');
+                noNumbers.classList.add('hidden');
+                liveBar.classList.remove('hidden');
+
+                const sum = numbers.reduce((a, b) => a + b, 0);
+                const avg = sum / numbers.length;
+                document.getElementById('liveSumVal').textContent = `$${formatArgentineNumber(sum)}`;
+                document.getElementById('liveAvgVal').textContent = `$${formatArgentineNumber(avg)}`;
+                document.getElementById('liveCountVal').textContent = String(numbers.length);
+
+                tags.innerHTML = numbers.map((n, i) => `
+                    <button type="button" onclick="deleteNumber(${i})" title="Quitar ${formatArgentineNumber(n)}"
+                        class="number-tag inline-flex items-center gap-1 bg-indigo-50 dark:bg-indigo-950/70 hover:bg-rose-100 dark:hover:bg-rose-950/80 text-indigo-800 dark:text-indigo-200 hover:text-rose-700 dark:hover:text-rose-300 border border-indigo-200/70 dark:border-indigo-800/60 px-2.5 py-1 rounded-full text-xs font-mono font-semibold">
+                        <span>${formatArgentineNumber(n)}</span>
+                        <span class="text-[10px] opacity-60">×</span>
+                    </button>
+                `).join('');
+            } else {
+                display.classList.add('hidden');
+                noNumbers.classList.remove('hidden');
+                liveBar.classList.add('hidden');
+            }
+        }
+
+        function deleteNumber(index) {
+            numbers.splice(index, 1);
+            document.getElementById('numbers').value = numbers.map(n => formatArgentineNumber(n)).join('\n');
+            document.getElementById('charCounter').textContent = `${document.getElementById('numbers').value.length} caracteres`;
+            displayNumbers();
+
+            if (numbers.length === 0) {
+                document.getElementById('results').classList.add('hidden');
+            } else if (lastOperation && !document.getElementById('results').classList.contains('hidden')) {
+                calculate(lastOperation, false);
+            }
+            showToast('Número eliminado y recalculado', 'info');
+        }
+
+        async function copyAllNumbers() {
+            if (!numbers.length) {
+                showToast('No hay números para copiar', 'warning');
+                return;
+            }
+            await copyTextSafe(numbers.map(n => formatArgentineNumber(n)).join('\n'));
+            showToast(`${numbers.length} números copiados`, 'success');
+        }
+
+        function runCalculation(operation) {
+            if (!numbers.length) {
+                showToast('Ingresa al menos un número primero', 'error');
+                document.getElementById('numbers').focus();
+                return;
+            }
+            calculate(operation, true);
+        }
+
+        function calculate(operation, recordHistory = true) {
+            if (operation === 'divide' && numbers.slice(1).some(n => n === 0)) {
+                showToast('Error: No se puede dividir por cero', 'error');
+                return;
+            }
+
+            lastOperation = operation;
+            const resultsList = document.getElementById('resultsList');
+            let html = '';
+            let resultValue = null;
+
+            switch (operation) {
+                case 'sum':
+                    resultValue = numbers.reduce((a, b) => a + b, 0);
+                    html = createResultItem('Suma Total:', resultValue, true);
+                    break;
+                case 'multiply':
+                    resultValue = numbers.reduce((a, b) => a * b, 1);
+                    html = createResultItem('Producto Total:', resultValue, true);
+                    break;
+                case 'subtract':
+                    resultValue = numbers.reduce((a, b) => a - b);
+                    html = createResultItem('Resta Secuencial:', resultValue, true);
+                    break;
+                case 'divide':
+                    resultValue = numbers.reduce((a, b) => a / b);
+                    html = createResultItem('División Secuencial:', resultValue, true);
+                    break;
+                case 'average':
+                    resultValue = numbers.reduce((a, b) => a + b, 0) / numbers.length;
+                    html = createResultItem('Promedio:', resultValue, true);
+                    break;
+                case 'stats': {
+                    const sum = numbers.reduce((a, b) => a + b, 0);
+                    const avg = sum / numbers.length;
+                    const sorted = [...numbers].sort((a, b) => a - b);
+                    const mid = Math.floor(sorted.length / 2);
+                    const median = sorted.length % 2 !== 0 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
+                    const min = sorted[0];
+                    const max = sorted[sorted.length - 1];
+                    html = [
+                        createResultItem('Cantidad de valores:', numbers.length, false),
+                        createResultItem('Suma Total:', sum, true),
+                        createResultItem('Promedio:', avg, false),
+                        createResultItem('Mediana:', median, false),
+                        createResultItem('Mínimo:', min, false, 'text-emerald-600 dark:text-emerald-400'),
+                        createResultItem('Máximo:', max, false, 'text-rose-600 dark:text-rose-400'),
+                        createResultItem('Rango (Máx − Mín):', max - min, false)
+                    ].join('');
+                    resultValue = sum;
+                    break;
+                }
+            }
+
+            resultsList.innerHTML = html;
+            document.getElementById('results').classList.remove('hidden');
+
+            if (recordHistory && resultValue !== null) {
+                addToHistory(operation, resultValue);
+                showToast('Cálculo completado', 'success');
+            }
+            lucide.createIcons();
+        }
+
+        function createResultItem(label, value, isMain, colorClass = 'text-indigo-600 dark:text-indigo-400') {
+            const formatted = formatArgentineNumber(value);
+            return `
+                <div class="flex justify-between py-2 border-b last:border-b-0 border-slate-100 dark:border-slate-800 items-center gap-2">
+                    <span class="font-medium text-slate-600 dark:text-slate-300 ${isMain ? 'text-sm font-bold' : 'text-xs'}">${escapeHtml(label)}</span>
+                    <div class="flex items-center gap-1.5">
+                        <span class="font-mono font-bold ${colorClass} ${isMain ? 'text-base sm:text-lg' : 'text-xs sm:text-sm'}">${escapeHtml(formatted)}</span>
+                        <button type="button" onclick="copyFormattedValue('${escapeHtml(formatted)}')" class="p-1 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-md transition cursor-pointer" title="Copiar valor">
+                            <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function copyFormattedValue(valStr) {
+            await copyTextSafe(valStr);
+            showToast(`Copiado: ${valStr}`, 'success');
+        }
+
+        async function copyAllResults() {
+            const text = document.getElementById('resultsList')?.innerText;
+            if (text) {
+                await copyTextSafe(text.trim());
+                showToast('Resultados copiados', 'success');
+            }
+        }
+
+        // ==================== HISTORIAL ====================
+        function addToHistory(operation, value) {
+            const names = {
+                sum: 'Suma',
+                multiply: 'Multiplicación',
+                subtract: 'Resta',
+                divide: 'División',
+                average: 'Promedio',
+                stats: 'Estadísticas (Suma)'
+            };
+            history.unshift({
+                id: Date.now(),
+                operation: names[operation] || operation,
+                value: formatArgentineNumber(value),
+                time: new Date().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' }),
+                date: new Date().toLocaleDateString('es-AR')
+            });
+            if (history.length > CONSTANTS.MAX_HISTORY_ITEMS) history.pop();
+            saveHistory();
+            displayHistory();
+        }
+
+        function displayHistory() {
+            const section = document.getElementById('historySection');
+            const list = document.getElementById('historyList');
+            document.getElementById('historyCountLabel').textContent = `${history.length} guardados`;
+
+            if (!history.length) {
+                section.classList.add('hidden');
+                return;
+            }
+
+            section.classList.remove('hidden');
+            list.innerHTML = history.map(e => `
+                <div class="bg-white dark:bg-slate-900 p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 flex justify-between items-center gap-2 text-xs">
+                    <div class="min-w-0 flex-1">
+                        <div class="flex items-center gap-2">
+                            <span class="font-semibold text-slate-800 dark:text-slate-100">${escapeHtml(e.operation)}</span>
+                            <span class="text-[10px] text-slate-400 font-mono">${escapeHtml(e.date)} ${escapeHtml(e.time)}</span>
+                        </div>
+                        <div class="font-mono font-semibold text-indigo-600 dark:text-indigo-400 truncate mt-0.5">${escapeHtml(e.value)}</div>
+                    </div>
+                    <button type="button" onclick="copyFormattedValue('${escapeHtml(String(e.value).replace(/'/g, ''))}')" class="p-1.5 text-slate-400 hover:text-indigo-600 rounded-lg transition cursor-pointer shrink-0" title="Copiar">
+                        <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                    </button>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function saveHistory() {
+            try {
+                localStorage.setItem('calcHistory', JSON.stringify(history));
+            } catch (e) { }
+        }
+
+        function loadHistory() {
+            try {
+                const saved = localStorage.getItem('calcHistory');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    if (Array.isArray(parsed)) history = parsed;
+                }
+            } catch (e) {
+                history = [];
+            }
+        }
+
+        function clearHistory() {
+            if (!history.length) return;
+            if (confirm('¿Vaciar el historial de operaciones?')) {
+                history = [];
+                saveHistory();
+                displayHistory();
+                showToast('Historial vaciado', 'info');
+            }
+        }
+
+        function clearAll() {
+            document.getElementById('numbers').value = '';
+            numbers = [];
+            lastOperation = null;
+            document.getElementById('charCounter').textContent = '0 caracteres';
+            displayNumbers();
+            document.getElementById('results').classList.add('hidden');
+            showToast('Números limpiados', 'info');
+        }
+
+        // ==================== DIVISAS Y COTIZACIONES ====================
+        function renderExchangeCards() {
+            document.getElementById('officialRate').innerHTML = `$${formatArgentineNumber(dollarRates.official.value)}<div class="text-[9px] opacity-75">C: $${formatArgentineNumber(dollarRates.official.compra || dollarRates.official.value)}</div>`;
+            document.getElementById('blueRate').innerHTML = `$${formatArgentineNumber(dollarRates.blue.value)}<div class="text-[9px] opacity-75">C: $${formatArgentineNumber(dollarRates.blue.compra || dollarRates.blue.value)}</div>`;
+            document.getElementById('customDollarRateDisplay').textContent = customDollarRate > 0 ? `$${formatArgentineNumber(customDollarRate)}` : 'Sin def.';
+
+            document.getElementById('officialEuroRate').innerHTML = `$${formatArgentineNumber(euroRates.official.value)}<div class="text-[9px] opacity-75">C: $${formatArgentineNumber(euroRates.official.compra || euroRates.official.value)}</div>`;
+            document.getElementById('blueEuroRate').innerHTML = `$${formatArgentineNumber(euroRates.blue.value)}<div class="text-[9px] opacity-75">Brecha USD</div>`;
+            document.getElementById('customEuroRateDisplay').textContent = customEuroRate > 0 ? `$${formatArgentineNumber(customEuroRate)}` : 'Sin def.';
+        }
+
+        function loadCachedRates() {
+            try {
+                const cachedUsd = JSON.parse(localStorage.getItem('dollarRates') || 'null');
+                if (cachedUsd?.official?.value) dollarRates.official = cachedUsd.official;
+                if (cachedUsd?.blue?.value) dollarRates.blue = cachedUsd.blue;
+
+                const cachedEur = JSON.parse(localStorage.getItem('euroRates') || 'null');
+                if (cachedEur?.official?.value) euroRates.official = cachedEur.official;
+                if (cachedEur?.blue?.value) euroRates.blue = cachedEur.blue;
+
+                const savedTime = localStorage.getItem('ratesLastUpdate');
+                if (savedTime) document.getElementById('lastUpdate').textContent = `${savedTime} (caché)`;
+
+                const savedCustomUsd = parseFloat(localStorage.getItem('customDollarRate') || '0');
+                if (savedCustomUsd > 0) {
+                    customDollarRate = savedCustomUsd;
+                    dollarRates.custom.value = savedCustomUsd;
+                }
+
+                const savedCustomEur = parseFloat(localStorage.getItem('customEuroRate') || '0');
+                if (savedCustomEur > 0) {
+                    customEuroRate = savedCustomEur;
+                    euroRates.custom.value = savedCustomEur;
+                }
+            } catch (e) { }
+            renderExchangeCards();
+        }
+
+        async function refreshAllRates(silent = false) {
+            let updated = false;
+            try {
+                const resUsd = await fetch(CONSTANTS.DOLLAR_API_URL);
+                if (resUsd.ok) {
+                    const data = await resUsd.json();
+                    const official = data.find(d => d.nombre === 'Oficial');
+                    const blue = data.find(d => d.nombre === 'Blue');
+                    if (official?.venta) {
+                        dollarRates.official = { value: official.venta, compra: official.compra || official.venta };
+                        updated = true;
+                    }
+                    if (blue?.venta) {
+                        dollarRates.blue = { value: blue.venta, compra: blue.compra || blue.venta };
+                        updated = true;
+                    }
+                }
+            } catch (e) { }
+
+            try {
+                const resEur = await fetch(CONSTANTS.EURO_API_URL);
+                if (resEur.ok) {
+                    const data = await resEur.json();
+                    if (data?.venta) {
+                        euroRates.official = { value: data.venta, compra: data.compra || data.venta };
+                        const spread = (dollarRates.official.value > 0 && dollarRates.blue.value > 0)
+                            ? (dollarRates.blue.value / dollarRates.official.value)
+                            : 1.05;
+                        euroRates.blue = {
+                            value: Math.round(euroRates.official.value * spread * 100) / 100,
+                            compra: Math.round((data.compra || data.venta) * spread * 100) / 100
+                        };
+                        updated = true;
+                    }
+                }
+            } catch (e) { }
+
+            if (updated) {
+                const timeStr = new Date().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
+                document.getElementById('lastUpdate').textContent = timeStr;
+                try {
+                    localStorage.setItem('dollarRates', JSON.stringify({ official: dollarRates.official, blue: dollarRates.blue }));
+                    localStorage.setItem('euroRates', JSON.stringify({ official: euroRates.official, blue: euroRates.blue }));
+                    localStorage.setItem('ratesLastUpdate', timeStr);
+                } catch (e) { }
+                renderExchangeCards();
+                updateSelectedCurrencyRate();
+                if (!silent) showToast('Cotizaciones actualizadas', 'success');
+            } else if (!silent) {
+                showToast('Sin conexión: usando última cotización guardada', 'warning');
+            }
+        }
+
+        function openConverterWith(currency, type) {
+            currentCurrency = currency;
+            currentExchangeType = type;
+            showCurrencyConverter();
+        }
+
+        function selectCurrency(currency) {
+            currentCurrency = currency;
+            const usdTab = document.getElementById('usdTab');
+            const eurTab = document.getElementById('eurTab');
+            const activeCls = 'py-2 rounded-xl text-xs sm:text-sm font-semibold transition cursor-pointer bg-indigo-600 text-white';
+            const inactiveCls = 'py-2 rounded-xl text-xs sm:text-sm font-semibold transition cursor-pointer bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300';
+
+            usdTab.className = currency === 'usd' ? activeCls : inactiveCls;
+            eurTab.className = currency === 'eur' ? activeCls : inactiveCls;
+
+            setCurrencyExchangeType(currentExchangeType);
+            updateConversionLabels();
+            convertCurrency();
+        }
+
+        function setCurrencyExchangeType(type) {
+            currentExchangeType = type;
+            const map = {
+                official: document.getElementById('useOfficialCurrencyBtn'),
+                blue: document.getElementById('useBlueCurrencyBtn'),
+                custom: document.getElementById('useCustomCurrencyBtn')
+            };
+            const activeCls = 'px-2 py-2 rounded-xl font-semibold transition text-xs cursor-pointer bg-indigo-600 text-white';
+            const inactiveCls = 'px-2 py-2 rounded-xl font-semibold transition text-xs cursor-pointer bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300';
+
+            Object.entries(map).forEach(([k, btn]) => {
+                btn.className = k === type ? activeCls : inactiveCls;
+            });
+
+            const customSection = document.getElementById('customCurrencyRateSection');
+            if (type === 'custom') {
+                customSection.classList.remove('hidden');
+                const saved = currentCurrency === 'usd' ? customDollarRate : customEuroRate;
+                document.getElementById('customCurrencyRate').value = saved > 0 ? formatArgentineNumber(saved) : '';
+            } else {
+                customSection.classList.add('hidden');
+            }
+
+            updateSelectedCurrencyRate();
+            convertCurrency();
+        }
+
+        function getActiveRate() {
+            const rates = currentCurrency === 'usd' ? dollarRates : euroRates;
+            if (currentExchangeType === 'official') return rates.official.value;
+            if (currentExchangeType === 'blue') return rates.blue.value;
+            return currentCurrency === 'usd' ? customDollarRate : customEuroRate;
+        }
+
+        function getActiveRateName() {
+            const currencyName = currentCurrency === 'usd' ? 'Dólar' : 'Euro';
+            if (currentExchangeType === 'official') return `${currencyName} Oficial`;
+            if (currentExchangeType === 'blue') return currentCurrency === 'usd' ? 'Dólar Blue' : 'Euro Referencia';
+            return `${currencyName} Personal`;
+        }
+
+        function updateSelectedCurrencyRate() {
+            const rate = getActiveRate();
+            document.getElementById('selectedCurrencyType').textContent = getActiveRateName();
+            document.getElementById('selectedCurrencyRate').textContent = rate > 0 ? `$${formatArgentineNumber(rate, 2)} ARS` : 'Sin definir';
+        }
+
+        function setCustomCurrencyRate() {
+            const parsed = parseArgentineNumber(document.getElementById('customCurrencyRate').value);
+            if (isNaN(parsed) || parsed <= 0) {
+                showToast('Ingresa una cotización mayor a 0', 'error');
+                return;
+            }
+
+            if (currentCurrency === 'usd') {
+                customDollarRate = parsed;
+                dollarRates.custom.value = parsed;
+                try { localStorage.setItem('customDollarRate', String(parsed)); } catch (e) { }
+            } else {
+                customEuroRate = parsed;
+                euroRates.custom.value = parsed;
+                try { localStorage.setItem('customEuroRate', String(parsed)); } catch (e) { }
+            }
+
+            renderExchangeCards();
+            updateSelectedCurrencyRate();
+            convertCurrency();
+            showToast(`Cotización guardada: $${formatArgentineNumber(parsed, 2)}`, 'success');
+        }
+
+        function toggleConversionDirection() {
+            conversionDirection = conversionDirection === 'toArs' ? 'fromArs' : 'toArs';
+            updateConversionLabels();
+            convertCurrency();
+        }
+
+        function updateConversionLabels() {
+            const code = currentCurrency === 'usd' ? 'USD' : 'EUR';
+            const name = currentCurrency === 'usd' ? 'Dólares (USD)' : 'Euros (EUR)';
+            if (conversionDirection === 'toArs') {
+                document.getElementById('currencyAmountLabel').textContent = `Monto en ${name}:`;
+                document.getElementById('currencyResultLabel').textContent = 'Equivalente a entregar en Pesos (ARS)';
+            } else {
+                document.getElementById('currencyAmountLabel').textContent = 'Monto en Pesos Argentinos (ARS):';
+                document.getElementById('currencyResultLabel').textContent = `Equivalente en ${name}`;
+            }
+            lucide.createIcons();
+        }
+
+        function convertCurrency() {
+            const amount = parseArgentineNumber(document.getElementById('currencyAmount').value);
+            const rate = getActiveRate();
+            const resEl = document.getElementById('currencyPesosResult');
+            const breakdownEl = document.getElementById('currencyBillBreakdown');
+            const sym = currentCurrency === 'usd' ? 'USD' : 'EUR';
+
+            if (isNaN(amount) || amount <= 0 || rate <= 0) {
+                resEl.textContent = conversionDirection === 'toArs' ? '$ 0,00' : `${sym} 0,00`;
+                breakdownEl.classList.add('hidden');
+                return;
+            }
+
+            if (conversionDirection === 'toArs') {
+                const pesos = amount * rate;
+                resEl.textContent = `$ ${formatArgentineNumber(pesos, 2)}`;
+                renderBillBreakdownInto(pesos, breakdownEl);
+            } else {
+                const foreign = amount / rate;
+                resEl.textContent = `${sym} ${formatArgentineNumber(foreign, 2)}`;
+                breakdownEl.classList.add('hidden');
+            }
+        }
+
+        function renderBillBreakdownInto(pesosAmount, container) {
+            let remaining = Math.floor(pesosAmount);
+            const breakdown = {};
+            CONSTANTS.BILL_DENOMINATIONS.forEach(b => {
+                if (remaining >= b) {
+                    breakdown[b] = Math.floor(remaining / b);
+                    remaining %= b;
+                }
+            });
+
+            const usedBills = CONSTANTS.BILL_DENOMINATIONS.filter(b => breakdown[b] > 0);
+            if (!usedBills.length) {
+                container.classList.add('hidden');
+                return;
+            }
+
+            const rows = usedBills.map(b => `
+                <div class="flex justify-between text-xs py-0.5">
+                    <span class="text-slate-600 dark:text-slate-300 font-mono">${breakdown[b]} × $${formatArgentineNumber(b)}</span>
+                    <span class="font-mono font-semibold text-indigo-600 dark:text-indigo-400">$${formatArgentineNumber(breakdown[b] * b)}</span>
+                </div>
+            `).join('');
+
+            const resto = pesosAmount - Math.floor(pesosAmount) + remaining;
+            container.innerHTML = `
+                <div class="bg-slate-50 dark:bg-slate-950 p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 space-y-1">
+                    <div class="text-xs font-semibold text-slate-700 dark:text-slate-200 mb-1">Sugerencia de billetes a entregar:</div>
+                    ${rows}
+                    ${resto >= 0.01 ? `<div class="text-[11px] text-amber-600 dark:text-amber-400 pt-1 border-t border-slate-200 dark:border-slate-800">Resto en cambio chico / centavos: $${formatArgentineNumber(resto, 2)}</div>` : ''}
+                </div>
+            `;
+            container.classList.remove('hidden');
+        }
+
+        function clearCurrencyForm() {
+            document.getElementById('currencyAmount').value = '';
+            convertCurrency();
+        }
+
+        function addCurrencyConversionToHistory() {
+            const amount = parseArgentineNumber(document.getElementById('currencyAmount').value);
+            const rate = getActiveRate();
+            if (isNaN(amount) || amount <= 0 || rate <= 0) {
+                showToast('Ingresa un monto y cotización válidos', 'error');
+                return;
+            }
+
+            const sym = currentCurrency === 'usd' ? 'USD' : 'EUR';
+            let opTitle = '';
+            let valDesc = '';
+
+            if (conversionDirection === 'toArs') {
+                const pesos = amount * rate;
+                opTitle = `${sym} → ARS (${getActiveRateName()})`;
+                valDesc = `$${formatArgentineNumber(pesos, 2)}`;
+            } else {
+                const foreign = amount / rate;
+                opTitle = `ARS → ${sym} (${getActiveRateName()})`;
+                valDesc = `${sym} ${formatArgentineNumber(foreign, 2)}`;
+            }
+
+            history.unshift({
+                id: Date.now(),
+                operation: opTitle,
+                value: valDesc,
+                time: new Date().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' }),
+                date: new Date().toLocaleDateString('es-AR')
+            });
+            if (history.length > CONSTANTS.MAX_HISTORY_ITEMS) history.pop();
+            saveHistory();
+            displayHistory();
+            showToast('Conversión guardada en historial', 'success');
+        }
+
+        // ==================== CONTADOR DE BILLETES (PERSISTENTE + FAJOS) ====================
+        function generateBillInputs() {
+            const container = document.getElementById('billsContainer');
+            container.innerHTML = CONSTANTS.BILL_DENOMINATIONS.map(denom => `
+                <div class="grid grid-cols-12 gap-2 items-center py-1.5 border-b last:border-b-0 border-slate-100 dark:border-slate-800">
+                    <label for="bill${denom}" class="col-span-3 text-xs sm:text-sm font-mono font-bold text-slate-700 dark:text-slate-200">$${formatArgentineNumber(denom)}</label>
+                    <div class="col-span-5 flex items-center gap-1">
+                        <input type="number" id="bill${denom}" value="0" min="0" max="${CONSTANTS.MAX_BILLS_PER_DENOM}"
+                            onfocus="if(this.value==='0') this.value=''"
+                            onblur="if(this.value==='') { this.value='0'; calculateBillTotal(); }"
+                            oninput="calculateBillTotal(); saveBillCounterState();"
+                            class="w-full px-2 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-center font-mono text-sm text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500">
+                        <button type="button" onclick="addFajo(${denom})" title="Sumar 1 fajo (+100 billetes)"
+                            class="px-2 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-indigo-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-lg text-[11px] font-mono font-semibold shrink-0 cursor-pointer">
+                            +100
+                        </button>
+                    </div>
+                    <span class="col-span-4 text-xs sm:text-sm font-mono font-bold text-indigo-600 dark:text-indigo-400 text-right">$<span id="total${denom}">0</span></span>
+                </div>
+            `).join('');
+        }
+
+        function addFajo(denom) {
+            const el = document.getElementById(`bill${denom}`);
+            const current = Math.max(0, parseInt(el.value || '0', 10) || 0);
+            el.value = current + 100;
+            calculateBillTotal();
+            saveBillCounterState();
+        }
+
+        function getBillCounterTotal() {
+            return CONSTANTS.BILL_DENOMINATIONS.reduce((sum, denom) => {
+                const qty = Math.max(0, parseInt(document.getElementById(`bill${denom}`)?.value || '0', 10) || 0);
+                return sum + qty * denom;
+            }, 0);
+        }
+
+        function calculateBillTotal() {
+            let total = 0;
+            CONSTANTS.BILL_DENOMINATIONS.forEach(denom => {
+                const qty = Math.max(0, parseInt(document.getElementById(`bill${denom}`)?.value || '0', 10) || 0);
+                const sub = qty * denom;
+                const subEl = document.getElementById(`total${denom}`);
+                if (subEl) subEl.textContent = formatArgentineNumber(sub);
+                total += sub;
+            });
+            document.getElementById('arqueoTotal').textContent = formatArgentineNumber(total);
+            document.getElementById('billBadgeHeader').textContent = `$${formatArgentineNumber(total)}`;
+            checkDifference();
+        }
+
+        function saveBillCounterState() {
+            try {
+                const bills = {};
+                CONSTANTS.BILL_DENOMINATIONS.forEach(d => {
+                    bills[d] = Math.max(0, parseInt(document.getElementById(`bill${d}`)?.value || '0', 10) || 0);
+                });
+                const shouldHave = document.getElementById('shouldHave')?.value || '';
+                localStorage.setItem('slotBillCounterState', JSON.stringify({ bills, shouldHave }));
+            } catch (e) { }
+        }
+
+        function loadBillCounterState() {
+            try {
+                const saved = JSON.parse(localStorage.getItem('slotBillCounterState') || 'null');
+                if (saved?.bills) {
+                    CONSTANTS.BILL_DENOMINATIONS.forEach(d => {
+                        const el = document.getElementById(`bill${d}`);
+                        if (el && saved.bills[d] !== undefined) el.value = saved.bills[d];
+                    });
+                }
+                if (saved?.shouldHave) {
+                    document.getElementById('shouldHave').value = saved.shouldHave;
+                }
+            } catch (e) { }
+            calculateBillTotal();
+        }
+
+        function resetBillCounter() {
+            CONSTANTS.BILL_DENOMINATIONS.forEach(d => {
+                const el = document.getElementById(`bill${d}`);
+                if (el) el.value = 0;
+            });
+            document.getElementById('shouldHave').value = '';
+            document.getElementById('differenceResult').innerHTML = '';
+            calculateBillTotal();
+            saveBillCounterState();
+            showToast('Contador de billetes en cero', 'info');
+        }
+
+        function checkDifference() {
+            const actual = getBillCounterTotal();
+            const shouldVal = parseArgentineNumber(document.getElementById('shouldHave')?.value || '');
+            const resultDiv = document.getElementById('differenceResult');
+            if (!resultDiv) return;
+
+            if (isNaN(shouldVal) || shouldVal <= 0) {
+                resultDiv.innerHTML = '';
+                return;
+            }
+
+            const diff = actual - shouldVal;
+            if (Math.abs(diff) < 0.01) {
+                resultDiv.innerHTML = '<div class="p-2.5 bg-emerald-500/25 border border-emerald-400/40 text-white rounded-xl text-xs font-bold text-center">✅ ARQUEO EXACTO (Diferencia $0,00)</div>';
+            } else if (diff > 0) {
+                resultDiv.innerHTML = `<div class="p-2.5 bg-amber-500/25 border border-amber-400/40 text-white rounded-xl text-xs font-bold text-center">📈 SOBRANTE DE CAJA: +$${formatArgentineNumber(diff, 2)}</div>`;
+            } else {
+                resultDiv.innerHTML = `<div class="p-2.5 bg-rose-500/35 border border-rose-400/50 text-white rounded-xl text-xs font-bold text-center">📉 FALTANTE DE CAJA: -$${formatArgentineNumber(Math.abs(diff), 2)}</div>`;
+            }
+        }
+
+        async function copyBillArqueoReport() {
+            const lines = [];
+            let total = 0;
+            CONSTANTS.BILL_DENOMINATIONS.forEach(d => {
+                const qty = Math.max(0, parseInt(document.getElementById(`bill${d}`)?.value || '0', 10) || 0);
+                if (qty > 0) {
+                    const sub = qty * d;
+                    total += sub;
+                    lines.push(`• $${formatArgentineNumber(d)} × ${qty} = $${formatArgentineNumber(sub)}`);
+                }
+            });
+
+            if (!lines.length) {
+                showToast('No hay billetes cargados aún', 'warning');
+                return;
+            }
+
+            let report = `ARQUEO DE BILLETES (${new Date().toLocaleString('es-AR')})\n${lines.join('\n')}\nTOTAL CONTADO: $${formatArgentineNumber(total)}`;
+            const shouldVal = parseArgentineNumber(document.getElementById('shouldHave')?.value || '');
+            if (!isNaN(shouldVal) && shouldVal > 0) {
+                const diff = total - shouldVal;
+                report += `\nESPERADO: $${formatArgentineNumber(shouldVal, 2)}\nDIFERENCIA: ${diff >= 0 ? '+' : '-'}$${formatArgentineNumber(Math.abs(diff), 2)}`;
+            }
+
+            await copyTextSafe(report);
+            showToast('Detalle de arqueo copiado', 'success');
+        }
+
+        function sendArqueoToShiftModal() {
+            const total = getBillCounterTotal();
+            closeModal('billCounterModal');
+            showShiftBalance();
+            document.getElementById('cashInBox').value = total > 0 ? formatArgentineNumber(total) : '';
+            calculateShiftBalance();
+        }
+
+        // ==================== DESGLOSE DE ENTREGA ====================
+        function calculateBestPayment() {
+            const amount = parseArgentineNumber(document.getElementById('paymentAmount').value);
+            const breakdownDiv = document.getElementById('paymentBreakdown');
+            if (isNaN(amount) || amount <= 0) {
+                breakdownDiv.innerHTML = '';
+                return;
+            }
+            renderBillBreakdownInto(amount, breakdownDiv);
+            breakdownDiv.classList.remove('hidden');
+        }
+
+        // ==================== CRÉDITOS ⇄ PESOS ====================
+        function setDenom(val) {
+            document.getElementById('creditValue').value = val;
+            if (document.getElementById('credits').value.trim()) {
+                convertCredits();
+            } else if (document.getElementById('pesos').value.trim()) {
+                convertPesos();
+            }
+        }
+
+        function convertCredits() {
+            const val = parseFloat(document.getElementById('creditValue').value || '0');
+            const credits = parseArgentineNumber(document.getElementById('credits').value);
+            const resBox = document.getElementById('conversionResult');
+
+            if (val > 0 && !isNaN(credits) && credits > 0) {
+                const totalPesos = credits * val;
+                document.getElementById('pesos').value = formatArgentineNumber(totalPesos);
+                resBox.innerHTML = `<b>${formatArgentineNumber(credits)} créditos</b> a $${formatArgentineNumber(val, 2)} = <b class="font-mono text-sm">$${formatArgentineNumber(totalPesos, 2)}</b>`;
+            } else {
+                document.getElementById('pesos').value = '';
+                resBox.textContent = 'Ingresa créditos o pesos para ver la equivalencia exacta.';
+            }
+        }
+
+        function convertPesos() {
+            const val = parseFloat(document.getElementById('creditValue').value || '0');
+            const pesos = parseArgentineNumber(document.getElementById('pesos').value);
+            const resBox = document.getElementById('conversionResult');
+
+            if (val > 0 && !isNaN(pesos) && pesos > 0) {
+                const totalCredits = pesos / val;
+                document.getElementById('credits').value = formatArgentineNumber(totalCredits);
+                resBox.innerHTML = `<b>$${formatArgentineNumber(pesos, 2)}</b> equivalen a <b class="font-mono text-sm">${formatArgentineNumber(totalCredits)} créditos</b>`;
+            } else {
+                document.getElementById('credits').value = '';
+                resBox.textContent = 'Ingresa créditos o pesos para ver la equivalencia exacta.';
+            }
+        }
+
+        // ==================== CUADRE DE TURNO ====================
+        function pullFromBillCounter() {
+            const total = getBillCounterTotal();
+            if (total <= 0) {
+                showToast('El Contador de Billetes está en $0', 'warning');
+                return;
+            }
+            document.getElementById('cashInBox').value = formatArgentineNumber(total);
+            calculateShiftBalance();
+            showToast('Total traído del Contador de Billetes', 'success');
+        }
+
+        function calculateShiftBalance() {
+            const initial = parseArgentineNumber(document.getElementById('initialCash').value) || 0;
+            const sales = parseArgentineNumber(document.getElementById('salesAmount').value) || 0;
+            const payouts = parseArgentineNumber(document.getElementById('payoutsAmount').value) || 0;
+            const cashRaw = document.getElementById('cashInBox').value.trim();
+            const cash = parseArgentineNumber(cashRaw) || 0;
+
+            const resultDiv = document.getElementById('shiftResult');
+            if (!initial && !sales && !payouts && !cashRaw) {
+                resultDiv.innerHTML = '';
+                return;
+            }
+
+            const expected = initial + sales - payouts;
+            const diff = cash - expected;
+
+            let badgeHtml = '';
+            if (cashRaw) {
+                if (Math.abs(diff) < 0.01) {
+                    badgeHtml = '<div class="mt-2.5 p-2 bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 rounded-lg text-xs font-bold text-center">✅ CUADRE PERFECTO ($0,00)</div>';
+                } else if (diff > 0) {
+                    badgeHtml = `<div class="mt-2.5 p-2 bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 rounded-lg text-xs font-bold text-center">📈 SOBRANTE: +$${formatArgentineNumber(diff, 2)}</div>`;
+                } else {
+                    badgeHtml = `<div class="mt-2.5 p-2 bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 rounded-lg text-xs font-bold text-center">📉 FALTANTE: -$${formatArgentineNumber(Math.abs(diff), 2)}</div>`;
+                }
+            }
+
+            resultDiv.innerHTML = `
+                <div class="bg-slate-50 dark:bg-slate-950 p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 text-xs space-y-1.5">
+                    <div class="flex justify-between"><span>Saldo esperado en caja:</span><span class="font-mono font-bold text-indigo-600 dark:text-indigo-400">$${formatArgentineNumber(expected, 2)}</span></div>
+                    ${cashRaw ? `<div class="flex justify-between"><span>Efectivo real contado:</span><span class="font-mono font-semibold">$${formatArgentineNumber(cash, 2)}</span></div>` : ''}
+                    ${badgeHtml}
+                </div>
+            `;
+        }
+
+        function clearShiftBalance() {
+            ['initialCash', 'salesAmount', 'payoutsAmount', 'cashInBox'].forEach(id => {
+                document.getElementById(id).value = '';
+            });
+            document.getElementById('shiftResult').innerHTML = '';
+        }
+
+        // ==================== MODALES Y NOTIFICACIONES ====================
+        function openModal(id) {
+            document.getElementById(id)?.classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        function closeModal(id) {
+            document.getElementById(id)?.classList.add('hidden');
+        }
+
+        function closeAllModals() {
+            document.querySelectorAll('.modal').forEach(m => m.classList.add('hidden'));
+        }
+
+        function showBillCounter() {
+            openModal('billCounterModal');
+            calculateBillTotal();
+        }
+
+        function showPaymentCalc() {
+            openModal('paymentModal');
+        }
+
+        function showCreditConverter() {
+            openModal('creditModal');
+        }
+
+        function showShiftBalance() {
+            openModal('shiftModal');
+            calculateShiftBalance();
+        }
+
+        function showCurrencyConverter() {
+            selectCurrency(currentCurrency);
+            openModal('currencyModal');
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const styles = {
+                success: 'bg-emerald-600 border-emerald-400/40 text-white',
+                error: 'bg-rose-600 border-rose-400/40 text-white',
+                warning: 'bg-amber-600 border-amber-400/40 text-white',
+                info: 'bg-slate-800 border-slate-700 text-white'
+            };
+            toast.innerHTML = `<div class="${styles[type] || styles.success} px-4 py-2.5 rounded-xl shadow-xl text-xs sm:text-sm font-medium fade-in border">${escapeHtml(message)}</div>`;
+            toast.classList.remove('hidden');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => toast.classList.add('hidden'), CONSTANTS.TOAST_DURATION);
+        }
+
+        // ==================== EVENTOS Y ATAJOS REALES ====================
+        function setupEventsAndShortcuts() {
+            const textarea = document.getElementById('numbers');
+            textarea.addEventListener('input', handleNumbersTextareaInput);
+
+            // Drag & Drop de archivos .txt
+            textarea.addEventListener('dragover', e => {
+                e.preventDefault();
+                textarea.classList.add('drag-over');
+            });
+            textarea.addEventListener('dragleave', () => textarea.classList.remove('drag-over'));
+            textarea.addEventListener('drop', e => {
+                e.preventDefault();
+                textarea.classList.remove('drag-over');
+                const file = e.dataTransfer.files[0];
+                if (file && (file.type === 'text/plain' || file.name.endsWith('.txt'))) {
+                    const reader = new FileReader();
+                    reader.onload = ev => {
+                        textarea.value = ev.target.result;
+                        handleNumbersTextareaInput();
+                        showToast('Archivo .txt cargado', 'success');
+                    };
+                    reader.readAsText(file);
+                } else if (file) {
+                    showToast('Arrastra únicamente archivos .txt', 'error');
+                }
+            });
+
+            // Atajos de teclado prometidos en pantalla (Ctrl+Enter y Alt+1..6) + Escape
+            const opByDigit = { '1': 'sum', '2': 'multiply', '3': 'subtract', '4': 'divide', '5': 'average', '6': 'stats' };
+            document.addEventListener('keydown', e => {
+                if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                    e.preventDefault();
+                    runCalculation(lastOperation || 'sum');
+                } else if (e.altKey && opByDigit[e.key]) {
+                    e.preventDefault();
+                    runCalculation(opByDigit[e.key]);
+                } else if (!e.ctrlKey && !e.metaKey && !e.altKey && opByDigit[e.key]) {
+                    const tag = document.activeElement?.tagName;
+                    if (tag !== 'INPUT' && tag !== 'TEXTAREA' && tag !== 'SELECT') {
+                        e.preventDefault();
+                        runCalculation(opByDigit[e.key]);
+                    }
+                } else if (e.key === 'Escape') {
+                    closeAllModals();
+                }
+            });
+
+            window.addEventListener('click', e => {
+                if (e.target.classList?.contains('modal')) {
+                    e.target.classList.add('hidden');
+                }
+            });
+        }
+
+        // ==================== INICIALIZAR ====================
+        function init() {
+            loadHistory();
+            displayHistory();
+            generateBillInputs();
+            loadBillCounterState();
+            loadCachedRates();
+            setupEventsAndShortcuts();
+            lucide.createIcons();
+
+            refreshAllRates(true);
+            setInterval(() => refreshAllRates(true), CONSTANTS.CACHE_DURATION);
+        }
+
+        init();
+    </script>
+</body>
+
 </html>
