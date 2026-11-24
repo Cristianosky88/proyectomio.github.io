@@ -1,0 +1,2085 @@
+<!DOCTYPE html>
+<html lang="es" class="">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Control de Asistencia y Auditoría CCTV</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'Segoe UI', 'sans-serif'],
+            mono: ['JetBrains Mono', 'Consolas', 'monospace']
+          }
+        }
+      }
+    };
+    (function () {
+      try {
+        if (localStorage.getItem('cctv_theme') === 'dark') {
+          document.documentElement.classList.add('dark');
+        }
+      } catch (e) { }
+    })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="css/global.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body
+  class="bg-slate-100 dark:bg-slate-950 p-3 sm:p-5 md:p-8 text-slate-800 dark:text-slate-100 min-h-screen font-sans transition-colors duration-200">
+
+  <div
+    class="max-w-6xl mx-auto bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 transition-colors duration-200">
+
+    <!-- Header Estándar -->
+    <header
+      class="no-print bg-slate-900 dark:bg-slate-950 border-b border-slate-800 px-4 sm:px-6 py-4 rounded-t-2xl text-white flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="bg-indigo-600 p-2.5 rounded-xl shadow-sm shrink-0 flex items-center justify-center">
+          <i data-lucide="activity" class="w-6 h-6 text-white"></i>
+        </div>
+        <div>
+          <h1 class="text-lg sm:text-xl font-bold leading-tight text-white flex flex-wrap items-center gap-2">
+            Auditoría de Turno & Control CCTV
+            <span id="headerMeta"
+              class="text-xs font-mono font-medium px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">Meta:
+              08:30 hs</span>
+          </h1>
+          <p class="text-xs text-slate-400 uppercase tracking-wider"><span id="fechaTurnoHeader">Control de Turno</span>
+            · Asistencia, Cámaras y Descansos</p>
+        </div>
+      </div>
+
+      <!-- Botones de Acción Global + Barra Universal -->
+      <div class="flex flex-wrap items-center gap-2 no-print">
+        <button type="button" onclick="autocompletarHuecos()"
+          class="px-3 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-sm transition flex items-center gap-1.5 cursor-pointer"
+          title="Rellena automáticamente los minutos vacíos entre actividades">
+          <i data-lucide="sparkles" class="w-4 h-4"></i>
+          <span class="hidden sm:inline">Autocompletar</span>
+        </button>
+
+        <button type="button" onclick="guardarAuditoriaEnHistorial()"
+          class="px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-sm transition flex items-center gap-1.5 cursor-pointer"
+          title="Guardar auditoría actual en el historial local">
+          <i data-lucide="save" class="w-4 h-4"></i>
+          <span class="hidden md:inline">Guardar</span>
+        </button>
+
+        <button type="button" onclick="abrirModalHistorial()"
+          class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer"
+          title="Ver auditorías guardadas">
+          <i data-lucide="folder-clock" class="w-4 h-4 text-indigo-400"></i>
+          <span class="hidden lg:inline">Historial</span>
+          <span id="badgeHistorialCount" class="px-1.5 py-0.2 rounded-full bg-slate-700 text-[10px] font-mono">0</span>
+        </button>
+
+        <button type="button" onclick="exportarCSV()"
+          class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-slate-700 transition cursor-pointer"
+          title="Exportar planilla a Excel (CSV)">
+          <i data-lucide="file-spreadsheet" class="w-5 h-5"></i>
+        </button>
+
+        <button type="button" onclick="restaurarPlanillaOriginal()"
+          class="px-2.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs font-semibold transition cursor-pointer"
+          title="Cargar planilla de ejemplo">
+          Ejemplo
+        </button>
+
+        <button type="button" onclick="mostrarModalLimpiar()"
+          class="p-2 rounded-xl bg-slate-800 hover:bg-rose-600 text-slate-200 hover:text-white border border-slate-700 transition cursor-pointer"
+          title="Vaciar planilla para empezar de 0">
+          <i data-lucide="trash-2" class="w-5 h-5"></i>
+        </button>
+
+        <button type="button" onclick="window.print()"
+          class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition cursor-pointer"
+          title="Imprimir informe">
+          <i data-lucide="printer" class="w-5 h-5"></i>
+        </button>
+
+        <div
+          class="hidden xl:flex items-center gap-2 bg-slate-800/90 border border-slate-700 px-3 py-1.5 rounded-xl text-xs font-mono text-slate-200">
+          <i data-lucide="clock" class="w-3.5 h-3.5 text-indigo-400"></i>
+          <span data-cctv-clock class="tabular-nums">00:00:00 Hs.</span>
+        </div>
+
+        <div data-cctv-nav></div>
+
+        <button type="button" onclick="toggleTheme()" title="Cambiar modo claro / oscuro"
+          class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition inline-flex items-center justify-center cursor-pointer">
+          <i data-lucide="sun" class="w-5 h-5 text-amber-400 hidden dark:block"></i>
+          <i data-lucide="moon" class="w-5 h-5 text-slate-200 block dark:hidden"></i>
+        </button>
+
+        <a href="index.html"
+          class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition inline-flex items-center justify-center"
+          title="Volver al Menú Principal">
+          <i data-lucide="home" class="w-5 h-5"></i>
+        </a>
+      </div>
+    </header>
+
+    <!-- Datalists -->
+    <datalist id="salasDatalist">
+      <option value="Sala Luxor"></option>
+      <option value="Casino Bulevard"></option>
+      <option value="Slots Salvador Mazza"></option>
+      <option value="Slots Lajitas"></option>
+      <option value="Slots Mosconi"></option>
+      <option value="Slots Refinor"></option>
+      <option value="Sala VIP"></option>
+    </datalist>
+
+    <datalist id="camarasDatalist"></datalist>
+
+    <main class="p-5 sm:p-6 bg-slate-50 dark:bg-slate-900/60 rounded-b-2xl space-y-6">
+
+      <!-- Encabezado Impreso (visible solo al imprimir) -->
+      <div class="hidden print:block border-b-2 border-slate-800 pb-3 mb-4">
+        <h1 class="text-xl font-bold text-slate-900">INFORME DE AUDITORÍA DE DESEMPEÑO Y CONTROL CCTV</h1>
+        <p id="printFichaResumen" class="text-xs text-slate-700 mt-1 font-mono"></p>
+      </div>
+
+      <!-- 1. Ficha del Personal Auditado y Turno -->
+      <section
+        class="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm no-print">
+        <div
+          class="flex flex-wrap items-center justify-between gap-2 mb-3 pb-2.5 border-b border-slate-100 dark:border-slate-800">
+          <h2
+            class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
+            <i data-lucide="user-check" class="w-4 h-4"></i> Datos de la Auditoría (Personal, Sala y Turno)
+          </h2>
+          <span class="text-[11px] text-slate-500 dark:text-slate-400">Soporta cruce de medianoche (00:00) en Turno
+            Noche</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3">
+          <div class="lg:col-span-3">
+            <label for="fichaEmpleado"
+              class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Personal Auditado</label>
+            <input type="text" id="fichaEmpleado" oninput="guardarFichaYActualizar()" placeholder="Ej: Gómez Juan"
+              class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-3 py-2 text-xs text-slate-900 dark:text-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 outline-none" />
+          </div>
+
+          <div class="lg:col-span-3">
+            <label for="fichaCargo" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Cargo /
+              Función</label>
+            <input type="text" id="fichaCargo" oninput="guardarFichaYActualizar()" placeholder="Ej: Asistente de Sala"
+              class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-3 py-2 text-xs text-slate-900 dark:text-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 outline-none" />
+          </div>
+
+          <div class="lg:col-span-2">
+            <label for="fichaSala" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Sala /
+              Objetivo</label>
+            <input type="text" id="fichaSala" list="salasDatalist" oninput="guardarFichaYActualizar()"
+              placeholder="Ej: Sala Luxor"
+              class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-3 py-2 text-xs text-slate-900 dark:text-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 outline-none" />
+          </div>
+
+          <div class="lg:col-span-2">
+            <label for="fichaFecha" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Fecha
+              Auditada</label>
+            <input type="date" id="fichaFecha" onchange="guardarFichaYActualizar()"
+              class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-2.5 py-2 text-xs font-mono-nums text-slate-900 dark:text-white focus:border-indigo-500 outline-none" />
+          </div>
+
+          <div class="lg:col-span-2">
+            <label for="fichaTurno"
+              class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Turno</label>
+            <select id="fichaTurno" onchange="guardarFichaYActualizar()"
+              class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-2.5 py-2 text-xs font-semibold text-slate-900 dark:text-white focus:border-indigo-500 outline-none">
+              <option value="TURNO MAÑANA">Turno Mañana</option>
+              <option value="TURNO TARDE">Turno Tarde</option>
+              <option value="TURNO NOCHE">Turno Noche (00:00)</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. Tarjetas de Resumen y Métricas Principales (5 KPIs) -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
+
+        <!-- Meta Jornada -->
+        <div
+          class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <span class="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Jornada
+                Meta</span>
+              <div class="text-xl font-bold text-slate-900 dark:text-white font-mono-nums mt-0.5" id="metricMeta">08:30
+                hs</div>
+            </div>
+            <span class="text-[11px] font-mono text-slate-500 dark:text-slate-400" id="metaMinutosTexto">510m</span>
+          </div>
+          <div class="mt-2 no-print space-y-1.5">
+            <input type="time" id="inputMetaJornada" value="08:30" min="00:01" max="23:59" step="60"
+              onchange="actualizarMetaJornada()"
+              class="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-2 py-1 text-xs font-mono-nums text-slate-800 dark:text-slate-100 focus:border-indigo-500 outline-none" />
+            <div class="flex gap-1">
+              <button type="button" onclick="setMetaRapida(480)"
+                class="flex-1 py-0.5 rounded bg-slate-100 dark:bg-slate-800 hover:bg-indigo-100 dark:hover:bg-indigo-950 text-[10px] font-mono font-semibold text-slate-600 dark:text-slate-300 cursor-pointer">08:00</button>
+              <button type="button" onclick="setMetaRapida(510)"
+                class="flex-1 py-0.5 rounded bg-slate-100 dark:bg-slate-800 hover:bg-indigo-100 dark:hover:bg-indigo-950 text-[10px] font-mono font-semibold text-slate-600 dark:text-slate-300 cursor-pointer">08:30</button>
+              <button type="button" onclick="setMetaRapida(540)"
+                class="flex-1 py-0.5 rounded bg-slate-100 dark:bg-slate-800 hover:bg-indigo-100 dark:hover:bg-indigo-950 text-[10px] font-mono font-semibold text-slate-600 dark:text-slate-300 cursor-pointer">09:00</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Asiste -->
+        <div
+          class="bg-emerald-50/70 dark:bg-emerald-950/25 p-4 rounded-xl border border-emerald-200 dark:border-emerald-800/60 shadow-sm flex items-center justify-between">
+          <div>
+            <span class="text-[11px] font-bold text-emerald-800 dark:text-emerald-300 uppercase tracking-wider">Asiste
+              (Trabajo)</span>
+            <div class="text-xl font-bold text-emerald-700 dark:text-emerald-400 font-mono-nums mt-1" id="metricAsiste">
+              00:00 hs</div>
+            <span class="text-xs text-emerald-700/80 dark:text-emerald-300/80 font-medium block mt-0.5"
+              id="metricAsistePorc">0% registrado</span>
+          </div>
+          <div
+            class="p-2 bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 rounded-lg shrink-0">
+            <i data-lucide="check-circle-2" class="w-5 h-5"></i>
+          </div>
+        </div>
+
+        <!-- Descanso Legal / Refrigerio -->
+        <div
+          class="bg-sky-50/70 dark:bg-sky-950/25 p-4 rounded-xl border border-sky-200 dark:border-sky-800/60 shadow-sm flex items-center justify-between">
+          <div>
+            <span class="text-[11px] font-bold text-sky-800 dark:text-sky-300 uppercase tracking-wider">Descansos</span>
+            <div class="text-xl font-bold text-sky-700 dark:text-sky-400 font-mono-nums mt-1" id="metricDescanso">00:00
+              hs</div>
+            <span class="text-xs text-sky-700/80 dark:text-sky-300/80 font-medium block mt-0.5"
+              id="metricDescansoDetalle">0 pausas registradas</span>
+          </div>
+          <div class="p-2 bg-sky-100 dark:bg-sky-900/50 text-sky-700 dark:text-sky-300 rounded-lg shrink-0">
+            <i data-lucide="coffee" class="w-5 h-5"></i>
+          </div>
+        </div>
+
+        <!-- Distracción Neta (Nuevo KPI dedicado) -->
+        <div
+          class="bg-amber-50/70 dark:bg-amber-950/25 p-4 rounded-xl border border-amber-200 dark:border-amber-800/60 shadow-sm flex items-center justify-between">
+          <div>
+            <span class="text-[11px] font-bold text-amber-800 dark:text-amber-300 uppercase tracking-wider">Distracción
+              Neta</span>
+            <div class="text-xl font-bold text-amber-700 dark:text-amber-400 font-mono-nums mt-1"
+              id="metricDistraccion">00:00 hs</div>
+            <span class="text-xs text-amber-700/80 dark:text-amber-300/80 font-medium block mt-0.5"
+              id="metricDistraccionPorc">0% (Charla/Cel/TV)</span>
+          </div>
+          <div class="p-2 bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-300 rounded-lg shrink-0">
+            <i data-lucide="smartphone" class="w-5 h-5"></i>
+          </div>
+        </div>
+
+        <!-- Balance / Diferencia -->
+        <div id="cardBalance"
+          class="bg-rose-50/70 dark:bg-rose-950/25 p-4 rounded-xl border border-rose-200 dark:border-rose-800/60 shadow-sm flex items-center justify-between transition-colors duration-200">
+          <div>
+            <span class="text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider"
+              id="labelBalance">Diferencia</span>
+            <div class="text-xl font-bold text-rose-700 dark:text-rose-400 font-mono-nums mt-1" id="metricDiferencia">
+              -08:30 hs</div>
+            <span class="text-xs text-rose-600 dark:text-rose-300 font-medium block mt-0.5" id="subDiferencia">Falta
+              tiempo</span>
+          </div>
+          <div class="p-2 bg-rose-100 dark:bg-rose-900/50 text-rose-700 dark:text-rose-300 rounded-lg shrink-0"
+            id="iconBalance">
+            <i data-lucide="scale" class="w-5 h-5"></i>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 3. Barra de Proporción y Diagnóstico Interactivo de Huecos / Solapamientos -->
+      <div
+        class="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <h2 id="tituloProporcion" class="text-sm font-bold text-slate-800 dark:text-slate-100">Proporción de la
+              Jornada (Meta: 08:30 hs / 510 min)</h2>
+            <p class="text-xs text-slate-500 dark:text-slate-400" id="rangoGlobalTexto">Rango cubierto: Sin registros
+              cargados</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-3 text-xs font-medium text-slate-600 dark:text-slate-300">
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-emerald-500 inline-block"></span>
+              Asiste</span>
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-sky-500 inline-block"></span>
+              Descanso</span>
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-amber-500 inline-block"></span>
+              Distracción</span>
+            <span class="flex items-center gap-1.5"><span
+                class="w-3 h-3 rounded-sm bg-slate-200 dark:bg-slate-700 inline-block"></span> Sin registrar</span>
+          </div>
+        </div>
+
+        <div class="w-full h-4 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden flex">
+          <div id="barAsiste" class="bg-emerald-500 h-full transition-all duration-300" style="width: 0%"
+            title="Asiste"></div>
+          <div id="barDescanso" class="bg-sky-500 h-full transition-all duration-300" style="width: 0%"
+            title="Descanso"></div>
+          <div id="barDistraccion" class="bg-amber-500 h-full transition-all duration-300" style="width: 0%"
+            title="Distracción"></div>
+        </div>
+
+        <!-- Panel de Diagnóstico de Huecos y Solapamientos -->
+        <div id="panelAnomalias"
+          class="bg-amber-50/80 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/60 rounded-xl p-3.5 text-xs space-y-2">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div class="font-bold text-amber-900 dark:text-amber-200 flex flex-wrap items-center gap-1.5">
+              <span>🔍 Diagnóstico de Línea de Tiempo:</span>
+              <span id="resumenAnomalias" class="font-normal text-amber-800 dark:text-amber-300">Analizando...</span>
+            </div>
+            <div class="flex flex-wrap items-center gap-2 no-print">
+              <button type="button" id="btnCorregirSolapamientos" onclick="corregirSolapamientosAutomatico()"
+                class="hidden px-2.5 py-1 bg-rose-600 hover:bg-rose-500 text-white rounded-lg font-semibold transition cursor-pointer">
+                Ajustar Solapamientos
+              </button>
+              <button type="button" id="btnAutocompletarPanel" onclick="autocompletarHuecos()"
+                class="px-2.5 py-1 bg-amber-600 hover:bg-amber-500 text-white rounded-lg font-semibold transition cursor-pointer">
+                Rellenar Huecos Ahora
+              </button>
+            </div>
+          </div>
+          <div id="listaAnomalias" class="flex flex-wrap gap-1.5 pt-1 max-h-28 overflow-y-auto"></div>
+        </div>
+      </div>
+
+      <!-- 4. Formulario para Agregar o Editar Tramos (Edición No Destructiva + Atajos de Duración) -->
+      <div id="cardFormulario"
+        class="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4 no-print transition-all">
+
+        <!-- Banner Modo Edición -->
+        <div id="bannerEdicion"
+          class="hidden bg-indigo-50 dark:bg-indigo-950/50 border border-indigo-300 dark:border-indigo-700 rounded-xl px-3.5 py-2.5 flex items-center justify-between gap-2 text-xs">
+          <div class="flex items-center gap-2 font-semibold text-indigo-800 dark:text-indigo-200">
+            <i data-lucide="pencil" class="w-4 h-4"></i>
+            <span id="textoBannerEdicion">Editando tramo seleccionado (el registro original se conserva hasta
+              guardar)</span>
+          </div>
+          <button type="button" onclick="cancelarEdicion()"
+            class="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 border border-indigo-200 dark:border-indigo-700 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 font-semibold cursor-pointer">
+            Cancelar edición
+          </button>
+        </div>
+
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <h2 class="text-sm font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+            <i data-lucide="plus-circle" class="w-4 h-4 text-indigo-500"></i>
+            <span id="tituloFormulario">Registrar Tramo Horario / Cámara</span>
+          </h2>
+
+          <div class="flex flex-wrap items-center gap-3">
+            <!-- Botones rápidos para sumar minutos al Inicio -->
+            <div class="flex items-center gap-1 text-[11px]">
+              <span class="text-slate-500 dark:text-slate-400 font-medium mr-0.5">Duración rápida:</span>
+              <button type="button" onclick="sumarDuracionRapida(1)"
+                class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 hover:bg-indigo-600 hover:text-white text-slate-700 dark:text-slate-200 font-mono font-semibold transition cursor-pointer">+1m</button>
+              <button type="button" onclick="sumarDuracionRapida(2)"
+                class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 hover:bg-indigo-600 hover:text-white text-slate-700 dark:text-slate-200 font-mono font-semibold transition cursor-pointer">+2m</button>
+              <button type="button" onclick="sumarDuracionRapida(5)"
+                class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 hover:bg-indigo-600 hover:text-white text-slate-700 dark:text-slate-200 font-mono font-semibold transition cursor-pointer">+5m</button>
+              <button type="button" onclick="sumarDuracionRapida(10)"
+                class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 hover:bg-indigo-600 hover:text-white text-slate-700 dark:text-slate-200 font-mono font-semibold transition cursor-pointer">+10m</button>
+              <button type="button" onclick="sumarDuracionRapida(15)"
+                class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 hover:bg-indigo-600 hover:text-white text-slate-700 dark:text-slate-200 font-mono font-semibold transition cursor-pointer">+15m</button>
+              <button type="button" onclick="sumarDuracionRapida(30)"
+                class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 hover:bg-indigo-600 hover:text-white text-slate-700 dark:text-slate-200 font-mono font-semibold transition cursor-pointer">+30m</button>
+            </div>
+
+            <label
+              class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-600 dark:text-slate-300 cursor-pointer">
+              <input type="checkbox" id="checkEncadenar" checked
+                class="rounded text-indigo-600 focus:ring-indigo-500" />
+              Encadenar inicio
+            </label>
+          </div>
+        </div>
+
+        <form id="formRegistro" onsubmit="agregarRegistro(event)"
+          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 items-end">
+          <div class="lg:col-span-2">
+            <label for="inputCategoria"
+              class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Categoría</label>
+            <select id="inputCategoria" onchange="sincronizarEstadoPorCategoria()"
+              class="w-full rounded-xl border border-slate-300 dark:border-slate-700 px-2.5 py-2 text-xs bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white focus:border-indigo-500 outline-none">
+              <option value="Operativo">Operativo / Sala</option>
+              <option value="Traslado">Transición / Traslado</option>
+              <option value="Celular Trabajo">Celular de Trabajo</option>
+              <option value="Descanso">Descanso Legal / Comida</option>
+              <option value="Charla">Charla / Conversación</option>
+              <option value="Celular">Celular Personal</option>
+              <option value="TV">Mira TV / Distracción</option>
+              <option value="Ausencia">Ausencia de Sector</option>
+            </select>
+          </div>
+
+          <div class="lg:col-span-2">
+            <label for="inputTipo" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Estado
+              Cómputo</label>
+            <select id="inputTipo"
+              class="w-full rounded-xl border border-slate-300 dark:border-slate-700 px-2.5 py-2 text-xs font-semibold bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white focus:border-indigo-500 outline-none">
+              <option value="ASISTE">🟢 ASISTE (Trabaja)</option>
+              <option value="NO_ASISTE">🟠 NO ASISTE (Inactivo)</option>
+            </select>
+          </div>
+
+          <div class="lg:col-span-2">
+            <label for="inputCamara" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Cámara
+              (CCTV)</label>
+            <input type="text" id="inputCamara" list="camarasDatalist" placeholder="Ej: CAM-01 (Sala Gral)" required
+              class="w-full rounded-xl border border-slate-300 dark:border-slate-700 px-2.5 py-2 text-xs bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white focus:border-indigo-500 outline-none" />
+          </div>
+
+          <div class="lg:col-span-1">
+            <label for="inputInicio"
+              class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Inicio</label>
+            <input type="time" id="inputInicio" required
+              class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-2 py-2 text-xs font-mono-nums text-slate-900 dark:text-white focus:border-indigo-500 outline-none" />
+          </div>
+
+          <div class="lg:col-span-1">
+            <label for="inputFin"
+              class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Fin</label>
+            <input type="time" id="inputFin" required
+              class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-2 py-2 text-xs font-mono-nums text-slate-900 dark:text-white focus:border-indigo-500 outline-none" />
+          </div>
+
+          <div class="lg:col-span-3">
+            <label for="inputDetalle" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Sector
+              / Observación</label>
+            <input type="text" id="inputDetalle" required placeholder="Ej: Asiste a Cliente (Sala)"
+              class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-3 py-2 text-xs text-slate-900 dark:text-white focus:border-indigo-500 outline-none" />
+          </div>
+
+          <div class="lg:col-span-1 flex items-center gap-2">
+            <label
+              class="inline-flex items-center gap-1 text-xs text-slate-600 dark:text-slate-300 cursor-pointer shrink-0"
+              title="Marcar para extraer video del DVR">
+              <input type="checkbox" id="inputBajarVideo" class="rounded text-rose-600" />
+              <span>🎥</span>
+            </label>
+            <button type="submit" id="btnSubmitRegistro"
+              class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2 px-3 rounded-xl text-xs transition shadow-sm cursor-pointer">
+              Añadir
+            </button>
+          </div>
+        </form>
+
+        <!-- Botonera de Carga Rápida (Presets Operativos) -->
+        <div class="pt-2.5 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center gap-2">
+          <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mr-1">Plantillas:</span>
+          <button type="button"
+            onclick="aplicarPlantilla('ASISTE','Operativo','CAM-01 (Sala Gral)','Asiste a Cliente - Recorre (Sala)')"
+            class="px-2.5 py-1 bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 rounded-lg text-xs font-medium transition cursor-pointer">+
+            Asiste Sala</button>
+          <button type="button"
+            onclick="aplicarPlantilla('ASISTE','Operativo','CAM-02 (Contadores)','Toma Contadores (Sala)')"
+            class="px-2.5 py-1 bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 rounded-lg text-xs font-medium transition cursor-pointer">+
+            Contadores</button>
+          <button type="button"
+            onclick="aplicarPlantilla('ASISTE','Operativo','CAM-08 (Caja)','Rinde efectivo en Caja')"
+            class="px-2.5 py-1 bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 rounded-lg text-xs font-medium transition cursor-pointer">+
+            Rinde Caja</button>
+          <button type="button"
+            onclick="aplicarPlantilla('NO_ASISTE','Celular','CAM-03 (Sector Bar)','Manipula Teléfono Celular')"
+            class="px-2.5 py-1 bg-amber-50 dark:bg-amber-950/50 hover:bg-amber-100 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800/60 rounded-lg text-xs font-medium transition cursor-pointer">+
+            Celular Personal</button>
+          <button type="button"
+            onclick="aplicarPlantilla('NO_ASISTE','Charla','CAM-04 (Recepción)','Permanece conversando en sector')"
+            class="px-2.5 py-1 bg-amber-50 dark:bg-amber-950/50 hover:bg-amber-100 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800/60 rounded-lg text-xs font-medium transition cursor-pointer">+
+            Charla</button>
+          <button type="button" onclick="aplicarPlantilla('NO_ASISTE','TV','CAM-03 (Sector Bar)','Mira TV en sector')"
+            class="px-2.5 py-1 bg-amber-50 dark:bg-amber-950/50 hover:bg-amber-100 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800/60 rounded-lg text-xs font-medium transition cursor-pointer">+
+            Mira TV</button>
+          <button type="button"
+            onclick="aplicarPlantilla('NO_ASISTE','Descanso','CAM-09 (Área Descanso)','Descanso / Refrigerio')"
+            class="px-2.5 py-1 bg-sky-50 dark:bg-sky-950/50 hover:bg-sky-100 text-sky-800 dark:text-sky-300 border border-sky-200 dark:border-sky-800/60 rounded-lg text-xs font-medium transition cursor-pointer">+
+            Descanso</button>
+          <span class="ml-auto text-[11px] text-slate-400 hidden md:inline">Clic en cualquier hueco amarillo para
+            cargarlo · <kbd
+              class="px-1 py-0.5 rounded bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 font-mono">Ctrl+Z</kbd>
+            deshacer</span>
+        </div>
+      </div>
+
+      <!-- 5. Barra de Búsqueda y Filtros para las Tablas -->
+      <div
+        class="bg-white dark:bg-slate-900 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-wrap items-center justify-between gap-3 no-print">
+        <div class="flex flex-wrap items-center gap-2.5 flex-1 min-w-[240px]">
+          <div class="relative flex-1 max-w-xs">
+            <i data-lucide="search"
+              class="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+            <input type="search" id="filtroTexto" oninput="actualizarTodo(true)"
+              placeholder="Filtrar por cámara, hora u observación..."
+              class="w-full pl-8 pr-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 text-xs text-slate-800 dark:text-slate-100 focus:border-indigo-500 outline-none" />
+          </div>
+
+          <select id="filtroCategoria" onchange="actualizarTodo(true)"
+            class="rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-3 py-1.5 text-xs text-slate-800 dark:text-slate-100 focus:border-indigo-500 outline-none">
+            <option value="TODAS">Todas las categorías</option>
+            <option value="Operativo">Operativo / Sala</option>
+            <option value="Traslado">Transición / Traslado</option>
+            <option value="Celular Trabajo">Celular de Trabajo</option>
+            <option value="Descanso">Descanso Legal</option>
+            <option value="Charla">Charla / Conversación</option>
+            <option value="Celular">Celular Personal</option>
+            <option value="TV">Mira TV / Distracción</option>
+            <option value="Ausencia">Ausencia de Sector</option>
+          </select>
+
+          <label
+            class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-600 dark:text-slate-300 cursor-pointer">
+            <input type="checkbox" id="filtroSoloDvr" onchange="actualizarTodo(true)"
+              class="rounded text-rose-600 focus:ring-rose-500" />
+            <span>Solo marcados DVR 🎥</span>
+          </label>
+        </div>
+
+        <button type="button" id="btnLimpiarFiltros" onclick="limpiarFiltrosTabla()"
+          class="hidden text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer">
+          Quitar filtros
+        </button>
+      </div>
+
+      <!-- 6. Tablas comparativas: ASISTE vs NO ASISTE -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+        <!-- Columna ASISTE -->
+        <div
+          class="bg-white dark:bg-slate-900 rounded-xl border border-emerald-200 dark:border-emerald-800/60 shadow-sm overflow-hidden flex flex-col">
+          <div class="bg-emerald-600 text-white px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="font-bold text-xs sm:text-sm tracking-wide">ASISTE (TRABAJO EFECTIVO)</span>
+              <span id="badgeCountAsiste" class="text-xs bg-emerald-800/70 px-2 py-0.5 rounded-full font-mono-nums">0
+                reg.</span>
+            </div>
+            <div class="text-sm font-bold font-mono-nums" id="subtotalAsiste">00:00 hs</div>
+          </div>
+          <div class="overflow-x-auto flex-1 max-h-[520px] overflow-y-auto print:max-h-none">
+            <table class="w-full text-left border-collapse text-xs">
+              <thead class="sticky top-0 z-10">
+                <tr
+                  class="bg-emerald-50 dark:bg-slate-950 text-emerald-950 dark:text-emerald-300 border-b border-emerald-200 dark:border-emerald-900/60 font-semibold">
+                  <th class="py-2.5 px-2.5">Horario</th>
+                  <th class="py-2.5 px-2.5">Cámara</th>
+                  <th class="py-2.5 px-2.5">Sector / Actividad</th>
+                  <th class="py-2.5 px-2.5 text-right">Tiempo</th>
+                  <th class="py-2.5 px-2 text-center no-print">Acción</th>
+                </tr>
+              </thead>
+              <tbody id="tbodyAsiste" class="divide-y divide-slate-100 dark:divide-slate-800"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Columna NO ASISTE -->
+        <div
+          class="bg-white dark:bg-slate-900 rounded-xl border border-amber-200 dark:border-amber-800/60 shadow-sm overflow-hidden flex flex-col">
+          <div class="bg-amber-600 text-white px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="font-bold text-xs sm:text-sm tracking-wide">NO ASISTE (OBSERVACIONES / DESCANSOS)</span>
+              <span id="badgeCountNoAsiste" class="text-xs bg-amber-800/70 px-2 py-0.5 rounded-full font-mono-nums">0
+                reg.</span>
+            </div>
+            <div class="text-sm font-bold font-mono-nums" id="subtotalNoAsiste">00:00 hs</div>
+          </div>
+          <div class="overflow-x-auto flex-1 max-h-[520px] overflow-y-auto print:max-h-none">
+            <table class="w-full text-left border-collapse text-xs">
+              <thead class="sticky top-0 z-10">
+                <tr
+                  class="bg-amber-50 dark:bg-slate-950 text-amber-950 dark:text-amber-300 border-b border-amber-200 dark:border-amber-900/60 font-semibold">
+                  <th class="py-2.5 px-2.5">Horario</th>
+                  <th class="py-2.5 px-2.5">Cámara</th>
+                  <th class="py-2.5 px-2.5">Observación</th>
+                  <th class="py-2.5 px-2.5 text-right">Tiempo</th>
+                  <th class="py-2.5 px-2 text-center no-print">Acción</th>
+                </tr>
+              </thead>
+              <tbody id="tbodyNoAsiste" class="divide-y divide-slate-100 dark:divide-slate-800"></tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 7. Orden DVR + Desglose por Cámara y Categoría -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- Orden de Extracción DVR -->
+        <div
+          class="lg:col-span-7 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-5 space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h3 class="text-sm font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+                <span>🎥 Orden de Extracción de Video (DVR / NVR)</span>
+                <span id="badgeCountDvr"
+                  class="text-xs px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-950/70 text-rose-700 dark:text-rose-300 font-semibold">0
+                  clips</span>
+              </h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Tramos marcados con 🎥 para respaldar grabaciones
+              </p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2 no-print">
+              <button type="button" onclick="marcarInactividadMayorA5Min()"
+                class="px-2.5 py-1.5 bg-amber-100 dark:bg-amber-950/60 hover:bg-amber-200 text-amber-900 dark:text-amber-300 border border-amber-200 dark:border-amber-800/60 rounded-lg text-xs font-semibold transition cursor-pointer">
+                Distracciones ≥ 5m
+              </button>
+              <button type="button" onclick="desmarcarTodosDvr()"
+                class="px-2.5 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-semibold transition cursor-pointer">
+                Limpiar 🎥
+              </button>
+              <button type="button" onclick="copiarOrdenDvr()"
+                class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold transition cursor-pointer">
+                📋 Copiar Orden DVR
+              </button>
+            </div>
+          </div>
+
+          <div id="contenedorDvr" class="space-y-2 max-h-64 overflow-y-auto pr-1"></div>
+        </div>
+
+        <!-- Permanencia por Cámara y Desglose de Inactividad -->
+        <div
+          class="lg:col-span-5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-5 space-y-5">
+          <div>
+            <h3 class="text-sm font-bold text-slate-800 dark:text-slate-100">📊 Desglose por Categoría</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mb-3">Distribución acumulada según tipo de actividad
+            </p>
+            <div id="contenedorDesgloseCategorias" class="space-y-2"></div>
+          </div>
+
+          <div class="pt-4 border-t border-slate-100 dark:border-slate-800">
+            <h3 class="text-sm font-bold text-slate-800 dark:text-slate-100">📹 Permanencia por Cámara (CCTV)</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mb-3">Tiempo registrado en cada cámara</p>
+            <div id="contenedorRankingCamaras" class="space-y-2.5 max-h-48 overflow-y-auto pr-1"></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 8. Resumen Ejecutivo de Auditoría (Acta Copiable CCTV) -->
+      <section
+        class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-5 space-y-3 no-print">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <h3 class="text-sm font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+              <i data-lucide="file-text" class="w-4 h-4 text-indigo-500"></i>
+              Resumen Ejecutivo de Auditoría (Listo para Copiar / Enviar)
+            </h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Síntesis formal con porcentajes, desglose de
+              distracciones y observaciones destacadas</p>
+          </div>
+          <button type="button" onclick="copiarResumenEjecutivo()"
+            class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-semibold shadow-sm transition flex items-center gap-1.5 cursor-pointer">
+            <i data-lucide="copy" class="w-4 h-4"></i>
+            Copiar Informe Ejecutivo
+          </button>
+        </div>
+
+        <textarea id="resumenEjecutivoTexto" rows="8" spellcheck="false"
+          class="report-font w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 p-3.5 text-xs text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 outline-none resize-y"></textarea>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Modal de Confirmación para Limpiar Todo -->
+  <div id="modalLimpiar"
+    class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4 no-print">
+    <div
+      class="bg-white dark:bg-slate-900 rounded-2xl max-w-sm w-full p-5 shadow-2xl border border-slate-200 dark:border-slate-800 space-y-4">
+      <div class="flex items-start gap-3">
+        <div
+          class="w-10 h-10 rounded-xl bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center font-bold shrink-0">
+          🗑️
+        </div>
+        <div>
+          <h3 class="text-sm font-bold text-slate-900 dark:text-white">¿Empezar planilla desde cero?</h3>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Se vaciarán los tramos actuales (podrás deshacerlo
+            desde la notificación inferior).</p>
+        </div>
+      </div>
+      <div class="pt-1">
+        <label for="inputHoraArranque" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Hora
+          de inicio del turno:</label>
+        <input type="time" id="inputHoraArranque" value="07:00"
+          class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-3 py-2 text-xs font-mono-nums text-slate-900 dark:text-white focus:border-indigo-500 outline-none" />
+      </div>
+      <div class="flex items-center justify-end gap-2 pt-2">
+        <button type="button" onclick="cerrarModalLimpiar()"
+          class="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-200 text-xs font-semibold transition cursor-pointer">
+          Cancelar
+        </button>
+        <button type="button" onclick="confirmarLimpiarTodo()"
+          class="px-3.5 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold shadow-sm transition cursor-pointer">
+          Sí, dejar en 0
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Historial de Auditorías Guardadas -->
+  <div id="modalHistorial"
+    class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4 no-print">
+    <div
+      class="bg-white dark:bg-slate-900 rounded-2xl max-w-lg w-full p-5 shadow-2xl border border-slate-200 dark:border-slate-800 space-y-4 max-h-[85vh] flex flex-col">
+      <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+        <h3 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          <i data-lucide="folder-clock" class="w-4 h-4 text-indigo-500"></i>
+          Historial de Auditorías Guardadas
+        </h3>
+        <button type="button" onclick="cerrarModalHistorial()"
+          class="text-xs font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-white cursor-pointer">Cerrar
+          ✕</button>
+      </div>
+      <div id="listaHistorialAuditorias" class="space-y-2.5 overflow-y-auto flex-1 pr-1"></div>
+    </div>
+  </div>
+
+  <!-- Toast de Notificación con Soporte para Deshacer -->
+  <div id="toast"
+    class="no-print fixed bottom-5 right-5 bg-slate-900 dark:bg-slate-800 border border-slate-700 text-white px-4 py-3 rounded-xl shadow-2xl text-xs font-medium opacity-0 pointer-events-none transition-all duration-200 z-50 flex items-center gap-3">
+    <span id="toastText">Acción realizada</span>
+    <button type="button" id="toastUndoBtn" onclick="deshacerUltimaAccion()"
+      class="hidden px-2.5 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold cursor-pointer">
+      Deshacer
+    </button>
+  </div>
+
+  <script>
+    const META_MINUTOS_DEFAULT = 510;
+    const STORAGE_REGISTROS_KEY = 'auditoria_cctv_registros';
+    const STORAGE_META_KEY = 'auditoria_cctv_meta_minutos';
+    const STORAGE_FICHA_KEY = 'auditoria_cctv_ficha_v1';
+    const STORAGE_HISTORIAL_KEY = 'auditoria_cctv_historial_v1';
+
+    const CAMARAS_BASE = [
+      'CAM-01 (Sala Gral)',
+      'CAM-02 (Contadores)',
+      'CAM-03 (Sector Bar)',
+      'CAM-04 (Recepción)',
+      'CAM-05 (Oficina Moya)',
+      'CAM-06 (Oficina Enc.)',
+      'CAM-07 (Acceso/Puerta)',
+      'CAM-08 (Caja)',
+      'CAM-09 (Área Descanso)'
+    ];
+
+    let metaMinutos = META_MINUTOS_DEFAULT;
+    let registros = [];
+    let editandoIndex = null;
+    let ultimoRespaldo = null;
+    let toastTimer = null;
+
+    function obtenerFechaTurnoPorDefecto() {
+      const ahora = new Date();
+      const yyyy = ahora.getFullYear();
+      const mm = String(ahora.getMonth() + 1).padStart(2, '0');
+      const dd = String(ahora.getDate()).padStart(2, '0');
+      const h = ahora.getHours();
+      const turno = (h >= 6 && h < 14) ? 'TURNO MAÑANA' : (h >= 14 && h < 22) ? 'TURNO TARDE' : 'TURNO NOCHE';
+      return { iso: `${yyyy}-${mm}-${dd}`, display: `${dd}/${mm}/${yyyy}`, turno };
+    }
+
+    function formatearFechaISO(isoStr) {
+      if (!isoStr || !isoStr.includes('-')) return obtenerFechaTurnoPorDefecto().display;
+      const [y, m, d] = isoStr.split('-');
+      return `${d}/${m}/${y}`;
+    }
+
+    function obtenerFichaActual() {
+      const def = obtenerFechaTurnoPorDefecto();
+      const fechaIso = document.getElementById('fichaFecha').value || def.iso;
+      return {
+        empleado: document.getElementById('fichaEmpleado').value.trim(),
+        cargo: document.getElementById('fichaCargo').value.trim(),
+        sala: document.getElementById('fichaSala').value.trim(),
+        fechaIso,
+        fechaDisplay: formatearFechaISO(fechaIso),
+        turno: document.getElementById('fichaTurno').value || def.turno
+      };
+    }
+
+    window.guardarFichaYActualizar = function () {
+      const f = obtenerFichaActual();
+      try {
+        localStorage.setItem(STORAGE_FICHA_KEY, JSON.stringify(f));
+      } catch (e) { }
+      actualizarTodo(true);
+    };
+
+    function guardarSnapshotUndo(etiqueta) {
+      ultimoRespaldo = {
+        etiqueta,
+        registros: JSON.parse(JSON.stringify(registros)),
+        metaMinutos
+      };
+    }
+
+    window.deshacerUltimaAccion = function () {
+      if (!ultimoRespaldo) return;
+      registros = ultimoRespaldo.registros;
+      metaMinutos = ultimoRespaldo.metaMinutos;
+      const etq = ultimoRespaldo.etiqueta;
+      ultimoRespaldo = null;
+      cancelarEdicion(true);
+      actualizarTodo();
+      mostrarToast(`↩️ Deshecho: ${etq}`);
+    };
+
+    // Datos de muestra completos
+    function prepararDatosIniciales() {
+      const asisteRaw = [
+        ["07:02", "07:49", "Toma Contadores (Sala)", "CAM-02 (Contadores)", "Operativo"],
+        ["07:49", "07:52", "Oficina Moya", "CAM-05 (Oficina Moya)", "Operativo"],
+        ["07:52", "07:55", "Toma Contadores (Sala)", "CAM-02 (Contadores)", "Operativo"],
+        ["08:01", "08:12", "Oficina Moya", "CAM-05 (Oficina Moya)", "Operativo"],
+        ["08:53", "09:01", "Sala", "CAM-01 (Sala Gral)", "Operativo"],
+        ["09:07", "09:14", "Recorre (Sala)", "CAM-01 (Sala Gral)", "Operativo"],
+        ["09:46", "09:47", "Asiste a Cliente (Sala)", "CAM-01 (Sala Gral)", "Operativo"],
+        ["09:51", "09:52", "Permanece parado al Costado (Bar)", "CAM-03 (Sector Bar)", "Operativo"],
+        ["09:57", "09:58", "Asiste a Cliente (Sala)", "CAM-01 (Sala Gral)", "Operativo"],
+        ["10:37", "10:40", "Asiste a Cliente (Sala)", "CAM-01 (Sala Gral)", "Operativo"],
+        ["10:46", "10:50", "Recorre, asiste clientes (Sala)", "CAM-01 (Sala Gral)", "Operativo"],
+        ["10:55", "10:56", "Retira silla (Sala)", "CAM-01 (Sala Gral)", "Operativo"],
+        ["10:57", "11:11", "Trabaja en Oficina (Encargado)", "CAM-06 (Oficina Enc.)", "Operativo"],
+        ["11:12", "11:14", "Entrega Impresión (Recepción)", "CAM-04 (Recepción)", "Operativo"],
+        ["11:17", "11:19", "Recorre (Sala)", "CAM-01 (Sala Gral)", "Operativo"],
+        ["11:32", "11:45", "Asiste a Cliente - Recorre (Sala)", "CAM-01 (Sala Gral)", "Operativo"],
+        ["11:55", "11:56", "Asiste a Cliente (Sala)", "CAM-01 (Sala Gral)", "Operativo"],
+        ["12:04", "12:11", "Trabaja con Técnico A.Benacchio (Sala) - (Oficina E)", "CAM-06 (Oficina Enc.)", "Operativo"],
+        ["12:12", "12:13", "Cubre Recepción", "CAM-04 (Recepción)", "Operativo"],
+        ["12:17", "12:18", "Recorre (Sala)", "CAM-01 (Sala Gral)", "Operativo"],
+        ["12:18", "12:24", "Asiste en Sector Bar", "CAM-03 (Sector Bar)", "Operativo"],
+        ["13:32", "13:34", "Asiste a Cliente (Sala)", "CAM-01 (Sala Gral)", "Operativo"],
+        ["13:47", "13:48", "Asiste a Cliente (Sala)", "CAM-01 (Sala Gral)", "Operativo"],
+        ["13:55", "14:00", "Asiste a Cliente (Sala)", "CAM-01 (Sala Gral)", "Operativo"],
+        ["14:10", "14:15", "Asiste a Cliente (Sala)", "CAM-01 (Sala Gral)", "Operativo"],
+        ["14:15", "14:20", "Rinde efectivo - Recorre Sala", "CAM-08 (Caja)", "Operativo"],
+        ["14:23", "14:28", "Cubre Recepción", "CAM-04 (Recepción)", "Operativo"],
+        ["14:29", "14:32", "Asiste en Sector Bar", "CAM-03 (Sector Bar)", "Operativo"],
+        ["14:38", "14:40", "Asiste a Cliente (Sala)", "CAM-01 (Sala Gral)", "Operativo"]
+      ];
+
+      const noAsisteRaw = [
+        ["07:56", "08:01", "Prepara infusión, permanece conversando con M. Carolina (Bar)", "CAM-03 (Sector Bar)", "Charla"],
+        ["08:13", "08:52", "Descanso", "CAM-09 (Área Descanso)", "Descanso"],
+        ["09:02", "09:06", "Manipula Teléfono Celular - Permanece en Barra limpiando anteojo", "CAM-03 (Sector Bar)", "Celular"],
+        ["09:16", "09:18", "Mira TV (Bar)", "CAM-03 (Sector Bar)", "TV"],
+        ["09:18", "09:45", "Conversa con J. Padilla (Recepción)", "CAM-04 (Recepción)", "Charla"],
+        ["09:47", "09:49", "Conversa con P.Ramos (Bar)", "CAM-03 (Sector Bar)", "Charla"],
+        ["09:49", "09:50", "Manipula Teléfono Celular (Bar)", "CAM-03 (Sector Bar)", "Celular"],
+        ["09:52", "09:56", "Conversa con J. Padilla (Recepción)", "CAM-04 (Recepción)", "Charla"],
+        ["09:59", "10:09", "Manipula Teléfono Celular y conversa con M. Carolina (Bar)", "CAM-03 (Sector Bar)", "Celular"],
+        ["10:10", "10:12", "Mira TV y Manipula Teléfono Celular (Bar)", "CAM-03 (Sector Bar)", "TV"],
+        ["10:13", "10:16", "Conversa con J. Padilla (Recepción)", "CAM-04 (Recepción)", "Charla"],
+        ["10:17", "10:18", "Toma Café (Bar)", "CAM-03 (Sector Bar)", "Charla"],
+        ["10:19", "10:20", "Mira TV (Sala)", "CAM-01 (Sala Gral)", "TV"],
+        ["10:20", "10:36", "Mira TV, conversa con P.Ramos y M. Carolina (Bar)", "CAM-03 (Sector Bar)", "TV"],
+        ["10:41", "10:42", "Permanece en Puerta Acceso junto a J. Padilla y M. Carolina", "CAM-07 (Acceso/Puerta)", "Charla"],
+        ["10:43", "10:45", "Conversa con M. Carolina (Bar)", "CAM-03 (Sector Bar)", "Charla"],
+        ["10:50", "10:54", "Conversa con J.Padilla y M. Carolina (Recepción)", "CAM-04 (Recepción)", "Charla"],
+        ["10:56", "10:57", "Conversa con M. Carolina (Sala)", "CAM-01 (Sala Gral)", "Charla"],
+        ["11:15", "11:16", "Conversa con M. Carolina (Bar)", "CAM-03 (Sector Bar)", "Charla"],
+        ["11:20", "11:25", "Manipula Teléfono Celular (Bar)", "CAM-03 (Sector Bar)", "Celular"],
+        ["11:26", "11:29", "Conversa con M.Carolina (Bar)", "CAM-03 (Sector Bar)", "Charla"],
+        ["11:30", "11:31", "Conversa con M.Carolina (Recepción)", "CAM-04 (Recepción)", "Charla"],
+        ["11:45", "11:46", "Manipula Teléfono Celular (Bar)", "CAM-03 (Sector Bar)", "Celular"],
+        ["11:47", "11:50", "Conversa con J. Padilla (Recepción)", "CAM-04 (Recepción)", "Charla"],
+        ["11:50", "11:51", "Manipula Teléfono Celular (Bar)", "CAM-03 (Sector Bar)", "Celular"],
+        ["11:51", "11:54", "Conversa con M.Carolina (Bar)", "CAM-03 (Sector Bar)", "Charla"],
+        ["11:57", "12:03", "Conversa con J.Padilla y M. Carolina (Recepción) - (Bar)", "CAM-04 (Recepción)", "Charla"],
+        ["12:14", "12:16", "Manipula Teléfono Celular (Bar)", "CAM-03 (Sector Bar)", "Celular"],
+        ["12:24", "12:26", "Manipula Teléfono Celular (Bar)", "CAM-03 (Sector Bar)", "Celular"],
+        ["12:27", "12:33", "Mira TV - Conversa con M.Carolina (Sala - Bar)", "CAM-03 (Sector Bar)", "TV"],
+        ["12:34", "13:11", "Descanso", "CAM-09 (Área Descanso)", "Descanso"],
+        ["13:12", "13:15", "Toma bebida - Manipula Teléfono Celular (Bar)", "CAM-03 (Sector Bar)", "Celular"],
+        ["13:16", "13:32", "Conversa con J. Padilla (Recepción)", "CAM-04 (Recepción)", "Charla"],
+        ["13:34", "13:35", "Manipula Teléfono Celular (Bar)", "CAM-03 (Sector Bar)", "Celular"],
+        ["13:36", "13:40", "Conversa con J. Padilla - Habla con M. Peñalba (Recepción) - (Caja)", "CAM-04 (Recepción)", "Charla"],
+        ["13:41", "13:46", "Conversa con G.Moya (Bar)", "CAM-03 (Sector Bar)", "Charla"],
+        ["13:46", "13:47", "Conversa con J. Padilla (Recepción)", "CAM-04 (Recepción)", "Charla"],
+        ["13:49", "13:54", "Conversa con G.Moya - Habla con C.Martinez (Bar)", "CAM-03 (Sector Bar)", "Charla"],
+        ["14:01", "14:10", "Conversa con M.Carolina (PITT) - (Recepción)", "CAM-04 (Recepción)", "Charla"],
+        ["14:21", "14:23", "Manipula Teléfono Celular (Bar)", "CAM-03 (Sector Bar)", "Celular"],
+        ["14:32", "14:37", "Conversa con M.Carolina y R. Altamirano (Bar)", "CAM-03 (Sector Bar)", "Charla"],
+        ["14:41", "14:47", "Conversa con M.Carolina y S. Camino (Bar)", "CAM-03 (Sector Bar)", "Charla"],
+        ["14:47", "15:31", "Descanso", "CAM-09 (Área Descanso)", "Descanso"]
+      ];
+
+      const lista = [];
+      asisteRaw.forEach(([inicio, fin, detalle, camara, categoria]) => {
+        const min = calcularMinutos(inicio, fin);
+        lista.push({ tipo: 'ASISTE', inicio, fin, detalle, camara, categoria, minutos: min, bajarVideo: false });
+      });
+      noAsisteRaw.forEach(([inicio, fin, detalle, camara, categoria]) => {
+        const min = calcularMinutos(inicio, fin);
+        lista.push({
+          tipo: 'NO_ASISTE',
+          inicio,
+          fin,
+          detalle,
+          camara,
+          categoria,
+          minutos: min,
+          bajarVideo: min >= 10 && categoria !== 'Descanso'
+        });
+      });
+
+      return lista;
+    }
+
+    // ==================== MATEMÁTICA HORARIA CON CRUCE DE MEDIANOCHE ====================
+    function horaAMinutos(hhmm) {
+      if (!hhmm || !hhmm.includes(':')) return 0;
+      const [h, m] = hhmm.split(':').map(Number);
+      return (isNaN(h) || isNaN(m)) ? 0 : (h * 60 + m);
+    }
+
+    function minutosADuracionStr(min) {
+      const signo = min < 0 ? "-" : "";
+      const abs = Math.abs(Math.round(min));
+      const h = Math.floor(abs / 60);
+      const m = abs % 60;
+      return `${signo}${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+    }
+
+    function minutosAReloj24(min) {
+      const norm = ((Math.round(min) % 1440) + 1440) % 1440;
+      const h = Math.floor(norm / 60);
+      const m = norm % 60;
+      return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+    }
+
+    function calcularMinutos(inicio, fin) {
+      if (!inicio || !fin) return 0;
+      const m1 = horaAMinutos(inicio);
+      const m2 = horaAMinutos(fin);
+      if (m2 === m1) return 0;
+      return m2 > m1 ? (m2 - m1) : ((1440 - m1) + m2);
+    }
+
+    // Determina si la línea de tiempo opera en modo nocturno (ej. 22:00 a 06:30)
+    function esModoNocturno() {
+      const turno = document.getElementById('fichaTurno')?.value || '';
+      if (turno === 'TURNO NOCHE') return true;
+      let tieneNoche = false;
+      let tieneMadrugada = false;
+      registros.forEach(r => {
+        const m = horaAMinutos(r.inicio);
+        if (m >= 1080) tieneNoche = true; // >= 18:00
+        if (m < 420) tieneMadrugada = true; // < 07:00
+      });
+      return tieneNoche && tieneMadrugada;
+    }
+
+    // Convierte HH:MM a eje continuo lineal para ordenar y medir huecos/solapamientos sin romperse a las 00:00
+    function obtenerIntervaloLineal(reg, modoNoche) {
+      let ini = horaAMinutos(reg.inicio);
+      let fin = horaAMinutos(reg.fin);
+      if (modoNoche && ini < 720) ini += 1440;
+      if (fin <= ini) fin += 1440;
+      return { ini, fin };
+    }
+
+    function escapeHTML(str) {
+      return String(str ?? '')
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    // ==================== META Y CONTROLES RÁPIDOS ====================
+    function actualizarTextoMeta() {
+      const meta = minutosADuracionStr(metaMinutos);
+      document.getElementById('headerMeta').innerText = `Meta: ${meta} hs`;
+      document.getElementById('metricMeta').innerText = `${meta} hs`;
+      document.getElementById('metaMinutosTexto').innerText = `${metaMinutos} min`;
+      document.getElementById('labelBalance').innerText = `Diferencia (${meta})`;
+      document.getElementById('tituloProporcion').innerText = `Proporción de la Jornada (Meta: ${meta} hs / ${metaMinutos} min)`;
+      document.getElementById('inputMetaJornada').value = minutosAReloj24(metaMinutos);
+    }
+
+    window.setMetaRapida = function (min) {
+      metaMinutos = min;
+      try {
+        localStorage.setItem(STORAGE_META_KEY, String(metaMinutos));
+      } catch (e) { }
+      actualizarTodo();
+      mostrarToast(`Meta ajustada a ${minutosADuracionStr(metaMinutos)} hs`);
+    };
+
+    window.actualizarMetaJornada = function () {
+      const valor = document.getElementById('inputMetaJornada').value;
+      const nuevaMeta = valor ? horaAMinutos(valor) : 0;
+      if (nuevaMeta < 1 || nuevaMeta > 1439) {
+        actualizarTextoMeta();
+        mostrarToast('⚠️ La jornada esperada debe ser mayor a 00:00 hs');
+        return;
+      }
+      metaMinutos = nuevaMeta;
+      try {
+        localStorage.setItem(STORAGE_META_KEY, String(metaMinutos));
+      } catch (e) { }
+      actualizarTodo();
+      mostrarToast(`Meta actualizada a ${minutosADuracionStr(metaMinutos)} hs`);
+    };
+
+    window.sincronizarEstadoPorCategoria = function () {
+      const cat = document.getElementById('inputCategoria').value;
+      const catsInactivas = ['Descanso', 'Charla', 'Celular', 'TV', 'Ausencia'];
+      document.getElementById('inputTipo').value = catsInactivas.includes(cat) ? 'NO_ASISTE' : 'ASISTE';
+    };
+
+    window.sumarDuracionRapida = function (deltaMin) {
+      const iniInput = document.getElementById('inputInicio');
+      const finInput = document.getElementById('inputFin');
+      if (!iniInput.value) {
+        const now = new Date();
+        iniInput.value = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+      }
+      const base = finInput.value ? horaAMinutos(finInput.value) : horaAMinutos(iniInput.value);
+      finInput.value = minutosAReloj24(base + deltaMin);
+      document.getElementById('inputDetalle').focus();
+    };
+
+    function actualizarDatalistCamaras() {
+      const dl = document.getElementById('camarasDatalist');
+      const extras = registros.map(r => r.camara).filter(Boolean);
+      const unicas = Array.from(new Set([...CAMARAS_BASE, ...extras]));
+      dl.innerHTML = unicas.map(c => `<option value="${escapeHTML(c)}"></option>`).join('');
+    }
+
+    // ==================== ACTUALIZACIÓN INTEGRAL ====================
+    function actualizarTodo(soloRender = false) {
+      actualizarTextoMeta();
+      const modoNoche = esModoNocturno();
+
+      // Si estamos editando una fila, preservamos la referencia al objeto para no perder su índice tras ordenar
+      const refEditando = (editandoIndex !== null && registros[editandoIndex]) ? registros[editandoIndex] : null;
+
+      registros.sort((a, b) => {
+        const ia = obtenerIntervaloLineal(a, modoNoche);
+        const ib = obtenerIntervaloLineal(b, modoNoche);
+        return ia.ini - ib.ini || ia.fin - ib.fin;
+      });
+
+      if (refEditando) {
+        editandoIndex = registros.indexOf(refEditando);
+        if (editandoIndex === -1) editandoIndex = null;
+      }
+
+      actualizarDatalistCamaras();
+
+      // Encabezado dinámico y ficha impresa
+      const ficha = obtenerFichaActual();
+      const partesHeader = [`${ficha.fechaDisplay} · ${ficha.turno}`];
+      if (ficha.empleado) partesHeader.push(ficha.empleado);
+      if (ficha.sala) partesHeader.push(ficha.sala);
+      document.getElementById('fechaTurnoHeader').textContent = partesHeader.join(' · ');
+      document.getElementById('printFichaResumen').textContent =
+        `Auditado: ${ficha.empleado || 'Sin especificar'} (${ficha.cargo || 'S/C'}) | Sala: ${ficha.sala || 'General'} | Fecha: ${ficha.fechaDisplay} | ${ficha.turno}`;
+
+      // Filtros activos
+      const qTexto = (document.getElementById('filtroTexto')?.value || '').trim().toLowerCase();
+      const qCat = document.getElementById('filtroCategoria')?.value || 'TODAS';
+      const soloDvr = Boolean(document.getElementById('filtroSoloDvr')?.checked);
+      const hayFiltro = Boolean(qTexto) || qCat !== 'TODAS' || soloDvr;
+      document.getElementById('btnLimpiarFiltros').classList.toggle('hidden', !hayFiltro);
+
+      const tbodyAsiste = document.getElementById('tbodyAsiste');
+      const tbodyNoAsiste = document.getElementById('tbodyNoAsiste');
+      tbodyAsiste.innerHTML = '';
+      tbodyNoAsiste.innerHTML = '';
+
+      let totalMinAsiste = 0;
+      let totalMinNoAsiste = 0;
+      let minDescanso = 0;
+      let countDescansos = 0;
+      let countAsiste = 0;
+      let countNoAsiste = 0;
+
+      registros.forEach((reg, index) => {
+        const duracion = calcularMinutos(reg.inicio, reg.fin);
+        reg.minutos = duracion;
+
+        const esDescanso = reg.categoria === 'Descanso';
+        if (reg.tipo === 'ASISTE') {
+          totalMinAsiste += duracion;
+          countAsiste++;
+        } else {
+          totalMinNoAsiste += duracion;
+          countNoAsiste++;
+          if (esDescanso) {
+            minDescanso += duracion;
+            countDescansos++;
+          }
+        }
+
+        // Aplicar filtro visual en tablas (sin alterar KPIs globales)
+        if (qCat !== 'TODAS' && reg.categoria !== qCat) return;
+        if (soloDvr && !reg.bajarVideo) return;
+        if (qTexto) {
+          const buscable = `${reg.inicio} ${reg.fin} ${reg.camara} ${reg.categoria} ${reg.detalle}`.toLowerCase();
+          if (!buscable.includes(qTexto)) return;
+        }
+
+        const tr = document.createElement('tr');
+        const isEditingThis = editandoIndex === index;
+        tr.className = isEditingThis
+          ? "bg-indigo-50/90 dark:bg-indigo-950/50 ring-1 ring-inset ring-indigo-400 transition-colors"
+          : "hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors";
+
+        const btnDvrClass = reg.bajarVideo
+          ? "bg-rose-600 text-white shadow-sm"
+          : "bg-slate-100 dark:bg-slate-800 text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700";
+
+        const badgeCat = reg.categoria
+          ? `<span class="inline-block mr-1.5 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">${escapeHTML(reg.categoria)}</span>`
+          : '';
+
+        const camBadgeClass = reg.tipo === 'ASISTE'
+          ? "bg-emerald-50 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800/60"
+          : "bg-amber-50 dark:bg-amber-950/50 text-amber-900 dark:text-amber-300 border-amber-200 dark:border-amber-800/60";
+
+        const durColorClass = reg.tipo === 'ASISTE'
+          ? "text-emerald-700 dark:text-emerald-400"
+          : (esDescanso ? "text-sky-700 dark:text-sky-400" : "text-amber-700 dark:text-amber-400");
+
+        tr.innerHTML = `
+          <td class="py-2 px-2.5 font-mono-nums font-medium text-slate-700 dark:text-slate-200 whitespace-nowrap">${reg.inicio} - ${reg.fin}</td>
+          <td class="py-2 px-2.5">
+            <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold border whitespace-nowrap ${camBadgeClass}">
+              ${escapeHTML(reg.camara || 'S/C')}
+            </span>
+          </td>
+          <td class="py-2 px-2.5 text-slate-800 dark:text-slate-200">${badgeCat}${escapeHTML(reg.detalle)}</td>
+          <td class="py-2 px-2.5 text-right font-mono-nums font-bold ${durColorClass}">${minutosADuracionStr(duracion)}</td>
+          <td class="py-2 px-2 text-center no-print whitespace-nowrap">
+            <button type="button" onclick="toggleBajarVideo(${index})" class="px-1.5 py-1 rounded text-xs transition mr-0.5 cursor-pointer ${btnDvrClass}" title="Marcar/Desmarcar para extracción DVR">
+              🎥
+            </button>
+            <button type="button" onclick="editarRegistro(${index})" class="text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition p-1 align-middle cursor-pointer" title="Editar este tramo">
+              ✏️
+            </button>
+            <button type="button" onclick="eliminarRegistro(${index})" class="text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 transition p-1 align-middle cursor-pointer" title="Eliminar fila">
+              🗑️
+            </button>
+          </td>
+        `;
+
+        if (reg.tipo === 'ASISTE') {
+          tbodyAsiste.appendChild(tr);
+        } else {
+          tbodyNoAsiste.appendChild(tr);
+        }
+      });
+
+      if (!tbodyAsiste.children.length) {
+        tbodyAsiste.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-xs text-slate-400 italic">${hayFiltro ? 'Sin coincidencias para el filtro aplicado' : 'Sin tramos de trabajo efectivo registrados'}</td></tr>`;
+      }
+      if (!tbodyNoAsiste.children.length) {
+        tbodyNoAsiste.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-xs text-slate-400 italic">${hayFiltro ? 'Sin coincidencias para el filtro aplicado' : 'Sin descansos ni distracciones registradas'}</td></tr>`;
+      }
+
+      // Subtotales de tabla
+      document.getElementById('subtotalAsiste').innerText = `${minutosADuracionStr(totalMinAsiste)} hs`;
+      document.getElementById('subtotalNoAsiste').innerText = `${minutosADuracionStr(totalMinNoAsiste)} hs`;
+      document.getElementById('badgeCountAsiste').innerText = `${countAsiste} reg.`;
+      document.getElementById('badgeCountNoAsiste').innerText = `${countNoAsiste} reg.`;
+
+      // Separar Descanso Legal de Distracción Neta
+      const minDistraccionNeta = Math.max(0, totalMinNoAsiste - minDescanso);
+      const totalRegistrado = totalMinAsiste + totalMinNoAsiste;
+      const porcAsiste = totalRegistrado > 0 ? ((totalMinAsiste / totalRegistrado) * 100).toFixed(1) : '0.0';
+      const porcDistraccion = totalRegistrado > 0 ? ((minDistraccionNeta / totalRegistrado) * 100).toFixed(1) : '0.0';
+
+      // Tarjetas Superiores
+      document.getElementById('metricAsiste').innerText = `${minutosADuracionStr(totalMinAsiste)} hs`;
+      document.getElementById('metricAsistePorc').innerText = `${porcAsiste}% del registrado`;
+      document.getElementById('metricDescanso').innerText = `${minutosADuracionStr(minDescanso)} hs`;
+      document.getElementById('metricDescansoDetalle').innerText = `${countDescansos} pausa(s) registrada(s)`;
+      document.getElementById('metricDistraccion').innerText = `${minutosADuracionStr(minDistraccionNeta)} hs`;
+      document.getElementById('metricDistraccionPorc').innerText = `${porcDistraccion}% (${minDistraccionNeta} min)`;
+
+      const diferencia = totalRegistrado - metaMinutos;
+      const metricDifEl = document.getElementById('metricDiferencia');
+      const subDifEl = document.getElementById('subDiferencia');
+      const cardBalance = document.getElementById('cardBalance');
+
+      if (diferencia === 0) {
+        metricDifEl.innerText = "00:00 hs";
+        metricDifEl.className = "text-xl font-bold text-emerald-700 dark:text-emerald-400 font-mono-nums mt-1";
+        subDifEl.innerText = `¡Jornada exacta!`;
+        subDifEl.className = "text-xs text-emerald-700 dark:text-emerald-300 font-semibold block mt-0.5";
+        cardBalance.className = "bg-emerald-50/70 dark:bg-emerald-950/25 p-4 rounded-xl border border-emerald-300 dark:border-emerald-800/60 shadow-sm flex items-center justify-between";
+      } else if (diferencia < 0) {
+        metricDifEl.innerText = `${minutosADuracionStr(diferencia)} hs`;
+        metricDifEl.className = "text-xl font-bold text-rose-700 dark:text-rose-400 font-mono-nums mt-1";
+        subDifEl.innerText = `Faltan ${Math.abs(diferencia)} min`;
+        subDifEl.className = "text-xs text-rose-600 dark:text-rose-300 font-medium block mt-0.5";
+        cardBalance.className = "bg-rose-50/70 dark:bg-rose-950/25 p-4 rounded-xl border border-rose-200 dark:border-rose-800/60 shadow-sm flex items-center justify-between";
+      } else {
+        metricDifEl.innerText = `+${minutosADuracionStr(diferencia)} hs`;
+        metricDifEl.className = "text-xl font-bold text-indigo-700 dark:text-indigo-400 font-mono-nums mt-1";
+        subDifEl.innerText = `Excede por ${diferencia} min`;
+        subDifEl.className = "text-xs text-indigo-600 dark:text-indigo-300 font-medium block mt-0.5";
+        cardBalance.className = "bg-indigo-50/70 dark:bg-indigo-950/25 p-4 rounded-xl border border-indigo-200 dark:border-indigo-800/60 shadow-sm flex items-center justify-between";
+      }
+
+      // Barra de Progreso
+      const denomBarra = Math.max(metaMinutos, totalRegistrado, 1);
+      const pAsiste = Math.min(100, (totalMinAsiste / denomBarra) * 100);
+      const pDescanso = Math.min(100 - pAsiste, (minDescanso / denomBarra) * 100);
+      const pDistraccion = Math.min(100 - pAsiste - pDescanso, (minDistraccionNeta / denomBarra) * 100);
+
+      document.getElementById('barAsiste').style.width = `${pAsiste}%`;
+      document.getElementById('barDescanso').style.width = `${pDescanso}%`;
+      document.getElementById('barDistraccion').style.width = `${pDistraccion}%`;
+
+      // Encadenar siguiente hora de inicio SOLO cuando NO se está editando una fila existente
+      if (editandoIndex === null && registros.length > 0 && document.getElementById('checkEncadenar').checked) {
+        const ultimoFin = registros[registros.length - 1].fin;
+        document.getElementById('inputInicio').value = ultimoFin;
+      }
+
+      const anomalias = analizarLineaDeTiempo(modoNoche);
+      renderizarOrdenDvr();
+      renderizarDesgloseYCamaras();
+      generarResumenEjecutivo({
+        ficha,
+        totalMinAsiste,
+        minDescanso,
+        countDescansos,
+        minDistraccionNeta,
+        totalRegistrado,
+        porcAsiste,
+        porcDistraccion,
+        diferencia,
+        anomalias
+      });
+      actualizarBadgeHistorial();
+
+      if (!soloRender) {
+        try {
+          localStorage.setItem(STORAGE_REGISTROS_KEY, JSON.stringify(registros));
+        } catch (e) { }
+      }
+    }
+
+    // ==================== DIAGNÓSTICO DE HUECOS Y SOLAPAMIENTOS ====================
+    function analizarLineaDeTiempo(modoNoche) {
+      const listaEl = document.getElementById('listaAnomalias');
+      const resumenEl = document.getElementById('resumenAnomalias');
+      const panelEl = document.getElementById('panelAnomalias');
+      const btnSolapa = document.getElementById('btnCorregirSolapamientos');
+      const btnHuecos = document.getElementById('btnAutocompletarPanel');
+      listaEl.innerHTML = '';
+
+      if (registros.length === 0) {
+        panelEl.className = "bg-slate-100 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl p-3.5 text-xs";
+        resumenEl.innerText = "Planilla en 0. Ingresa el primer tramo en el formulario inferior para comenzar.";
+        resumenEl.className = "font-medium text-slate-600 dark:text-slate-300";
+        document.getElementById('rangoGlobalTexto').innerText = "Rango cubierto: Sin registros cargados";
+        btnSolapa.classList.add('hidden');
+        btnHuecos.classList.add('hidden');
+        return { huecos: [], solapamientos: [] };
+      }
+
+      const primero = obtenerIntervaloLineal(registros[0], modoNoche);
+      let maxFinLineal = primero.fin;
+      let ultimoFinStr = registros[0].fin;
+      registros.forEach(r => {
+        const iv = obtenerIntervaloLineal(r, modoNoche);
+        if (iv.fin >= maxFinLineal) {
+          maxFinLineal = iv.fin;
+          ultimoFinStr = r.fin;
+        }
+      });
+
+      const spanTotal = Math.max(0, maxFinLineal - primero.ini);
+      document.getElementById('rangoGlobalTexto').innerText =
+        `Rango horario cubierto: ${registros[0].inicio} a ${ultimoFinStr} (${minutosADuracionStr(spanTotal)} hs entre inicio y fin)`;
+
+      const huecos = [];
+      const solapamientos = [];
+      let totalMinHuecos = 0;
+      let totalMinSolapados = 0;
+      let cursorMaxFin = primero.fin;
+      let cursorMaxFinStr = registros[0].fin;
+
+      for (let i = 1; i < registros.length; i++) {
+        const sig = obtenerIntervaloLineal(registros[i], modoNoche);
+        if (sig.ini > cursorMaxFin) {
+          const diff = sig.ini - cursorMaxFin;
+          totalMinHuecos += diff;
+          huecos.push({
+            desde: cursorMaxFinStr,
+            hasta: registros[i].inicio,
+            minutos: diff
+          });
+        } else if (sig.ini < cursorMaxFin) {
+          const overlap = Math.min(cursorMaxFin, sig.fin) - sig.ini;
+          totalMinSolapados += overlap;
+          solapamientos.push({
+            desde: registros[i].inicio,
+            hasta: minutosAReloj24(Math.min(cursorMaxFin, sig.fin)),
+            minutos: overlap
+          });
+        }
+        if (sig.fin > cursorMaxFin) {
+          cursorMaxFin = sig.fin;
+          cursorMaxFinStr = registros[i].fin;
+        }
+      }
+
+      btnSolapa.classList.toggle('hidden', solapamientos.length === 0);
+      btnHuecos.classList.toggle('hidden', huecos.length === 0 && (registros.reduce((a, r) => a + r.minutos, 0) >= metaMinutos));
+
+      if (huecos.length === 0 && solapamientos.length === 0) {
+        panelEl.className = "bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/60 rounded-xl p-3.5 text-xs";
+        resumenEl.innerText = "¡Línea de tiempo continua! Sin huecos ni solapamientos entre tramos.";
+        resumenEl.className = "font-semibold text-emerald-800 dark:text-emerald-300";
+      } else {
+        const partes = [];
+        if (solapamientos.length > 0) {
+          partes.push(`${solapamientos.length} solapamiento(s) (${totalMinSolapados} min duplicados)`);
+        }
+        if (huecos.length > 0) {
+          partes.push(`${huecos.length} hueco(s) sin registrar (${totalMinHuecos} min / ${minutosADuracionStr(totalMinHuecos)} hs)`);
+        }
+        panelEl.className = solapamientos.length > 0
+          ? "bg-rose-50/90 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-800/60 rounded-xl p-3.5 text-xs space-y-2"
+          : "bg-amber-50/90 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/60 rounded-xl p-3.5 text-xs space-y-2";
+        resumenEl.innerText = `Se detectaron ${partes.join(' y ')}:`;
+        resumenEl.className = solapamientos.length > 0
+          ? "font-semibold text-rose-900 dark:text-rose-200"
+          : "font-medium text-amber-900 dark:text-amber-200";
+
+        solapamientos.forEach(s => {
+          const span = document.createElement('span');
+          span.className = "px-2 py-0.5 rounded-lg bg-rose-100 dark:bg-rose-900/60 border border-rose-300 dark:border-rose-700 text-rose-900 dark:text-rose-200 font-mono-nums text-[11px] font-semibold";
+          span.innerText = `⚠️ Solapa ${s.desde} ↔ ${s.hasta} (${s.minutos}m)`;
+          listaEl.appendChild(span);
+        });
+
+        huecos.forEach(h => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.title = 'Clic para cargar este hueco en el formulario';
+          btn.className = "px-2 py-0.5 rounded-lg bg-white dark:bg-slate-900 hover:bg-indigo-50 dark:hover:bg-indigo-950 border border-amber-300 dark:border-amber-700 text-amber-900 dark:text-amber-200 font-mono-nums text-[11px] shadow-sm transition cursor-pointer";
+          btn.innerText = `Hueco ${h.desde} → ${h.hasta} (${h.minutos}m)`;
+          btn.onclick = () => cargarHuecoEnFormulario(h.desde, h.hasta);
+          listaEl.appendChild(btn);
+        });
+      }
+
+      return { huecos, solapamientos };
+    }
+
+    function cargarHuecoEnFormulario(desde, hasta) {
+      cancelarEdicion(true);
+      document.getElementById('inputInicio').value = desde;
+      document.getElementById('inputFin').value = hasta;
+      document.getElementById('inputDetalle').focus();
+      document.getElementById('cardFormulario').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      mostrarToast(`Hueco ${desde} → ${hasta} cargado en el formulario`);
+    }
+
+    window.corregirSolapamientosAutomatico = function () {
+      if (registros.length < 2) return;
+      guardarSnapshotUndo('ajuste de solapamientos');
+      const modoNoche = esModoNocturno();
+
+      registros.sort((a, b) => {
+        const ia = obtenerIntervaloLineal(a, modoNoche);
+        const ib = obtenerIntervaloLineal(b, modoNoche);
+        return ia.ini - ib.ini || ia.fin - ib.fin;
+      });
+
+      const limpios = [registros[0]];
+      for (let i = 1; i < registros.length; i++) {
+        const prev = obtenerIntervaloLineal(limpios[limpios.length - 1], modoNoche);
+        const curr = obtenerIntervaloLineal(registros[i], modoNoche);
+
+        if (curr.fin <= prev.fin) {
+          // Tramo totalmente contenido dentro del anterior: se omite duplicado
+          continue;
+        }
+        if (curr.ini < prev.fin) {
+          registros[i].inicio = minutosAReloj24(prev.fin);
+          registros[i].minutos = calcularMinutos(registros[i].inicio, registros[i].fin);
+        }
+        limpios.push(registros[i]);
+      }
+
+      registros = limpios;
+      actualizarTodo();
+      mostrarToast('✓ Solapamientos horarios corregidos', true);
+    };
+
+    window.autocompletarHuecos = function () {
+      if (registros.length === 0) {
+        mostrarToast('Primero registra al menos un tramo para autocompletar');
+        return;
+      }
+
+      const modoNoche = esModoNocturno();
+      registros.sort((a, b) => obtenerIntervaloLineal(a, modoNoche).ini - obtenerIntervaloLineal(b, modoNoche).ini);
+
+      const nuevosTramos = [];
+      let cursorFin = obtenerIntervaloLineal(registros[0], modoNoche).fin;
+      let cursorFinStr = registros[0].fin;
+      let cursorCam = registros[0].camara || 'CAM-01 (Sala Gral)';
+
+      for (let i = 1; i < registros.length; i++) {
+        const sig = obtenerIntervaloLineal(registros[i], modoNoche);
+        if (sig.ini > cursorFin) {
+          const d = sig.ini - cursorFin;
+          nuevosTramos.push({
+            tipo: 'ASISTE',
+            inicio: cursorFinStr,
+            fin: registros[i].inicio,
+            detalle: 'Transición / Traslado entre sectores (Autocompletado)',
+            camara: cursorCam,
+            categoria: 'Traslado',
+            minutos: d,
+            bajarVideo: false
+          });
+        }
+        if (sig.fin > cursorFin) {
+          cursorFin = sig.fin;
+          cursorFinStr = registros[i].fin;
+          cursorCam = registros[i].camara || cursorCam;
+        }
+      }
+
+      const totalActual = registros.reduce((acc, r) => acc + calcularMinutos(r.inicio, r.fin), 0) +
+        nuevosTramos.reduce((acc, r) => acc + r.minutos, 0);
+
+      if (totalActual < metaMinutos) {
+        const faltante = metaMinutos - totalActual;
+        nuevosTramos.push({
+          tipo: 'ASISTE',
+          inicio: cursorFinStr,
+          fin: minutosAReloj24(cursorFin + faltante),
+          detalle: 'Cierre de jornada / Fichada de salida',
+          camara: 'CAM-07 (Acceso/Puerta)',
+          categoria: 'Operativo',
+          minutos: faltante,
+          bajarVideo: false
+        });
+      }
+
+      if (nuevosTramos.length === 0) {
+        mostrarToast('No hay huecos ni minutos faltantes para autocompletar');
+        return;
+      }
+
+      guardarSnapshotUndo('autocompletar huecos');
+      registros = registros.concat(nuevosTramos);
+      actualizarTodo();
+      mostrarToast(`⚡ Se completaron ${nuevosTramos.length} tramo(s)`, true);
+    };
+
+    // ==================== AGREGAR Y EDITAR SIN PÉRDIDA DE DATOS ====================
+    window.agregarRegistro = function (e) {
+      e.preventDefault();
+      const tipo = document.getElementById('inputTipo').value;
+      const categoria = document.getElementById('inputCategoria').value;
+      const camara = document.getElementById('inputCamara').value.trim() || 'CAM-01 (Sala Gral)';
+      const inicio = document.getElementById('inputInicio').value;
+      const fin = document.getElementById('inputFin').value;
+      const detalle = document.getElementById('inputDetalle').value.trim();
+      const bajarVideo = document.getElementById('inputBajarVideo').checked;
+
+      const minutos = calcularMinutos(inicio, fin);
+      if (minutos <= 0 || minutos > 960) {
+        mostrarToast('⚠️ Verifica el horario (duración entre 1 min y 16 hs)');
+        return;
+      }
+
+      const nuevoObj = { tipo, categoria, camara, inicio, fin, detalle, minutos, bajarVideo };
+
+      if (editandoIndex !== null && registros[editandoIndex]) {
+        guardarSnapshotUndo('edición de tramo');
+        registros[editandoIndex] = nuevoObj;
+        cancelarEdicion(true);
+        actualizarTodo();
+        mostrarToast('✏️ Tramo actualizado correctamente', true);
+      } else {
+        registros.push(nuevoObj);
+        document.getElementById('inputDetalle').value = '';
+        document.getElementById('inputFin').value = '';
+        document.getElementById('inputBajarVideo').checked = false;
+        actualizarTodo();
+        mostrarToast('✓ Tramo horario agregado');
+      }
+    };
+
+    window.editarRegistro = function (index) {
+      const reg = registros[index];
+      if (!reg) return;
+      editandoIndex = index;
+
+      document.getElementById('inputTipo').value = reg.tipo;
+      document.getElementById('inputCategoria').value = reg.categoria || 'Operativo';
+      document.getElementById('inputCamara').value = reg.camara || 'CAM-01 (Sala Gral)';
+      document.getElementById('inputInicio').value = reg.inicio;
+      document.getElementById('inputFin').value = reg.fin;
+      document.getElementById('inputDetalle').value = reg.detalle;
+      document.getElementById('inputBajarVideo').checked = !!reg.bajarVideo;
+
+      document.getElementById('bannerEdicion').classList.remove('hidden');
+      document.getElementById('textoBannerEdicion').textContent = `Editando tramo ${reg.inicio} - ${reg.fin} (${reg.camara})`;
+      document.getElementById('btnSubmitRegistro').textContent = 'Guardar';
+      document.getElementById('tituloFormulario').textContent = 'Modificar Tramo Seleccionado';
+
+      actualizarTodo(true);
+      document.getElementById('cardFormulario').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      document.getElementById('inputDetalle').focus();
+    };
+
+    window.cancelarEdicion = function (silencioso = false) {
+      editandoIndex = null;
+      document.getElementById('bannerEdicion').classList.add('hidden');
+      document.getElementById('btnSubmitRegistro').textContent = 'Añadir';
+      document.getElementById('tituloFormulario').textContent = 'Registrar Tramo Horario / Cámara';
+      document.getElementById('inputDetalle').value = '';
+      document.getElementById('inputFin').value = '';
+      document.getElementById('inputBajarVideo').checked = false;
+      if (!silencioso) {
+        actualizarTodo(true);
+        mostrarToast('Edición cancelada');
+      }
+    };
+
+    window.eliminarRegistro = function (index) {
+      if (!registros[index]) return;
+      guardarSnapshotUndo(`eliminar tramo ${registros[index].inicio}-${registros[index].fin}`);
+      if (editandoIndex === index) cancelarEdicion(true);
+      registros.splice(index, 1);
+      actualizarTodo();
+      mostrarToast('🗑️ Registro eliminado', true);
+    };
+
+    window.limpiarFiltrosTabla = function () {
+      document.getElementById('filtroTexto').value = '';
+      document.getElementById('filtroCategoria').value = 'TODAS';
+      document.getElementById('filtroSoloDvr').checked = false;
+      actualizarTodo(true);
+    };
+
+    // ==================== ORDEN DVR, ESTADÍSTICAS Y RESUMEN EJECUTIVO ====================
+    function renderizarOrdenDvr() {
+      const cont = document.getElementById('contenedorDvr');
+      const badge = document.getElementById('badgeCountDvr');
+      const marcados = registros.filter(r => r.bajarVideo);
+      badge.innerText = `${marcados.length} clips`;
+
+      if (marcados.length === 0) {
+        cont.innerHTML = `<div class="text-xs text-slate-400 italic py-6 text-center">No hay cámaras marcadas. Haz clic en 🎥 en cualquier fila o usa "Distracciones ≥ 5m" para armar la orden DVR.</div>`;
+        return;
+      }
+
+      cont.innerHTML = marcados.map((r, i) => `
+        <div class="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs">
+          <div class="flex items-center gap-2 min-w-0">
+            <span class="font-mono-nums font-bold text-rose-600 dark:text-rose-400 shrink-0">#${i + 1}</span>
+            <span class="px-2 py-0.5 rounded bg-slate-900 dark:bg-indigo-950 text-white dark:text-indigo-200 border border-slate-700 font-semibold text-[11px] shrink-0">${escapeHTML(r.camara)}</span>
+            <span class="font-mono-nums font-bold text-slate-800 dark:text-slate-100 shrink-0">${r.inicio} a ${r.fin}</span>
+            <span class="text-slate-600 dark:text-slate-400 truncate">${escapeHTML(r.detalle)}</span>
+          </div>
+          <span class="font-mono-nums font-semibold text-slate-700 dark:text-slate-300 shrink-0">${r.minutos}m (${minutosADuracionStr(r.minutos)})</span>
+        </div>
+      `).join('');
+    }
+
+    function renderizarDesgloseYCamaras() {
+      const contCam = document.getElementById('contenedorRankingCamaras');
+      const contCat = document.getElementById('contenedorDesgloseCategorias');
+      const mapaCam = {};
+      const mapaCat = {};
+      let totalMin = 0;
+
+      registros.forEach(r => {
+        const cam = r.camara || 'Sin Cámara';
+        const cat = r.categoria || (r.tipo === 'ASISTE' ? 'Operativo' : 'Observación');
+        mapaCam[cam] = (mapaCam[cam] || 0) + r.minutos;
+        mapaCat[cat] = (mapaCat[cat] || 0) + r.minutos;
+        totalMin += r.minutos;
+      });
+
+      const coloresCat = {
+        'Operativo': 'bg-emerald-500',
+        'Traslado': 'bg-teal-500',
+        'Celular Trabajo': 'bg-cyan-500',
+        'Descanso': 'bg-sky-500',
+        'Charla': 'bg-amber-500',
+        'Celular': 'bg-rose-500',
+        'TV': 'bg-orange-500',
+        'Ausencia': 'bg-red-600'
+      };
+
+      const catsOrdenadas = Object.entries(mapaCat).sort((a, b) => b[1] - a[1]);
+      contCat.innerHTML = catsOrdenadas.length
+        ? catsOrdenadas.map(([cat, min]) => {
+          const porc = totalMin > 0 ? Math.round((min / totalMin) * 100) : 0;
+          const barCls = coloresCat[cat] || 'bg-indigo-500';
+          return `
+              <div class="space-y-1">
+                <div class="flex justify-between text-xs">
+                  <span class="font-semibold text-slate-700 dark:text-slate-200">${escapeHTML(cat)}</span>
+                  <span class="font-mono-nums text-slate-600 dark:text-slate-300 font-bold">${minutosADuracionStr(min)} hs (${min}m · ${porc}%)</span>
+                </div>
+                <div class="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                  <div class="${barCls} h-full rounded-full" style="width: ${porc}%"></div>
+                </div>
+              </div>
+            `;
+        }).join('')
+        : '<p class="text-xs text-slate-400 italic">Sin datos registrados.</p>';
+
+      const camsOrdenadas = Object.entries(mapaCam).sort((a, b) => b[1] - a[1]);
+      contCam.innerHTML = camsOrdenadas.length
+        ? camsOrdenadas.map(([cam, min]) => {
+          const porc = totalMin > 0 ? Math.round((min / totalMin) * 100) : 0;
+          return `
+              <div class="space-y-1">
+                <div class="flex justify-between text-xs">
+                  <span class="font-semibold text-slate-700 dark:text-slate-200">${escapeHTML(cam)}</span>
+                  <span class="font-mono-nums text-slate-600 dark:text-slate-300 font-bold">${minutosADuracionStr(min)} hs (${porc}%)</span>
+                </div>
+                <div class="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                  <div class="bg-indigo-600 h-full rounded-full" style="width: ${porc}%"></div>
+                </div>
+              </div>
+            `;
+        }).join('')
+        : '<p class="text-xs text-slate-400 italic">Sin cámaras registradas.</p>';
+    }
+
+    function generarResumenEjecutivo(ctx) {
+      const { ficha, totalMinAsiste, minDescanso, countDescansos, minDistraccionNeta, totalRegistrado, porcAsiste, porcDistraccion, diferencia } = ctx;
+      const area = document.getElementById('resumenEjecutivoTexto');
+      if (!area) return;
+
+      if (registros.length === 0) {
+        area.value = 'Carga tramos horarios para generar automáticamente el Resumen Ejecutivo de Auditoría CCTV.';
+        return;
+      }
+
+      const porCat = {};
+      registros.forEach(r => {
+        if (r.tipo === 'NO_ASISTE' && r.categoria !== 'Descanso') {
+          const c = r.categoria || 'Observación';
+          porCat[c] = (porCat[c] || 0) + r.minutos;
+        }
+      });
+
+      const detalleDistraccion = Object.entries(porCat)
+        .sort((a, b) => b[1] - a[1])
+        .map(([c, m]) => `${c}: ${m} min (${minutosADuracionStr(m)} hs)`)
+        .join(' | ') || 'Sin distracciones registradas';
+
+      const topInactivos = registros
+        .filter(r => r.tipo === 'NO_ASISTE' && r.categoria !== 'Descanso' && r.minutos >= 5)
+        .sort((a, b) => b.minutos - a.minutos)
+        .slice(0, 6)
+        .map(r => `  • ${r.inicio} a ${r.fin} (${r.minutos} min) [${r.camara}]: ${r.detalle}`);
+
+      const balanceStr = diferencia === 0
+        ? `Jornada exacta (${minutosADuracionStr(metaMinutos)} hs)`
+        : (diferencia < 0 ? `Faltan ${Math.abs(diferencia)} min respecto a meta (${minutosADuracionStr(metaMinutos)} hs)` : `Excede por ${diferencia} min respecto a meta (${minutosADuracionStr(metaMinutos)} hs)`);
+
+      const lineas = [
+        `INFORME DE AUDITORÍA DE TURNO - CCTV`,
+        `Fecha: ${ficha.fechaDisplay} | ${ficha.turno}${ficha.sala ? ` | Sala: ${ficha.sala}` : ''}`,
+        `Personal Auditado: ${ficha.empleado || 'Sin especificar'}${ficha.cargo ? ` (${ficha.cargo})` : ''}`,
+        `Horario Registrado: ${registros[0].inicio} a ${registros[registros.length - 1].fin} (Total computado: ${minutosADuracionStr(totalRegistrado)} hs — ${balanceStr})`,
+        ``,
+        `RESUMEN DE TIEMPOS:`,
+        `• Trabajo Efectivo (ASISTE): ${minutosADuracionStr(totalMinAsiste)} hs (${totalMinAsiste} min — ${porcAsiste}%)`,
+        `• Descansos Permitidos: ${minutosADuracionStr(minDescanso)} hs (${minDescanso} min en ${countDescansos} pausa/s)`,
+        `• Distracción / Inactividad Neta: ${minutosADuracionStr(minDistraccionNeta)} hs (${minDistraccionNeta} min — ${porcDistraccion}%)`,
+        `  Desglose inactividad: ${detalleDistraccion}.`
+      ];
+
+      if (topInactivos.length > 0) {
+        lineas.push(``, `PRINCIPALES OBSERVACIONES (≥ 5 MIN):`, ...topInactivos);
+      }
+
+      area.value = lineas.join('\n');
+    }
+
+    async function copiarTextoPortapapeles(texto, mensajeToast) {
+      if (navigator.clipboard && window.isSecureContext) {
+        try {
+          await navigator.clipboard.writeText(texto);
+          mostrarToast(mensajeToast);
+          return;
+        } catch (e) { }
+      }
+      const textarea = document.createElement('textarea');
+      textarea.value = texto;
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+      mostrarToast(mensajeToast);
+    }
+
+    window.copiarResumenEjecutivo = function () {
+      const txt = document.getElementById('resumenEjecutivoTexto').value.trim();
+      if (!txt || registros.length === 0) {
+        mostrarToast('No hay datos cargados para copiar');
+        return;
+      }
+      copiarTextoPortapapeles(txt, '📋 Informe Ejecutivo copiado al portapapeles');
+    };
+
+    window.toggleBajarVideo = function (index) {
+      if (!registros[index]) return;
+      registros[index].bajarVideo = !registros[index].bajarVideo;
+      actualizarTodo();
+    };
+
+    window.marcarInactividadMayorA5Min = function () {
+      let count = 0;
+      registros.forEach(r => {
+        if (r.tipo === 'NO_ASISTE' && r.categoria !== 'Descanso' && r.minutos >= 5) {
+          r.bajarVideo = true;
+          count++;
+        }
+      });
+      actualizarTodo();
+      mostrarToast(`🎥 ${count} tramo(s) de distracción marcados para DVR`);
+    };
+
+    window.desmarcarTodosDvr = function () {
+      registros.forEach(r => { r.bajarVideo = false; });
+      actualizarTodo();
+      mostrarToast('Marcas de extracción DVR limpiadas');
+    };
+
+    window.copiarOrdenDvr = function () {
+      const marcados = registros.filter(r => r.bajarVideo);
+      if (marcados.length === 0) {
+        mostrarToast('No hay clips marcados para copiar');
+        return;
+      }
+      const f = obtenerFichaActual();
+      const cabecera = `ORDEN DE EXTRACCIÓN DE VIDEO (CCTV - ${f.fechaDisplay} - ${f.turno})` +
+        (f.empleado ? `\nAuditado: ${f.empleado}${f.sala ? ` | Sala: ${f.sala}` : ''}` : '');
+      const texto = cabecera + '\n' +
+        marcados.map((r, i) => `${i + 1}. [${r.camara}] de ${r.inicio} a ${r.fin} (${r.minutos} min / ${minutosADuracionStr(r.minutos)} hs) - ${r.detalle}`).join('\n');
+
+      copiarTextoPortapapeles(texto, '📋 Orden DVR copiada al portapapeles');
+    };
+
+    window.aplicarPlantilla = function (tipo, categoria, camara, detalle) {
+      document.getElementById('inputTipo').value = tipo;
+      document.getElementById('inputCategoria').value = categoria;
+      document.getElementById('inputCamara').value = camara;
+      document.getElementById('inputDetalle').value = detalle;
+      document.getElementById('inputFin').focus();
+      mostrarToast('Plantilla aplicada: ingresa la hora de Fin (o usa +5m / +10m)');
+    };
+
+    // ==================== LIMPIAR, EJEMPLO Y EXPORTAR CSV ====================
+    window.mostrarModalLimpiar = function () {
+      const modal = document.getElementById('modalLimpiar');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    };
+
+    window.cerrarModalLimpiar = function () {
+      const modal = document.getElementById('modalLimpiar');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    };
+
+    window.confirmarLimpiarTodo = function () {
+      if (registros.length > 0) {
+        guardarSnapshotUndo('limpieza completa de planilla');
+      }
+      cancelarEdicion(true);
+      registros = [];
+      metaMinutos = META_MINUTOS_DEFAULT;
+      try {
+        localStorage.setItem(STORAGE_REGISTROS_KEY, JSON.stringify([]));
+        localStorage.setItem(STORAGE_META_KEY, String(META_MINUTOS_DEFAULT));
+      } catch (e) { }
+
+      const horaArranque = document.getElementById('inputHoraArranque').value || '07:00';
+      document.getElementById('inputInicio').value = horaArranque;
+      document.getElementById('inputFin').value = '';
+      document.getElementById('inputDetalle').value = '';
+      document.getElementById('inputBajarVideo').checked = false;
+      document.getElementById('inputMetaJornada').value = '08:30';
+
+      cerrarModalLimpiar();
+      actualizarTodo();
+      document.getElementById('inputFin').focus();
+      mostrarToast('✨ Planilla limpia en 0', Boolean(ultimoRespaldo));
+    };
+
+    window.restaurarPlanillaOriginal = function () {
+      if (registros.length > 0) {
+        guardarSnapshotUndo('cargar planilla de ejemplo');
+      }
+      cancelarEdicion(true);
+      registros = prepararDatosIniciales();
+      actualizarTodo();
+      mostrarToast('Planilla de ejemplo cargada', Boolean(ultimoRespaldo));
+    };
+
+    window.exportarCSV = function () {
+      if (registros.length === 0) {
+        mostrarToast('No hay registros para exportar');
+        return;
+      }
+      const f = obtenerFichaActual();
+      let csv = `Fecha Auditada,${f.fechaDisplay},Turno,${f.turno},Personal,"${f.empleado.replace(/"/g, '""')}",Sala,"${f.sala.replace(/"/g, '""')}"\n\n`;
+      csv += "Estado,Categoria,Camara,Inicio,Fin,Duracion (HH:MM),Minutos,Bajar Video DVR,Observacion\n";
+      registros.forEach(r => {
+        const fila = [
+          r.tipo,
+          `"${(r.categoria || '').replace(/"/g, '""')}"`,
+          `"${(r.camara || '').replace(/"/g, '""')}"`,
+          r.inicio,
+          r.fin,
+          minutosADuracionStr(r.minutos),
+          r.minutos,
+          r.bajarVideo ? 'SI' : 'NO',
+          `"${(r.detalle || '').replace(/"/g, '""')}"`
+        ];
+        csv += fila.join(",") + "\n";
+      });
+
+      const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      const slugEmp = (f.empleado || 'empleado').toLowerCase().replace(/[^a-z0-9]+/g, '_');
+      a.download = `auditoria_cctv_${slugEmp}_${f.fechaIso}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      mostrarToast('📥 Archivo CSV descargado');
+    };
+
+    // ==================== HISTORIAL DE AUDITORÍAS GUARDADAS ====================
+    function leerHistorialAuditorias() {
+      try {
+        const raw = localStorage.getItem(STORAGE_HISTORIAL_KEY);
+        const parsed = raw ? JSON.parse(raw) : [];
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function actualizarBadgeHistorial() {
+      const el = document.getElementById('badgeHistorialCount');
+      if (el) el.textContent = String(leerHistorialAuditorias().length);
+    }
+
+    window.guardarAuditoriaEnHistorial = function () {
+      if (registros.length === 0) {
+        mostrarToast('Carga al menos un tramo antes de guardar en el historial');
+        return;
+      }
+      const f = obtenerFichaActual();
+      const hist = leerHistorialAuditorias();
+      const totalAsiste = registros.filter(r => r.tipo === 'ASISTE').reduce((a, r) => a + r.minutos, 0);
+      const totalNoAsiste = registros.filter(r => r.tipo !== 'ASISTE').reduce((a, r) => a + r.minutos, 0);
+
+      hist.unshift({
+        id: Date.now(),
+        guardadoEl: new Date().toLocaleString('es-AR'),
+        ficha: f,
+        metaMinutos,
+        resumen: `${minutosADuracionStr(totalAsiste)} Asiste / ${minutosADuracionStr(totalNoAsiste)} No Asiste (${registros.length} tramos)`,
+        registros: JSON.parse(JSON.stringify(registros))
+      });
+
+      if (hist.length > 25) hist.pop();
+      try {
+        localStorage.setItem(STORAGE_HISTORIAL_KEY, JSON.stringify(hist));
+      } catch (e) { }
+      actualizarBadgeHistorial();
+      mostrarToast('💾 Auditoría guardada en el historial');
+    };
+
+    window.abrirModalHistorial = function () {
+      renderizarListaHistorial();
+      const m = document.getElementById('modalHistorial');
+      m.classList.remove('hidden');
+      m.classList.add('flex');
+    };
+
+    window.cerrarModalHistorial = function () {
+      const m = document.getElementById('modalHistorial');
+      m.classList.add('hidden');
+      m.classList.remove('flex');
+    };
+
+    function renderizarListaHistorial() {
+      const cont = document.getElementById('listaHistorialAuditorias');
+      const hist = leerHistorialAuditorias();
+      if (!hist.length) {
+        cont.innerHTML = `<p class="text-xs text-slate-500 dark:text-slate-400 text-center py-8 italic">Aún no hay auditorías guardadas. Usa el botón "Guardar" en la barra superior para archivar evaluaciones por empleado.</p>`;
+        return;
+      }
+      cont.innerHTML = hist.map(item => `
+        <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex items-center justify-between gap-3 text-xs">
+          <div class="min-w-0">
+            <div class="font-bold text-slate-800 dark:text-slate-100 truncate">
+              ${escapeHTML(item.ficha?.empleado || 'Sin nombre')} · <span class="text-indigo-600 dark:text-indigo-400">${escapeHTML(item.ficha?.sala || 'Sala Gral')}</span>
+            </div>
+            <div class="text-slate-500 dark:text-slate-400 font-mono text-[11px] mt-0.5">
+              ${escapeHTML(item.ficha?.fechaDisplay || '')} · ${escapeHTML(item.ficha?.turno || '')} · ${escapeHTML(item.resumen || '')}
+            </div>
+          </div>
+          <div class="flex items-center gap-1.5 shrink-0">
+            <button type="button" onclick="cargarAuditoriaDeHistorial(${Number(item.id)})" class="px-2.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold cursor-pointer">
+              Cargar
+            </button>
+            <button type="button" onclick="eliminarAuditoriaDeHistorial(${Number(item.id)})" class="px-2 py-1.5 rounded-lg bg-slate-200 dark:bg-slate-800 hover:bg-rose-600 hover:text-white text-slate-600 dark:text-slate-300 font-semibold cursor-pointer">
+              ✕
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    window.cargarAuditoriaDeHistorial = function (id) {
+      const hist = leerHistorialAuditorias();
+      const item = hist.find(x => x.id === id);
+      if (!item) return;
+      if (registros.length > 0) guardarSnapshotUndo('cargar auditoría del historial');
+
+      registros = JSON.parse(JSON.stringify(item.registros || []));
+      metaMinutos = item.metaMinutos || META_MINUTOS_DEFAULT;
+      if (item.ficha) {
+        document.getElementById('fichaEmpleado').value = item.ficha.empleado || '';
+        document.getElementById('fichaCargo').value = item.ficha.cargo || '';
+        document.getElementById('fichaSala').value = item.ficha.sala || '';
+        document.getElementById('fichaFecha').value = item.ficha.fechaIso || obtenerFechaTurnoPorDefecto().iso;
+        document.getElementById('fichaTurno').value = item.ficha.turno || 'TURNO MAÑANA';
+        try { localStorage.setItem(STORAGE_FICHA_KEY, JSON.stringify(item.ficha)); } catch (e) { }
+      }
+      try { localStorage.setItem(STORAGE_META_KEY, String(metaMinutos)); } catch (e) { }
+      cancelarEdicion(true);
+      cerrarModalHistorial();
+      actualizarTodo();
+      mostrarToast(`📂 Auditoría de ${item.ficha?.empleado || 'empleado'} cargada`, Boolean(ultimoRespaldo));
+    };
+
+    window.eliminarAuditoriaDeHistorial = function (id) {
+      const hist = leerHistorialAuditorias().filter(x => x.id !== id);
+      try {
+        localStorage.setItem(STORAGE_HISTORIAL_KEY, JSON.stringify(hist));
+      } catch (e) { }
+      renderizarListaHistorial();
+      actualizarBadgeHistorial();
+    };
+
+    // ==================== NOTIFICACIONES Y ATAJOS DE TECLADO ====================
+    function mostrarToast(msg, conUndo = false) {
+      const t = document.getElementById('toast');
+      document.getElementById('toastText').innerText = msg;
+      const undoBtn = document.getElementById('toastUndoBtn');
+      undoBtn.classList.toggle('hidden', !conUndo || !ultimoRespaldo);
+
+      t.classList.remove('opacity-0', 'pointer-events-none');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        t.classList.add('opacity-0', 'pointer-events-none');
+      }, conUndo ? 5000 : 2800);
+    }
+
+    document.addEventListener('keydown', function (e) {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
+        const tag = document.activeElement?.tagName;
+        if (tag !== 'INPUT' && tag !== 'TEXTAREA' && ultimoRespaldo) {
+          e.preventDefault();
+          deshacerUltimaAccion();
+        }
+      } else if (e.key === 'Escape') {
+        cerrarModalLimpiar();
+        cerrarModalHistorial();
+        if (editandoIndex !== null) cancelarEdicion();
+      }
+    });
+
+    // ==================== INICIALIZACIÓN ====================
+    window.addEventListener('DOMContentLoaded', function () {
+      const def = obtenerFechaTurnoPorDefecto();
+      document.getElementById('fichaFecha').value = def.iso;
+      document.getElementById('fichaTurno').value = def.turno;
+      document.getElementById('inputCamara').value = 'CAM-01 (Sala Gral)';
+
+      try {
+        const fichaGuardada = localStorage.getItem(STORAGE_FICHA_KEY);
+        if (fichaGuardada) {
+          const f = JSON.parse(fichaGuardada);
+          if (f && typeof f === 'object') {
+            document.getElementById('fichaEmpleado').value = f.empleado || '';
+            document.getElementById('fichaCargo').value = f.cargo || '';
+            document.getElementById('fichaSala').value = f.sala || '';
+            if (f.fechaIso) document.getElementById('fichaFecha').value = f.fechaIso;
+            if (f.turno) document.getElementById('fichaTurno').value = f.turno;
+          }
+        }
+
+        const metaGuardada = localStorage.getItem(STORAGE_META_KEY);
+        if (metaGuardada !== null) {
+          const metaParseada = Number(metaGuardada);
+          if (Number.isInteger(metaParseada) && metaParseada >= 1 && metaParseada <= 1439) {
+            metaMinutos = metaParseada;
+          }
+        }
+
+        const guardado = localStorage.getItem(STORAGE_REGISTROS_KEY);
+        if (guardado !== null) {
+          const parsed = JSON.parse(guardado);
+          if (Array.isArray(parsed)) {
+            registros = parsed;
+            if (registros.length === 0) {
+              document.getElementById('inputInicio').value = def.turno === 'TURNO NOCHE' ? '22:00' : (def.turno === 'TURNO TARDE' ? '14:00' : '07:00');
+            }
+            actualizarTodo();
+            if (window.lucide) lucide.createIcons();
+            return;
+          }
+        }
+      } catch (e) { }
+
+      registros = [];
+      document.getElementById('inputInicio').value = '07:00';
+      actualizarTodo();
+      if (window.lucide) lucide.createIcons();
+    });
+  </script>
+  <script src="js/global.js"></script>
+</body>
+
+</html>
