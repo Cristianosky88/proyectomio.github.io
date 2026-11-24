@@ -11,8 +11,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <!-- Font Awesome Icons -->
+    <!-- Font Awesome Icons & Lucide Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/global.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -92,7 +94,7 @@
     <script>
         (function () {
             try {
-                if (localStorage.getItem('luxor_theme') === 'dark') {
+                if (localStorage.getItem('cctv_theme') === 'dark') {
                     document.documentElement.classList.add('dark');
                 }
             } catch (e) { }
@@ -100,60 +102,63 @@
     </script>
 </head>
 
-<body class="bg-slate-100 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen font-sans transition-colors duration-200 selection:bg-blue-500 selection:text-white">
+<body class="bg-slate-100 dark:bg-slate-950 p-3 sm:p-5 md:p-8 text-slate-800 dark:text-slate-100 min-h-screen font-sans transition-colors duration-200 selection:bg-indigo-500 selection:text-white">
 
-    <!-- Navbar / Header -->
-    <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-30 shadow-md">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-wrap items-center justify-between gap-3">
+    <div class="max-w-6xl mx-auto bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 transition-colors duration-200">
+
+        <!-- Header Estándar -->
+        <header class="no-print bg-slate-900 dark:bg-slate-950 border-b border-slate-800 px-4 sm:px-6 py-4 rounded-t-2xl text-white flex flex-wrap justify-between items-center gap-3">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400 shadow-inner shrink-0">
-                    <i class="fa-solid fa-video text-lg"></i>
+                <div class="bg-indigo-600 p-2.5 rounded-xl shadow-sm shrink-0 flex items-center justify-center">
+                    <i data-lucide="building-2" class="w-6 h-6 text-white"></i>
                 </div>
                 <div>
-                    <h1 class="font-bold text-base sm:text-lg tracking-tight text-white flex items-center gap-2">
-                        Pago Alto Sala Luxor
-                        <span class="text-xs font-mono uppercase px-2 py-0.5 bg-blue-500/15 text-blue-300 border border-blue-500/30 rounded-full">CCTV</span>
-                    </h1>
-                    <p class="text-xs text-slate-400 hidden sm:block">REPORTE DE PAGOS ALTOS Y REDENCIÓN DE TICKETS</p>
+                    <h1 class="text-lg sm:text-xl font-bold leading-tight text-white">Pago Alto · Sala Luxor</h1>
+                    <p class="text-slate-400 text-xs uppercase tracking-wider">CCTV · Redención de Tickets y Pagos Altos</p>
                 </div>
             </div>
 
-            <div class="flex items-center gap-2">
-                <!-- Reloj en tiempo real -->
-                <div class="hidden md:flex items-center gap-2 bg-slate-800 border border-slate-700 px-3 py-1.5 rounded-lg text-xs font-mono text-slate-200">
-                    <i class="fa-regular fa-clock text-blue-400 animate-pulse"></i>
-                    <span id="liveClock">00:00:00 Hs.</span>
-                </div>
-
+            <div class="flex flex-wrap items-center gap-2">
                 <!-- Volver a Pal Var -->
-                <a href="palvar.html" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-indigo-600 hover:bg-indigo-500 text-white transition flex items-center gap-1.5" title="Volver a Pal Var">
-                    <i class="fa-solid fa-arrow-left"></i>
+                <a href="palvar.html" class="px-3 py-2 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white transition flex items-center gap-1.5" title="Ir a Pal Var">
+                    <i data-lucide="ticket" class="w-4 h-4"></i>
                     <span class="hidden sm:inline">Pal Var</span>
                 </a>
 
+                <a href="palcap.html" class="px-3 py-2 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 transition flex items-center gap-1.5" title="Ir a Pal Cap">
+                    <i data-lucide="wallet-cards" class="w-4 h-4 text-indigo-400"></i>
+                    <span class="hidden sm:inline">Pal Cap</span>
+                </a>
+
                 <!-- Botón Reiniciar -->
-                <button type="button" onclick="resetForm()" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center gap-1.5 cursor-pointer" title="Reiniciar formulario">
-                    <i class="fa-solid fa-rotate-left"></i>
+                <button type="button" onclick="resetForm()" class="px-3 py-2 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center gap-1.5 cursor-pointer" title="Reiniciar formulario">
+                    <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
                     <span class="hidden sm:inline">Reiniciar</span>
                 </button>
 
+                <!-- Reloj en tiempo real -->
+                <div class="hidden md:flex items-center gap-2 bg-slate-800/90 border border-slate-700 px-3 py-1.5 rounded-xl text-xs font-mono text-slate-200">
+                    <i data-lucide="clock" class="w-3.5 h-3.5 text-indigo-400"></i>
+                    <span id="liveClock" data-cctv-clock class="tabular-nums">00:00:00 Hs.</span>
+                </div>
+
+                <div data-cctv-nav></div>
+
                 <!-- Botón Tema Claro / Oscuro -->
-                <button type="button" onclick="toggleTheme()" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition cursor-pointer" title="Cambiar modo claro / oscuro">
-                    <i class="fa-solid fa-sun text-amber-400 hidden dark:inline"></i>
-                    <i class="fa-solid fa-moon text-slate-300 inline dark:hidden"></i>
+                <button type="button" onclick="toggleTheme()" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition inline-flex items-center justify-center cursor-pointer" title="Cambiar modo claro / oscuro">
+                    <i data-lucide="sun" class="w-5 h-5 text-amber-400 hidden dark:block"></i>
+                    <i data-lucide="moon" class="w-5 h-5 text-slate-200 block dark:hidden"></i>
                 </button>
 
                 <!-- Ir al Menú Principal -->
-                <a href="index.html" class="px-2.5 py-1.5 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center gap-1.5" title="Ir al Menú Principal">
-                    <i class="fa-solid fa-house"></i>
-                    <span class="hidden sm:inline">Inicio</span>
+                <a href="index.html" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition inline-flex items-center justify-center" title="Ir al Menú Principal">
+                    <i data-lucide="home" class="w-5 h-5"></i>
                 </a>
             </div>
-        </div>
-    </header>
+        </header>
 
-    <!-- Main Container -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <!-- Main Container -->
+        <main class="p-5 sm:p-6 bg-slate-50 dark:bg-slate-900/60 rounded-b-2xl">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
             <!-- Columna Izquierda: Formulario de Carga (7 columnas) -->
@@ -417,7 +422,7 @@
             </div>
 
             <!-- Columna Derecha: Vista Previa, Copiado e Historial (5 columnas, sticky funcional) -->
-            <div class="lg:col-span-5 space-y-5 lg:sticky lg:top-20">
+            <div class="lg:col-span-5 space-y-5 lg:sticky lg:top-6">
 
                 <!-- Card Vista Previa del Texto -->
                 <div class="bg-white dark:bg-slate-900 border-2 border-blue-500/30 rounded-2xl p-5 shadow-md">
@@ -489,7 +494,8 @@
             </div>
 
         </div>
-    </main>
+        </main>
+    </div>
 
     <!-- Textarea oculto de respaldo para copiar al portapapeles -->
     <textarea id="clipboardFallback" class="fixed -top-96 left-0 opacity-0 pointer-events-none" aria-hidden="true"></textarea>
@@ -528,9 +534,13 @@
         }
 
         function toggleTheme() {
+            if (window.CCTVTheme) {
+                window.CCTVTheme.toggle();
+                return;
+            }
             const isDark = document.documentElement.classList.toggle('dark');
             try {
-                localStorage.setItem('luxor_theme', isDark ? 'dark' : 'light');
+                localStorage.setItem('cctv_theme', isDark ? 'dark' : 'light');
             } catch (e) { }
         }
 
@@ -1173,6 +1183,7 @@
             }, 3200);
         }
     </script>
+    <script src="js/global.js"></script>
 </body>
 
 </html>

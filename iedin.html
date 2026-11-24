@@ -1,129 +1,178 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generador de Reportes CCTV - Multidivisa</title>
+    <title>Traslado de Valores - CCTV</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'Segoe UI', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'Consolas', 'monospace']
+                    }
+                }
+            }
+        };
+        (function () {
+            try {
+                if (localStorage.getItem('cctv_theme') === 'dark') {
+                    document.documentElement.classList.add('dark');
+                }
+            } catch (e) {}
+        })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/global.css">
     <script src="https://unpkg.com/lucide@latest"></script>
-    <style>
-        body { background-color: #f8fafc; font-family: 'Segoe UI', sans-serif; }
-        .report-font { 
-            font-family: 'Times New Roman', Times, serif; 
-            line-height: 1.5;
-        }
-        .fade-in { animation: fadeIn 0.3s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-    </style>
 </head>
-<body class="p-4 md:p-8 text-slate-800">
+<body class="bg-slate-100 dark:bg-slate-950 p-3 sm:p-5 md:p-8 text-slate-800 dark:text-slate-100 min-h-screen font-sans transition-colors duration-200">
 
-    <div class="max-w-5xl mx-auto bg-white rounded-xl shadow-xl overflow-hidden border border-slate-200">
-        
-        <!-- Header -->
-        <div class="bg-slate-900 p-5 text-white flex justify-between items-center">
+    <div class="max-w-6xl mx-auto bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 transition-colors duration-200">
+
+        <!-- Header Estándar -->
+        <header class="no-print bg-slate-900 dark:bg-slate-950 border-b border-slate-800 px-4 sm:px-6 py-4 rounded-t-2xl text-white flex flex-wrap justify-between items-center gap-3">
             <div class="flex items-center gap-3">
-                <div class="bg-indigo-600 p-2 rounded-lg">
+                <div class="bg-indigo-600 p-2.5 rounded-xl shadow-sm shrink-0 flex items-center justify-center">
                     <i data-lucide="banknote" class="w-6 h-6 text-white"></i>
                 </div>
                 <div>
-                    <h1 class="text-xl font-bold">Traslado de Valores</h1>
-                    <p class="text-slate-400 text-xs uppercase tracking-wider">Tesorería - Sistema de Registro</p>
+                    <h1 class="text-lg sm:text-xl font-bold leading-tight text-white">Traslado de Valores</h1>
+                    <p class="text-slate-400 text-xs uppercase tracking-wider">CCTV · Tesorería Multidivisa</p>
                 </div>
             </div>
-            <div class="flex items-center justify-end gap-3 flex-wrap">
-                <div class="flex items-center gap-3 bg-slate-800 px-4 py-2 rounded-lg border border-slate-700">
-                    <span class="text-xs font-semibold text-blue-400">Hora Inicio:</span>
-                    <input type="time" id="horaBase" oninput="sincronizarTodo()" class="bg-transparent text-white font-mono outline-none">
+
+            <div class="flex flex-wrap items-center gap-2">
+                <div class="flex items-center gap-2 bg-slate-800 border border-slate-700 px-3 py-1.5 rounded-xl">
+                    <span class="text-xs font-semibold text-indigo-400">Hora Inicio:</span>
+                    <input type="time" id="horaBase" oninput="sincronizarTodo()" class="bg-transparent text-white font-mono text-xs outline-none">
                 </div>
-                <a href="index.html" class="no-print text-indigo-400 hover:text-indigo-300 transition-colors flex items-center justify-center p-2" title="Volver a Inicio">
-                    <i data-lucide="home" class="w-6 h-6"></i>
+
+                <div class="hidden md:flex items-center gap-2 bg-slate-800/90 border border-slate-700 px-3 py-1.5 rounded-xl text-xs font-mono text-slate-200">
+                    <i data-lucide="clock" class="w-3.5 h-3.5 text-indigo-400"></i>
+                    <span data-cctv-clock class="tabular-nums">00:00:00 Hs.</span>
+                </div>
+
+                <div data-cctv-nav></div>
+
+                <button type="button" onclick="toggleTheme()" title="Cambiar modo claro / oscuro"
+                    class="p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl transition inline-flex items-center justify-center text-slate-200 cursor-pointer">
+                    <i data-lucide="sun" class="w-5 h-5 text-amber-400 hidden dark:block"></i>
+                    <i data-lucide="moon" class="w-5 h-5 text-slate-200 block dark:hidden"></i>
+                </button>
+
+                <a href="index.html" title="Volver al Menú Principal"
+                    class="p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl transition inline-flex items-center justify-center text-slate-200">
+                    <i data-lucide="home" class="w-5 h-5"></i>
                 </a>
             </div>
-        </div>
+        </header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12">
-            
+        <div class="grid grid-cols-1 lg:grid-cols-12 rounded-b-2xl overflow-hidden">
+
             <!-- COLUMNA IZQUIERDA: FORMULARIO -->
-            <div class="lg:col-span-7 p-6 space-y-4 bg-slate-50">
-                
-                <!-- Sección de Datos -->
-                <div class="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
-                    <h3 class="font-bold text-slate-700 text-sm mb-4">💼 Datos del Operativo</h3>
+            <div class="lg:col-span-7 p-5 sm:p-6 space-y-5 bg-slate-50 dark:bg-slate-900/60">
+                <div class="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+                    <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2.5">
+                        <span class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
+                            <i data-lucide="briefcase" class="w-4 h-4"></i> 1. Datos del Operativo
+                        </span>
+                    </div>
+
                     <div class="space-y-4">
                         <div>
-                            <label class="block text-xs font-semibold text-slate-500 mb-1">👤 Jefe de Caja</label>
-                            <input type="text" id="g-jefe" placeholder="Nombre completo" oninput="sincronizarTodo()" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                            <label for="g-jefe" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Jefe de Caja</label>
+                            <input type="text" id="g-jefe" placeholder="Nombre completo" oninput="sincronizarTodo()"
+                                class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition">
                         </div>
-                        
-                        <div class="grid grid-cols-2 gap-3">
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                             <div>
-                                <label class="block text-xs font-semibold text-slate-500 mb-1">💵 Monto ARS ($)</label>
-                                <input type="text" id="g-monto" placeholder="000.000,00" oninput="sincronizarTodo()" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                                <label for="g-monto" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Monto ARS ($)</label>
+                                <input type="text" id="g-monto" placeholder="000.000,00" oninput="sincronizarTodo()"
+                                    class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm font-mono text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition">
                             </div>
                             <div>
-                                <label class="block text-xs font-semibold text-slate-500 mb-1">💵 Monto USD (u$s)</label>
-                                <input type="text" id="g-usd" placeholder="0.000,00" oninput="sincronizarTodo()" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                                <label for="g-usd" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Monto USD (u$s)</label>
+                                <input type="text" id="g-usd" placeholder="0.000,00" oninput="sincronizarTodo()"
+                                    class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm font-mono text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition">
                             </div>
                         </div>
 
                         <div>
-                            <label class="block text-xs font-semibold text-slate-500 mb-1">📍 Destino</label>
-                            <input type="text" id="g-destino" placeholder="Lugar de destino" oninput="sincronizarTodo()" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                            <label for="g-destino" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Destino de Transferencia</label>
+                            <input type="text" id="g-destino" placeholder="Lugar o sala de destino" oninput="sincronizarTodo()"
+                                class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition">
                         </div>
+
                         <div>
-                            <label class="block text-xs font-semibold text-slate-500 mb-1">🚚 Responsable de Traslado</label>
-                            <input type="text" id="g-responsable" placeholder="Nombre de quien traslada" oninput="sincronizarTodo()" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                            <label for="g-responsable" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Responsable de Traslado</label>
+                            <input type="text" id="g-responsable" placeholder="Nombre de quien traslada" oninput="sincronizarTodo()"
+                                class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition">
                         </div>
                     </div>
                 </div>
 
-                <div class="flex gap-2 pt-4">
-                    <button type="button" onclick="limpiarCampos()" class="flex-1 px-4 py-2 bg-red-600 text-white hover:bg-red-700 rounded font-semibold text-sm transition flex items-center justify-center gap-2">
+                <div class="flex flex-wrap gap-2.5">
+                    <button type="button" onclick="volverAlInicio()" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2 shadow-sm cursor-pointer">
+                        <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                        <span>Hora Actual</span>
+                    </button>
+                    <button type="button" onclick="limpiarCampos()" class="px-4 py-2.5 bg-rose-600 hover:bg-rose-500 text-white rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2 shadow-sm cursor-pointer">
                         <i data-lucide="trash-2" class="w-4 h-4"></i>
-                        <span>Limpiar</span>
+                        <span>Limpiar Campos</span>
                     </button>
                 </div>
 
-                <div class="bg-amber-50 border border-amber-300 rounded-lg p-3">
-                    <p class="text-xs text-amber-700">💡 <strong>Nota:</strong> Si dejas un monto vacío, el sistema no lo incluirá. Puedes editar el resultado final manualmente.</p>
+                <div class="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/50 rounded-xl p-3.5 flex items-center gap-2.5">
+                    <i data-lucide="info" class="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0"></i>
+                    <p class="text-xs text-amber-800 dark:text-amber-300">Si dejas uno de los montos vacío (ARS o USD), el sistema redactará únicamente la moneda informada.</p>
                 </div>
             </div>
 
             <!-- COLUMNA DERECHA: RESULTADO -->
-            <div class="lg:col-span-5 bg-slate-100 border-l border-slate-200 flex flex-col">
-                <div class="p-6 sticky top-0 max-h-screen overflow-y-auto">
-                    <div class="flex items-center justify-between mb-4">
-                        <h2 class="font-bold text-slate-800">📄 Texto Generado</h2>
-                        <span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded font-semibold">Editable</span>
+            <div class="lg:col-span-5 bg-slate-100/80 dark:bg-slate-950/60 border-t lg:border-t-0 lg:border-l border-slate-200 dark:border-slate-800 p-5 sm:p-6 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <h2 class="text-sm font-bold uppercase tracking-wider text-slate-700 dark:text-slate-200 flex items-center gap-2">
+                            <i data-lucide="file-text" class="w-4 h-4 text-indigo-500"></i> Texto Generado
+                        </h2>
+                        <span class="text-[11px] bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/50 px-2 py-0.5 rounded-full font-semibold">Editable</span>
                     </div>
-                    
-                    <div class="bg-white rounded-lg shadow-sm border border-slate-300 p-4 mb-4">
-                        <textarea id="outputEditable" class="report-font w-full h-96 p-3 bg-slate-50 border border-slate-200 rounded text-sm outline-none focus:bg-white focus:ring-2 focus:ring-blue-100 transition-all resize-none" spellcheck="false"></textarea>
+
+                    <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-3 mb-4">
+                        <textarea id="outputEditable" spellcheck="false"
+                            class="report-font w-full h-96 p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs sm:text-sm text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-indigo-500 transition resize-none"></textarea>
                     </div>
-                    
-                    <button onclick="copiarTexto()" class="w-full px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded font-semibold text-sm transition flex items-center justify-center gap-2">
-                        <i data-lucide="copy" class="w-4 h-4"></i>
-                        <span>Copiar al Portapapeles</span>
-                    </button>
                 </div>
+
+                <button type="button" onclick="copiarTexto()" class="w-full px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2 shadow-sm cursor-pointer">
+                    <i data-lucide="copy" class="w-4 h-4"></i>
+                    <span>Copiar al Portapapeles</span>
+                </button>
             </div>
         </div>
     </div>
 
     <!-- TOAST NOTIFICACIONES -->
-    <div id="notification" class="hidden fixed bottom-4 right-4 bg-green-100 text-green-800 px-4 py-3 rounded-lg shadow-lg flex items-center gap-2 fade-in z-40">
+    <div id="notification" class="hidden fixed bottom-5 right-5 bg-emerald-600 text-white px-4 py-3 rounded-xl shadow-xl flex items-center gap-2.5 fade-in z-50 text-sm font-medium">
         <i data-lucide="check-circle" class="w-4 h-4"></i>
         <span id="notification-text">Texto copiado al portapapeles</span>
     </div>
 
-<script>
-    lucide.createIcons();
+    <script src="js/global.js"></script>
+    <script>
         function sumarMinutos(hora, minutos) {
-            let [h, m] = hora.split(':').map(Number);
-            let d = new Date();
-            d.setHours(h);
-            d.setMinutes(m + minutos);
+            if (!hora || !hora.includes(':')) return '--:--';
+            const [h, m] = hora.split(':').map(Number);
+            if (isNaN(h) || isNaN(m)) return '--:--';
+            const d = new Date();
+            d.setHours(h, m + minutos, 0, 0);
             return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
         }
 
@@ -135,7 +184,7 @@
             const destino = document.getElementById('g-destino').value || "[Destino]";
             const resp = document.getElementById('g-responsable').value || "[Responsable]";
 
-            const h1 = hBase;
+            const h1 = hBase || '--:--';
             const h2 = sumarMinutos(hBase, 1);
             const h3 = sumarMinutos(hBase, 2);
 
@@ -183,7 +232,7 @@
         function copiarTexto() {
             const areaEditable = document.getElementById('outputEditable');
             const textoParaCopiar = areaEditable.value;
-            
+
             navigator.clipboard.writeText(textoParaCopiar).then(() => {
                 showNotification('¡Texto copiado al portapapeles!');
             }).catch(() => {
@@ -196,18 +245,12 @@
         function showNotification(message, type = 'success') {
             const notification = document.getElementById('notification');
             document.getElementById('notification-text').textContent = message;
-            notification.classList.remove('hidden', 'bg-red-100', 'text-red-800');
-            if (type === 'error') {
-                notification.classList.add('bg-red-100', 'text-red-800');
-            } else {
-                notification.classList.add('bg-green-100', 'text-green-800');
-            }
+            notification.classList.remove('hidden', 'bg-rose-600', 'bg-emerald-600');
+            notification.classList.add(type === 'error' ? 'bg-rose-600' : 'bg-emerald-600');
             setTimeout(() => notification.classList.add('hidden'), 3000);
         }
 
-        window.onload = () => {
-            volverAlInicio();
-        };
+        window.addEventListener('DOMContentLoaded', volverAlInicio);
     </script>
 </body>
 </html>

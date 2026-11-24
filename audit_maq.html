@@ -10,6 +10,10 @@
             darkMode: 'class',
             theme: {
                 extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'Segoe UI', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'Consolas', 'monospace']
+                    },
                     animation: {
                         'fade-in': 'fadeIn 0.3s ease-out',
                         'slide-up': 'slideUp 0.3s ease-out',
@@ -29,6 +33,19 @@
             }
         }
     </script>
+    <script>
+        (function () {
+            try {
+                if (localStorage.getItem('cctv_theme') === 'dark') {
+                    document.documentElement.classList.add('dark');
+                }
+            } catch (e) {}
+        })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/global.css">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         body { 
@@ -73,48 +90,37 @@
         }
     </style>
 </head>
-<body class="min-h-screen text-slate-800 dark:text-slate-200 transition-colors duration-200">
+<body class="bg-slate-100 dark:bg-slate-950 p-3 sm:p-5 md:p-8 text-slate-800 dark:text-slate-100 min-h-screen font-sans transition-colors duration-200">
 
-    <div class="max-w-5xl mx-auto px-4 py-8">
-        <!-- Header -->
-        <div class="bg-slate-900 p-5 text-white flex justify-between items-center rounded-t-xl mb-1 shadow-md">
+    <div class="max-w-6xl mx-auto bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 transition-colors duration-200">
+        <!-- Header Estándar -->
+        <header class="no-print bg-slate-900 dark:bg-slate-950 border-b border-slate-800 px-4 sm:px-6 py-4 rounded-t-2xl text-white flex flex-wrap justify-between items-center gap-3">
             <div class="flex items-center gap-3">
-                <div class="bg-indigo-600 p-2 rounded-lg">
+                <div class="bg-indigo-600 p-2.5 rounded-xl shadow-sm shrink-0 flex items-center justify-center">
                     <i data-lucide="clipboard-check" class="w-6 h-6 text-white"></i>
                 </div>
                 <div>
-                    <h1 class="text-xl font-bold">Auditoría de Máquinas</h1>
-                    <p class="text-slate-400 text-xs uppercase tracking-wider">Reporte Técnico</p>
+                    <h1 class="text-lg sm:text-xl font-bold leading-tight text-white">Auditoría de Máquinas</h1>
+                    <p class="text-slate-400 text-xs uppercase tracking-wider">CCTV · Bitácora Cronológica de Eventos</p>
                 </div>
             </div>
-            <div>
-                <a href="index.html" class="p-2 hover:bg-slate-700 rounded-lg transition inline-flex items-center justify-center text-white" title="Volver a Inicio">
-                    <i data-lucide="home" class="w-5 h-5 text-white"></i>
-                </a>
-            </div>
-        </div>
-            <div class="flex flex-col gap-2">
-                <h1 class="text-3xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                    <i data-lucide="shield-check" class="text-blue-600 dark:text-blue-400"></i>
-                    Reporte de Control de Auditorías de Máquinas
-                </h1>
-                <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Sistema de registro cronológico</p>
-            </div>
-            <div class="flex items-center gap-3">
-                <div id="current-clock" class="bg-white dark:bg-slate-800 px-6 py-3 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 text-center">
-                    <div class="text-2xl font-mono font-bold text-blue-600 dark:text-blue-400">00:00:00</div>
-                    <div class="text-xs uppercase tracking-wider font-semibold text-slate-400 dark:text-slate-500">Hora del Sistema</div>
+            <div class="flex flex-wrap items-center gap-2">
+                <div id="current-clock" class="hidden md:flex items-center gap-2 bg-slate-800/90 px-3 py-1.5 rounded-xl border border-slate-700">
+                    <i data-lucide="clock" class="w-3.5 h-3.5 text-indigo-400"></i>
+                    <div class="text-xs font-mono font-medium text-slate-200 tabular-nums" data-cctv-clock>00:00:00 Hs.</div>
                 </div>
-                <button onclick="toggleDarkMode()" class="no-print p-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 transition-all" title="Modo oscuro">
-                    <i data-lucide="moon" class="w-5 h-5 text-slate-600 dark:text-slate-400" id="dark-mode-icon"></i>
+                <div data-cctv-nav></div>
+                <button type="button" onclick="toggleDarkMode()" class="no-print p-2 bg-slate-800 border border-slate-700 rounded-xl hover:bg-slate-700 transition inline-flex items-center justify-center text-slate-200 cursor-pointer" title="Cambiar modo claro / oscuro">
+                    <i data-lucide="sun" class="w-5 h-5 text-amber-400 hidden dark:block"></i>
+                    <i data-lucide="moon" class="w-5 h-5 text-slate-200 block dark:hidden" id="dark-mode-icon"></i>
                 </button>
-                <a href="index.html" class="no-print p-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 transition-all text-blue-600 dark:text-blue-400" title="Volver a Inicio">
+                <a href="index.html" class="no-print p-2 bg-slate-800 border border-slate-700 rounded-xl hover:bg-slate-700 transition text-slate-200 inline-flex items-center justify-center" title="Volver al Menú Principal">
                     <i data-lucide="home" class="w-5 h-5"></i>
                 </a>
             </div>
         </header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="p-5 sm:p-6 md:p-8 grid grid-cols-1 lg:grid-cols-3 gap-6 rounded-b-2xl bg-slate-50 dark:bg-slate-900/60">
             <!-- Sidebar: Forms -->
             <div class="lg:col-span-1 space-y-6 no-print">
                 
@@ -368,32 +374,38 @@
 
         // ==================== DARK MODE ====================
         function toggleDarkMode() {
-            document.documentElement.classList.toggle('dark');
-            const isDark = document.documentElement.classList.contains('dark');
-            localStorage.setItem('darkMode', isDark);
-            updateDarkModeIcon();
+            if (window.CCTVTheme) {
+                window.CCTVTheme.toggle();
+                return;
+            }
+            const isDark = document.documentElement.classList.toggle('dark');
+            try {
+                localStorage.setItem('cctv_theme', isDark ? 'dark' : 'light');
+            } catch (e) {}
         }
 
         function loadDarkMode() {
-            const isDark = localStorage.getItem('darkMode') === 'true';
-            if (isDark) {
-                document.documentElement.classList.add('dark');
-            }
-            updateDarkModeIcon();
+            try {
+                if (localStorage.getItem('cctv_theme') === 'dark') {
+                    document.documentElement.classList.add('dark');
+                }
+            } catch (e) {}
         }
 
-        function updateDarkModeIcon() {
-            const icon = document.getElementById('dark-mode-icon');
-            if (icon) {
-                const isDark = document.documentElement.classList.contains('dark');
-                icon.setAttribute('data-lucide', isDark ? 'sun' : 'moon');
-                lucide.createIcons();
-            }
-        }
+        function updateDarkModeIcon() {}
 
         // ==================== CLOCK ====================
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
         function updateClock() {
-            const clockEl = document.querySelector('#current-clock .text-2xl');
+            const clockEl = document.querySelector('#current-clock .font-mono');
             if (!clockEl) return;
             const now = new Date();
             clockEl.textContent = now.toLocaleTimeString('es-AR', { hour12: false });
@@ -457,13 +469,13 @@
                 closeModal();
             };
 
-            // Submit on Enter
-            body.addEventListener('keydown', (e) => {
+            // Submit on Enter (sin duplicar listeners en aperturas sucesivas)
+            body.onkeydown = (e) => {
                 if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
                     e.preventDefault();
                     submitBtn.click();
                 }
-            });
+            };
         }
 
         function closeModal() {
@@ -624,16 +636,16 @@
                         <p 
                             class="editable-text text-sm leading-relaxed pr-12 text-slate-700 dark:text-slate-200 focus:text-slate-900 dark:focus:text-white transition-colors flex-1" 
                             contenteditable="true" 
-                            onblur="updateLogText(${log.id}, this.innerText)"
+                            onblur="updateLogText(${Number(log.id)}, this.innerText)"
                             spellcheck="false"
-                        >${log.text}</p>
+                        >${escapeHtml(log.text)}</p>
                     </div>
                     
                     <div class="action-btns opacity-0 absolute top-2 right-2 flex gap-1 transition-opacity">
-                        <button onclick="copyText('${log.text.replace(/'/g, "\\'")}')" title="Copiar" class="p-2 bg-slate-50 dark:bg-slate-600 border border-slate-200 dark:border-slate-500 rounded-lg text-slate-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-all">
+                        <button type="button" onclick="copyLogById(${Number(log.id)})" title="Copiar" class="p-2 bg-slate-50 dark:bg-slate-600 border border-slate-200 dark:border-slate-500 rounded-lg text-slate-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-all">
                             <i data-lucide="copy" class="w-3.5 h-3.5"></i>
                         </button>
-                        <button onclick="deleteLog(${log.id})" title="Eliminar" class="p-2 bg-slate-50 dark:bg-slate-600 border border-slate-200 dark:border-slate-500 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 transition-all">
+                        <button type="button" onclick="deleteLog(${Number(log.id)})" title="Eliminar" class="p-2 bg-slate-50 dark:bg-slate-600 border border-slate-200 dark:border-slate-500 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 transition-all">
                             <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
                         </button>
                     </div>
@@ -691,18 +703,22 @@
         }
 
         // ==================== CLIPBOARD ====================
-        function copyText(text) {
+        function copyLogById(id) {
+            const entry = logs.find(l => l.id === id);
+            if (entry) copyText(entry.text);
+        }
+
+        function copyText(text, customMsg = '📋 Texto copiado') {
             navigator.clipboard.writeText(text).then(() => {
-                showToast('📋 Texto copiado');
+                showToast(customMsg);
             }).catch(() => {
-                // Fallback
                 const textArea = document.createElement("textarea");
                 textArea.value = text;
                 document.body.appendChild(textArea);
                 textArea.select();
                 document.execCommand('copy');
                 document.body.removeChild(textArea);
-                showToast('📋 Texto copiado');
+                showToast(customMsg);
             });
         }
 
@@ -712,8 +728,7 @@
                 return;
             }
             const fullText = logs.map(l => l.text).join('\n\n');
-            copyText(fullText);
-            showToast("📄 Reporte completo copiado");
+            copyText(fullText, "📄 Reporte completo copiado");
         }
 
         // ==================== TOAST ====================
@@ -745,5 +760,6 @@
         // ==================== INITIALIZE ====================
         init();
     </script>
+    <script src="js/global.js"></script>
 </body>
 </html>

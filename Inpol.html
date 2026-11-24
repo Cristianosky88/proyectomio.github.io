@@ -1,10 +1,34 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Generador de Novedades CCTV - Ingresos Policiales</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'Segoe UI', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'Consolas', 'monospace']
+                    }
+                }
+            }
+        };
+        (function () {
+            try {
+                if (localStorage.getItem('cctv_theme') === 'dark') {
+                    document.documentElement.classList.add('dark');
+                }
+            } catch (e) {}
+        })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/global.css">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root {
@@ -15,32 +39,8 @@
             --warning: #d97706;
         }
         
-        body { 
-            background-color: #f8fafc; 
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
-            min-height: 100vh;
-        }
-        
         .transition-height { 
             transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out; 
-        }
-        
-        .fade-in { 
-            animation: fadeIn 0.3s ease-in-out; 
-        }
-        
-        @keyframes fadeIn { 
-            from { opacity: 0; transform: translateY(-10px); } 
-            to { opacity: 1; transform: translateY(0); } 
-        }
-        
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateX(20px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-        
-        .slide-in {
-            animation: slideIn 0.3s ease-out;
         }
         
         @keyframes pulse {
@@ -52,7 +52,6 @@
             animation: pulse 2s ease-in-out infinite;
         }
         
-        /* Mejoras de accesibilidad */
         @media (prefers-reduced-motion: reduce) {
             * { animation-duration: 0.01ms !important; }
         }
@@ -68,61 +67,64 @@
             background-color: #f0f4ff;
         }
         
+        html.dark .history-item:hover {
+            border-left-color: #818cf8;
+            background-color: rgba(99, 102, 241, 0.14);
+        }
+        
         .history-item.active {
             background-color: #e0e7ff;
             border-left-color: var(--primary);
         }
         
-        /* Scrollbar personalizado */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: #f1f5f9;
-            border-radius: 3px;
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 3px;
-        }
-        
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
+        html.dark .history-item.active {
+            background-color: rgba(99, 102, 241, 0.22);
+            border-left-color: #818cf8;
         }
     </style>
 </head>
-<body class="flex items-center justify-center p-4 lg:p-8">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-5xl overflow-hidden border border-slate-200">
+<body class="bg-slate-100 dark:bg-slate-950 p-3 sm:p-5 md:p-8 text-slate-800 dark:text-slate-100 min-h-screen font-sans transition-colors duration-200">
+    <div class="max-w-6xl mx-auto bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 transition-colors duration-200">
         
-        <!-- Header Mejorado -->
-        <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white p-4 flex items-center justify-between relative shadow-lg">
+        <!-- Header Estándar -->
+        <header class="no-print bg-slate-900 dark:bg-slate-950 border-b border-slate-800 px-4 sm:px-6 py-4 rounded-t-2xl text-white flex flex-wrap items-center justify-between gap-3">
             <div class="flex items-center gap-3">
-                <div class="bg-indigo-600 p-2 rounded-lg">
+                <div class="bg-indigo-600 p-2.5 rounded-xl shadow-sm shrink-0 flex items-center justify-center">
                     <i data-lucide="shield-check" class="w-6 h-6 text-white"></i>
                 </div>
                 <div>
-                    <h1 class="text-xl font-bold">Ingresos Adicional Policial</h1>
-                    <p class="text-slate-400 text-xs uppercase tracking-wider">Sistema de Registro CCTV • v2.0</p>
+                    <h1 class="text-lg sm:text-xl font-bold leading-tight text-white">Ingresos Adicional Policial</h1>
+                    <p class="text-slate-400 text-xs uppercase tracking-wider">CCTV · Control y Relevos Policiales</p>
                 </div>
             </div>
                
-            <div class="flex gap-2">
+            <div class="flex flex-wrap items-center gap-2">
+                <a href="ingreso.html" class="px-3 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-xl text-xs font-semibold text-white transition inline-flex items-center gap-1.5" title="Ir a Ingreso Personal Externo">
+                    <i data-lucide="user-plus" class="w-4 h-4"></i>
+                    <span class="hidden sm:inline">Externos</span>
+                </a>
+
                 <!-- Indicador de hora actual -->
-                <div class="hidden sm:flex items-center gap-2 text-xs bg-slate-700 px-3 py-1.5 rounded-lg border border-slate-600">
-                    <i data-lucide="clock" class="w-4 h-4 text-indigo-400"></i>
-                    <span id="horaActual" class="text-slate-300 font-medium"></span>
+                <div class="hidden md:flex items-center gap-2 text-xs bg-slate-800/90 px-3 py-1.5 rounded-xl border border-slate-700 font-mono text-slate-200">
+                    <i data-lucide="clock" class="w-3.5 h-3.5 text-indigo-400"></i>
+                    <span id="horaActual" data-cctv-clock class="tabular-nums">00:00:00 Hs.</span>
                 </div>
+
+                <div data-cctv-nav></div>
+
+                <button type="button" onclick="toggleTheme()" title="Cambiar modo claro / oscuro" class="p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl transition inline-flex items-center justify-center text-slate-200 cursor-pointer">
+                    <i data-lucide="sun" class="w-5 h-5 text-amber-400 hidden dark:block"></i>
+                    <i data-lucide="moon" class="w-5 h-5 text-slate-200 block dark:hidden"></i>
+                </button>
                    
-                <a href="index.html" class="p-2 hover:bg-slate-700 rounded-lg transition inline-flex items-center justify-center flex-shrink-0" title="Volver a Inicio">
+                <a href="index.html" class="p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl transition inline-flex items-center justify-center text-slate-200 shrink-0" title="Volver al Menú Principal">
                     <i data-lucide="home" class="w-5 h-5"></i>
                 </a>
             </div>
-        </div>
+        </header>
 
         <!-- Contenido Principal -->
-        <div class="p-6 md:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div class="p-5 sm:p-6 md:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6 rounded-b-2xl bg-slate-50 dark:bg-slate-900/60">
             
             <!-- Columna Izquierda: Controles (5/12) -->
             <div class="lg:col-span-5 space-y-4 border-b lg:border-b-0 lg:border-r border-slate-200 pb-6 lg:pb-0 lg:pr-6">
@@ -439,6 +441,7 @@
             cargarHistorial();
             actualizarContadores();
             toggleTiempos();
+            calcularDuracion();
             generarTexto();
             actualizarReloj();
             
@@ -620,9 +623,9 @@
             if (tipo === 'ingresa') {
                 const valHoraInicio = horaInicio.value || '00:00';
                 const valHoraFin = horaFin.value || '00:00';
-                texto += `ingresa Adicional de La Policia ${valPolicia}, el cual prestara servicio como Control Interno desde las horas ${valHoraInicio} hasta las horas ${valHoraFin}.-`;
+                texto += `ingresa Adicional de la Policía ${valPolicia}, el cual prestará servicio como Control Interno desde las horas ${valHoraInicio} hasta las horas ${valHoraFin}.-`;
             } else {
-                texto += `se retira Adicional de La Policia ${valPolicia}.-`;
+                texto += `se retira Adicional de la Policía ${valPolicia}.-`;
             }
             
             resultado.value = texto;
@@ -811,9 +814,11 @@
             });
             btnPrevisualizar.addEventListener('click', previsualizar);
             
-            // Atajos de teclado
+            // Atajos de teclado (sin bloquear Ctrl+C cuando el usuario seleccionó texto)
             document.addEventListener('keydown', (e) => {
-                if (e.ctrlKey && e.key === 'c' && document.activeElement !== resultado) {
+                const hasSelection = Boolean(window.getSelection()?.toString()) ||
+                    (document.activeElement && ['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName) && document.activeElement.selectionStart !== document.activeElement.selectionEnd);
+                if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c' && !hasSelection && document.activeElement !== resultado) {
                     e.preventDefault();
                     copiarTexto();
                 }
@@ -837,5 +842,6 @@
         init();
     })();
     </script>
+    <script src="js/global.js"></script>
 </body>
 </html>

@@ -22,6 +22,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/global.css">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         body {
@@ -78,7 +79,7 @@
     <script>
         (function () {
             try {
-                if (localStorage.getItem('jackpot-theme') === 'dark') {
+                if (localStorage.getItem('cctv_theme') === 'dark') {
                     document.documentElement.classList.add('dark');
                 }
             } catch (e) { }
@@ -86,50 +87,54 @@
     </script>
 </head>
 
-<body class="bg-slate-100 dark:bg-slate-950 p-3 sm:p-6 md:p-8 text-slate-800 dark:text-slate-100 min-h-screen transition-colors duration-200">
+<body class="bg-slate-100 dark:bg-slate-950 p-3 sm:p-5 md:p-8 text-slate-800 dark:text-slate-100 min-h-screen font-sans transition-colors duration-200">
 
-    <div class="max-w-5xl mx-auto bg-white dark:bg-slate-900 rounded-2xl shadow-xl overflow-hidden border border-slate-200 dark:border-slate-800">
+    <div class="max-w-6xl mx-auto bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 transition-colors duration-200">
 
-        <!-- Header -->
-        <header class="bg-slate-900 dark:bg-slate-950 border-b border-slate-800 p-4 sm:p-5 text-white flex flex-wrap justify-between items-center gap-3">
+        <!-- Header Estándar -->
+        <header class="no-print bg-slate-900 dark:bg-slate-950 border-b border-slate-800 px-4 sm:px-6 py-4 rounded-t-2xl text-white flex flex-wrap justify-between items-center gap-3">
             <div class="flex items-center gap-3">
-                <div class="bg-indigo-600 p-2.5 rounded-xl shadow-sm shrink-0">
-                    <i data-lucide="wallet" class="w-6 h-6 text-white"></i>
+                <div class="bg-indigo-600 p-2.5 rounded-xl shadow-sm shrink-0 flex items-center justify-center">
+                    <i data-lucide="trophy" class="w-6 h-6 text-white"></i>
                 </div>
                 <div>
-                    <h1 class="text-lg sm:text-xl font-bold leading-tight">Registro de Jackpot - Modelo N° 1</h1>
-                    <p class="text-slate-400 text-xs uppercase tracking-wider">Planilla de Reporte CCTV</p>
+                    <h1 class="text-lg sm:text-xl font-bold leading-tight text-white">Jackpot · Modelo N° 1</h1>
+                    <p class="text-slate-400 text-xs uppercase tracking-wider">CCTV · Planilla de Premio Mayor (<span id="fechaActual">--/--/----</span>)</p>
                 </div>
             </div>
 
-            <div class="no-print flex flex-wrap items-center gap-2.5">
-                <button type="button" onclick="toggleTheme()" title="Cambiar modo claro/oscuro"
-                    class="p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl transition inline-flex items-center justify-center shrink-0 text-white cursor-pointer">
+            <div class="no-print flex flex-wrap items-center gap-2">
+                <a href="Jackpot2.html" id="btnJackpot2Header" class="px-3 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-semibold text-xs transition shadow-sm flex items-center gap-1.5">
+                    <i data-lucide="zap" class="w-4 h-4"></i>
+                    <span class="hidden sm:inline">Modelo 2</span>
+                </a>
+
+                <a href="jackpotluxor.html" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 rounded-xl font-semibold text-xs transition flex items-center gap-1.5" title="Abrir Jackpot Luxor">
+                    <i data-lucide="coins" class="w-4 h-4 text-indigo-400"></i>
+                    <span class="hidden sm:inline">Luxor</span>
+                </a>
+
+                <div class="hidden md:flex items-center gap-2 bg-slate-800/90 border border-slate-700 px-3 py-1.5 rounded-xl text-xs font-mono text-slate-200">
+                    <i data-lucide="clock" class="w-3.5 h-3.5 text-indigo-400"></i>
+                    <span data-cctv-clock class="tabular-nums">00:00:00 Hs.</span>
+                </div>
+
+                <div data-cctv-nav></div>
+
+                <button type="button" onclick="toggleTheme()" title="Cambiar modo claro / oscuro"
+                    class="p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl transition inline-flex items-center justify-center shrink-0 text-slate-200 cursor-pointer">
                     <i data-lucide="sun" class="w-5 h-5 text-amber-400 hidden dark:block"></i>
                     <i data-lucide="moon" class="w-5 h-5 text-slate-200 block dark:hidden"></i>
                 </button>
 
-                <a href="index.html" class="p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl transition inline-flex items-center justify-center shrink-0 text-white" title="Volver al Menú Principal">
-                    <i data-lucide="home" class="w-5 h-5 text-white"></i>
+                <a href="index.html" class="p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl transition inline-flex items-center justify-center shrink-0 text-slate-200" title="Volver al Menú Principal">
+                    <i data-lucide="home" class="w-5 h-5"></i>
                 </a>
-
-                <a href="Jackpot2.html" id="btnJackpot2Header" class="px-3.5 py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:from-amber-600 hover:to-orange-600 rounded-xl font-bold text-xs sm:text-sm transition shadow-sm flex items-center gap-1.5">
-                    <i data-lucide="zap" class="w-4 h-4"></i> Jackpot 2
-                </a>
-
-                <a href="jackpotluxor.html" class="px-3.5 py-2 bg-gradient-to-r from-rose-500 to-red-600 text-white hover:from-rose-600 hover:to-red-700 rounded-xl font-bold text-xs sm:text-sm transition shadow-sm flex items-center gap-1.5" title="Abrir Jackpot Luxor">
-                    <i data-lucide="shield-check" class="w-4 h-4"></i> Jackpot Luxor
-                </a>
-
-                <div class="text-right pl-2 border-l border-slate-700">
-                    <div class="text-[11px] text-slate-400 leading-none">Fecha</div>
-                    <div class="font-mono font-bold text-sm sm:text-base mt-0.5" id="fechaActual">--/--/----</div>
-                </div>
             </div>
         </header>
 
         <!-- Contenido Principal -->
-        <div>
+        <div class="rounded-b-2xl overflow-hidden">
             <form id="formJackpot" class="no-print divide-y divide-slate-200 dark:divide-slate-800" autocomplete="off" novalidate>
 
                 <!-- 1. INFORMACIÓN DE CONTACTO CCTV -->
@@ -431,11 +436,15 @@
                 .replace(/'/g, '&#39;');
         }
 
-        // ===== MODO CLARO / OSCURO (compartido con Jackpot2.html) =====
+        // ===== MODO CLARO / OSCURO (compartido en todo el sitio) =====
         function toggleTheme() {
+            if (window.CCTVTheme) {
+                window.CCTVTheme.toggle();
+                return;
+            }
             const isDark = document.documentElement.classList.toggle('dark');
             try {
-                localStorage.setItem('jackpot-theme', isDark ? 'dark' : 'light');
+                localStorage.setItem('cctv_theme', isDark ? 'dark' : 'light');
             } catch (e) { }
         }
 
@@ -853,6 +862,7 @@
         actualizarFecha();
         cargarHistorial();
     </script>
+    <script src="js/global.js"></script>
 
 </body>
 

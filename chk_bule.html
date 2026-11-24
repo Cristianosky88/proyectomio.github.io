@@ -1,43 +1,75 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Control de Botones - Casino Bulevard</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'Segoe UI', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'Consolas', 'monospace']
+                    }
+                }
+            }
+        };
+        (function () {
+            try {
+                if (localStorage.getItem('cctv_theme') === 'dark') {
+                    document.documentElement.classList.add('dark');
+                }
+            } catch (e) {}
+        })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/global.css">
     <script src="https://unpkg.com/lucide@latest"></script>
-    <style>
-        body { background-color: #f8fafc; font-family: 'Segoe UI', sans-serif; }
-        .fade-in { animation: fadeIn 0.3s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-    </style>
 </head>
-<body class="p-4 md:p-8 text-slate-800">
+<body class="bg-slate-100 dark:bg-slate-950 p-3 sm:p-5 md:p-8 text-slate-800 dark:text-slate-100 min-h-screen font-sans transition-colors duration-200">
 
-    <div class="max-w-5xl mx-auto bg-white rounded-xl shadow-xl overflow-hidden border border-slate-200">
+    <div class="max-w-6xl mx-auto bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 transition-colors duration-200">
         
-        <!-- Header -->
-        <div class="bg-slate-900 p-5 text-white flex justify-between items-center rounded-t-xl mb-1 shadow-md">
+        <!-- Header Estándar -->
+        <header class="no-print bg-slate-900 dark:bg-slate-950 border-b border-slate-800 px-4 sm:px-6 py-4 rounded-t-2xl text-white flex flex-wrap justify-between items-center gap-3">
             <div class="flex items-center gap-3">
-                <div class="bg-indigo-600 p-2 rounded-lg">
-                    <i data-lucide="shield-alert" class="w-6 h-6 text-white"></i>
+                <div class="bg-indigo-600 p-2.5 rounded-xl shadow-sm shrink-0 flex items-center justify-center">
+                    <i data-lucide="bell-ring" class="w-6 h-6 text-white"></i>
                 </div>
                 <div>
-                    <h1 class="text-xl font-bold">Control de Botones - Casino Bulevard</h1>
-                    <p class="text-slate-400 text-xs uppercase tracking-wider">Reporte de Chequeo de Botones</p>
+                    <h1 class="text-lg sm:text-xl font-bold leading-tight text-white">Control de Botones · Bulevard</h1>
+                    <p class="text-slate-400 text-xs uppercase tracking-wider">CCTV · Chequeo de Pulsadores Antipánico</p>
                 </div>
             </div>
-            <div>
-                <a href="index.html" class="p-2 hover:bg-slate-700 rounded-lg transition inline-flex items-center justify-center text-white" title="Volver a Inicio">
-                    <i data-lucide="home" class="w-5 h-5 text-white"></i>
+            <div class="flex flex-wrap items-center gap-2">
+                <a href="chk_luxor.html" class="px-3 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-xl transition text-xs font-semibold text-white flex items-center gap-1.5" title="Ir a Chequeo Sala Luxor">
+                    <i data-lucide="shield-alert" class="w-4 h-4"></i>
+                    <span class="hidden sm:inline">Sala Luxor</span>
+                </a>
+                <div class="hidden md:flex items-center gap-2 bg-slate-800/90 border border-slate-700 px-3 py-1.5 rounded-xl text-xs font-mono text-slate-200">
+                    <i data-lucide="clock" class="w-3.5 h-3.5 text-indigo-400"></i>
+                    <span data-cctv-clock class="tabular-nums">00:00:00 Hs.</span>
+                </div>
+                <div data-cctv-nav></div>
+                <button type="button" onclick="toggleTheme()" title="Cambiar modo claro / oscuro" class="p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl transition inline-flex items-center justify-center text-slate-200 cursor-pointer">
+                    <i data-lucide="sun" class="w-5 h-5 text-amber-400 hidden dark:block"></i>
+                    <i data-lucide="moon" class="w-5 h-5 text-slate-200 block dark:hidden"></i>
+                </button>
+                <a href="index.html" class="p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl transition inline-flex items-center justify-center text-slate-200" title="Volver al Menú Principal">
+                    <i data-lucide="home" class="w-5 h-5"></i>
                 </a>
             </div>
-        </div>
+        </header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12">
+        <div class="grid grid-cols-1 lg:grid-cols-12 rounded-b-2xl overflow-hidden">
             
             <!-- COLUMNA IZQUIERDA: FORMULARIO -->
-            <div class="lg:col-span-7 p-6 space-y-4 bg-slate-50">
+            <div class="lg:col-span-7 p-5 sm:p-6 space-y-4 bg-slate-50 dark:bg-slate-900/60">
                 
                 <!-- CARGAR ÚLTIMO REGISTRO -->
                 <div id="loadLastContainer" class="hidden bg-blue-50 border border-blue-300 rounded-lg p-3 flex items-center justify-between">
@@ -116,7 +148,7 @@
                         <div class="bg-white rounded-lg shadow-sm border border-slate-300 p-4 mb-4">
                             <div id="informe" class="text-sm whitespace-pre-wrap leading-relaxed text-slate-700"></div>
                         </div>
-                        <button id="copiarBtn" class="w-full px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded font-semibold text-sm transition flex items-center justify-center gap-2">
+                        <button type="button" id="copiarBtn" class="w-full px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded font-semibold text-sm transition flex items-center justify-center gap-2">
                             <i data-lucide="copy" class="w-4 h-4"></i>
                             <span>Copiar al Portapapeles</span>
                         </button>
@@ -160,7 +192,6 @@
     const copiarBtn = document.getElementById('copiarBtn');
     const generarBtn = document.getElementById('generarBtn');
     const guardarBtn = document.getElementById('guardarBtn');
-    const inicioBtn = document.getElementById('inicioBtn');
     const timestampElement = document.getElementById('timestamp');
     const historicoSelect = document.getElementById('historicoSelect');
     const loadLastContainer = document.getElementById('loadLastContainer');
@@ -217,18 +248,27 @@
         }
     }
 
-    // Cargar último registro
+    // Verificar si existe último registro y cargarlo bajo demanda
+    function verificarUltimoDisponible() {
+        const ultimo = localStorage.getItem('chkBuleLastRecord');
+        if (ultimo) {
+            loadLastContainer.classList.remove('hidden');
+        }
+    }
+
     function cargarUltimos() {
         const ultimo = localStorage.getItem('chkBuleLastRecord');
         if (ultimo) {
-            const data = JSON.parse(ultimo);
-            document.getElementById('hora1').value = data.hora1 || '';
-            document.getElementById('informante1').value = data.informante1 || '';
-            document.getElementById('hora2').value = data.hora2 || '';
-            document.getElementById('informante2').value = data.informante2 || '';
-            document.getElementById('argos').value = data.argos || '';
-            loadLastContainer.classList.remove('hidden');
-            validarHoras();
+            try {
+                const data = JSON.parse(ultimo);
+                document.getElementById('hora1').value = data.hora1 || '';
+                document.getElementById('informante1').value = data.informante1 || '';
+                document.getElementById('hora2').value = data.hora2 || '';
+                document.getElementById('informante2').value = data.informante2 || '';
+                document.getElementById('argos').value = data.argos || '';
+                validarHoras();
+                showNotification('Último registro cargado');
+            } catch (e) {}
         }
     }
 
@@ -238,7 +278,7 @@
     function actualizarHistorial() {
         const historial = JSON.parse(localStorage.getItem('chkBuleHistorial') || '[]');
         historicoSelect.innerHTML = '<option value="">📜 Seleccionar informe anterior...</option>';
-        historial.reverse().forEach((item, idx) => {
+        historial.forEach((item, idx) => {
             const option = document.createElement('option');
             option.value = idx;
             option.textContent = `${item.fecha} - ${item.hora1} a ${item.hora2} (${item.informante1})`;
@@ -247,9 +287,9 @@
     }
 
     historicoSelect.addEventListener('change', function() {
-        if (!this.value) return;
-        const historial = JSON.parse(localStorage.getItem('chkBuleHistorial') || '[]').reverse();
-        const item = historial[this.value];
+        if (this.value === '') return;
+        const historial = JSON.parse(localStorage.getItem('chkBuleHistorial') || '[]');
+        const item = historial[Number(this.value)];
         if (item) {
             informeDiv.textContent = item.contenido;
             timestampElement.textContent = `Generado el: ${item.fecha}`;
@@ -271,10 +311,13 @@
             return;
         }
 
-        // Validar horas
+        // Validar horas (permitiendo cruce de medianoche en turno tarde/noche)
         const [h1, m1] = hora1.split(':').map(Number);
         const [h2, m2] = hora2.split(':').map(Number);
-        if (h2 * 60 + m2 <= h1 * 60 + m1) {
+        const min1 = h1 * 60 + m1;
+        const min2 = h2 * 60 + m2;
+        const horarioValido = (min2 > min1) || (h1 >= 12 && min2 < min1);
+        if (!horarioValido) {
             showNotification('La hora 2 debe ser posterior a la hora 1', 'error');
             return;
         }
@@ -283,7 +326,7 @@
 
 A las ${hora1} Hs. CCTV recibe llamada de ${informante1}, informa que realizará chequeo de botones antipánico.
 
-A las ${hora2} ${informante2}, informa que se comunicó personal de Argos ${argos} informando que se recibió todas las señales de los pulsadores.`;
+A las ${hora2} Hs. ${informante2}, informa que se comunicó personal de Argos ${argos} informando que se recibieron todas las señales de los pulsadores.`;
 
         informeDiv.textContent = contenido;
         timestampElement.textContent = `Generado el: ${new Date().toLocaleString('es-AR')}`;
@@ -309,9 +352,10 @@ A las ${hora2} ${informante2}, informa que se comunicó personal de Argos ${argo
         localStorage.setItem('chkBuleLastRecord', JSON.stringify({
             hora1, informante1, hora2, informante2, argos
         }));
+        loadLastContainer.classList.remove('hidden');
 
         // Guardar en historial (máx 10)
-        const contenido = informeDiv.textContent || `Control de Botones - Bulevard\n\nA las ${hora1} Hs. CCTV recibe llamada de ${informante1}, informa que realizará chequeo de botones antipánico.\n\nA las ${hora2} ${informante2}, informa que se comunicó personal de Argos ${argos} informando que se recibió todas las señales de los pulsadores.`;
+        const contenido = informeDiv.textContent || `Control de Botones - Bulevard\n\nA las ${hora1} Hs. CCTV recibe llamada de ${informante1}, informa que realizará chequeo de botones antipánico.\n\nA las ${hora2} Hs. ${informante2}, informa que se comunicó personal de Argos ${argos} informando que se recibieron todas las señales de los pulsadores.`;
         const historial = JSON.parse(localStorage.getItem('chkBuleHistorial') || '[]');
         historial.unshift({
             fecha: new Date().toLocaleString('es-AR'),
@@ -347,21 +391,17 @@ A las ${hora2} ${informante2}, informa que se comunicó personal de Argos ${argo
         const now = new Date();
         const horas = String(now.getHours()).padStart(2, '0');
         const minutos = String(now.getMinutes()).padStart(2, '0');
-        const horaActual = `${horas}:${minutos}`;
-        document.getElementById('hora1').value = horaActual;
-        document.getElementById('hora2').value = horaActual;
+        const dFin = new Date(now.getTime() + 5 * 60000);
+        document.getElementById('hora1').value = `${horas}:${minutos}`;
+        document.getElementById('hora2').value = `${String(dFin.getHours()).padStart(2, '0')}:${String(dFin.getMinutes()).padStart(2, '0')}`;
+        validarHoras();
     }
-
-    // Volver al inicio
-    inicioBtn.addEventListener('click', function() {
-        window.location.href = 'index.html';
-    });
 
     // Mostrar notificación
     function showNotification(message, type = 'success') {
         const notification = document.getElementById('notification');
         document.getElementById('notification-text').textContent = message;
-        notification.classList.remove('hidden', 'bg-red-100', 'text-red-800');
+        notification.classList.remove('hidden', 'bg-red-100', 'text-red-800', 'bg-green-100', 'text-green-800');
         if (type === 'error') {
             notification.classList.add('bg-red-100', 'text-red-800');
         } else {
@@ -371,12 +411,13 @@ A las ${hora2} ${informante2}, informa que se comunicó personal de Argos ${argo
     }
 
     // Inicializar al cargar página
-    window.addEventListener('load', function() {
+    window.addEventListener('DOMContentLoaded', function() {
         establecerHoraActual();
         actualizarHistorial();
-        cargarUltimos();
+        verificarUltimoDisponible();
     });
 </script>
+<script src="js/global.js"></script>
 
 </body>
 </html>

@@ -1,10 +1,34 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ingreso Personal Externo</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'Segoe UI', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'Consolas', 'monospace']
+                    }
+                }
+            }
+        };
+        (function () {
+            try {
+                if (localStorage.getItem('cctv_theme') === 'dark') {
+                    document.documentElement.classList.add('dark');
+                }
+            } catch (e) {}
+        })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/global.css">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root {
@@ -15,20 +39,6 @@
             --warning: #d97706;
         }
         
-        body { 
-            background-color: #f8fafc; 
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
-        }
-        
-        .fade-in { 
-            animation: fadeIn 0.3s ease-in-out; 
-        }
-        
-        @keyframes fadeIn { 
-            from { opacity: 0; transform: translateY(-10px); } 
-            to { opacity: 1; transform: translateY(0); } 
-        }
-        
         @keyframes pulse {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.5; }
@@ -36,12 +46,10 @@
         
         .saving { animation: pulse 1.5s ease-in-out infinite; }
         
-        /* Mejoras de accesibilidad */
         @media (prefers-reduced-motion: reduce) {
             * { animation-duration: 0.01ms !important; }
         }
         
-        /* Tooltips mejorados */
         [data-tooltip] {
             position: relative;
         }
@@ -55,46 +63,52 @@
             background: #1e293b;
             color: white;
             padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
+            border-radius: 6px;
+            font-size: 11px;
             white-space: nowrap;
             z-index: 50;
         }
     </style>
 </head>
-<body class="p-4 md:p-8 text-slate-800">
-    <div class="max-w-5xl mx-auto bg-white rounded-xl shadow-xl overflow-hidden border border-slate-200">
+<body class="bg-slate-100 dark:bg-slate-950 p-3 sm:p-5 md:p-8 text-slate-800 dark:text-slate-100 min-h-screen font-sans transition-colors duration-200">
+    <div class="max-w-6xl mx-auto bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 transition-colors duration-200">
         
-        <!-- Header Mejorado -->
-        <header class="bg-gradient-to-r from-slate-900 to-slate-800 p-5 text-white">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <div class="flex items-center gap-3">
-                    <div class="bg-indigo-600 p-2 rounded-lg shadow-lg">
-                        <i data-lucide="user-plus" class="w-6 h-6 text-white"></i>
-                    </div>
-                    <div>
-                        <h1 class="text-xl font-bold">Ingreso Personal Externo</h1>
-                        <p class="text-slate-400 text-xs uppercase tracking-wider">Sistema de Registro - CCTV v2.0</p>
-                    </div>
+        <!-- Header Estándar -->
+        <header class="no-print bg-slate-900 dark:bg-slate-950 border-b border-slate-800 px-4 sm:px-6 py-4 rounded-t-2xl text-white flex flex-wrap justify-between items-center gap-3">
+            <div class="flex items-center gap-3">
+                <div class="bg-indigo-600 p-2.5 rounded-xl shadow-sm shrink-0 flex items-center justify-center">
+                    <i data-lucide="user-plus" class="w-6 h-6 text-white"></i>
                 </div>
-                
-                <nav class="flex items-center gap-2">
-                    <a href="Inpol.html" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-lg transition-all duration-200 text-white border border-blue-500 shadow-md hover:shadow-lg" data-tooltip="Acceso policial">
-                        <i data-lucide="shield" class="w-5 h-5"></i>
-                        <span class="text-sm font-medium hidden sm:inline">Policial</span>
-                    </a>
-                    <a href="index.html" class="flex items-center gap-2 bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-lg transition-all duration-200 text-white shadow-md hover:shadow-lg" title="Volver a Inicio">
-                        <i data-lucide="home" class="w-5 h-5"></i>
-                        <span class="text-sm font-medium hidden sm:inline">Inicio</span>
-                    </a>
-                </nav>
+                <div>
+                    <h1 class="text-lg sm:text-xl font-bold leading-tight text-white">Ingreso Personal Externo</h1>
+                    <p class="text-slate-400 text-xs uppercase tracking-wider">CCTV · Técnicos, Proveedores y Visitas</p>
+                </div>
             </div>
+            
+            <nav class="flex flex-wrap items-center gap-2">
+                <a href="Inpol.html" class="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-500 px-3 py-2 rounded-xl transition text-xs font-semibold text-white shadow-sm" title="Ir a Adicional Policial">
+                    <i data-lucide="shield-check" class="w-4 h-4"></i>
+                    <span class="hidden sm:inline">Policial</span>
+                </a>
+                <div class="hidden md:flex items-center gap-2 bg-slate-800/90 border border-slate-700 px-3 py-1.5 rounded-xl text-xs font-mono text-slate-200">
+                    <i data-lucide="clock" class="w-3.5 h-3.5 text-indigo-400"></i>
+                    <span data-cctv-clock class="tabular-nums">00:00:00 Hs.</span>
+                </div>
+                <div data-cctv-nav></div>
+                <button type="button" onclick="toggleTheme()" title="Cambiar modo claro / oscuro" class="p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl transition inline-flex items-center justify-center text-slate-200 cursor-pointer">
+                    <i data-lucide="sun" class="w-5 h-5 text-amber-400 hidden dark:block"></i>
+                    <i data-lucide="moon" class="w-5 h-5 text-slate-200 block dark:hidden"></i>
+                </button>
+                <a href="index.html" class="p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl transition inline-flex items-center justify-center text-slate-200" title="Volver al Menú Principal">
+                    <i data-lucide="home" class="w-5 h-5"></i>
+                </a>
+            </nav>
         </header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12">
+        <div class="grid grid-cols-1 lg:grid-cols-12 rounded-b-2xl overflow-hidden">
             
             <!-- COLUMNA IZQUIERDA: FORMULARIO -->
-            <div class="lg:col-span-7 p-6 space-y-6 bg-slate-50">
+            <div class="lg:col-span-7 p-5 sm:p-6 space-y-6 bg-slate-50 dark:bg-slate-900/60">
                 
                 <!-- Indicador de progreso -->
                 <div class="flex items-center gap-2 mb-4">
@@ -137,7 +151,7 @@
                                             class="w-full p-2 bg-slate-50 border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
                                         <option value="">Seleccionar personal...</option>
                                         <optgroup label="Supervisores">
-                                            <option value="Supervisor de Control Interno">Padilla Jorge </option>
+                                            <option value="Supervisor de Control Interno Padilla Jorge">Padilla Jorge</option>
                                             <option value="Supervisora de Control Interno Rojas Dolly">Rojas Dolly</option>
                                             <option value="Supervisor de Control Interno Urbano Daniel">Urbano Daniel</option>
                                         </optgroup>
@@ -420,16 +434,15 @@
 
     <!-- DATALISTS -->
     <datalist id="workers-list">
-        <option value="Sr. Sosa Lucas">
-        <option value="Sr. Vilte Nicolas">
-        <option value="Sra. Reyes Rosana">
-        <option value="Sra. Calapeña Lorena">
-        <option value="Sra. Chungara Leonor">
-        <option value="Sr. Yapura Sergio">
-        <option value="Sra. Bais Ivana">
-        <option value="Sra. Mendieta Anahi">
-        <option value="Sra. Solange Barboza"></option> 
-        </option>
+        <option value="Sr. Sosa Lucas"></option>
+        <option value="Sr. Vilte Nicolas"></option>
+        <option value="Sra. Reyes Rosana"></option>
+        <option value="Sra. Calapeña Lorena"></option>
+        <option value="Sra. Chungara Leonor"></option>
+        <option value="Sr. Yapura Sergio"></option>
+        <option value="Sra. Bais Ivana"></option>
+        <option value="Sra. Mendieta Anahi"></option>
+        <option value="Sra. Solange Barboza"></option>
     </datalist>
 
     <datalist id="companies-list">
@@ -720,30 +733,25 @@
         showNotification('💾 Informe descargado', 'success');
     }
     
-    // Imprimir informe
+    // Imprimir informe (compatible con Live Server y escapando HTML)
     function printReport() {
         if (!state.currentReport) {
             showNotification('⚠️ Genere un informe primero', 'warning');
             return;
         }
-        
+        const safeReport = String(state.currentReport)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+
         const printWindow = window.open('', '_blank');
-        printWindow.document.write(`
-            <!DOCTYPE html>
-            <html>
-                <head>
-                    <title>Informe de Ingreso - CCTV</title>
-                    <style>
-                        body { font-family: monospace; padding: 40px; }
-                        pre { white-space: pre-wrap; font-size: 14px; }
-                    </style>
-                </head>
-                <body` + `>
-                    <pre>${state.currentReport}</pre>
-                </body` + `>
-            </html` + `>
-        `);
+        if (!printWindow) {
+            showNotification('⚠️ Habilite las ventanas emergentes para imprimir', 'warning');
+            return;
+        }
+        printWindow.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Informe de Ingreso - CCTV<\/title><style>body { font-family: monospace; padding: 40px; } pre { white-space: pre-wrap; font-size: 14px; }<\/style><\/head><body><pre>${safeReport}<\/pre><\/body><\/html>`);
         printWindow.document.close();
+        printWindow.focus();
         printWindow.print();
     }
     
@@ -923,7 +931,7 @@
         showNotification('📦 Historial exportado', 'success');
     };
     
-    // Limpiar formulario
+    // Limpiar formulario completo (incluyendo selects y campos personalizados)
     function clearForm() {
         if (state.formModified) {
             if (!confirm('¿Está seguro de limpiar todos los campos? Se perderán los datos no guardados.')) {
@@ -935,11 +943,19 @@
             input.value = '';
             input.classList.remove('border-red-500', 'bg-red-50');
         });
+        $$('#report-form select').forEach(sel => {
+            sel.value = '';
+            sel.classList.remove('border-red-500', 'bg-red-50');
+        });
+        $('#custom-supervisor1').classList.add('hidden');
+        $('#custom-supervisor2').classList.add('hidden');
+        $('#task-counter').textContent = `0/${CONFIG.maxTaskLength}`;
         
         $('#report-container').classList.add('hidden');
         $('#no-report').classList.remove('hidden');
         state.currentReport = null;
         state.formModified = false;
+        updateProgress();
         
         showNotification('🧹 Formulario limpiado', 'info');
     }
@@ -1022,11 +1038,11 @@
             updateProgress();
         });
         
-        // Sincronización automática
+        // Sincronización automática (input y change para incluir <select>)
         ['supervisor1', 'company1', 'worker1'].forEach(id => {
             const element = document.getElementById(id);
             if (element) {
-                element.addEventListener('input', function() {
+                const syncFn = function() {
                     const targetMap = {
                         'supervisor1': 'supervisor2',
                         'company1': 'company2',
@@ -1040,7 +1056,9 @@
                             targetElement.dispatchEvent(new Event('change'));
                         }
                     }
-                });
+                };
+                element.addEventListener('input', syncFn);
+                element.addEventListener('change', syncFn);
             }
         });
         
@@ -1107,6 +1125,7 @@
     
 })();
 </script>
+<script src="js/global.js"></script>
 
 </body>
 </html>

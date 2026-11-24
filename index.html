@@ -1,186 +1,437 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Centro de Reportes - Menú Principal</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lucide Icons -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'Segoe UI', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'Consolas', 'monospace']
+                    }
+                }
+            }
+        };
+        (function () {
+            try {
+                if (localStorage.getItem('cctv_theme') === 'dark') {
+                    document.documentElement.classList.add('dark');
+                }
+            } catch (e) { }
+        })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/global.css">
     <script src="https://unpkg.com/lucide@latest"></script>
-    <style>
-        body { background-color: #f8fafc; font-family: 'Segoe UI', sans-serif; }
-        .fade-in { animation: fadeIn 0.3s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
-        /* Efecto hover suave para las tarjetas */
-        .module-card:hover {
-            transform: translateY(-5px);
-            border-color: #6366f1; /* Indigo-500 */
-        }
-    </style>
 </head>
-<body class="text-slate-800 min-h-screen flex flex-col">
 
-    <!-- Header -->
-    <div class="bg-slate-900 p-5 text-white flex justify-center items-center relative shadow-md">
-        <div class="flex items-center gap-3">
-            <div class="bg-indigo-600 p-2 rounded-lg relative overflow-hidden group hover:bg-indigo-500 transition">
-                <i data-lucide="layout-grid" class="w-6 h-6 text-white transition"></i>
+<body
+    class="bg-slate-100 dark:bg-slate-950 p-3 sm:p-5 md:p-8 text-slate-800 dark:text-slate-100 min-h-screen font-sans transition-colors duration-200">
+
+    <div
+        class="max-w-6xl mx-auto bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 transition-colors duration-200">
+
+        <!-- Header Estándar -->
+        <header
+            class="no-print bg-slate-900 dark:bg-slate-950 border-b border-slate-800 px-4 sm:px-6 py-4 rounded-t-2xl text-white flex flex-wrap justify-between items-center gap-3">
+            <div class="flex items-center gap-3">
+                <div class="bg-indigo-600 p-2.5 rounded-xl shadow-sm shrink-0 flex items-center justify-center">
+                    <i data-lucide="layout-grid" class="w-6 h-6 text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg sm:text-xl font-bold leading-tight text-white">Centro de Reportes CCTV</h1>
+                    <p class="text-slate-400 text-xs uppercase tracking-wider">Sistema de Reportes</p>
+                </div>
             </div>
-            <div class="text-left">
-                <h1 class="text-xl font-bold">Centro de Reportes</h1>
-                <p class="text-slate-400 text-xs uppercase tracking-wider">Sistema de Gestión de Reportes</p>
+
+            <div class="flex flex-wrap items-center gap-2">
+                <div class="relative hidden sm:block">
+                    <i data-lucide="search"
+                        class="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                    <input type="search" id="menuSearchInput" placeholder="Filtrar herramientas..." autocomplete="off"
+                        class="bg-slate-800 border border-slate-700 text-slate-100 placeholder-slate-400 text-xs rounded-xl pl-8 pr-3 py-2 w-44 md:w-56 focus:outline-none focus:border-indigo-500 transition">
+                </div>
+
+                <div
+                    class="hidden md:flex items-center gap-2 bg-slate-800/90 border border-slate-700 px-3 py-1.5 rounded-xl text-xs font-mono text-slate-200">
+                    <i data-lucide="clock" class="w-3.5 h-3.5 text-indigo-400"></i>
+                    <span data-cctv-clock class="tabular-nums">00:00:00 Hs.</span>
+                </div>
+
+                <div data-cctv-nav></div>
+
+                <button type="button" onclick="toggleTheme()" title="Cambiar modo claro / oscuro"
+                    class="p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl transition inline-flex items-center justify-center text-slate-200 cursor-pointer">
+                    <i data-lucide="sun" class="w-5 h-5 text-amber-400 hidden dark:block"></i>
+                    <i data-lucide="moon" class="w-5 h-5 text-slate-200 block dark:hidden"></i>
+                </button>
             </div>
-        </div>
-    </div>
+        </header>
 
-    <!-- Main Content Grid -->
-    <div class="flex-1 p-6 md:p-10 max-w-7xl mx-auto w-full">
-        
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 fade-in">
+        <!-- Contenido Principal -->
+        <main class="p-5 sm:p-6 md:p-8 bg-slate-50 dark:bg-slate-900/60">
+            <!-- Buscador móvil -->
+            <div class="sm:hidden mb-5 relative">
+                <i data-lucide="search"
+                    class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                <input type="search" id="menuSearchMobile" placeholder="Buscar herramienta o reporte..."
+                    autocomplete="off"
+                    class="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 text-sm rounded-xl pl-10 pr-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
 
-            <!-- Jackpot 2 -->
-            <a href="jackpot.html" class="module-card group bg-white p-6 rounded-2xl shadow-sm border border-slate-200 transition-all duration-300 flex flex-col items-center text-center cursor-pointer relative overflow-hidden">
-                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-yellow-500 to-orange-500"></div>
-                <div class="bg-orange-50 p-4 rounded-full mb-4 group-hover:bg-orange-100 transition-colors">
-                    <i data-lucide="layers" class="w-10 h-10 text-orange-600"></i>
-                </div>
-                <h3 class="text-lg font-bold text-slate-700 mb-1 group-hover:text-orange-700 transition-colors">Modelos de Jackpot</h3>
-                <p class="text-xs text-slate-400">Reportes de pagos Mayores</p>
-            </a>
+            <div id="modulesGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 fade-in">
 
-            <!-- Pal Var -->
-            <a href="palvar.html" class="module-card group bg-white p-6 rounded-2xl shadow-sm border border-slate-200 transition-all duration-300 flex flex-col items-center text-center cursor-pointer relative overflow-hidden">
-                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-400 to-pink-500"></div>
-                <div class="bg-purple-50 p-4 rounded-full mb-4 group-hover:bg-purple-100 transition-colors">
-                    <i data-lucide="line-chart" class="w-10 h-10 text-purple-600"></i>
-                </div>
-                <h3 class="text-lg font-bold text-slate-700 mb-1 group-hover:text-purple-700 transition-colors">Pal Var</h3>
-                <p class="text-xs text-slate-400">Reporte de Pagos Altos</p>
-            </a>
+                <!-- Modelos de Jackpot -->
+                <a href="jackpot.html" data-card-search="jackpot premios mayores pagos modelo 1 2 luxor"
+                    class="module-card group bg-white dark:bg-slate-900 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 flex items-start gap-4 cursor-pointer relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-500 to-orange-500"></div>
+                    <div
+                        class="bg-amber-50 dark:bg-amber-950/50 p-3.5 rounded-xl shrink-0 group-hover:scale-105 transition-transform">
+                        <i data-lucide="trophy" class="w-7 h-7 text-amber-600 dark:text-amber-400"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <span
+                            class="text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">Premios
+                            Mayores</span>
+                        <h3
+                            class="text-base font-bold text-slate-800 dark:text-slate-100 mt-0.5 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                            Modelos de Jackpot</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Actas Modelo 1, Progresivo y Sala
+                            Luxor</p>
+                    </div>
+                </a>
 
-            <!-- Ingreso Personal -->
-            <a href="ingreso.html" class="module-card group bg-white p-6 rounded-2xl shadow-sm border border-slate-200 transition-all duration-300 flex flex-col items-center text-center cursor-pointer relative overflow-hidden">
-                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-400 to-green-500"></div>
-                <div class="bg-emerald-50 p-4 rounded-full mb-4 group-hover:bg-emerald-100 transition-colors">
-                    <i data-lucide="user-plus" class="w-10 h-10 text-emerald-600"></i>
-                </div>
-                <h3 class="text-lg font-bold text-slate-700 mb-1 group-hover:text-emerald-700 transition-colors">Ingreso Personal</h3>
-                <p class="text-xs text-slate-400">Reporte de Personal Externos</p>
-            </a>
+                <!-- Pal Var -->
+                <a href="palvar.html" data-card-search="pal var pagos altos tickets salas varias"
+                    class="module-card group bg-white dark:bg-slate-900 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 flex items-start gap-4 cursor-pointer relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-purple-500"></div>
+                    <div
+                        class="bg-indigo-50 dark:bg-indigo-950/50 p-3.5 rounded-xl shrink-0 group-hover:scale-105 transition-transform">
+                        <i data-lucide="ticket" class="w-7 h-7 text-indigo-600 dark:text-indigo-400"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <span
+                            class="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">Pagos
+                            Altos</span>
+                        <h3
+                            class="text-base font-bold text-slate-800 dark:text-slate-100 mt-0.5 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                            Pal Var</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Control de tickets, pagos altos y
+                            propinas</p>
+                    </div>
+                </a>
 
-            <!-- Chequeo Bulevard -->
-            <a href="chk_bule.html" class="module-card group bg-white p-6 rounded-2xl shadow-sm border border-slate-200 transition-all duration-300 flex flex-col items-center text-center cursor-pointer relative overflow-hidden">
-                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-400 to-red-600"></div>
-                <div class="bg-red-50 p-4 rounded-full mb-4 group-hover:bg-red-100 transition-colors">
-                    <i data-lucide="shield-check" class="w-10 h-10 text-red-600"></i>
-                </div>
-                <h3 class="text-lg font-bold text-slate-700 mb-1 group-hover:text-red-700 transition-colors">Chequeo Bulevard</h3>
-                <p class="text-xs text-slate-400">Reporte de Chequeo de botones</p>
-            </a>
+                <!-- Pago Alto Luxor -->
+                <a href="pagoaltoluxor.html" data-card-search="pago alto luxor redencion tickets caja"
+                    class="module-card group bg-white dark:bg-slate-900 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 flex items-start gap-4 cursor-pointer relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-indigo-600"></div>
+                    <div
+                        class="bg-blue-50 dark:bg-blue-950/50 p-3.5 rounded-xl shrink-0 group-hover:scale-105 transition-transform">
+                        <i data-lucide="building-2" class="w-7 h-7 text-blue-600 dark:text-blue-400"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <span
+                            class="text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">Sala
+                            Luxor</span>
+                        <h3
+                            class="text-base font-bold text-slate-800 dark:text-slate-100 mt-0.5 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                            Pago Alto Luxor</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Control De Pagos Altos,Sala Luxor</p>
+                    </div>
+                </a>
 
-            <!-- Chequeo Luxor -->
-            <a href="chk_luxor.html" class="module-card group bg-white p-6 rounded-2xl shadow-sm border border-slate-200 transition-all duration-300 flex flex-col items-center text-center cursor-pointer relative overflow-hidden">
-                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-500 to-rose-600"></div>
-                <div class="bg-rose-50 p-4 rounded-full mb-4 group-hover:bg-rose-100 transition-colors">
-                    <i data-lucide="shield" class="w-10 h-10 text-rose-600"></i>
-                </div>
-                <h3 class="text-lg font-bold text-slate-700 mb-1 group-hover:text-rose-700 transition-colors">Chequeo Luxor</h3>
-                <p class="text-xs text-slate-400">Reporte de Chequeo de botones Luxor</p>
-            </a>
+                <!-- Pal Cap -->
+                <a href="palcap.html" data-card-search="pal cap caja cambio efectivo tickets capital"
+                    class="module-card group bg-white dark:bg-slate-900 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 flex items-start gap-4 cursor-pointer relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-violet-500 to-fuchsia-500"></div>
+                    <div
+                        class="bg-violet-50 dark:bg-violet-950/50 p-3.5 rounded-xl shrink-0 group-hover:scale-105 transition-transform">
+                        <i data-lucide="wallet-cards" class="w-7 h-7 text-violet-600 dark:text-violet-400"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <span
+                            class="text-[10px] font-bold uppercase tracking-wider text-violet-600 dark:text-violet-400">Caja</span>
+                        <h3
+                            class="text-base font-bold text-slate-800 dark:text-slate-100 mt-0.5 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                            Pal Cap</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Cambio de efectivo por tickets en
+                            ventanilla</p>
+                    </div>
+                </a>
 
-            <!-- Calculadora 2 (La nueva que hicimos) -->
-            <a href="calculadora2.html" class="module-card group bg-white p-6 rounded-2xl shadow-sm border border-slate-200 transition-all duration-300 flex flex-col items-center text-center cursor-pointer relative overflow-hidden ring-2 ring-indigo-100">
-                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-violet-600"></div>
+                <!-- Ingreso Personal -->
+                <a href="ingreso.html" data-card-search="ingreso personal externo proveedores tecnicos policial"
+                    class="module-card group bg-white dark:bg-slate-900 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 flex items-start gap-4 cursor-pointer relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-400 to-green-600"></div>
+                    <div
+                        class="bg-emerald-50 dark:bg-emerald-950/50 p-3.5 rounded-xl shrink-0 group-hover:scale-105 transition-transform">
+                        <i data-lucide="user-plus" class="w-7 h-7 text-emerald-600 dark:text-emerald-400"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <span
+                            class="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Accesos</span>
+                        <h3
+                            class="text-base font-bold text-slate-800 dark:text-slate-100 mt-0.5 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                            Ingreso Personal</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Personal externo, técnicos y
+                            adicional policial</p>
+                    </div>
+                </a>
 
-                <div class="bg-indigo-50 p-4 rounded-full mb-4 group-hover:bg-indigo-100 transition-colors">
-                    <i data-lucide="calculator" class="w-10 h-10 text-indigo-600"></i>
-                </div>
-                <h3 class="text-lg font-bold text-slate-700 mb-1 group-hover:text-indigo-700 transition-colors">Calculadora 2</h3>
-                <p class="text-xs text-slate-400">Herramienta</p>
-            </a>
+                <!-- Chequeo Bulevard -->
+                <a href="chk_bule.html" data-card-search="chequeo botones antipanico bulevard argos"
+                    class="module-card group bg-white dark:bg-slate-900 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 flex items-start gap-4 cursor-pointer relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-rose-400 to-red-600"></div>
+                    <div
+                        class="bg-rose-50 dark:bg-rose-950/50 p-3.5 rounded-xl shrink-0 group-hover:scale-105 transition-transform">
+                        <i data-lucide="bell-ring" class="w-7 h-7 text-rose-600 dark:text-rose-400"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <span
+                            class="text-[10px] font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400">Seguridad</span>
+                        <h3
+                            class="text-base font-bold text-slate-800 dark:text-slate-100 mt-0.5 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                            Chequeo Bulevard</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Control de botones antipánico
+                            Bulevard</p>
+                    </div>
+                </a>
 
-            <!-- Test 2 (Palcap) -->
-            <a href="palcap.html" class="module-card group bg-white p-6 rounded-2xl shadow-sm border border-slate-200 transition-all duration-300 flex flex-col items-center text-center cursor-pointer relative overflow-hidden">
-                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-gray-400 to-slate-500"></div>
-                <div class="bg-slate-100 p-4 rounded-full mb-4 group-hover:bg-slate-200 transition-colors">
-                    <i data-lucide="flask-conical" class="w-10 h-10 text-slate-600"></i>
-                </div>
-                <h3 class="text-lg font-bold text-slate-700 mb-1 group-hover:text-slate-900 transition-colors">Pal Cap</h3>
-                <p class="text-xs text-slate-400">Reporte de Pagos Tickets</p>
-            </a>
+                <!-- Chequeo Luxor -->
+                <a href="chk_luxor.html" data-card-search="chequeo botones panico luxor argos"
+                    class="module-card group bg-white dark:bg-slate-900 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 flex items-start gap-4 cursor-pointer relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-500 to-rose-600"></div>
+                    <div
+                        class="bg-red-50 dark:bg-red-950/50 p-3.5 rounded-xl shrink-0 group-hover:scale-105 transition-transform">
+                        <i data-lucide="shield-alert" class="w-7 h-7 text-red-600 dark:text-red-400"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <span
+                            class="text-[10px] font-bold uppercase tracking-wider text-red-600 dark:text-red-400">Seguridad</span>
+                        <h3
+                            class="text-base font-bold text-slate-800 dark:text-slate-100 mt-0.5 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                            Chequeo Luxor</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Control de botones de pánico Sala
+                            Luxor</p>
+                    </div>
+                </a>
 
-            <!-- Ingreso y Egreso de Valores -->
-            <a href="iedin.html" class="module-card group bg-white p-6 rounded-2xl shadow-sm border border-slate-200 transition-all duration-300 flex flex-col items-center text-center cursor-pointer relative overflow-hidden">
-                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-400 to-blue-500"></div>
-                <div class="bg-cyan-50 p-4 rounded-full mb-4 group-hover:bg-cyan-100 transition-colors">
-                    <i data-lucide="database" class="w-10 h-10 text-cyan-600"></i>
-                </div>
-                <h3 class="text-lg font-bold text-slate-700 mb-1 group-hover:text-cyan-700 transition-colors">Ingreso y Egreso de Valores</h3>
-                <p class="text-xs text-slate-400">Ingreso de efectivo basico</p>
-            </a>
-            <!-- Declaracion Jurada -->
-            <a href="ddj.html" class="module-card group bg-white p-6 rounded-2xl shadow-sm border border-slate-200 transition-all duration-300 flex flex-col items-center text-center cursor-pointer relative overflow-hidden">
-                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-teal-400 to-teal-500"></div>
-                <div class="bg-teal-50 p-4 rounded-full mb-4 group-hover:bg-teal-100 transition-colors">
-                    <i data-lucide="book-open-check" class="w-10 h-10 text-teal-600"></i>
-                </div>
-                <h3 class="text-lg font-bold text-slate-700 mb-1 group-hover:text-teal-700 transition-colors">Declaracion Jurada</h3>
-                <p class="text-xs text-slate-400">Declaracion Jurada Basico</p>
-            </a>
-            
-            <!-- Corte de Luz -->
-            <a href="corte_luz.html" class="module-card group bg-white p-6 rounded-2xl shadow-sm border border-slate-200 transition-all duration-300 flex flex-col items-center text-center cursor-pointer relative overflow-hidden">
-                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-400 to-amber-500"></div>
-                <div class="bg-amber-50 p-4 rounded-full mb-4 group-hover:bg-amber-100 transition-colors">
-                    <i data-lucide="cloud-alert" class="w-10 h-10 text-amber-600"></i>  
-                </div>
-                <h3 class="text-lg font-bold text-slate-700 mb-1 group-hover:text-amber-700 transition-colors">Corte de Luz</h3>
-                <p class="text-xs text-slate-400">Reporte de Corte de Luz Salas Varias</p>
-            </a>
-            
-            <!-- Cerado de Maquinas -->
-            <a href="cerado.html" class="module-card group bg-white p-6 rounded-2xl shadow-sm border border-slate-200 transition-all duration-300 flex flex-col items-center text-center cursor-pointer relative overflow-hidden">
-                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-sky-400 to-sky-600"></div>
-                <div class="bg-sky-50 p-4 rounded-full mb-4 group-hover:bg-sky-100 transition-colors">
-                    <i data-lucide="monitor-cog" class="w-10 h-10 text-sky-600"></i>   
-                </div>
-                <h3 class="text-lg font-bold text-slate-700 mb-1 group-hover:text-sky-700 transition-colors">Cerado de Maquinas</h3>
-                <p class="text-xs text-slate-400">Reporte de Cerado de Maquinas</p>
-            </a>
-            
-            <!-- Auditoria de Maquina -->
-            <a href="audit_maq.html" class="module-card group bg-white p-6 rounded-2xl shadow-sm border border-slate-200 transition-all duration-300 flex flex-col items-center text-center cursor-pointer relative overflow-hidden">
-                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-fuchsia-400 to-pink-500"></div>
-                <div class="bg-fuchsia-50 p-4 rounded-full mb-4 group-hover:bg-fuchsia-100 transition-colors">
-                    <i data-lucide="clipboard-check" class="w-10 h-10 text-fuchsia-600"></i>
-                </div>
-                <h3 class="text-lg font-bold text-slate-700 mb-1 group-hover:text-fuchsia-700 transition-colors">Auditoria de Maquinas</h3>
-                <p class="text-xs text-slate-400">Reporte Para Auditoria de Maquinas</p>
-            </a>
+                <!-- Traslado de Valores -->
+                <a href="iedin.html"
+                    data-card-search="ingreso egreso traslado valores efectivo tesoreria multidivisa usd"
+                    class="module-card group bg-white dark:bg-slate-900 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 flex items-start gap-4 cursor-pointer relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-400 to-sky-600"></div>
+                    <div
+                        class="bg-cyan-50 dark:bg-cyan-950/50 p-3.5 rounded-xl shrink-0 group-hover:scale-105 transition-transform">
+                        <i data-lucide="banknote" class="w-7 h-7 text-cyan-600 dark:text-cyan-400"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <span
+                            class="text-[10px] font-bold uppercase tracking-wider text-cyan-600 dark:text-cyan-400">Tesorería</span>
+                        <h3
+                            class="text-base font-bold text-slate-800 dark:text-slate-100 mt-0.5 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                            Traslado de Valores</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Ingreso y egreso de efectivo ARS /
+                            USD</p>
+                    </div>
+                </a>
 
-            <!-- Organizador de Cámaras -->
-            <a href="cam.html" class="module-card group bg-white p-6 rounded-2xl shadow-sm border border-slate-200 transition-all duration-300 flex flex-col items-center text-center cursor-pointer relative overflow-hidden">
-                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-indigo-600"></div>
-                <div class="bg-blue-50 p-4 rounded-full mb-4 group-hover:bg-blue-100 transition-colors">
-                    <i data-lucide="video" class="w-10 h-10 text-blue-600"></i>
-                </div>
-                <h3 class="text-lg font-bold text-slate-700 mb-1 group-hover:text-blue-700 transition-colors">Organizador de Cámaras</h3>
-                <p class="text-xs text-slate-400">Consolidación de Horarios y Descargas</p>
-            </a>
+                <!-- Declaración Jurada -->
+                <a href="ddj.html" data-card-search="declaracion jurada ddjj acta cliente"
+                    class="module-card group bg-white dark:bg-slate-900 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 flex items-start gap-4 cursor-pointer relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-teal-400 to-emerald-600"></div>
+                    <div
+                        class="bg-teal-50 dark:bg-teal-950/50 p-3.5 rounded-xl shrink-0 group-hover:scale-105 transition-transform">
+                        <i data-lucide="file-check-2" class="w-7 h-7 text-teal-600 dark:text-teal-400"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <span
+                            class="text-[10px] font-bold uppercase tracking-wider text-teal-600 dark:text-teal-400">Documentación</span>
+                        <h3
+                            class="text-base font-bold text-slate-800 dark:text-slate-100 mt-0.5 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                            Declaración Jurada</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Generador cronológico rápido de DDJJ
+                        </p>
+                    </div>
+                </a>
 
-        </div>
+                <!-- Corte de Luz -->
+                <a href="corte_luz.html" data-card-search="corte de luz suministro energia salas apagados"
+                    class="module-card group bg-white dark:bg-slate-900 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 flex items-start gap-4 cursor-pointer relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-400 to-yellow-600"></div>
+                    <div
+                        class="bg-amber-50 dark:bg-amber-950/50 p-3.5 rounded-xl shrink-0 group-hover:scale-105 transition-transform">
+                        <i data-lucide="cloud-lightning" class="w-7 h-7 text-amber-600 dark:text-amber-400"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <span
+                            class="text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">Contingencias</span>
+                        <h3
+                            class="text-base font-bold text-slate-800 dark:text-slate-100 mt-0.5 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                            Corte de Luz</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Cronología de corte y
+                            restablecimiento</p>
+                    </div>
+                </a>
+
+                <!-- Cerado de Máquinas -->
+                <a href="cerado.html" data-card-search="cerado maquinas ram clear tecnico"
+                    class="module-card group bg-white dark:bg-slate-900 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 flex items-start gap-4 cursor-pointer relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-sky-400 to-blue-600"></div>
+                    <div
+                        class="bg-sky-50 dark:bg-sky-950/50 p-3.5 rounded-xl shrink-0 group-hover:scale-105 transition-transform">
+                        <i data-lucide="wrench" class="w-7 h-7 text-sky-600 dark:text-sky-400"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <span
+                            class="text-[10px] font-bold uppercase tracking-wider text-sky-600 dark:text-sky-400">Técnica</span>
+                        <h3
+                            class="text-base font-bold text-slate-800 dark:text-slate-100 mt-0.5 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                            Cerado de Máquinas</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Reporte técnico de cerado múltiple
+                        </p>
+                    </div>
+                </a>
+
+                <!-- Auditoría de Máquinas -->
+                <a href="audit_maq.html" data-card-search="auditoria maquinas bitacora eventos ram clear"
+                    class="module-card group bg-white dark:bg-slate-900 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 flex items-start gap-4 cursor-pointer relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-fuchsia-500 to-pink-600"></div>
+                    <div
+                        class="bg-fuchsia-50 dark:bg-fuchsia-950/50 p-3.5 rounded-xl shrink-0 group-hover:scale-105 transition-transform">
+                        <i data-lucide="clipboard-check" class="w-7 h-7 text-fuchsia-600 dark:text-fuchsia-400"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <span
+                            class="text-[10px] font-bold uppercase tracking-wider text-fuchsia-600 dark:text-fuchsia-400">Sala</span>
+                        <h3
+                            class="text-base font-bold text-slate-800 dark:text-slate-100 mt-0.5 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                            Auditoría de Máquinas</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Bitácora cronológica de eventos
+                            técnicos</p>
+                    </div>
+                </a>
+
+                <!-- Organizador de Cámaras -->
+                <a href="cam.html" data-card-search="camaras organizador dvr horarios descargas video"
+                    class="module-card group bg-white dark:bg-slate-900 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 flex items-start gap-4 cursor-pointer relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-indigo-600"></div>
+                    <div
+                        class="bg-blue-50 dark:bg-blue-950/50 p-3.5 rounded-xl shrink-0 group-hover:scale-105 transition-transform">
+                        <i data-lucide="video" class="w-7 h-7 text-blue-600 dark:text-blue-400"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <span
+                            class="text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">CCTV
+                            / DVR</span>
+                        <h3
+                            class="text-base font-bold text-slate-800 dark:text-slate-100 mt-0.5 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                            Organizador de Cámaras</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Consolidación de tramos y control DVR
+                        </p>
+                    </div>
+                </a>
+
+                <!-- Auditoría de Desempeño -->
+                <a href="desemp.html" data-card-search="desempeno asistencia turno descansos camaras"
+                    class="module-card group bg-white dark:bg-slate-900 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 flex items-start gap-4 cursor-pointer relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500 to-teal-600"></div>
+                    <div
+                        class="bg-emerald-50 dark:bg-emerald-950/50 p-3.5 rounded-xl shrink-0 group-hover:scale-105 transition-transform">
+                        <i data-lucide="activity" class="w-7 h-7 text-emerald-600 dark:text-emerald-400"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <span
+                            class="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Control</span>
+                        <h3
+                            class="text-base font-bold text-slate-800 dark:text-slate-100 mt-0.5 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                            Auditoría de Desempeño</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Control continuo de asistencia y
+                            descansos</p>
+                    </div>
+                </a>
+
+                <!-- Calculadora Profesional -->
+                <a href="calculadora2.html" data-card-search="calculadora billetes arqueo divisas dolar euro"
+                    class="module-card group bg-white dark:bg-slate-900 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 flex items-start gap-4 cursor-pointer relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-violet-600"></div>
+                    <div
+                        class="bg-indigo-50 dark:bg-indigo-950/50 p-3.5 rounded-xl shrink-0 group-hover:scale-105 transition-transform">
+                        <i data-lucide="calculator" class="w-7 h-7 text-indigo-600 dark:text-indigo-400"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <span
+                            class="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">Herramienta</span>
+                        <h3
+                            class="text-base font-bold text-slate-800 dark:text-slate-100 mt-0.5 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                            Calculadora Profesional</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Arqueo de fajos, cuadre de caja y
+                            divisas</p>
+                    </div>
+                </a>
+
+            </div>
+
+            <p id="noResultsMsg" class="hidden text-center text-sm text-slate-500 dark:text-slate-400 py-10">
+                No se encontraron módulos que coincidan con tu búsqueda.
+            </p>
+        </main>
 
         <!-- Footer -->
-        <div class="mt-12 text-center text-slate-400 text-sm">
-            <p>&copy; 2026 Centro de Operaciones. Todos los derechos reservados.Cristian Parraga</p>
-        </div>
+        <footer
+            class="bg-white dark:bg-slate-950/80 border-t border-slate-200 dark:border-slate-800 px-6 py-4 rounded-b-2xl flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500 dark:text-slate-400">
+            <span>&copy; 2026 Centro de Operaciones CCTV · Cristian Parraga</span>
+            <span class="font-mono">Atajo rápido: <kbd
+                    class="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700">Alt
+                    + M</kbd> para abrir módulos</span>
+        </footer>
 
     </div>
 
+    <script src="js/global.js"></script>
     <script>
-        lucide.createIcons();
+        (function () {
+            const desktopSearch = document.getElementById('menuSearchInput');
+            const mobileSearch = document.getElementById('menuSearchMobile');
+            const cards = Array.from(document.querySelectorAll('#modulesGrid [data-card-search]'));
+            const emptyMsg = document.getElementById('noResultsMsg');
+
+            function filterCards(val) {
+                const q = (val || '').trim().toLowerCase();
+                let visible = 0;
+                cards.forEach(function (card) {
+                    const text = (card.textContent + ' ' + card.getAttribute('data-card-search')).toLowerCase();
+                    const show = !q || text.indexOf(q) !== -1;
+                    card.classList.toggle('hidden', !show);
+                    if (show) visible++;
+                });
+                emptyMsg.classList.toggle('hidden', visible > 0);
+            }
+
+            if (desktopSearch) {
+                desktopSearch.addEventListener('input', function () {
+                    if (mobileSearch) mobileSearch.value = this.value;
+                    filterCards(this.value);
+                });
+            }
+            if (mobileSearch) {
+                mobileSearch.addEventListener('input', function () {
+                    if (desktopSearch) desktopSearch.value = this.value;
+                    filterCards(this.value);
+                });
+            }
+        })();
     </script>
 </body>
+
 </html>
