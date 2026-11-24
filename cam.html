@@ -1,0 +1,1409 @@
+<!DOCTYPE html>
+<html lang="es" class="">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organizador de Cámaras y Horarios</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        };
+    </script>
+    <!-- Fuente Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Scrollbar sutil (claro y oscuro) */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+
+        .dark ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        .dark ::-webkit-scrollbar-thumb {
+            background: #334155;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        .dark ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+
+        /* Resaltado temporal al desplazarse a una cámara */
+        @keyframes rowHighlight {
+            0%, 35% {
+                background-color: rgba(59, 130, 246, 0.18);
+            }
+            100% {
+                background-color: transparent;
+            }
+        }
+
+        .row-flash {
+            animation: rowHighlight 1.4s ease-out;
+        }
+
+        /* Estilos limpios para Impresión / Guardar como PDF */
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+
+            body {
+                background: #ffffff !important;
+                color: #0f172a !important;
+            }
+
+            main {
+                max-width: 100% !important;
+                padding: 0 !important;
+            }
+
+            .print-full {
+                grid-column: span 12 / span 12 !important;
+            }
+
+            .print-unscroll {
+                max-height: none !important;
+                overflow: visible !important;
+            }
+
+            .print-card {
+                box-shadow: none !important;
+                border-color: #cbd5e1 !important;
+                break-inside: avoid;
+            }
+        }
+    </style>
+    <script>
+        // Aplicar tema guardado antes de renderizar para evitar parpadeo
+        (function () {
+            try {
+                const savedTheme = localStorage.getItem('cam_theme');
+                if (savedTheme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                }
+            } catch (e) { }
+        })();
+    </script>
+</head>
+
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col transition-colors duration-200">
+
+    <!-- Notificación flotante (Toast) con soporte para acción Deshacer -->
+    <div id="toast"
+        class="no-print fixed bottom-5 right-5 z-50 hidden transform transition-all duration-300 translate-y-2 opacity-0">
+        <div class="bg-slate-900 dark:bg-slate-800 border border-slate-700 text-white px-4 py-3 rounded-xl shadow-lg flex items-center gap-3 text-sm font-medium">
+            <svg class="w-5 h-5 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            <span id="toastMessage">Acción completada</span>
+            <button id="toastUndoBtn" onclick="deshacerLimpieza()"
+                class="hidden ml-1 px-2.5 py-1 text-xs font-semibold bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition cursor-pointer">
+                Deshacer
+            </button>
+        </div>
+    </div>
+
+    <!-- Encabezado -->
+    <header class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-30 transition-colors">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <a href="index.html" title="Volver al Menú Principal"
+                    class="no-print p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition flex items-center justify-center shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                    </svg>
+                </a>
+                <div class="bg-blue-600 text-white p-2.5 rounded-xl shadow-sm shrink-0">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z">
+                        </path>
+                    </svg>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <h1 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-white leading-tight">
+                            Organizador de Cámaras y Horarios
+                        </h1>
+                        <span id="saveIndicator"
+                            class="no-print hidden sm:inline-flex items-center gap-1 text-[11px] font-medium text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/60 px-2 py-0.5 rounded-full">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                            Autoguardado
+                        </span>
+                    </div>
+                    <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+                        Consolidación inteligente de tramos, cálculo de duración y control de descargas
+                    </p>
+                </div>
+            </div>
+
+            <div class="no-print flex flex-wrap items-center gap-2">
+                <button onclick="cargarEjemplo()"
+                    class="px-3 py-2 text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl transition cursor-pointer">
+                    Cargar ejemplo
+                </button>
+                <button onclick="limpiarTodo()"
+                    class="px-3 py-2 text-xs sm:text-sm font-medium text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/50 hover:bg-rose-100 dark:hover:bg-rose-900/50 rounded-xl transition cursor-pointer">
+                    Limpiar
+                </button>
+                <button onclick="window.print()" title="Imprimir o guardar como PDF"
+                    class="p-2 text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl transition cursor-pointer">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z">
+                        </path>
+                    </svg>
+                </button>
+                <button onclick="toggleDarkMode()" id="themeToggleBtn" title="Cambiar modo claro/oscuro"
+                    class="p-2 text-slate-600 dark:text-amber-400 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl transition cursor-pointer">
+                    <!-- Sol (visible en dark) -->
+                    <svg class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z">
+                        </path>
+                    </svg>
+                    <!-- Luna (visible en light) -->
+                    <svg class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenido Principal -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+            <!-- Columna Izquierda: Entrada de Datos y Configuración -->
+            <div class="no-print lg:col-span-5 flex flex-col gap-4">
+                <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col h-full">
+                    <div class="flex items-center justify-between gap-2 mb-3">
+                        <label for="rawInput" class="font-semibold text-slate-800 dark:text-slate-100 text-sm sm:text-base">
+                            1. Pega aquí el registro de horarios
+                        </label>
+                        <div class="flex items-center gap-1.5">
+                            <button onclick="pegarDesdePortapapeles()" title="Pegar desde el portapapeles"
+                                class="text-xs font-medium px-2.5 py-1 bg-blue-50 dark:bg-blue-950/60 hover:bg-blue-100 dark:hover:bg-blue-900/60 text-blue-700 dark:text-blue-300 rounded-lg transition flex items-center gap-1 cursor-pointer">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2">
+                                    </path>
+                                </svg>
+                                Pegar
+                            </button>
+                            <span id="lineCountBadge"
+                                class="text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-2.5 py-1 rounded-lg">
+                                0 tramos válidos
+                            </span>
+                        </div>
+                    </div>
+
+                    <textarea id="rawInput" rows="15"
+                        placeholder="Formatos soportados:&#10;06:00HS.- : 215-612-701: 06:06Hs.-&#10;06:06 - 208, 701 - 06:11&#10;06.11hs a 06.20hs: 709 - 412 - 413"
+                        class="w-full flex-1 p-3.5 text-xs sm:text-sm font-mono bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 border border-slate-300 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-y transition"></textarea>
+
+                    <!-- Opciones de procesamiento -->
+                    <div class="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 flex flex-col gap-3.5">
+                        <label class="flex items-start gap-2.5 text-sm text-slate-700 dark:text-slate-300 cursor-pointer select-none">
+                            <input type="checkbox" id="mergeCheck" checked onchange="actualizarOpciones()"
+                                class="mt-0.5 w-4 h-4 text-blue-600 rounded border-slate-300 dark:border-slate-600 focus:ring-blue-500">
+                            <span>Unificar tramos continuos y superpuestos <span class="text-xs text-slate-400 block">Ej: 06:00 a 06:06 + 06:05 a 06:11 → 06:00 a 06:11</span></span>
+                        </label>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label for="gapSelect" class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+                                    Tolerancia entre cortes
+                                </label>
+                                <select id="gapSelect" onchange="actualizarOpciones()"
+                                    class="w-full px-3 py-2 text-xs sm:text-sm bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
+                                    <option value="0">0 min (Solo continuos)</option>
+                                    <option value="1">Hasta 1 min de brecha</option>
+                                    <option value="2">Hasta 2 min de brecha</option>
+                                    <option value="5">Hasta 5 min de brecha</option>
+                                    <option value="10">Hasta 10 min de brecha</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="sortModeSelect" class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+                                    Ordenar cámaras por
+                                </label>
+                                <select id="sortModeSelect" onchange="actualizarOpciones()"
+                                    class="w-full px-3 py-2 text-xs sm:text-sm bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
+                                    <option value="cam-desc">Cámara (Mayor a Menor)</option>
+                                    <option value="cam-asc">Cámara (Menor a Mayor)</option>
+                                    <option value="duration-desc">Mayor tiempo de video</option>
+                                    <option value="blocks-desc">Más tramos a bajar</option>
+                                    <option value="time-asc">Orden cronológico</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button onclick="procesarRegistros()"
+                        class="mt-4 w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold rounded-xl shadow-sm transition flex items-center justify-center gap-2 cursor-pointer">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4">
+                            </path>
+                        </svg>
+                        Procesar y Ordenar
+                    </button>
+                </div>
+            </div>
+
+            <!-- Columna Derecha: Resultados -->
+            <div class="print-full lg:col-span-7 flex flex-col gap-5">
+
+                <!-- Tarjetas de Resumen Rápido -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <div class="print-card bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                        <p class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Cámaras Únicas</p>
+                        <p id="statTotalCams" class="text-2xl font-bold text-slate-900 dark:text-white mt-1">0</p>
+                        <p id="statPendingSub" class="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">Sin registros</p>
+                    </div>
+                    <div class="print-card bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                        <p class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Tramos a Bajar</p>
+                        <p id="statTotalBlocks" class="text-2xl font-bold text-blue-600 dark:text-blue-400 mt-1">0</p>
+                        <p id="statSavedBlocks" class="text-[11px] text-emerald-600 dark:text-emerald-400 mt-0.5">0 consolidados</p>
+                    </div>
+                    <div class="print-card bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                        <p class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Video Total</p>
+                        <p id="statTotalDuration" class="text-2xl font-bold text-indigo-600 dark:text-indigo-400 mt-1">0m</p>
+                        <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">Suma de cortes</p>
+                    </div>
+                    <div class="print-card bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                        <div class="flex items-center justify-between gap-1">
+                            <p class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Franja Horaria</p>
+                            <span id="nightShiftBadge"
+                                class="hidden text-[10px] font-semibold bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 px-1.5 py-0.5 rounded">
+                                Nocturno
+                            </span>
+                        </div>
+                        <p id="statTimeRange" class="text-base sm:text-lg font-bold text-slate-800 dark:text-slate-100 mt-1.5 whitespace-nowrap">--:-- a --:--</p>
+                        <p id="statSpanSub" class="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">Rango global</p>
+                    </div>
+                </div>
+
+                <!-- Lista enumerada rápida -->
+                <div class="print-card bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                        <h2 id="pillsSectionTitle" class="font-semibold text-slate-800 dark:text-slate-100 text-sm sm:text-base">
+                            2. Cámaras ordenadas (Mayor a Menor)
+                        </h2>
+                        <button onclick="copiarListaCamaras()"
+                            class="no-print text-xs font-medium px-3 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg transition flex items-center gap-1.5 cursor-pointer">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z">
+                                </path>
+                            </svg>
+                            Copiar lista
+                        </button>
+                    </div>
+                    <div id="cameraPillsContainer" class="flex flex-wrap gap-2 min-h-[38px] items-center">
+                        <span class="text-sm text-slate-400 dark:text-slate-500 italic">
+                            Pega los horarios a la izquierda para ver las cámaras...
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Tabla Detallada de Descargas -->
+                <div class="print-card bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col">
+                    <div class="p-5 border-b border-slate-100 dark:border-slate-800 flex flex-col gap-4">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <div>
+                                <h2 class="font-semibold text-slate-800 dark:text-slate-100 text-sm sm:text-base">
+                                    3. Detalle exacto por cámara para descargar
+                                </h2>
+                                <p class="no-print text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                                    Clic en la fila para marcar cámara lista · Clic en un horario para copiarlo o tacharlo
+                                </p>
+                            </div>
+
+                            <!-- Acciones de exportación y copiado -->
+                            <div class="no-print flex flex-wrap items-center gap-1.5">
+                                <button onclick="copiarTablaCompleta(false)" title="Copiar reporte completo en texto"
+                                    class="px-3 py-1.5 text-xs font-medium bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl transition flex items-center gap-1.5 cursor-pointer">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2">
+                                        </path>
+                                    </svg>
+                                    Copiar todo
+                                </button>
+                                <button onclick="copiarFormatoWhatsApp()" title="Copiar con formato para WhatsApp o informe"
+                                    class="px-2.5 py-1.5 text-xs font-medium bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl transition cursor-pointer">
+                                    WhatsApp
+                                </button>
+                                <button onclick="exportarCSV()" title="Descargar planilla CSV compatible con Excel"
+                                    class="px-2.5 py-1.5 text-xs font-medium bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl transition flex items-center gap-1 cursor-pointer">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4">
+                                        </path>
+                                    </svg>
+                                    CSV
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Barra de progreso de descargas -->
+                        <div id="progressContainer" class="no-print hidden flex-col gap-1.5">
+                            <div class="flex items-center justify-between text-xs">
+                                <span id="progressLabel" class="font-medium text-slate-600 dark:text-slate-300">
+                                    Progreso: 0 de 0 cámaras listas (0%)
+                                </span>
+                                <div class="flex items-center gap-3">
+                                    <button id="copyPendingBtn" onclick="copiarTablaCompleta(true)"
+                                        class="hidden text-blue-600 dark:text-blue-400 hover:underline font-medium cursor-pointer">
+                                        Copiar pendientes
+                                    </button>
+                                    <button id="resetChecksBtn" onclick="desmarcarTodas()"
+                                        class="hidden text-slate-500 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 font-medium cursor-pointer">
+                                        Desmarcar todas
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="w-full h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                                <div id="progressBarFill"
+                                    class="h-full bg-emerald-500 transition-all duration-300 rounded-full"
+                                    style="width: 0%"></div>
+                            </div>
+                        </div>
+
+                        <!-- Filtros de estado y buscador -->
+                        <div class="no-print flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                            <div class="inline-flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl self-start">
+                                <button onclick="cambiarFiltroEstado('all')" id="filterBtn-all"
+                                    class="px-3 py-1 rounded-lg text-xs font-semibold transition cursor-pointer bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm">
+                                    Todas (<span id="countAll">0</span>)
+                                </button>
+                                <button onclick="cambiarFiltroEstado('pending')" id="filterBtn-pending"
+                                    class="px-3 py-1 rounded-lg text-xs font-medium transition cursor-pointer text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
+                                    Pendientes (<span id="countPending">0</span>)
+                                </button>
+                                <button onclick="cambiarFiltroEstado('done')" id="filterBtn-done"
+                                    class="px-3 py-1 rounded-lg text-xs font-medium transition cursor-pointer text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
+                                    Listas (<span id="countDone">0</span>)
+                                </button>
+                            </div>
+
+                            <div class="relative w-full sm:w-52">
+                                <input type="text" id="searchCamInput" oninput="filtrarTabla()"
+                                    placeholder="Buscar cámara (ej. 709)..."
+                                    class="w-full pl-8 pr-7 py-1.5 text-xs sm:text-sm bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
+                                <svg class="w-4 h-4 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none"
+                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                </svg>
+                                <button id="clearSearchBtn" onclick="limpiarBusqueda()" title="Limpiar búsqueda"
+                                    class="hidden absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Alertas de posibles errores tipográficos en el texto -->
+                    <div id="warningsBox"
+                        class="hidden bg-amber-50 dark:bg-amber-950/40 border-b border-amber-200 dark:border-amber-800/60 px-5 py-3 text-xs text-amber-800 dark:text-amber-200">
+                    </div>
+
+                    <div class="print-unscroll overflow-x-auto max-h-[560px]">
+                        <table class="w-full text-left border-collapse">
+                            <thead
+                                class="bg-slate-50 dark:bg-slate-800/90 sticky top-0 z-10 border-b border-slate-200 dark:border-slate-700 text-[11px] font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider backdrop-blur-sm">
+                                <tr>
+                                    <th class="no-print py-3 px-3.5 w-11 text-center">Listo</th>
+                                    <th class="py-3 px-3.5 w-24">Cámara</th>
+                                    <th class="py-3 px-3.5 w-36">Rango / Total</th>
+                                    <th class="py-3 px-3.5">Tramos Exactos a Bajar</th>
+                                    <th class="no-print py-3 px-3.5 w-14 text-center">Copiar</th>
+                                </tr>
+                            </thead>
+                            <tbody id="resultsTableBody" class="divide-y divide-slate-100 dark:divide-slate-800 text-sm">
+                                <tr>
+                                    <td colspan="5" class="py-10 text-center text-slate-400 dark:text-slate-500">
+                                        Sin datos procesados aún.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Textarea oculto de respaldo para copiar al portapapeles en entornos restringidos -->
+    <textarea id="clipboardHelper" class="fixed -top-96 left-0 opacity-0 pointer-events-none" aria-hidden="true"></textarea>
+
+    <script>
+        const STORAGE_KEY = 'cam_organizer_state_v1';
+
+        // Estado global
+        let datosProcesados = [];
+        let camarasCompletadas = new Set();
+        let tramosCompletados = new Set(); // formato "cam:start-end"
+        let filtroEstadoActual = 'all'; // 'all' | 'pending' | 'done'
+        let respaldoAntesDeLimpiar = null;
+        let globalTimeRangeStr = '--:-- a --:--';
+
+        /**
+         * Escapa caracteres HTML para evitar inyección al mostrar advertencias del texto crudo
+         */
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        /**
+         * Convierte minutos absolutos (ej. 1465) a string HH:MM (ej. 00:25)
+         */
+        function minAHoraStr(totalMin) {
+            const norm = ((totalMin % 1440) + 1440) % 1440;
+            const hh = String(Math.floor(norm / 60)).padStart(2, '0');
+            const mm = String(norm % 60).padStart(2, '0');
+            return `${hh}:${mm}`;
+        }
+
+        /**
+         * Formatea duración en minutos (ej. 75 -> "1h 15m", 45 -> "45m")
+         */
+        function formatearDuracion(mins) {
+            if (mins <= 0) return '0m';
+            if (mins < 60) return `${mins}m`;
+            const h = Math.floor(mins / 60);
+            const m = mins % 60;
+            return m === 0 ? `${h}h` : `${h}h ${String(m).padStart(2, '0')}m`;
+        }
+
+        /**
+         * Muestra una notificación temporal en pantalla
+         */
+        function mostrarToast(mensaje, conDeshacer = false) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMessage');
+            const undoBtn = document.getElementById('toastUndoBtn');
+
+            toastMsg.textContent = mensaje;
+            undoBtn.classList.toggle('hidden', !conDeshacer);
+
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            }, 10);
+
+            clearTimeout(window.toastTimeout);
+            window.toastTimeout = setTimeout(() => {
+                toast.classList.add('translate-y-2', 'opacity-0');
+                setTimeout(() => toast.classList.add('hidden'), 300);
+            }, conDeshacer ? 5000 : 2500);
+        }
+
+        /**
+         * Copia texto usando la API moderna con fallback compatible con iframes/file://
+         */
+        async function copiarTexto(texto, mensajeExito) {
+            if (navigator.clipboard && window.isSecureContext) {
+                try {
+                    await navigator.clipboard.writeText(texto);
+                    mostrarToast(mensajeExito || 'Copiado al portapapeles');
+                    return;
+                } catch (e) {
+                    // Continuar al fallback
+                }
+            }
+
+            const helper = document.getElementById('clipboardHelper');
+            helper.value = texto;
+            helper.select();
+            helper.setSelectionRange(0, 999999);
+            try {
+                document.execCommand('copy');
+                mostrarToast(mensajeExito || 'Copiado al portapapeles');
+            } catch (err) {
+                mostrarToast('No se pudo copiar automáticamente');
+            }
+        }
+
+        /**
+         * Pega contenido desde el portapapeles al área de texto
+         */
+        async function pegarDesdePortapapeles() {
+            if (!navigator.clipboard || !navigator.clipboard.readText) {
+                document.getElementById('rawInput').focus();
+                mostrarToast('Usa Ctrl+V para pegar aquí');
+                return;
+            }
+            try {
+                const texto = await navigator.clipboard.readText();
+                if (!texto) {
+                    mostrarToast('El portapapeles está vacío');
+                    return;
+                }
+                const input = document.getElementById('rawInput');
+                input.value = input.value.trim() ? `${input.value.trim()}\n${texto}` : texto;
+                procesarRegistros();
+                mostrarToast('Texto pegado y procesado');
+            } catch (err) {
+                document.getElementById('rawInput').focus();
+                mostrarToast('Permiso denegado: presiona Ctrl+V en el cuadro');
+            }
+        }
+
+        /**
+         * Alterna el modo oscuro y guarda la preferencia
+         */
+        function toggleDarkMode() {
+            const isDark = document.documentElement.classList.toggle('dark');
+            try {
+                localStorage.setItem('cam_theme', isDark ? 'dark' : 'light');
+            } catch (e) { }
+        }
+
+        /**
+         * Guarda estado actual en localStorage
+         */
+        function guardarEstado() {
+            try {
+                const payload = {
+                    rawInput: document.getElementById('rawInput').value,
+                    shouldMerge: document.getElementById('mergeCheck').checked,
+                    gapMinutes: document.getElementById('gapSelect').value,
+                    sortMode: document.getElementById('sortModeSelect').value,
+                    completedCams: Array.from(camarasCompletadas),
+                    completedIntervals: Array.from(tramosCompletados)
+                };
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+            } catch (e) { }
+        }
+
+        /**
+         * Carga estado guardado al iniciar la página
+         */
+        function restaurarEstado() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (!raw) return;
+                const state = JSON.parse(raw);
+
+                if (typeof state.rawInput === 'string') {
+                    document.getElementById('rawInput').value = state.rawInput;
+                }
+                if (typeof state.shouldMerge === 'boolean') {
+                    document.getElementById('mergeCheck').checked = state.shouldMerge;
+                }
+                if (state.gapMinutes !== undefined) {
+                    document.getElementById('gapSelect').value = String(state.gapMinutes);
+                }
+                if (state.sortMode) {
+                    document.getElementById('sortModeSelect').value = state.sortMode;
+                }
+                if (Array.isArray(state.completedCams)) {
+                    camarasCompletadas = new Set(state.completedCams.map(Number));
+                }
+                if (Array.isArray(state.completedIntervals)) {
+                    tramosCompletados = new Set(state.completedIntervals.map(String));
+                }
+            } catch (e) { }
+        }
+
+        /**
+         * Habilita/deshabilita selector de tolerancia según el checkbox de fusión y reprocesa
+         */
+        function actualizarOpciones() {
+            const mergeChecked = document.getElementById('mergeCheck').checked;
+            const gapSelect = document.getElementById('gapSelect');
+            gapSelect.disabled = !mergeChecked;
+            gapSelect.classList.toggle('opacity-50', !mergeChecked);
+            procesarRegistros();
+        }
+
+        /**
+         * Intenta extraer { sH, sM, eH, eM, middleCams } de una línea admitiendo múltiples formatos
+         */
+        function parsearLineaHorario(line) {
+            // Formato 1A: Inicio con HS (acepta :, ., -) y Fin con HS (acepta :, ., -)
+            // Ej: 07:08HS.-  208-205-801  07:53HS.-  o  07.08hs 208 11-06hs
+            let mStart = line.match(/^(\d{1,2})[:.\-](\d{2})\s*[Hh][Ss]?\.?-?\s*[:\-–—]?\s*/);
+            let mEnd = line.match(/[:\-–—\s]*(\d{1,2})[:.\-](\d{2})\s*[Hh][Ss]?\.?-?\s*$/);
+
+            if (mStart && mEnd && mStart[0].length + mEnd[0].length <= line.length) {
+                return {
+                    sH: parseInt(mStart[1], 10),
+                    sM: parseInt(mStart[2], 10),
+                    eH: parseInt(mEnd[1], 10),
+                    eM: parseInt(mEnd[2], 10),
+                    camsPart: line.slice(mStart[0].length, line.length - mEnd[0].length)
+                };
+            }
+
+            // Formato 1B: Inicio y Fin con ':' o '.' (con o sin HS) alrededor de las cámaras
+            // Ej: 07:08 - 208, 205 - 07:53
+            mStart = line.match(/^(\d{1,2})[:.](\d{2})\s*(?:[Hh][Ss]?\.?-?)?\s*[:\-–—]?\s*/);
+            mEnd = line.match(/[:\-–—\s]*(\d{1,2})[:.](\d{2})\s*(?:[Hh][Ss]?\.?-?)?\s*$/);
+
+            if (mStart && mEnd && mStart[0].length + mEnd[0].length <= line.length) {
+                return {
+                    sH: parseInt(mStart[1], 10),
+                    sM: parseInt(mStart[2], 10),
+                    eH: parseInt(mEnd[1], 10),
+                    eM: parseInt(mEnd[2], 10),
+                    camsPart: line.slice(mStart[0].length, line.length - mEnd[0].length)
+                };
+            }
+
+            // Formato 2: Dos horarios al comienzo seguidos de las cámaras
+            // Ej: 07:08 a 07:53 : 208 - 205 - 801  o  07.08hs - 07.53hs: 208, 205
+            const mPrefix = line.match(/^(\d{1,2})[:.](\d{2})\s*(?:[Hh][Ss]?\.?-?)?\s*(?:a|al|hasta|[\-–—])\s*(\d{1,2})[:.](\d{2})\s*(?:[Hh][Ss]?\.?-?)?\s*[:\-–—\s]+(.+)$/i);
+            if (mPrefix) {
+                return {
+                    sH: parseInt(mPrefix[1], 10),
+                    sM: parseInt(mPrefix[2], 10),
+                    eH: parseInt(mPrefix[3], 10),
+                    eM: parseInt(mPrefix[4], 10),
+                    camsPart: mPrefix[5]
+                };
+            }
+
+            return null;
+        }
+
+        /**
+         * Analiza el texto ingresado, detecta turnos nocturnos, fusiona solapamientos y ordena cámaras
+         */
+        function procesarRegistros() {
+            const rawText = document.getElementById('rawInput').value;
+            const lines = rawText.split(/\r?\n/);
+
+            const shouldMerge = document.getElementById('mergeCheck').checked;
+            const gapTolerance = shouldMerge ? (parseInt(document.getElementById('gapSelect').value, 10) || 0) : 0;
+            const sortMode = document.getElementById('sortModeSelect').value;
+
+            const parsedEntries = [];
+            const warnings = [];
+
+            lines.forEach((rawLine, idx) => {
+                const line = rawLine.trim();
+                if (!line || /^[-=_*#]+$/.test(line)) return;
+
+                const parsed = parsearLineaHorario(line);
+                if (!parsed) {
+                    if (/\d{1,2}[:.]\d{2}|\d{1,2}-\d{2}\s*[Hh][Ss]/.test(line)) {
+                        warnings.push(`Línea ${idx + 1} ignorada por formato incompleto: "${line}"`);
+                    }
+                    return;
+                }
+
+                const { sH, sM, eH, eM, camsPart } = parsed;
+
+                if (sH > 23 || sM > 59 || eH > 23 || eM > 59) {
+                    warnings.push(`Línea ${idx + 1} ignorada por hora fuera de rango (00:00–23:59): "${line}"`);
+                    return;
+                }
+
+                const camMatches = camsPart.match(/\d+/g);
+                if (!camMatches || camMatches.length === 0) {
+                    warnings.push(`Línea ${idx + 1} (${String(sH).padStart(2, '0')}:${String(sM).padStart(2, '0')} a ${String(eH).padStart(2, '0')}:${String(eM).padStart(2, '0')}) no contiene números de cámara.`);
+                    return;
+                }
+
+                const startMinDay = sH * 60 + sM;
+                const endMinDay = eH * 60 + eM;
+
+                if (startMinDay === endMinDay) {
+                    warnings.push(`Línea ${idx + 1}: Hora de inicio y fin iguales (${minAHoraStr(startMinDay)}). Verifica si es correcto.`);
+                }
+
+                // Detectar error tipográfico si fin < inicio sin ser cruce razonable de medianoche (ej. 08:50 a 08:20)
+                if (endMinDay < startMinDay) {
+                    const wrappedDuration = (endMinDay + 1440) - startMinDay;
+                    if (wrappedDuration > 12 * 60) {
+                        warnings.push(`Línea ${idx + 1} ignorada: La hora de fin (${minAHoraStr(endMinDay)}) es anterior a la de inicio (${minAHoraStr(startMinDay)}).`);
+                        return;
+                    }
+                }
+
+                const uniqueCams = [...new Set(camMatches.map(n => parseInt(n, 10)))];
+                parsedEntries.push({
+                    lineNumber: idx + 1,
+                    startMinDay,
+                    endMinDay,
+                    cams: uniqueCams
+                });
+            });
+
+            // Detectar automáticamente si el lote corresponde a un Turno Nocturno (cruza las 00:00)
+            const hasDirectMidnightCross = parsedEntries.some(e => e.endMinDay < e.startMinDay);
+            const hasEvening = parsedEntries.some(e => e.startMinDay >= 18 * 60);
+            const hasEarlyMorning = parsedEntries.some(e => e.startMinDay < 9 * 60);
+            const hasMidday = parsedEntries.some(e => e.startMinDay >= 10 * 60 && e.startMinDay < 17 * 60);
+            const isNightShift = hasDirectMidnightCross || (hasEvening && hasEarlyMorning && !hasMidday);
+
+            document.getElementById('nightShiftBadge').classList.toggle('hidden', !isNightShift);
+
+            const camMap = new Map();
+            let globalMinAbs = null;
+            let globalMaxAbs = null;
+            let totalRawBlocks = 0;
+
+            parsedEntries.forEach((entry, orderIdx) => {
+                let sAbs = entry.startMinDay;
+                let eAbs = entry.endMinDay;
+
+                if (isNightShift) {
+                    if (sAbs < 12 * 60) sAbs += 1440;
+                    if (eAbs < 12 * 60) eAbs += 1440;
+                }
+                if (eAbs < sAbs) {
+                    eAbs += 1440;
+                }
+
+                if (globalMinAbs === null || sAbs < globalMinAbs) globalMinAbs = sAbs;
+                if (globalMaxAbs === null || eAbs > globalMaxAbs) globalMaxAbs = eAbs;
+
+                entry.cams.forEach(camNum => {
+                    if (!camMap.has(camNum)) {
+                        camMap.set(camNum, { firstOrder: orderIdx, rawIntervals: [] });
+                    }
+                    camMap.get(camNum).rawIntervals.push({ startMin: sAbs, endMin: eAbs });
+                    totalRawBlocks++;
+                });
+            });
+
+            document.getElementById('lineCountBadge').textContent = `${parsedEntries.length} ${parsedEntries.length === 1 ? 'tramo válido' : 'tramos válidos'}`;
+
+            // Renderizar advertencias de forma segura (sin XSS)
+            const warningsBox = document.getElementById('warningsBox');
+            if (warnings.length > 0) {
+                warningsBox.innerHTML = `<div class="font-semibold mb-1">Observaciones detectadas (${warnings.length}):</div><ul class="list-disc pl-4 space-y-0.5">${warnings.map(w => `<li>${escapeHtml(w)}</li>`).join('')}</ul>`;
+                warningsBox.classList.remove('hidden');
+            } else {
+                warningsBox.classList.add('hidden');
+            }
+
+            let totalConsolidatedBlocks = 0;
+            let totalGlobalMinutes = 0;
+
+            const processedList = Array.from(camMap.entries()).map(([camNum, data]) => {
+                // Ordenar siempre cronológicamente antes de consolidar
+                const sorted = [...data.rawIntervals].sort((a, b) => a.startMin - b.startMin || a.endMin - b.endMin);
+                const finalIntervals = [];
+
+                if (shouldMerge && sorted.length > 0) {
+                    finalIntervals.push({ ...sorted[0] });
+                    for (let i = 1; i < sorted.length; i++) {
+                        const prev = finalIntervals[finalIntervals.length - 1];
+                        const curr = sorted[i];
+                        if (curr.startMin <= prev.endMin + gapTolerance) {
+                            prev.endMin = Math.max(prev.endMin, curr.endMin);
+                        } else {
+                            finalIntervals.push({ ...curr });
+                        }
+                    }
+                } else {
+                    // Sin fusión: eliminar únicamente duplicados idénticos exactos en el mismo horario
+                    for (let i = 0; i < sorted.length; i++) {
+                        const prev = finalIntervals[finalIntervals.length - 1];
+                        const curr = sorted[i];
+                        if (!prev || prev.startMin !== curr.startMin || prev.endMin !== curr.endMin) {
+                            finalIntervals.push({ ...curr });
+                        }
+                    }
+                }
+
+                const formattedIntervals = finalIntervals.map(iv => {
+                    const start = minAHoraStr(iv.startMin);
+                    const end = minAHoraStr(iv.endMin);
+                    const durationMin = Math.max(0, iv.endMin - iv.startMin);
+                    return {
+                        start,
+                        end,
+                        startMin: iv.startMin,
+                        endMin: iv.endMin,
+                        durationMin,
+                        key: `${camNum}:${start}-${end}`
+                    };
+                });
+
+                const camTotalMin = formattedIntervals.reduce((acc, iv) => acc + iv.durationMin, 0);
+                const minStart = sorted[0].startMin;
+                const maxEnd = sorted.reduce((mx, iv) => Math.max(mx, iv.endMin), sorted[0].endMin);
+
+                totalConsolidatedBlocks += formattedIntervals.length;
+                totalGlobalMinutes += camTotalMin;
+
+                return {
+                    camera: camNum,
+                    firstOrder: data.firstOrder,
+                    firstStartMin: minStart,
+                    firstStart: minAHoraStr(minStart),
+                    lastEnd: minAHoraStr(maxEnd),
+                    totalMinutes: camTotalMin,
+                    intervals: formattedIntervals
+                };
+            });
+
+            // Ordenar según criterio elegido
+            const titulosOrden = {
+                'cam-desc': '2. Cámaras ordenadas (Mayor a Menor)',
+                'cam-asc': '2. Cámaras ordenadas (Menor a Mayor)',
+                'duration-desc': '2. Cámaras ordenadas (Mayor duración)',
+                'blocks-desc': '2. Cámaras ordenadas (Más tramos)',
+                'time-asc': '2. Cámaras ordenadas (Orden cronológico)'
+            };
+            document.getElementById('pillsSectionTitle').textContent = titulosOrden[sortMode] || titulosOrden['cam-desc'];
+
+            processedList.sort((a, b) => {
+                if (sortMode === 'cam-asc') return a.camera - b.camera;
+                if (sortMode === 'duration-desc') return (b.totalMinutes - a.totalMinutes) || (b.camera - a.camera);
+                if (sortMode === 'blocks-desc') return (b.intervals.length - a.intervals.length) || (b.camera - a.camera);
+                if (sortMode === 'time-asc') return (a.firstStartMin - b.firstStartMin) || (a.firstOrder - b.firstOrder) || (b.camera - a.camera);
+                return b.camera - a.camera; // default cam-desc
+            });
+
+            datosProcesados = processedList;
+
+            // Actualizar KPIs superiores
+            document.getElementById('statTotalCams').textContent = datosProcesados.length;
+            document.getElementById('statTotalBlocks').textContent = totalConsolidatedBlocks;
+
+            const savedCount = Math.max(0, totalRawBlocks - totalConsolidatedBlocks);
+            document.getElementById('statSavedBlocks').textContent = savedCount > 0
+                ? `${savedCount} ${savedCount === 1 ? 'corte ahorrado' : 'cortes ahorrados'}`
+                : 'Tramos directos';
+
+            document.getElementById('statTotalDuration').textContent = formatearDuracion(totalGlobalMinutes);
+
+            if (globalMinAbs !== null && globalMaxAbs !== null) {
+                globalTimeRangeStr = `${minAHoraStr(globalMinAbs)} a ${minAHoraStr(globalMaxAbs)}`;
+                document.getElementById('statTimeRange').textContent = globalTimeRangeStr;
+                document.getElementById('statSpanSub').textContent = `Cobertura: ${formatearDuracion(globalMaxAbs - globalMinAbs)}`;
+            } else {
+                globalTimeRangeStr = '--:-- a --:--';
+                document.getElementById('statTimeRange').textContent = globalTimeRangeStr;
+                document.getElementById('statSpanSub').textContent = 'Rango global';
+            }
+
+            guardarEstado();
+            renderizarResultados();
+        }
+
+        /**
+         * Actualiza contadores de progreso y pestañas de filtro
+         */
+        function actualizarProgresoYFiltros() {
+            const total = datosProcesados.length;
+            const doneCount = datosProcesados.filter(item => camarasCompletadas.has(item.camera)).length;
+            const pendingCount = total - doneCount;
+            const pct = total > 0 ? Math.round((doneCount / total) * 100) : 0;
+
+            document.getElementById('countAll').textContent = total;
+            document.getElementById('countPending').textContent = pendingCount;
+            document.getElementById('countDone').textContent = doneCount;
+
+            document.getElementById('statPendingSub').textContent = total === 0
+                ? 'Sin registros'
+                : (pendingCount === 0 ? '¡Todas descargadas!' : `${pendingCount} ${pendingCount === 1 ? 'pendiente' : 'pendientes'}`);
+
+            const progressContainer = document.getElementById('progressContainer');
+            if (total > 0) {
+                progressContainer.classList.remove('hidden');
+                progressContainer.classList.add('flex');
+                document.getElementById('progressLabel').textContent = `Progreso: ${doneCount} de ${total} cámaras listas (${pct}%)`;
+                document.getElementById('progressBarFill').style.width = `${pct}%`;
+                document.getElementById('resetChecksBtn').classList.toggle('hidden', doneCount === 0 && tramosCompletados.size === 0);
+                document.getElementById('copyPendingBtn').classList.toggle('hidden', pendingCount === 0 || doneCount === 0);
+            } else {
+                progressContainer.classList.add('hidden');
+                progressContainer.classList.remove('flex');
+            }
+
+            ['all', 'pending', 'done'].forEach(mode => {
+                const btn = document.getElementById(`filterBtn-${mode}`);
+                const active = filtroEstadoActual === mode;
+                btn.className = active
+                    ? 'px-3 py-1 rounded-lg text-xs font-semibold transition cursor-pointer bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
+                    : 'px-3 py-1 rounded-lg text-xs font-medium transition cursor-pointer text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white';
+            });
+        }
+
+        /**
+         * Dibuja las etiquetas superiores y la tabla detallada
+         */
+        function renderizarResultados() {
+            const pillsContainer = document.getElementById('cameraPillsContainer');
+            const tbody = document.getElementById('resultsTableBody');
+
+            actualizarProgresoYFiltros();
+
+            if (datosProcesados.length === 0) {
+                pillsContainer.innerHTML = '<span class="text-sm text-slate-400 dark:text-slate-500 italic">Pega los horarios a la izquierda para ver las cámaras...</span>';
+                tbody.innerHTML = '<tr><td colspan="5" class="py-10 text-center text-slate-400 dark:text-slate-500">Sin datos procesados aún.</td></tr>';
+                return;
+            }
+
+            // Renderizar píldoras enumeradas
+            pillsContainer.innerHTML = datosProcesados.map((item, idx) => {
+                const isDone = camarasCompletadas.has(item.camera);
+                return `
+                    <button onclick="scrollACamara(${item.camera})" title="Ir a Cámara ${item.camera} (${formatearDuracion(item.totalMinutes)})"
+                        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold border transition cursor-pointer ${isDone
+                        ? 'bg-emerald-50 dark:bg-emerald-950/50 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 line-through opacity-75'
+                        : 'bg-slate-100 dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-blue-950/60 border-slate-200 dark:border-slate-700 hover:border-blue-300 dark:hover:border-blue-700 text-slate-800 dark:text-slate-200'
+                    }">
+                        <span class="text-slate-400 dark:text-slate-500 font-normal">${idx + 1}.</span>
+                        <span>Cám ${item.camera}</span>
+                    </button>
+                `;
+            }).join('');
+
+            // Renderizar filas de la tabla
+            tbody.innerHTML = datosProcesados.map(item => {
+                const isCamDone = camarasCompletadas.has(item.camera);
+
+                const tramosBadges = item.intervals.map((iv, ivIdx) => {
+                    const isIvDone = isCamDone || tramosCompletados.has(iv.key);
+                    return `
+                        <span class="inline-flex items-center rounded-lg border text-xs font-mono mr-1.5 mb-1.5 overflow-hidden transition ${isIvDone
+                            ? 'bg-emerald-50 dark:bg-emerald-950/50 border-emerald-200 dark:border-emerald-800/80 text-emerald-800 dark:text-emerald-300 line-through opacity-75'
+                            : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200'
+                        }">
+                            <button type="button" onclick="toggleTramoIndividual(event, ${item.camera}, ${ivIdx})"
+                                title="Marcar tramo como descargado"
+                                class="no-print px-1.5 py-1 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition cursor-pointer border-r border-slate-200 dark:border-slate-700">
+                                ${isIvDone ? '✓' : '○'}
+                            </button>
+                            <button type="button" onclick="copiarTramoIndividual(event, ${item.camera}, ${ivIdx})"
+                                title="Clic para copiar horario (${iv.durationMin} min)"
+                                class="px-2 py-1 hover:bg-blue-50 dark:hover:bg-blue-900/40 transition cursor-pointer flex items-center gap-1.5">
+                                <span>${iv.start} a ${iv.end}</span>
+                                <span class="text-[10px] font-sans font-medium text-slate-400 dark:text-slate-400">(${formatearDuracion(iv.durationMin)})</span>
+                            </button>
+                        </span>
+                    `;
+                }).join('');
+
+                return `
+                    <tr id="row-cam-${item.camera}" data-cam="${item.camera}" data-done="${isCamDone ? '1' : '0'}"
+                        onclick="toggleCompletadaFila(event, ${item.camera})"
+                        class="transition cursor-pointer hover:bg-slate-50/90 dark:hover:bg-slate-800/50 ${isCamDone ? 'bg-emerald-50/40 dark:bg-emerald-950/20 opacity-70' : ''}">
+                        <td class="no-print py-3.5 px-3.5 text-center align-top">
+                            <input type="checkbox" ${isCamDone ? 'checked' : ''}
+                                onclick="event.stopPropagation()"
+                                onchange="toggleCompletada(${item.camera})"
+                                aria-label="Marcar cámara ${item.camera} como descargada"
+                                class="w-4 h-4 text-emerald-600 rounded border-slate-300 dark:border-slate-600 focus:ring-emerald-500 cursor-pointer mt-1.5">
+                        </td>
+                        <td class="py-3.5 px-3.5 align-top">
+                            <div class="flex flex-col items-start gap-1">
+                                <span class="inline-flex items-center justify-center px-2.5 py-1 rounded-lg font-bold text-sm ${isCamDone
+                                    ? 'bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300'
+                                    : 'bg-blue-50 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300'
+                                }">
+                                    ${item.camera}
+                                </span>
+                                <span class="text-[11px] text-slate-400 dark:text-slate-500 font-medium">
+                                    ${item.intervals.length} ${item.intervals.length === 1 ? 'corte' : 'cortes'}
+                                </span>
+                            </div>
+                        </td>
+                        <td class="py-3.5 px-3.5 align-top whitespace-nowrap">
+                            <div class="font-mono text-xs text-slate-700 dark:text-slate-300 pt-0.5">
+                                ${item.firstStart} a ${item.lastEnd}
+                            </div>
+                            <div class="inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 text-[11px] font-semibold">
+                                Total: ${formatearDuracion(item.totalMinutes)}
+                            </div>
+                        </td>
+                        <td class="py-3.5 px-3.5 align-top">
+                            <div class="flex flex-wrap">${tramosBadges}</div>
+                        </td>
+                        <td class="no-print py-3.5 px-3.5 text-center align-top">
+                            <button type="button" onclick="copiarFila(event, ${item.camera})"
+                                title="Copiar todos los horarios de cámara ${item.camera}"
+                                class="p-1.5 text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/60 rounded-lg transition cursor-pointer">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z">
+                                    </path>
+                                </svg>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            filtrarTabla();
+        }
+
+        /**
+         * Clic en cualquier parte libre de la fila marca/desmarca la cámara
+         */
+        function toggleCompletadaFila(event, camNum) {
+            if (event.target.closest('button, input, a')) return;
+            toggleCompletada(camNum);
+        }
+
+        /**
+         * Marca o desmarca una cámara completa como descargada
+         */
+        function toggleCompletada(camNum) {
+            const item = datosProcesados.find(d => d.camera === camNum);
+            if (camarasCompletadas.has(camNum)) {
+                camarasCompletadas.delete(camNum);
+                if (item) item.intervals.forEach(iv => tramosCompletados.delete(iv.key));
+            } else {
+                camarasCompletadas.add(camNum);
+                if (item) item.intervals.forEach(iv => tramosCompletados.add(iv.key));
+            }
+            guardarEstado();
+            renderizarResultados();
+        }
+
+        /**
+         * Marca o desmarca un tramo puntual dentro de una cámara
+         */
+        function toggleTramoIndividual(event, camNum, ivIdx) {
+            event.stopPropagation();
+            const item = datosProcesados.find(d => d.camera === camNum);
+            if (!item || !item.intervals[ivIdx]) return;
+
+            const iv = item.intervals[ivIdx];
+
+            // Si toda la cámara estaba lista, al destildar un tramo pasamos los demás a individuales listos
+            if (camarasCompletadas.has(camNum)) {
+                camarasCompletadas.delete(camNum);
+                item.intervals.forEach((other, idx) => {
+                    if (idx !== ivIdx) tramosCompletados.add(other.key);
+                    else tramosCompletados.delete(other.key);
+                });
+            } else {
+                if (tramosCompletados.has(iv.key)) {
+                    tramosCompletados.delete(iv.key);
+                } else {
+                    tramosCompletados.add(iv.key);
+                }
+                const allChecked = item.intervals.every(x => tramosCompletados.has(x.key));
+                if (allChecked) {
+                    camarasCompletadas.add(camNum);
+                }
+            }
+
+            guardarEstado();
+            renderizarResultados();
+        }
+
+        /**
+         * Copia un tramo puntual al hacer clic en su horario
+         */
+        function copiarTramoIndividual(event, camNum, ivIdx) {
+            event.stopPropagation();
+            const item = datosProcesados.find(d => d.camera === camNum);
+            if (!item || !item.intervals[ivIdx]) return;
+            const iv = item.intervals[ivIdx];
+            copiarTexto(`${iv.start} a ${iv.end}`, `Cám ${camNum}: ${iv.start} a ${iv.end} copiado`);
+        }
+
+        /**
+         * Desmarca todas las cámaras completadas sin borrar el texto ingresado
+         */
+        function desmarcarTodas() {
+            camarasCompletadas.clear();
+            tramosCompletados.clear();
+            guardarEstado();
+            renderizarResultados();
+            mostrarToast('Marcas de descarga reiniciadas');
+        }
+
+        /**
+         * Cambia la pestaña de filtro (Todas / Pendientes / Listas)
+         */
+        function cambiarFiltroEstado(nuevoFiltro) {
+            filtroEstadoActual = nuevoFiltro;
+            actualizarProgresoYFiltros();
+            filtrarTabla();
+        }
+
+        /**
+         * Desplaza suavemente hacia la fila de una cámara al hacer clic en su etiqueta superior
+         */
+        function scrollACamara(camNum) {
+            let row = document.getElementById(`row-cam-${camNum}`);
+            // Si la fila está oculta por filtro, volver a "Todas" para mostrarla
+            if (row && row.style.display === 'none') {
+                filtroEstadoActual = 'all';
+                document.getElementById('searchCamInput').value = '';
+                actualizarProgresoYFiltros();
+                filtrarTabla();
+                row = document.getElementById(`row-cam-${camNum}`);
+            }
+            if (row) {
+                row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                row.classList.remove('row-flash');
+                void row.offsetWidth;
+                row.classList.add('row-flash');
+            }
+        }
+
+        /**
+         * Limpia el cuadro de búsqueda rápida
+         */
+        function limpiarBusqueda() {
+            document.getElementById('searchCamInput').value = '';
+            filtrarTabla();
+        }
+
+        /**
+         * Filtra la tabla combinando el buscador de cámara y el estado (Todas/Pendientes/Listas)
+         */
+        function filtrarTabla() {
+            const query = document.getElementById('searchCamInput').value.trim();
+            document.getElementById('clearSearchBtn').classList.toggle('hidden', query.length === 0);
+
+            const rows = document.querySelectorAll('#resultsTableBody tr[data-cam]');
+            let visibles = 0;
+
+            rows.forEach(row => {
+                const cam = row.getAttribute('data-cam');
+                const isDone = row.getAttribute('data-done') === '1';
+
+                const matchesQuery = !query || cam.includes(query);
+                const matchesStatus = filtroEstadoActual === 'all'
+                    || (filtroEstadoActual === 'pending' && !isDone)
+                    || (filtroEstadoActual === 'done' && isDone);
+
+                const show = matchesQuery && matchesStatus;
+                row.style.display = show ? '' : 'none';
+                if (show) visibles++;
+            });
+
+            const emptyFilterRow = document.getElementById('emptyFilterRow');
+            if (rows.length > 0 && visibles === 0) {
+                if (!emptyFilterRow) {
+                    const tr = document.createElement('tr');
+                    tr.id = 'emptyFilterRow';
+                    tr.innerHTML = `<td colspan="5" class="py-8 text-center text-slate-400 dark:text-slate-500 text-sm">No hay cámaras que coincidan con el filtro actual.</td>`;
+                    document.getElementById('resultsTableBody').appendChild(tr);
+                }
+            } else if (emptyFilterRow) {
+                emptyFilterRow.remove();
+            }
+        }
+
+        /**
+         * Copia solo la lista enumerada de cámaras
+         */
+        function copiarListaCamaras() {
+            if (datosProcesados.length === 0) return;
+            const texto = datosProcesados.map((item, idx) => `${idx + 1}. Cámara ${item.camera} (${formatearDuracion(item.totalMinutes)})`).join('\n');
+            copiarTexto(texto, 'Lista de cámaras copiada');
+        }
+
+        /**
+         * Copia todos los tramos de una cámara específica
+         */
+        function copiarFila(event, camNum) {
+            event.stopPropagation();
+            const item = datosProcesados.find(d => d.camera === camNum);
+            if (!item) return;
+            const tramos = item.intervals.map(iv => `${iv.start} a ${iv.end}`).join(' · ');
+            copiarTexto(`Cámara ${item.camera} (${formatearDuracion(item.totalMinutes)}): ${tramos}`, `Horarios de Cámara ${item.camera} copiados`);
+        }
+
+        /**
+         * Copia toda la tabla (o solo las pendientes) en texto limpio
+         */
+        function copiarTablaCompleta(soloPendientes = false) {
+            const lista = soloPendientes
+                ? datosProcesados.filter(item => !camarasCompletadas.has(item.camera))
+                : datosProcesados;
+
+            if (lista.length === 0) {
+                mostrarToast('No hay cámaras para copiar');
+                return;
+            }
+
+            const lineas = lista.map((item, idx) => {
+                const tramos = item.intervals.map(iv => `${iv.start} a ${iv.end}`).join(' | ');
+                const estado = camarasCompletadas.has(item.camera) ? '[LISTO] ' : '';
+                return `${idx + 1}. ${estado}CÁMARA ${item.camera} (Total: ${formatearDuracion(item.totalMinutes)} | Rango: ${item.firstStart} a ${item.lastEnd}) -> ${tramos}`;
+            });
+
+            copiarTexto(
+                lineas.join('\n'),
+                soloPendientes ? 'Cámaras pendientes copiadas' : 'Reporte completo copiado al portapapeles'
+            );
+        }
+
+        /**
+         * Copia un resumen formateado con negritas ideal para WhatsApp o correo
+         */
+        function copiarFormatoWhatsApp() {
+            if (datosProcesados.length === 0) {
+                mostrarToast('Sin datos para copiar');
+                return;
+            }
+
+            const encabezado = `*REPORTE DE DESCARGA DE CÁMARAS*\nFranja: ${globalTimeRangeStr} | Cámaras: ${datosProcesados.length}\n`;
+            const cuerpo = datosProcesados.map(item => {
+                const check = camarasCompletadas.has(item.camera) ? '✅' : '🎥';
+                const tramos = item.intervals.map(iv => `${iv.start} a ${iv.end}`).join(' · ');
+                return `${check} *Cám ${item.camera}* _(${formatearDuracion(item.totalMinutes)})_: ${tramos}`;
+            }).join('\n');
+
+            copiarTexto(`${encabezado}\n${cuerpo}`, 'Formato WhatsApp copiado');
+        }
+
+        /**
+         * Exporta el detalle procesado a un archivo CSV compatible con Microsoft Excel (UTF-8 con BOM)
+         */
+        function exportarCSV() {
+            if (datosProcesados.length === 0) {
+                mostrarToast('Sin datos para exportar');
+                return;
+            }
+
+            const cabeceras = ['Orden', 'Estado', 'Camara', 'Primer Inicio', 'Ultimo Fin', 'Cantidad Cortes', 'Duracion Total (min)', 'Tramos Exactos'];
+            const filas = datosProcesados.map((item, idx) => {
+                const estado = camarasCompletadas.has(item.camera) ? 'Descargada' : 'Pendiente';
+                const tramos = item.intervals.map(iv => `${iv.start} a ${iv.end}`).join(' | ');
+                return [
+                    idx + 1,
+                    estado,
+                    item.camera,
+                    item.firstStart,
+                    item.lastEnd,
+                    item.intervals.length,
+                    item.totalMinutes,
+                    `"${tramos}"`
+                ].join(';');
+            });
+
+            const contenidoCsv = '\uFEFF' + [cabeceras.join(';'), ...filas].join('\r\n');
+            const blob = new Blob([contenidoCsv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+
+            const link = document.createElement('a');
+            const fecha = new Date().toISOString().slice(0, 10);
+            link.href = url;
+            link.download = `camaras_horarios_${fecha}.csv`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+
+            mostrarToast('Archivo CSV descargado');
+        }
+
+        /**
+         * Limpia el área de texto guardando copia temporal para poder Deshacer
+         */
+        function limpiarTodo() {
+            const currentText = document.getElementById('rawInput').value;
+            if (currentText.trim() || camarasCompletadas.size > 0) {
+                respaldoAntesDeLimpiar = {
+                    rawInput: currentText,
+                    completedCams: new Set(camarasCompletadas),
+                    completedIntervals: new Set(tramosCompletados)
+                };
+            }
+
+            document.getElementById('rawInput').value = '';
+            document.getElementById('searchCamInput').value = '';
+            filtroEstadoActual = 'all';
+            camarasCompletadas.clear();
+            tramosCompletados.clear();
+            procesarRegistros();
+            mostrarToast('Formulario limpiado', Boolean(respaldoAntesDeLimpiar));
+        }
+
+        /**
+         * Restaura los datos si el usuario presionó Limpiar por accidente
+         */
+        function deshacerLimpieza() {
+            if (!respaldoAntesDeLimpiar) return;
+            document.getElementById('rawInput').value = respaldoAntesDeLimpiar.rawInput;
+            camarasCompletadas = new Set(respaldoAntesDeLimpiar.completedCams);
+            tramosCompletados = new Set(respaldoAntesDeLimpiar.completedIntervals);
+            respaldoAntesDeLimpiar = null;
+            procesarRegistros();
+            mostrarToast('Datos restaurados');
+        }
+
+        /**
+         * Carga datos de muestra para probar al instante
+         */
+        function cargarEjemplo() {
+            document.getElementById('rawInput').value = `07:08HS.-  208-205-801-201-212-802-        07:53HS.-
+07:53HS.-  215 - 612                                       08:00HS.-
+08:00HS.-  709-412-413-                                08:02HS.-
+08:02HS.-  709-409-                                         08:03HS.-
+08:03HS.-  412 - (407-709) -                            08:07HS.-
+08:07HS.-  709 -710 -                                      08:21HS.-
+08:21HS.-  412 -412-413 - 709 - 707 -          08:57HS.-`;
+            camarasCompletadas.clear();
+            tramosCompletados.clear();
+            filtroEstadoActual = 'all';
+            procesarRegistros();
+            mostrarToast('Ejemplo cargado');
+        }
+
+        // Inicialización al cargar el DOM
+        document.getElementById('rawInput').addEventListener('input', () => {
+            procesarRegistros();
+        });
+
+        restaurarEstado();
+        actualizarOpciones();
+    </script>
+</body>
+
+</html>
