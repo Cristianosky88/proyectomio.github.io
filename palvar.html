@@ -1,272 +1,514 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Control de Tickets</title>
+    <title>Pal Var - Sistema de Control de Tickets</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'Segoe UI', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'Consolas', 'monospace'],
+                    }
+                }
+            }
+        };
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        /* CSS ORIGINAL - SIN MODIFICACIONES */
-        body { background-color: #f8fafc; font-family: 'Segoe UI', sans-serif; }
-        .fade-in { animation: fadeIn 0.3s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-        
-        /* Solo agrego estas clases necesarias para las nuevas funcionalidades, sin modificar las existentes */
-        .modal.hidden { display: none; }
-        .history-item { cursor: pointer; transition: all 0.2s; }
-        .history-item:hover { background-color: #e0e7ff; }
-        .status-badge { transition: all 0.2s; }
-    </style>
-</head>
-<body class="p-4 md:p-8 text-slate-800">
+        body {
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+        }
 
-    <div class="max-w-5xl mx-auto bg-white rounded-xl shadow-xl overflow-hidden border border-slate-200">
-        
-        <!-- Header con agregado de botones nuevos pero manteniendo estilo -->
-        <div class="bg-slate-900 p-5 text-white flex justify-between items-center">
+        .fade-in {
+            animation: fadeIn 0.25s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal.hidden {
+            display: none;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+
+        .dark ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        .dark ::-webkit-scrollbar-thumb {
+            background: #334155;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        .dark ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+
+        .highlight-var {
+            background-color: rgba(79, 70, 229, 0.12);
+            color: #4338ca;
+            padding: 1px 5px;
+            border-radius: 4px;
+            font-weight: 600;
+            border-bottom: 1px dashed #4f46e5;
+        }
+
+        .dark .highlight-var {
+            background-color: rgba(99, 102, 241, 0.22);
+            color: #a5b4fc;
+            border-bottom: 1px dashed #818cf8;
+        }
+
+        .highlight-pending {
+            background-color: rgba(245, 158, 11, 0.16);
+            color: #b45309;
+            padding: 1px 5px;
+            border-radius: 4px;
+            font-weight: 600;
+            border-bottom: 1px dashed #d97706;
+        }
+
+        .dark .highlight-pending {
+            background-color: rgba(245, 158, 11, 0.22);
+            color: #fcd34d;
+            border-bottom: 1px dashed #f59e0b;
+        }
+    </style>
+    <script>
+        (function () {
+            try {
+                if (localStorage.getItem('palvar_theme') === 'dark') {
+                    document.documentElement.classList.add('dark');
+                }
+            } catch (e) { }
+        })();
+    </script>
+</head>
+
+<body class="bg-slate-100 dark:bg-slate-950 p-3 sm:p-6 md:p-8 text-slate-800 dark:text-slate-100 min-h-screen transition-colors duration-200">
+
+    <div class="max-w-6xl mx-auto bg-white dark:bg-slate-900 rounded-2xl shadow-xl overflow-hidden border border-slate-200 dark:border-slate-800">
+
+        <!-- Header -->
+        <header class="bg-slate-900 dark:bg-slate-950 border-b border-slate-800 p-4 sm:p-5 text-white flex flex-wrap justify-between items-center gap-3">
             <div class="flex items-center gap-3">
-                <div class="bg-indigo-600 p-2 rounded-lg">
+                <div class="bg-indigo-600 p-2.5 rounded-xl shadow-sm shrink-0">
                     <i data-lucide="ticket" class="w-6 h-6 text-white"></i>
                 </div>
                 <div>
-                    <h1 class="text-xl font-bold">Sistema de Control de Tickets</h1>
-                    <p class="text-slate-400 text-xs uppercase tracking-wider">Reporte de Pagos Altos</p>
+                    <h1 class="text-lg sm:text-xl font-bold leading-tight">Sistema de Control de Tickets</h1>
+                    <p class="text-slate-400 text-xs uppercase tracking-wider">Pal Var · Reporte de Pagos Altos</p>
                 </div>
             </div>
-            <div class="flex gap-2">
-                <a href="pagoaltoluxor.html" class="px-3 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg transition text-sm font-semibold">
-                    Pago Alto Luxor
+
+            <div class="flex flex-wrap items-center gap-2">
+                <!-- Reloj en vivo -->
+                <div class="hidden md:flex items-center gap-2 bg-slate-800 border border-slate-700 px-3 py-1.5 rounded-xl text-xs font-mono text-slate-200">
+                    <i data-lucide="clock" class="w-3.5 h-3.5 text-indigo-400"></i>
+                    <span id="liveClock">00:00:00 Hs.</span>
+                </div>
+
+                <a href="pagoaltoluxor.html" class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-xl transition text-xs sm:text-sm font-semibold text-white flex items-center gap-1.5">
+                    <i data-lucide="building-2" class="w-4 h-4"></i>
+                    <span>Pago Alto Luxor</span>
                 </a>
-                <button id="exportPDFBtn" class="p-2 hover:bg-slate-700 rounded-lg transition">
-                    <i data-lucide="file-text" class="w-5 h-5"></i>
+
+                <button type="button" id="exportPDFBtn" class="p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl transition cursor-pointer" title="Exportar reporte actual a PDF">
+                    <i data-lucide="file-down" class="w-5 h-5 text-slate-200"></i>
                 </button>
-                <button id="statsBtn" class="p-2 hover:bg-slate-700 rounded-lg transition">
-                    <i data-lucide="bar-chart-2" class="w-5 h-5"></i>
+
+                <button type="button" id="statsBtn" class="p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl transition cursor-pointer" title="Ver estadísticas del turno">
+                    <i data-lucide="bar-chart-2" class="w-5 h-5 text-slate-200"></i>
                 </button>
-                <button id="inicioBtn" class="p-2 hover:bg-slate-700 rounded-lg transition">
-                    <i data-lucide="home" class="w-5 h-5"></i>
+
+                <button type="button" id="themeToggleBtn" class="p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl transition cursor-pointer" title="Cambiar modo claro / oscuro">
+                    <i data-lucide="sun" class="w-5 h-5 text-amber-400 hidden dark:block"></i>
+                    <i data-lucide="moon" class="w-5 h-5 text-slate-200 block dark:hidden"></i>
+                </button>
+
+                <button type="button" id="inicioBtn" class="p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl transition cursor-pointer" title="Volver al Menú Principal">
+                    <i data-lucide="home" class="w-5 h-5 text-slate-200"></i>
                 </button>
             </div>
-        </div>
+        </header>
 
         <div class="grid grid-cols-1 lg:grid-cols-12">
-            
-            <!-- COLUMNA IZQUIERDA: FORMULARIO (se agrega campo de hora segunda) -->
-            <div class="lg:col-span-7 p-6 space-y-4 bg-slate-50">
-                
-                <form id="formTickets" autocomplete="off" class="space-y-4">
-                    
-                    <div class="grid grid-cols-3 gap-4">
-                        <div class="col-span-1">
-                            <label class="block text-xs font-semibold text-slate-500 mb-1">👤 Nombre de la Persona</label>
-                            <input type="text" id="nombrePersona" required pattern="^[A-Za-zÁáÉéÍíÓóÚúÑñ\s]+$" placeholder="Nombre completo" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
-                            <div id="nombreError" class="text-xs text-red-500 hidden mt-1">Solo letras y espacios</div>
+
+            <!-- COLUMNA IZQUIERDA: FORMULARIO -->
+            <div class="lg:col-span-7 p-5 sm:p-6 bg-slate-50 dark:bg-slate-900/60">
+
+                <form id="formTickets" autocomplete="off" novalidate class="space-y-5">
+
+                    <!-- Bloque 1: Personal y Cliente -->
+                    <div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+                        <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2.5">
+                            <span class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
+                                <i data-lucide="users" class="w-4 h-4"></i> 1. Personal Informante y Cliente
+                            </span>
+                            <button type="button" id="loadLastStaffBtn" class="hidden text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer">
+                                Usar último personal
+                            </button>
                         </div>
-                        <div class="col-span-1">
-                            <label class="block text-xs font-semibold text-slate-500 mb-1">👥 Tipo de Cliente</label>
-                            <select id="clienteGenero" required class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
-                                <option value="Cliente Sr.">Cliente Sr.</option>
-                                <option value="Clienta Sra.">Clienta Sra.</option>
-                            </select>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-12 gap-3.5">
+                            <div class="sm:col-span-5">
+                                <label for="tipoCargo" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Cargo del Personal *</label>
+                                <input type="text" id="tipoCargo" required list="cargos-list" placeholder="Ej: Encargado, Cajera..." class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition">
+                            </div>
+                            <div class="sm:col-span-7">
+                                <label for="nombrePersona" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Nombre / Apellido del Personal *</label>
+                                <input type="text" id="nombrePersona" required placeholder="Ej: Gómez" class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition">
+                                <div id="nombreError" class="text-xs text-rose-500 hidden mt-1">Usa solo letras, espacios, puntos o guiones.</div>
+                            </div>
                         </div>
-                        <div class="col-span-1">
-                            <label class="block text-xs font-semibold text-slate-500 mb-1">👤 Nombre del Cliente</label>
-                            <input type="text" id="nombreCliente" placeholder="Ej: Juan" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+
+                        <div class="grid grid-cols-1 sm:grid-cols-12 gap-3.5">
+                            <div class="sm:col-span-5">
+                                <label for="clienteGenero" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Trato del Cliente</label>
+                                <select id="clienteGenero" required class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition">
+                                    <option value="Cliente Sr.">Cliente Sr.</option>
+                                    <option value="Clienta Sra.">Clienta Sra.</option>
+                                </select>
+                            </div>
+                            <div class="sm:col-span-7">
+                                <label for="nombreCliente" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Nombre del Cliente <span class="font-normal text-slate-400">(Opcional)</span></label>
+                                <input type="text" id="nombreCliente" placeholder="Ej: Juan Pérez (o vacío)" class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition">
+                            </div>
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-3 gap-4">
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-500 mb-1">🎫 Cantidad de Tickets</label>
-                            <input type="number" id="cantidadTickets" min="1" required placeholder="0" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                    <!-- Bloque 2: Tickets, Valores y Propina -->
+                    <div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+                        <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2.5">
+                            <span class="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
+                                <i data-lucide="banknote" class="w-4 h-4"></i> 2. Tickets, Valores y Propina
+                            </span>
+                            <span class="text-[11px] text-slate-400">Separador de miles en vivo</span>
                         </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-500 mb-1">💵 Valor Total</label>
-                            <input type="text" id="valorTotal" placeholder="0.000,000" required class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                            <!-- Cantidad Tickets -->
+                            <div>
+                                <label for="cantidadTickets" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Cantidad de Tickets *</label>
+                                <input type="number" id="cantidadTickets" min="1" max="999" required placeholder="0" class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm font-mono text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition">
+                                <div class="flex flex-wrap gap-1 mt-1.5">
+                                    <button type="button" onclick="setQuickTickets(1)" class="px-2 py-0.5 text-[11px] font-mono font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-md border border-slate-200 dark:border-slate-700 cursor-pointer">1</button>
+                                    <button type="button" onclick="setQuickTickets(2)" class="px-2 py-0.5 text-[11px] font-mono font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-md border border-slate-200 dark:border-slate-700 cursor-pointer">2</button>
+                                    <button type="button" onclick="setQuickTickets(5)" class="px-2 py-0.5 text-[11px] font-mono font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-md border border-slate-200 dark:border-slate-700 cursor-pointer">5</button>
+                                    <button type="button" onclick="setQuickTickets(10)" class="px-2 py-0.5 text-[11px] font-mono font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-md border border-slate-200 dark:border-slate-700 cursor-pointer">10</button>
+                                </div>
+                            </div>
+
+                            <!-- Valor Total -->
+                            <div>
+                                <label for="valorTotal" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Valor Total ($) *</label>
+                                <div class="relative">
+                                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-mono text-sm">$</span>
+                                    <input type="text" id="valorTotal" inputmode="decimal" placeholder="000.000,00" required class="w-full pl-7 pr-3 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm font-mono text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition">
+                                </div>
+                                <div class="flex flex-wrap gap-1 mt-1.5">
+                                    <button type="button" onclick="setQuickTotal(250000)" class="px-2 py-0.5 text-[11px] font-mono font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-md border border-slate-200 dark:border-slate-700 cursor-pointer">250k</button>
+                                    <button type="button" onclick="setQuickTotal(500000)" class="px-2 py-0.5 text-[11px] font-mono font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-md border border-slate-200 dark:border-slate-700 cursor-pointer">500k</button>
+                                    <button type="button" onclick="setQuickTotal(1000000)" class="px-2 py-0.5 text-[11px] font-mono font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-md border border-slate-200 dark:border-slate-700 cursor-pointer">1M</button>
+                                </div>
+                            </div>
+
+                            <!-- Monto Pagado -->
+                            <div>
+                                <label for="montoPagado" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1 flex items-center justify-between">
+                                    <span>Monto Pagado ($) *</span>
+                                    <button type="button" onclick="equalizePaid()" class="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer">Igualar</button>
+                                </label>
+                                <div class="relative">
+                                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-mono text-sm">$</span>
+                                    <input type="text" id="montoPagado" inputmode="decimal" placeholder="000.000,00" required class="w-full pl-7 pr-3 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm font-mono text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition">
+                                </div>
+                                <p class="text-[11px] text-slate-400 mt-1.5">Clic en "Igualar" si abona el total.</p>
+                            </div>
                         </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-500 mb-1">💰 Monto Pagado</label>
-                            <input type="text" id="montoPagado" placeholder="0.000,000" required class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+
+                        <!-- Indicador en vivo de diferencia / estado de pago -->
+                        <div id="deudaIndicador" class="hidden p-3.5 rounded-xl border text-xs flex items-center justify-between gap-3 transition-all">
+                            <div>
+                                <div class="font-semibold uppercase tracking-wide" id="deudaDetalle">Estado de Pago</div>
+                            </div>
+                            <div id="deudaTexto" class="text-sm sm:text-base font-mono font-bold shrink-0"></div>
+                        </div>
+
+                        <!-- Propina -->
+                        <div class="grid grid-cols-1 sm:grid-cols-12 gap-3.5 pt-1 items-end">
+                            <div class="sm:col-span-4">
+                                <label for="dejaPropina" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">¿Deja Propina?</label>
+                                <select id="dejaPropina" class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition">
+                                    <option value="no">No</option>
+                                    <option value="si">Sí, deja propina</option>
+                                </select>
+                            </div>
+                            <div id="montoPropinaContainer" class="sm:col-span-8 hidden">
+                                <label for="montoPropina" class="block text-xs font-semibold text-emerald-700 dark:text-emerald-400 mb-1">Monto Propina ($)</label>
+                                <div class="flex flex-wrap sm:flex-nowrap items-center gap-2">
+                                    <div class="relative flex-1 min-w-[140px]">
+                                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-emerald-600 dark:text-emerald-400 font-mono text-sm">$</span>
+                                        <input type="text" id="montoPropina" inputmode="decimal" placeholder="0.000,00" class="w-full pl-7 pr-3 py-2 bg-emerald-50/50 dark:bg-slate-950 border border-emerald-300 dark:border-emerald-700 rounded-xl text-sm font-mono text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500 outline-none transition">
+                                    </div>
+                                    <div class="flex gap-1">
+                                        <button type="button" onclick="setQuickPropina(2000)" class="px-2 py-1.5 text-[11px] font-mono font-semibold bg-emerald-50 dark:bg-slate-800 text-emerald-700 dark:text-emerald-300 rounded-lg border border-emerald-200 dark:border-slate-700 hover:bg-emerald-100 cursor-pointer">$2k</button>
+                                        <button type="button" onclick="setQuickPropina(5000)" class="px-2 py-1.5 text-[11px] font-mono font-semibold bg-emerald-50 dark:bg-slate-800 text-emerald-700 dark:text-emerald-300 rounded-lg border border-emerald-200 dark:border-slate-700 hover:bg-emerald-100 cursor-pointer">$5k</button>
+                                        <button type="button" onclick="setQuickPropina(10000)" class="px-2 py-1.5 text-[11px] font-mono font-semibold bg-emerald-50 dark:bg-slate-800 text-emerald-700 dark:text-emerald-300 rounded-lg border border-emerald-200 dark:border-slate-700 hover:bg-emerald-100 cursor-pointer">$10k</button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-3 gap-4">
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-500 mb-1">⏰ Hora Primera Operación</label>
-                            <input type="time" id="horaPrimeraOperacion" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                    <!-- Bloque 3: Horarios y Observaciones -->
+                    <div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+                        <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2.5">
+                            <span class="text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
+                                <i data-lucide="clock-3" class="w-4 h-4"></i> 3. Horarios de Operación y Notas
+                            </span>
+                            <button type="button" onclick="fillSequentialTimesNow()" class="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer">
+                                Autocompletar horas ahora
+                            </button>
                         </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-500 mb-1">⏰ Hora Segunda Operación</label>
-                            <input type="time" id="horaSegundaOperacion" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <!-- 1° Hora -->
+                            <div>
+                                <label for="horaPrimeraOperacion" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">1° Hora Llamada</label>
+                                <div class="flex gap-1">
+                                    <input type="time" id="horaPrimeraOperacion" class="w-full p-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm font-mono text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none">
+                                    <button type="button" onclick="setTimeNow('horaPrimeraOperacion')" title="Hora actual" class="px-2.5 bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 rounded-xl text-xs font-semibold cursor-pointer">⚡</button>
+                                </div>
+                            </div>
+
+                            <!-- 2° Hora -->
+                            <div>
+                                <label for="horaSegundaOperacion" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">2° Hora Redime</label>
+                                <div class="flex gap-1">
+                                    <input type="time" id="horaSegundaOperacion" class="w-full p-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm font-mono text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none">
+                                    <button type="button" onclick="addMinutesFrom('horaPrimeraOperacion', 'horaSegundaOperacion', 1)" title="+1 min respecto a 1° hora" class="px-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 rounded-xl text-[11px] font-mono font-semibold cursor-pointer">+1m</button>
+                                </div>
+                            </div>
+
+                            <!-- 3° Hora -->
+                            <div>
+                                <label for="horaUltimaOperacion" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">3° Hora Cancela</label>
+                                <div class="flex gap-1">
+                                    <input type="time" id="horaUltimaOperacion" class="w-full p-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm font-mono text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none">
+                                    <button type="button" onclick="addMinutesFrom('horaSegundaOperacion', 'horaUltimaOperacion', 2)" title="+2 min respecto a 2° hora" class="px-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 rounded-xl text-[11px] font-mono font-semibold cursor-pointer">+2m</button>
+                                </div>
+                            </div>
                         </div>
+
+                        <div id="timeSeqWarning" class="hidden px-3 py-2 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-200 text-xs">
+                            ⚠️ Alguna hora posterior es menor a la anterior. Revisa la secuencia horaria.
+                        </div>
+
                         <div>
-                            <label class="block text-xs font-semibold text-slate-500 mb-1">⏰ Hora Última Operación</label>
-                            <input type="time" id="horaUltimaOperacion" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                            <div class="flex items-center justify-between mb-1">
+                                <label for="observaciones" class="text-xs font-semibold text-slate-600 dark:text-slate-300">Observaciones <span class="font-normal text-slate-400">(Opcional)</span></label>
+                                <span id="charCounter" class="text-[11px] font-mono text-slate-400">0/200</span>
+                            </div>
+                            <textarea id="observaciones" maxlength="200" placeholder="Notas adicionales del evento..." class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none resize-none h-16 transition"></textarea>
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-3 gap-4">
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-500 mb-1">🎯 Cargo</label>
-                            <input type="text" id="tipoCargo" required list="cargos-list" placeholder="Seleccionar cargo..." class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-500 mb-1">💸 Deja Propina?</label>
-                            <select id="dejaPropina" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
-                                <option value="no">No</option>
-                                <option value="si">Sí</option>
-                            </select>
-                        </div>
-                        <div id="montoPropinaContainer" class="hidden">
-                            <label class="block text-xs font-semibold text-slate-500 mb-1">💵 Monto Propina</label>
-                            <input type="text" id="montoPropina" placeholder="0.000,000" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-500 mb-1">📝 Observaciones (Opcional)</label>
-                        <textarea id="observaciones" placeholder="Notas adicionales..." class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none resize-none h-16"></textarea>
-                        <div id="charCounter" class="text-xs text-slate-400 text-right mt-1">0/200</div>
-                    </div>
-
-                    <div id="avisoMonto" class="p-3 rounded text-sm hidden"></div>
-
-                    <div class="flex gap-2 flex-wrap pt-4">
-                        <button type="submit" class="flex-1 min-w-[120px] px-4 py-2 bg-indigo-600 text-white hover:bg-indigo-700 rounded font-semibold text-sm transition flex items-center justify-center gap-2">
-                            <i data-lucide="file-text" class="w-4 h-4"></i>
-                            <span>Generar Reporte</span>
+                    <!-- Botones Principales -->
+                    <div class="flex gap-2.5 flex-wrap pt-1">
+                        <button type="submit" class="flex-1 min-w-[160px] px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white rounded-xl font-semibold text-sm shadow-sm transition flex items-center justify-center gap-2 cursor-pointer">
+                            <i data-lucide="file-check-2" class="w-4 h-4"></i>
+                            <span>Generar y Guardar</span>
                         </button>
-                        <button type="button" id="copiarBtn" class="flex-1 min-w-[120px] px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded font-semibold text-sm transition flex items-center justify-center gap-2">
+                        <button type="button" id="copiarBtn" class="flex-1 min-w-[130px] px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-semibold text-sm shadow-sm transition flex items-center justify-center gap-2 cursor-pointer">
                             <i data-lucide="copy" class="w-4 h-4"></i>
-                            <span>Copiar</span>
+                            <span>Copiar Todo</span>
                         </button>
-                        <button type="reset" id="resetBtn" class="flex-1 min-w-[120px] px-4 py-2 bg-orange-600 text-white hover:bg-orange-700 rounded font-semibold text-sm transition flex items-center justify-center gap-2">
+                        <button type="button" id="resetBtn" class="px-4 py-2.5 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl font-semibold text-sm transition flex items-center justify-center gap-1.5 cursor-pointer">
                             <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
-                            <span>Resetear</span>
+                            <span>Limpiar</span>
                         </button>
                     </div>
-                    
-                    <div class="text-xs text-slate-400 text-center pt-2">
-                        <i data-lucide="keyboard" class="w-3 h-3 inline"></i>
-                        Atajos: Ctrl+G (Generar) | Ctrl+C (Copiar) | Ctrl+R (Reset)
+
+                    <div class="text-[11px] text-slate-400 dark:text-slate-500 text-center">
+                        Atajos: <b>Alt+G</b> / <b>Ctrl+G</b> (Generar y Guardar) · <b>Alt+L</b> (Limpiar)
                     </div>
                 </form>
             </div>
 
-            <!-- COLUMNA DERECHA: REPORTE E HISTORIAL -->
-            <div class="lg:col-span-5 bg-slate-100 border-l border-slate-200 flex flex-col">
-                <div class="p-6 sticky top-0 max-h-screen overflow-y-auto">
-                    <div class="flex items-center justify-between mb-4">
-                        <h2 class="font-bold text-slate-800">📄 Reporte Generado</h2>
-                        <div class="text-xs px-2 py-1 bg-indigo-100 text-indigo-700 rounded-full cursor-pointer" id="statsBadge">Historial</div>
-                    </div>
-                    
-                    <!-- BUSCADOR EN HISTORIAL -->
-                    <div class="mb-4 relative">
-                        <input type="text" id="searchHistorial" placeholder="🔍 Buscar en historial..." class="w-full p-2 pl-8 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
-                    </div>
+            <!-- COLUMNA DERECHA: VISTA PREVIA EN VIVO, REPORTE E HISTORIAL -->
+            <div class="lg:col-span-5 bg-slate-100/80 dark:bg-slate-950/60 border-t lg:border-t-0 lg:border-l border-slate-200 dark:border-slate-800 flex flex-col">
+                <div class="p-5 sm:p-6 space-y-5">
 
-                    <!-- HISTORIAL DE REPORTES -->
-                    <div class="mb-4 p-3 bg-white rounded-lg border border-slate-200">
-                        <div class="flex items-center justify-between mb-2">
-                            <label class="text-xs font-semibold text-slate-600">📜 Historial de Reportes</label>
-                            <button id="clearHistoryBtn" class="text-xs text-red-500 hover:text-red-700 transition">Limpiar todo</button>
-                        </div>
-                        <div id="historyList" class="max-h-48 overflow-y-auto space-y-1">
-                            <!-- Items dinámicos -->
-                        </div>
-                        <div id="noHistoryMsg" class="text-xs text-slate-400 text-center py-4 hidden">
-                            No hay reportes guardados
-                        </div>
-                    </div>
-
-                    <!-- INDICADOR DE DEUDA -->
-                    <div id="deudaIndicador" class="hidden mb-4 p-4 rounded-lg">
-                        <div class="text-xs font-semibold mb-2">⚠️ Estado de Pago</div>
-                        <div id="deudaTexto" class="text-lg font-bold"></div>
-                        <div id="deudaDetalle" class="text-xs mt-2"></div>
-                    </div>
-
-                    <!-- REPORTE -->
-                    <div id="reportContainer" class="hidden">
-                        <div class="bg-white rounded-lg shadow-sm border border-slate-300 p-4 mb-4">
-                            <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-200">
-                                <span class="font-bold text-sm text-slate-700">📄 Reporte #<span id="reportId"></span></span>
-                                <button id="editReportBtn" class="text-xs text-indigo-600 hover:text-indigo-700 transition flex items-center gap-1">
-                                    <i data-lucide="edit-2" class="w-3 h-3"></i>
-                                    Editar
+                    <!-- VISTA PREVIA / REPORTE ACTIVO -->
+                    <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-4">
+                        <div class="flex items-center justify-between mb-3 pb-2.5 border-b border-slate-100 dark:border-slate-800">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span>
+                                <h2 class="font-bold text-sm text-slate-800 dark:text-slate-100" id="previewHeaderTitle">Vista Previa en Vivo</h2>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span id="reportIdBadge" class="hidden text-[11px] font-mono bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 px-2 py-0.5 rounded-md">
+                                    #<span id="reportId"></span>
+                                </span>
+                                <button type="button" id="editReportBtn" class="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline transition flex items-center gap-1 cursor-pointer">
+                                    <i data-lucide="edit-2" class="w-3.5 h-3.5"></i>
+                                    Editar texto
                                 </button>
                             </div>
-                            <div id="reporte" class="text-sm font-mono whitespace-pre-wrap leading-relaxed text-slate-700"></div>
                         </div>
-                        <div class="flex gap-2">
-                            <button id="copiarReporteBtn" class="flex-1 px-4 py-2 bg-indigo-600 text-white hover:bg-indigo-700 rounded font-semibold text-sm transition flex items-center justify-center gap-2">
-                                <i data-lucide="copy" class="w-4 h-4"></i>
-                                <span>Copiar Reporte</span>
+
+                        <!-- Vista enriquecida con variables resaltadas -->
+                        <div id="liveVisualPreview" class="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-3.5 text-xs sm:text-sm font-mono leading-relaxed text-slate-700 dark:text-slate-200 space-y-2"></div>
+
+                        <!-- Contenedor oculto de texto plano exacto para copiar/PDF/imprimir -->
+                        <div id="reporte" class="hidden"></div>
+
+                        <!-- Copiado rápido por etapa -->
+                        <div class="grid grid-cols-3 gap-2 mt-3">
+                            <button type="button" onclick="copyStageLine(0)" class="py-1.5 px-2 bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-semibold transition cursor-pointer">
+                                1° Llamada
                             </button>
-                            <button id="printReportBtn" class="flex-1 px-4 py-2 bg-slate-600 text-white hover:bg-slate-700 rounded font-semibold text-sm transition flex items-center justify-center gap-2">
+                            <button type="button" onclick="copyStageLine(1)" class="py-1.5 px-2 bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-semibold transition cursor-pointer">
+                                2° Redime
+                            </button>
+                            <button type="button" onclick="copyStageLine(2)" class="py-1.5 px-2 bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-semibold transition cursor-pointer">
+                                3° Cancela
+                            </button>
+                        </div>
+
+                        <div class="flex gap-2 mt-2.5">
+                            <button type="button" id="copiarReporteBtn" class="flex-1 px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold text-xs sm:text-sm transition flex items-center justify-center gap-1.5 cursor-pointer">
+                                <i data-lucide="copy" class="w-4 h-4"></i>
+                                <span>Copiar Acta</span>
+                            </button>
+                            <button type="button" id="printReportBtn" class="px-3.5 py-2 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl font-semibold text-xs sm:text-sm transition flex items-center justify-center gap-1.5 cursor-pointer">
                                 <i data-lucide="printer" class="w-4 h-4"></i>
                                 <span>Imprimir</span>
                             </button>
                         </div>
-                        <div id="timestamp" class="text-xs text-slate-500 text-center italic mt-3"></div>
+
+                        <div id="timestamp" class="text-[11px] text-slate-400 dark:text-slate-500 text-center italic mt-2.5">
+                            Completa los datos y presiona "Generar y Guardar" para registrarlo en el historial.
+                        </div>
                     </div>
 
-                    <div id="noReport" class="bg-slate-200 rounded-lg p-6 text-center text-slate-600 text-sm">
-                        <i data-lucide="clipboard" class="w-8 h-8 mx-auto mb-2 opacity-50"></i>
-                        <p>El reporte aparecerá aquí una vez generado</p>
-                        <p class="text-xs mt-2">Presiona Ctrl+G para generar rápidamente</p>
+                    <!-- HISTORIAL DE REPORTES -->
+                    <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center gap-2">
+                                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">Historial de Reportes</h3>
+                                <button type="button" id="statsBadge" class="text-[11px] font-semibold px-2 py-0.5 bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 rounded-full cursor-pointer hover:bg-indigo-100 transition">
+                                    0 reportes
+                                </button>
+                            </div>
+                            <div class="flex items-center gap-2.5">
+                                <button type="button" onclick="exportHistoryCSV()" class="text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:underline cursor-pointer" title="Descargar historial en Excel/CSV">
+                                    CSV
+                                </button>
+                                <button type="button" id="clearHistoryBtn" class="text-xs font-semibold text-rose-500 hover:underline transition cursor-pointer">
+                                    Vaciar
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Buscador en historial -->
+                        <div class="mb-3 relative">
+                            <input type="text" id="searchHistorial" placeholder="Buscar por personal, cliente o fecha..." class="w-full py-2 pl-8 pr-3 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 outline-none">
+                            <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2"></i>
+                        </div>
+
+                        <div id="historyList" class="max-h-60 overflow-y-auto space-y-2 pr-1"></div>
+                        <div id="noHistoryMsg" class="text-xs text-slate-400 dark:text-slate-500 text-center py-5 hidden italic">
+                            No hay reportes que coincidan.
+                        </div>
                     </div>
+
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- TOAST NOTIFICACIONES -->
-    <div id="notification" class="hidden fixed bottom-4 right-4 bg-green-100 text-green-800 px-4 py-3 rounded-lg shadow-lg flex items-center gap-2 fade-in z-40">
-        <i data-lucide="check-circle" class="w-4 h-4"></i>
-        <span id="notification-text">Operación exitosa</span>
+    <!-- TOAST NOTIFICACIONES CON OPCIÓN DESHACER -->
+    <div id="notification" class="hidden fixed bottom-5 right-5 px-4 py-3 rounded-xl shadow-xl flex items-center gap-3 fade-in z-50 border">
+        <span id="notification-text" class="text-xs sm:text-sm font-medium">Operación exitosa</span>
+        <button type="button" id="undoResetBtn" onclick="undoFormReset()" class="hidden px-2.5 py-1 text-xs font-bold bg-white/20 hover:bg-white/30 rounded-lg transition cursor-pointer">
+            Deshacer
+        </button>
     </div>
 
     <!-- MODAL ESTADÍSTICAS -->
-    <div id="statsModal" class="modal hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md max-h-[80vh] overflow-y-auto">
-            <div class="bg-slate-900 text-white p-4 flex items-center justify-between">
+    <div id="statsModal" class="modal hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-md max-h-[85vh] overflow-y-auto border border-slate-200 dark:border-slate-800">
+            <div class="bg-slate-900 dark:bg-slate-950 text-white p-4 flex items-center justify-between">
                 <div class="flex items-center gap-2">
-                    <i data-lucide="bar-chart-2" class="w-5 h-5"></i>
-                    <h3 class="font-bold">Estadísticas del Sistema</h3>
+                    <i data-lucide="bar-chart-2" class="w-5 h-5 text-indigo-400"></i>
+                    <h3 class="font-bold text-sm sm:text-base">Estadísticas del Turno</h3>
                 </div>
-                <button onclick="closeStatsModal()" class="hover:bg-slate-700 p-1 rounded">
+                <button type="button" onclick="closeStatsModal()" class="hover:bg-slate-800 p-1 rounded-lg cursor-pointer">
                     <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
             </div>
-            <div class="p-6 space-y-4" id="statsContent"></div>
-            <div class="p-4 border-t border-slate-200">
-                <button onclick="closeStatsModal()" class="w-full px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded font-semibold transition">Cerrar</button>
+            <div class="p-5 space-y-4" id="statsContent"></div>
+            <div class="p-4 border-t border-slate-200 dark:border-slate-800 flex gap-2">
+                <button type="button" onclick="exportHistoryCSV()" class="flex-1 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-semibold transition cursor-pointer">Exportar CSV</button>
+                <button type="button" onclick="closeStatsModal()" class="flex-1 px-4 py-2 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-xl text-sm font-semibold transition cursor-pointer">Cerrar</button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL EDICIÓN -->
-    <div id="editModal" class="modal hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl">
-            <div class="bg-slate-900 text-white p-4 flex items-center justify-between">
+    <!-- MODAL EDICIÓN MANUAL -->
+    <div id="editModal" class="modal hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+            <div class="bg-slate-900 dark:bg-slate-950 text-white p-4 flex items-center justify-between">
                 <div class="flex items-center gap-2">
-                    <i data-lucide="edit-2" class="w-5 h-5"></i>
-                    <h3 class="font-bold">Editar Reporte</h3>
+                    <i data-lucide="edit-2" class="w-5 h-5 text-indigo-400"></i>
+                    <h3 class="font-bold text-sm sm:text-base">Editar Texto del Reporte</h3>
                 </div>
-                <button onclick="closeEditModal()" class="hover:bg-slate-700 p-1 rounded">
+                <button type="button" onclick="closeEditModal()" class="hover:bg-slate-800 p-1 rounded-lg cursor-pointer">
                     <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
             </div>
-            <div class="p-6">
-                <textarea id="editReportContent" rows="10" class="w-full p-3 border border-slate-300 rounded font-mono text-sm"></textarea>
+            <div class="p-5">
+                <textarea id="editReportContent" rows="8" class="w-full p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl font-mono text-xs sm:text-sm text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
             </div>
-            <div class="p-4 border-t border-slate-200 flex gap-2">
-                <button onclick="saveEditedReport()" class="flex-1 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded font-semibold transition">Guardar Cambios</button>
-                <button onclick="closeEditModal()" class="flex-1 px-4 py-2 bg-slate-200 hover:bg-slate-300 rounded font-semibold transition">Cancelar</button>
+            <div class="p-4 border-t border-slate-200 dark:border-slate-800 flex gap-2">
+                <button type="button" onclick="saveEditedReport()" class="flex-1 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold transition cursor-pointer">Guardar Cambios</button>
+                <button type="button" onclick="closeEditModal()" class="flex-1 px-4 py-2 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-xl text-sm font-semibold transition cursor-pointer">Cancelar</button>
             </div>
         </div>
     </div>
@@ -276,551 +518,946 @@
         <option value="Jefe de Caja"></option>
         <option value="As. de Caja"></option>
         <option value="Encargado"></option>
+        <option value="Encargada"></option>
         <option value="Operadora"></option>
         <option value="Operador"></option>
         <option value="Cajera"></option>
         <option value="Cajero"></option>
-        <option value="As de Sala."></option>
+        <option value="As. de Sala"></option>
     </datalist>
 
-<script>
-    lucide.createIcons();
+    <textarea id="clipboardFallback" class="fixed -top-96 left-0 opacity-0 pointer-events-none" aria-hidden="true"></textarea>
 
-    // ==================== CONSTANTES ====================
-    const MAX_HISTORY = 20;
-    const MAX_OBS = 200;
+    <script>
+        const MAX_HISTORY = 30;
+        const MAX_OBS = 200;
 
-    // ==================== FUNCIONES UTILITARIAS ====================
-    const toNumberStringAR = num => num.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    const parseNumberAR = input => input ? parseFloat(input.replace(/\./g, '').replace(',', '.')) || 0 : 0;
-    const formatCurrencyAR = value => new Intl.NumberFormat('es-AR', {
-        style: 'currency', currency: 'ARS', minimumFractionDigits: 2, maximumFractionDigits: 2
-    }).format(value);
+        // Elementos principales
+        const valorTotal = document.getElementById('valorTotal');
+        const montoPagado = document.getElementById('montoPagado');
+        const montoPropinaInput = document.getElementById('montoPropina');
+        const dejaPropinaSelect = document.getElementById('dejaPropina');
+        const montoPropinaContainer = document.getElementById('montoPropinaContainer');
+        const tipoCargo = document.getElementById('tipoCargo');
+        const nombrePersona = document.getElementById('nombrePersona');
+        const clienteGenero = document.getElementById('clienteGenero');
+        const nombreCliente = document.getElementById('nombreCliente');
+        const cantidadTickets = document.getElementById('cantidadTickets');
+        const horaPrimeraInput = document.getElementById('horaPrimeraOperacion');
+        const horaSegundaInput = document.getElementById('horaSegundaOperacion');
+        const horaUltimaInput = document.getElementById('horaUltimaOperacion');
+        const observaciones = document.getElementById('observaciones');
 
-    // ==================== ELEMENTOS ====================
-    const valorTotal = document.getElementById('valorTotal');
-    const montoPagado = document.getElementById('montoPagado');
-    const tipoCargo = document.getElementById('tipoCargo');
-    const formTickets = document.getElementById('formTickets');
-    const reporteDiv = document.getElementById('reporte');
-    const observaciones = document.getElementById('observaciones');
-    const deudaIndicador = document.getElementById('deudaIndicador');
-    const deudaTexto = document.getElementById('deudaTexto');
-    const deudaDetalle = document.getElementById('deudaDetalle');
-    const historyList = document.getElementById('historyList');
-    const noHistoryMsg = document.getElementById('noHistoryMsg');
-    const reportContainer = document.getElementById('reportContainer');
-    const noReport = document.getElementById('noReport');
-    const timestampElement = document.getElementById('timestamp');
-    const searchHistorial = document.getElementById('searchHistorial');
-    const charCounter = document.getElementById('charCounter');
-    const statsBadge = document.getElementById('statsBadge');
-    const reportIdSpan = document.getElementById('reportId');
+        const formTickets = document.getElementById('formTickets');
+        const reporteDiv = document.getElementById('reporte');
+        const liveVisualPreview = document.getElementById('liveVisualPreview');
+        const deudaIndicador = document.getElementById('deudaIndicador');
+        const deudaTexto = document.getElementById('deudaTexto');
+        const deudaDetalle = document.getElementById('deudaDetalle');
+        const historyList = document.getElementById('historyList');
+        const noHistoryMsg = document.getElementById('noHistoryMsg');
+        const timestampElement = document.getElementById('timestamp');
+        const searchHistorial = document.getElementById('searchHistorial');
+        const charCounter = document.getElementById('charCounter');
+        const statsBadge = document.getElementById('statsBadge');
+        const reportIdSpan = document.getElementById('reportId');
+        const reportIdBadge = document.getElementById('reportIdBadge');
+        const previewHeaderTitle = document.getElementById('previewHeaderTitle');
 
-    let historial = [];
-    let currentEditIndex = null;
+        let historial = [];
+        let isViewingSavedOrEdited = false;
+        let lastResetSnapshot = null;
+        let notifTimer = null;
 
-    // ==================== TEMA OSCURO ====================
-    function setupTheme() {
-        lucide.createIcons();
-    }
+        // ==================== UTILIDADES Y SEGURIDAD ====================
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
 
-    // ==================== VALIDACIONES ====================
-    function validateNombre() {
-        const input = document.getElementById('nombrePersona');
-        const error = document.getElementById('nombreError');
-        const regex = /^[A-Za-zÁáÉéÍíÓóÚúÑñ\s]+$/;
-        
-        if (input.value && !regex.test(input.value)) {
-            error.classList.remove('hidden');
-            input.classList.add('border-red-500');
-            return false;
-        } else {
-            error.classList.add('hidden');
-            input.classList.remove('border-red-500');
+        function formatMoneyPlainAR(num) {
+            const totalCents = Math.round((Number(num) || 0) * 100);
+            const sign = totalCents < 0 ? '-' : '';
+            const absCents = Math.abs(totalCents);
+            const intPart = String(Math.floor(absCents / 100)).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            const decPart = String(absCents % 100).padStart(2, '0');
+            return `${sign}$${intPart},${decPart}`;
+        }
+
+        function formatInputDisplayAR(num) {
+            if (!num || num <= 0) return '';
+            const totalCents = Math.round(num * 100);
+            const intPart = String(Math.floor(totalCents / 100)).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            const decPart = totalCents % 100;
+            return decPart > 0 ? `${intPart},${String(decPart).padStart(2, '0')}` : intPart;
+        }
+
+        function parseAndFormatArgentineInput(rawValue) {
+            const val = String(rawValue || '').replace(/[^\d.,]/g, '');
+            if (!val) return { numeric: 0, formatted: '' };
+
+            let intDigits = '';
+            let decDigits = null;
+
+            if (val.includes(',')) {
+                const parts = val.split(',');
+                intDigits = parts[0].replace(/\D/g, '');
+                decDigits = parts.slice(1).join('').replace(/\D/g, '').slice(0, 2);
+            } else {
+                const dotParts = val.split('.');
+                if (dotParts.length === 2 && dotParts[1].length <= 2 && dotParts[0].length >= 4) {
+                    intDigits = dotParts[0].replace(/\D/g, '');
+                    decDigits = dotParts[1].replace(/\D/g, '');
+                } else {
+                    intDigits = val.replace(/\D/g, '');
+                }
+            }
+
+            if (!intDigits && decDigits === null) return { numeric: 0, formatted: '' };
+
+            const cleanedInt = intDigits.replace(/^0+(?=\d)/, '');
+            const intFormatted = cleanedInt ? cleanedInt.replace(/\B(?=(\d{3})+(?!\d))/g, '.') : '0';
+            const intNum = cleanedInt ? parseInt(cleanedInt, 10) : 0;
+            const decNum = decDigits ? parseInt(decDigits.padEnd(2, '0'), 10) / 100 : 0;
+            const numeric = intNum + decNum;
+
+            const formatted = decDigits !== null ? `${intFormatted},${decDigits}` : (intNum > 0 ? intFormatted : '');
+            return { numeric, formatted };
+        }
+
+        function parseNumberAR(rawValue) {
+            return parseAndFormatArgentineInput(rawValue).numeric;
+        }
+
+        // ==================== RELOJ Y TEMA OSCURO ====================
+        function updateLiveClock() {
+            const now = new Date();
+            const hh = String(now.getHours()).padStart(2, '0');
+            const mm = String(now.getMinutes()).padStart(2, '0');
+            const ss = String(now.getSeconds()).padStart(2, '0');
+            document.getElementById('liveClock').textContent = `${hh}:${mm}:${ss} Hs.`;
+        }
+
+        function toggleTheme() {
+            const isDark = document.documentElement.classList.toggle('dark');
+            try {
+                localStorage.setItem('palvar_theme', isDark ? 'dark' : 'light');
+            } catch (e) { }
+        }
+
+        document.getElementById('themeToggleBtn').addEventListener('click', toggleTheme);
+
+        // ==================== HORARIOS RÁPIDOS ====================
+        function setTimeNow(id, skipUpdate = false) {
+            const now = new Date();
+            document.getElementById(id).value = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+            if (!skipUpdate) onLiveFieldChange();
+        }
+
+        function addMinutesFrom(refId, targetId, mins, skipUpdate = false) {
+            const refVal = document.getElementById(refId).value;
+            const d = new Date();
+            if (refVal && refVal.includes(':')) {
+                const [h, m] = refVal.split(':').map(Number);
+                d.setHours(h, m + mins, 0, 0);
+            } else {
+                d.setMinutes(d.getMinutes() + mins);
+            }
+            document.getElementById(targetId).value = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+            if (!skipUpdate) onLiveFieldChange();
+        }
+
+        function fillSequentialTimesNow() {
+            setTimeNow('horaPrimeraOperacion', true);
+            addMinutesFrom('horaPrimeraOperacion', 'horaSegundaOperacion', 1, true);
+            addMinutesFrom('horaSegundaOperacion', 'horaUltimaOperacion', 2, false);
+        }
+
+        function checkTimeOrder() {
+            const toMin = v => {
+                if (!v || !v.includes(':')) return null;
+                const [h, m] = v.split(':').map(Number);
+                return h * 60 + m;
+            };
+            const t1 = toMin(horaPrimeraInput.value);
+            const t2 = toMin(horaSegundaInput.value);
+            const t3 = toMin(horaUltimaInput.value);
+            const warn = document.getElementById('timeSeqWarning');
+
+            let bad = false;
+            if (t1 !== null && t2 !== null && ((t2 - t1 + 1440) % 1440) > 180) bad = true;
+            if (t2 !== null && t3 !== null && ((t3 - t2 + 1440) % 1440) > 180) bad = true;
+            warn.classList.toggle('hidden', !bad);
+        }
+
+        // ==================== BOTONES RÁPIDOS DE VALORES ====================
+        function setQuickTickets(n) {
+            cantidadTickets.value = n;
+            onLiveFieldChange();
+        }
+
+        function setQuickTotal(amount) {
+            valorTotal.value = formatInputDisplayAR(amount);
+            if (!montoPagado.value.trim()) {
+                montoPagado.value = formatInputDisplayAR(amount);
+            }
+            actualizarDeuda();
+            onLiveFieldChange();
+        }
+
+        function equalizePaid() {
+            const total = parseNumberAR(valorTotal.value);
+            if (total <= 0) {
+                showNotification('Primero ingresa el Valor Total', 'error');
+                valorTotal.focus();
+                return;
+            }
+            montoPagado.value = formatInputDisplayAR(total);
+            actualizarDeuda();
+            onLiveFieldChange();
+        }
+
+        function setQuickPropina(amount) {
+            montoPropinaInput.value = formatInputDisplayAR(amount);
+            onLiveFieldChange();
+        }
+
+        // ==================== VALIDACIONES Y FORMATEO EN VIVO ====================
+        function validateNombre() {
+            const val = nombrePersona.value.trim();
+            const error = document.getElementById('nombreError');
+            const valid = !val || /^[\p{L}\s.'-]+$/u.test(val);
+            error.classList.toggle('hidden', valid);
+            nombrePersona.classList.toggle('border-rose-500', !valid);
+            return valid;
+        }
+
+        [valorTotal, montoPagado, montoPropinaInput].forEach(input => {
+            input.addEventListener('input', e => {
+                const { formatted } = parseAndFormatArgentineInput(e.target.value);
+                e.target.value = formatted;
+                actualizarDeuda();
+                onLiveFieldChange();
+            });
+        });
+
+        dejaPropinaSelect.addEventListener('change', e => {
+            if (e.target.value === 'si') {
+                montoPropinaContainer.classList.remove('hidden');
+            } else {
+                montoPropinaContainer.classList.add('hidden');
+                montoPropinaInput.value = '';
+            }
+            onLiveFieldChange();
+        });
+
+        observaciones.addEventListener('input', () => {
+            const length = observaciones.value.length;
+            charCounter.textContent = `${length}/${MAX_OBS}`;
+            charCounter.classList.toggle('text-rose-500', length >= MAX_OBS);
+            onLiveFieldChange();
+        });
+
+        [tipoCargo, nombrePersona, clienteGenero, nombreCliente, cantidadTickets, horaPrimeraInput, horaSegundaInput, horaUltimaInput].forEach(el => {
+            el.addEventListener('input', () => {
+                if (el === nombrePersona) validateNombre();
+                onLiveFieldChange();
+            });
+            el.addEventListener('change', onLiveFieldChange);
+        });
+
+        // ==================== ACTUALIZAR ESTADO DE PAGO ====================
+        function actualizarDeuda() {
+            const totalCents = Math.round(parseNumberAR(valorTotal.value) * 100);
+            const pagadoCents = Math.round(parseNumberAR(montoPagado.value) * 100);
+
+            if (totalCents <= 0 && pagadoCents <= 0) {
+                deudaIndicador.classList.add('hidden');
+                return;
+            }
+
+            if (totalCents <= 0 && pagadoCents > 0) {
+                deudaIndicador.className = 'p-3.5 rounded-xl border bg-blue-50 dark:bg-blue-950/40 border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-200 text-xs flex items-center justify-between gap-3 transition-all';
+                deudaDetalle.textContent = 'Ingresa el Valor Total para comparar el pago';
+                deudaTexto.textContent = formatMoneyPlainAR(pagadoCents / 100);
+                return;
+            }
+
+            if (!montoPagado.value.trim()) {
+                deudaIndicador.classList.add('hidden');
+                return;
+            }
+
+            const saldoCents = totalCents - pagadoCents;
+
+            if (saldoCents < 0) {
+                const exceso = Math.abs(saldoCents) / 100;
+                deudaIndicador.className = 'p-3.5 rounded-xl border bg-rose-50 dark:bg-rose-950/50 border-rose-300 dark:border-rose-700 text-rose-800 dark:text-rose-200 text-xs flex items-center justify-between gap-3 transition-all';
+                deudaDetalle.textContent = '⚠️ EXCESO DE PAGO (Sobrepago al cliente)';
+                deudaTexto.textContent = `+${formatMoneyPlainAR(exceso)}`;
+            } else if (saldoCents > 0) {
+                deudaIndicador.className = 'p-3.5 rounded-xl border bg-amber-50 dark:bg-amber-950/50 border-amber-300 dark:border-amber-700 text-amber-900 dark:text-amber-200 text-xs flex items-center justify-between gap-3 transition-all';
+                deudaDetalle.textContent = '💳 PAGO PARCIAL / PENDIENTE DE ABONAR';
+                deudaTexto.textContent = `-${formatMoneyPlainAR(saldoCents / 100)}`;
+            } else {
+                deudaIndicador.className = 'p-3.5 rounded-xl border bg-emerald-50 dark:bg-emerald-950/50 border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-200 text-xs flex items-center justify-between gap-3 transition-all';
+                deudaDetalle.textContent = '✅ PAGO EXACTO CANCELADO EN SU TOTALIDAD';
+                deudaTexto.textContent = 'Dif: $0,00';
+            }
+        }
+
+        // ==================== CONSTRUCCIÓN DE ACTA Y VISTA PREVIA EN VIVO ====================
+        function buildDraftData() {
+            const now = new Date();
+            const horaActual = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+            const cargoVal = tipoCargo.value.trim();
+            const nombreVal = nombrePersona.value.trim();
+            const generoVal = clienteGenero.value;
+            const cliNombreVal = nombreCliente.value.trim();
+            const qtyNum = Math.max(0, parseInt(cantidadTickets.value, 10) || 0);
+            const totalNum = parseNumberAR(valorTotal.value);
+            const pagadoNum = parseNumberAR(montoPagado.value);
+            const dejaProp = dejaPropinaSelect.value === 'si';
+            const propinaNum = parseNumberAR(montoPropinaInput.value);
+            const obsVal = observaciones.value.trim();
+
+            const h1 = horaPrimeraInput.value || horaActual;
+            const h2 = horaSegundaInput.value || horaPrimeraInput.value || horaActual;
+            const h3 = horaUltimaInput.value || horaSegundaInput.value || horaActual;
+
+            const staffStr = [cargoVal || 'Cargo', nombreVal || 'Nombre'].join(' ');
+            const clienteCompleto = cliNombreVal ? `${generoVal} ${cliNombreVal}` : generoVal;
+            const palabraTickets = qtyNum === 1 ? 'ticket' : 'tickets';
+            const pronombrePropina = generoVal.startsWith('Clienta') ? 'la misma' : 'el mismo';
+
+            const totalStr = totalNum > 0 ? formatMoneyPlainAR(totalNum) : '$000.000,00';
+            const pagadoStr = pagadoNum > 0 ? formatMoneyPlainAR(pagadoNum) : '$000.000,00';
+            const propinaStr = propinaNum > 0 ? formatMoneyPlainAR(propinaNum) : '$0.000,00';
+
+            const p1Plain = `A las ${h1} Hs. CCTV recibe llamada de ${staffStr}, informa que recibió de ${clienteCompleto} ${qtyNum} ${palabraTickets} para cambio por valor de ${totalStr}.-`;
+            const p2Plain = `A las ${h2} Hs. ${staffStr} redime ${qtyNum} ${palabraTickets}.-`;
+
+            const propinaPlain = dejaProp ? `, ${pronombrePropina} deja en concepto de propina ${propinaStr}` : '';
+            const p3Plain = `A las ${h3} Hs. ${staffStr} cancela en ventanilla de caja ${pagadoStr} a ${clienteCompleto}${propinaPlain}.-`;
+
+            const plainLines = [p1Plain, p2Plain, p3Plain];
+            if (obsVal) plainLines.push(`Observaciones: ${obsVal}`);
+
+            const clsStaff = (cargoVal && nombreVal) ? 'highlight-var' : 'highlight-pending';
+            const clsQty = qtyNum > 0 ? 'highlight-var' : 'highlight-pending';
+            const clsTotal = totalNum > 0 ? 'highlight-var' : 'highlight-pending';
+            const clsPagado = pagadoNum > 0 ? 'highlight-var' : 'highlight-pending';
+            const clsPropina = propinaNum > 0 ? 'highlight-var' : 'highlight-pending';
+
+            const p1Html = `A las <span class="highlight-var">${escapeHtml(h1)}</span> Hs. CCTV recibe llamada de <span class="${clsStaff}">${escapeHtml(staffStr)}</span>, informa que recibió de <span class="highlight-var">${escapeHtml(clienteCompleto)}</span> <span class="${clsQty}">${qtyNum}</span> ${palabraTickets} para cambio por valor de <span class="${clsTotal}">${totalStr}</span>.-`;
+            const p2Html = `A las <span class="highlight-var">${escapeHtml(h2)}</span> Hs. <span class="${clsStaff}">${escapeHtml(staffStr)}</span> redime <span class="${clsQty}">${qtyNum}</span> ${palabraTickets}.-`;
+            const propinaHtml = dejaProp ? `, ${pronombrePropina} deja en concepto de propina <span class="${clsPropina}">${propinaStr}</span>` : '';
+            const p3Html = `A las <span class="highlight-var">${escapeHtml(h3)}</span> Hs. <span class="${clsStaff}">${escapeHtml(staffStr)}</span> cancela en ventanilla de caja <span class="${clsPagado}">${pagadoStr}</span> a <span class="highlight-var">${escapeHtml(clienteCompleto)}</span>${propinaHtml}.-`;
+
+            let htmlPreview = `<p>${p1Html}</p><p>${p2Html}</p><p>${p3Html}</p>`;
+            if (obsVal) {
+                htmlPreview += `<p class="pt-1 border-t border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300"><b>Observaciones:</b> ${escapeHtml(obsVal)}</p>`;
+            }
+
+            return {
+                cargoVal,
+                nombreVal,
+                generoVal,
+                cliNombreVal,
+                clienteCompleto,
+                qtyNum,
+                totalNum,
+                pagadoNum,
+                dejaProp,
+                propinaNum,
+                obsVal,
+                plainLines,
+                fullText: plainLines.join('\n'),
+                htmlPreview
+            };
+        }
+
+        function onLiveFieldChange() {
+            isViewingSavedOrEdited = false;
+            reportIdBadge.classList.add('hidden');
+            previewHeaderTitle.textContent = 'Vista Previa en Vivo';
+            checkTimeOrder();
+            const draft = buildDraftData();
+            liveVisualPreview.innerHTML = draft.htmlPreview;
+            reporteDiv.textContent = draft.fullText;
+        }
+
+        function renderPlainIntoPreview(text) {
+            const lines = String(text || '').split(/\r?\n/).filter(l => l.trim() !== '');
+            liveVisualPreview.innerHTML = lines.map(l => `<p>${escapeHtml(l)}</p>`).join('');
+            reporteDiv.textContent = text;
+        }
+
+        // ==================== GENERAR Y GUARDAR REPORTE ====================
+        function validateFormBeforeGenerate(draft) {
+            if (!validateNombre()) {
+                showNotification('Revisa el formato del nombre del personal', 'error');
+                nombrePersona.focus();
+                return false;
+            }
+            if (!draft.cargoVal) {
+                showNotification('Ingresa el cargo del personal', 'error');
+                tipoCargo.focus();
+                return false;
+            }
+            if (!draft.nombreVal) {
+                showNotification('Ingresa el nombre del personal', 'error');
+                nombrePersona.focus();
+                return false;
+            }
+            if (draft.qtyNum <= 0) {
+                showNotification('Ingresa una cantidad válida de tickets', 'error');
+                cantidadTickets.focus();
+                return false;
+            }
+            if (draft.totalNum <= 0) {
+                showNotification('Ingresa el Valor Total de los tickets', 'error');
+                valorTotal.focus();
+                return false;
+            }
+            if (draft.pagadoNum <= 0) {
+                showNotification('Ingresa el Monto Pagado', 'error');
+                montoPagado.focus();
+                return false;
+            }
+            if (draft.dejaProp && draft.propinaNum <= 0) {
+                showNotification('Marcaste que deja propina: ingresa el monto de propina', 'error');
+                montoPropinaInput.focus();
+                return false;
+            }
             return true;
         }
-    }
 
-    document.getElementById('nombrePersona').addEventListener('input', validateNombre);
+        function generateReport(e) {
+            if (e) e.preventDefault();
+            const draft = buildDraftData();
+            if (!validateFormBeforeGenerate(draft)) return;
 
-    // ==================== FORMATEO DE NÚMEROS ====================
-    [valorTotal, montoPagado].forEach(input => {
-        input.addEventListener('blur', e => {
-            const num = parseNumberAR(e.target.value);
-            e.target.value = toNumberStringAR(num);
-            actualizarDeuda();
-        });
-        input.addEventListener('input', actualizarDeuda);
-    });
+            const now = new Date();
+            const saldo = draft.totalNum - draft.pagadoNum;
 
-    const dejaPropinaSelect = document.getElementById('dejaPropina');
-    const montoPropinaContainer = document.getElementById('montoPropinaContainer');
-    const montoPropinaInput = document.getElementById('montoPropina');
+            const nuevoReporte = {
+                id: Date.now(),
+                text: draft.fullText,
+                timestamp: now.toLocaleString('es-AR'),
+                fecha: now.toLocaleDateString('es-AR'),
+                nombre: draft.nombreVal,
+                cargo: draft.cargoVal,
+                clienteGenero: draft.generoVal,
+                nombreCliente: draft.cliNombreVal,
+                cliente: draft.clienteCompleto,
+                cantidad: draft.qtyNum,
+                total: draft.totalNum,
+                pagado: draft.pagadoNum,
+                saldo: saldo,
+                propina: draft.dejaProp ? draft.propinaNum : 0
+            };
 
-    dejaPropinaSelect.addEventListener('change', (e) => {
-        if (e.target.value === 'si') {
-            montoPropinaContainer.classList.remove('hidden');
-        } else {
-            montoPropinaContainer.classList.add('hidden');
-            montoPropinaInput.value = '';
-        }
-    });
+            historial.unshift(nuevoReporte);
+            if (historial.length > MAX_HISTORY) historial.pop();
+            try {
+                localStorage.setItem('ticketHistorial', JSON.stringify(historial));
+                localStorage.setItem('lastStaffPalVar', JSON.stringify({
+                    nombre: draft.nombreVal,
+                    tipoCargo: draft.cargoVal
+                }));
+            } catch (err) { }
 
-    montoPropinaInput.addEventListener('blur', e => {
-        if (e.target.value) {
-            const num = parseNumberAR(e.target.value);
-            e.target.value = toNumberStringAR(num);
-        }
-    });
+            reportIdSpan.textContent = String(nuevoReporte.id).slice(-6);
+            reportIdBadge.classList.remove('hidden');
+            previewHeaderTitle.textContent = 'Reporte Generado';
+            liveVisualPreview.innerHTML = draft.htmlPreview;
+            reporteDiv.textContent = draft.fullText;
+            timestampElement.textContent = `Guardado en historial el: ${nuevoReporte.timestamp}`;
 
-    // Contador de caracteres
-    observaciones.addEventListener('input', () => {
-        const length = observaciones.value.length;
-        charCounter.textContent = `${length}/${MAX_OBS}`;
-        if (length > MAX_OBS) {
-            observaciones.value = observaciones.value.substring(0, MAX_OBS);
-            charCounter.classList.add('text-red-500');
-        } else {
-            charCounter.classList.remove('text-red-500');
-        }
-    });
-
-    // ==================== ACTUALIZAR DEUDA ====================
-    function actualizarDeuda() {
-        const total = parseNumberAR(valorTotal.value);
-        const pagado = parseNumberAR(montoPagado.value);
-        const saldo = total - pagado;
-
-        if (total === 0 || isNaN(total)) {
-            deudaIndicador.classList.add('hidden');
-            return;
-        }
-
-        deudaIndicador.classList.remove('hidden');
-
-        if (pagado > total) {
-            const exceso = pagado - total;
-            deudaTexto.textContent = formatCurrencyAR(exceso);
-            deudaDetalle.textContent = '⚠️ EXCESO DE PAGO - Revisar con el cliente';
-            deudaIndicador.className = 'mb-4 p-4 rounded-lg bg-red-100';
-            deudaTexto.className = 'text-lg font-bold text-red-700';
-        } else if (saldo > 0) {
-            deudaTexto.textContent = formatCurrencyAR(saldo);
-            deudaDetalle.textContent = '💳 PAGO PENDIENTE - El cliente debe abonar esta diferencia';
-            deudaIndicador.className = 'mb-4 p-4 rounded-lg bg-yellow-100';
-            deudaTexto.className = 'text-lg font-bold text-yellow-700';
-        } else {
-            deudaTexto.textContent = '✓ PAGADO';
-            deudaDetalle.textContent = '✅ El cliente ha cancelado la totalidad del monto';
-            deudaIndicador.className = 'mb-4 p-4 rounded-lg bg-green-100';
-            deudaTexto.className = 'text-lg font-bold text-green-700';
-        }
-    }
-
-    // ==================== GENERAR REPORTE ====================
-    function generateReport(e) {
-        e.preventDefault();
-
-        if (!validateNombre()) {
-            showNotification('Revise el formato del nombre', 'error');
-            return;
-        }
-
-        const nombre = document.getElementById('nombrePersona').value.trim();
-        const clienteGenero = document.getElementById('clienteGenero').value;
-        const nombreCliente = document.getElementById('nombreCliente').value.trim();
-        const cantidad = Number(document.getElementById('cantidadTickets').value);
-        const total = parseNumberAR(valorTotal.value);
-        const pagado = parseNumberAR(montoPagado.value);
-        let cargo = tipoCargo.value.trim();
-        const obs = observaciones.value.trim();
-        const horaPrimera = document.getElementById('horaPrimeraOperacion').value;
-        const horaSegunda = document.getElementById('horaSegundaOperacion').value;
-        const horaUltimaInput = document.getElementById('horaUltimaOperacion');
-        const horaUltima = horaUltimaInput ? horaUltimaInput.value : '';
-        const dejaPropina = document.getElementById('dejaPropina').value;
-        const montoPropinaText = document.getElementById('montoPropina').value.trim();
-
-        if (!nombre || !cantidad || !total || !pagado || !cargo) {
-            showNotification('Complete todos los campos obligatorios', 'error');
-            return;
-        }
-
-        const fecha = new Date();
-        const horaActual = fecha.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', hour12: false });
-        const fechaCompleta = fecha.toLocaleDateString('es-AR');
-        
-        const horaPrimeraLinea = horaPrimera || horaActual;
-        const horaSegundaLinea = horaSegunda || horaPrimera || horaActual;
-        const horaTerceraLinea = horaUltima || horaActual;
-        
-        const clienteCompleto = nombreCliente ? `${clienteGenero} ${nombreCliente}` : clienteGenero;
-
-        let propinaTexto = '';
-        if (dejaPropina === 'si' && montoPropinaText) {
-            propinaTexto = `, el mismo deja en concepto de propina $${montoPropinaText}`;
-        }
-
-        let reportText = `A las ${horaPrimeraLinea} Hs. CCTV recibe llamada de ${cargo} ${nombre}, informa que recibió de ${clienteCompleto}, ${cantidad} tickets para cambio por valor de ${formatCurrencyAR(total)}.-
-A las ${horaSegundaLinea} Hs. ${cargo} ${nombre} redime ${cantidad} tickets.-
-A las ${horaTerceraLinea} Hs. ${cargo} ${nombre} cancela en ventanilla de caja ${formatCurrencyAR(pagado)} a ${clienteCompleto}${propinaTexto}.-
-${obs ? `Observaciones: ${obs}` : ''}`;
-
-        reporteDiv.textContent = reportText;
-        
-        const saldo = total - pagado;
-        const nuevoReporte = {
-            id: Date.now(),
-            text: reportText,
-            timestamp: new Date().toLocaleString('es-AR'),
-            fecha: fechaCompleta,
-            nombre: nombre,
-            cargo: cargo,
-            cliente: clienteCompleto,
-            cantidad: cantidad,
-            total: total,
-            pagado: pagado,
-            saldo: saldo,
-            propina: (dejaPropina === 'si' && montoPropinaText) ? parseNumberAR(montoPropinaText) : 0
-        };
-        
-        historial.unshift(nuevoReporte);
-        if (historial.length > MAX_HISTORY) historial.pop();
-        localStorage.setItem('ticketHistorial', JSON.stringify(historial));
-        
-        localStorage.setItem('lastClient', JSON.stringify({
-            nombre: nombre,
-            clienteGenero: clienteGenero,
-            nombreCliente: nombreCliente,
-            cargo: cargo,
-            tipoCargo: tipoCargo.value
-        }));
-        
-        reportIdSpan.textContent = nuevoReporte.id;
-        reportContainer.classList.remove('hidden');
-        noReport.classList.add('hidden');
-        timestampElement.textContent = `Generado el: ${new Date().toLocaleString('es-AR')}`;
-        
-        actualizarHistorial();
-        actualizarStatsBadge();
-        showNotification('Reporte generado exitosamente');
-    }
-
-    formTickets.addEventListener('submit', generateReport);
-
-    // ==================== HISTORIAL ====================
-    function actualizarHistorial(filter = '') {
-        let filtrados = [...historial];
-        if (filter) {
-            const lowerFilter = filter.toLowerCase();
-            filtrados = filtrados.filter(item => 
-                (item.nombre || '').toLowerCase().includes(lowerFilter) ||
-                (item.cliente || '').toLowerCase().includes(lowerFilter) ||
-                (item.cargo || '').toLowerCase().includes(lowerFilter) ||
-                (item.timestamp || '').toLowerCase().includes(lowerFilter)
-            );
-        }
-        
-        if (filtrados.length === 0) {
-            historyList.innerHTML = '';
-            noHistoryMsg.classList.remove('hidden');
-            return;
-        }
-        
-        noHistoryMsg.classList.add('hidden');
-        historyList.innerHTML = filtrados.map(item => `
-            <div class="history-item p-2 rounded-lg cursor-pointer transition-all bg-slate-50 hover:bg-indigo-50 border border-slate-200" onclick="cargarReporte(${item.id})">
-                <div class="flex items-center justify-between">
-                    <div class="flex-1">
-                        <div class="text-xs font-semibold text-slate-700">${item.nombre} (${item.cargo})</div>
-                        <div class="text-[10px] text-slate-500">${item.timestamp}</div>
-                        <div class="text-[10px] text-indigo-600">${formatCurrencyAR(item.total)}</div>
-                    </div>
-                    <button onclick="event.stopPropagation(); eliminarReporte(${item.id})" class="p-1 hover:bg-red-100 rounded transition" title="Eliminar">
-                        <i data-lucide="trash-2" class="w-3 h-3 text-red-500"></i>
-                    </button>
-                </div>
-            </div>
-        `).join('');
-        lucide.createIcons();
-    }
-
-    function cargarReporte(id) {
-        const reporte = historial.find(h => h.id === id);
-        if (reporte) {
-            reporteDiv.textContent = reporte.text;
-            timestampElement.textContent = `Generado el: ${reporte.timestamp}`;
-            reportIdSpan.textContent = reporte.id;
-            reportContainer.classList.remove('hidden');
-            noReport.classList.add('hidden');
-            showNotification('Reporte cargado');
-        }
-    }
-
-    function eliminarReporte(id) {
-        if (confirm('¿Eliminar este reporte del historial?')) {
-            historial = historial.filter(h => h.id !== id);
-            localStorage.setItem('ticketHistorial', JSON.stringify(historial));
+            checkLastStaffButton();
             actualizarHistorial(searchHistorial.value);
             actualizarStatsBadge();
-            showNotification('Reporte eliminado', 'info');
+            showNotification('Reporte generado y guardado en el historial');
         }
-    }
 
-    document.getElementById('clearHistoryBtn').addEventListener('click', () => {
-        if (confirm('⚠️ ¿Eliminar TODO el historial? Esta acción es irreversible')) {
-            historial = [];
-            localStorage.setItem('ticketHistorial', JSON.stringify(historial));
-            actualizarHistorial();
-            actualizarStatsBadge();
-            showNotification('Historial completamente limpiado', 'info');
-        }
-    });
+        formTickets.addEventListener('submit', generateReport);
 
-    searchHistorial.addEventListener('input', () => {
-        actualizarHistorial(searchHistorial.value);
-    });
-
-    // ==================== ESTADÍSTICAS ====================
-    function actualizarStatsBadge() {
-        const total = historial.length;
-        statsBadge.innerHTML = `📊 ${total} reportes`;
-    }
-
-    function mostrarEstadisticas() {
-        const total = historial.length;
-        const totalPagado = historial.reduce((sum, h) => sum + (h.pagado || 0), 0);
-        const totalTickets = historial.reduce((sum, h) => sum + (h.cantidad || 0), 0);
-        const totalValor = historial.reduce((sum, h) => sum + (h.total || 0), 0);
-        const deudaPendiente = historial.reduce((sum, h) => sum + ((h.saldo || 0) > 0 ? (h.saldo || 0) : 0), 0);
-        const totalPropina = historial.reduce((sum, h) => sum + (h.propina || 0), 0);
-        
-        const content = document.getElementById('statsContent');
-        content.innerHTML = `
-            <div class="space-y-3">
-                <div class="bg-indigo-50 p-3 rounded-lg">
-                    <div class="text-xs text-slate-500">Total Reportes</div>
-                    <div class="text-2xl font-bold text-indigo-600">${total}</div>
-                </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <div class="bg-green-50 p-3 rounded-lg">
-                        <div class="text-xs text-slate-500">Total Pagado</div>
-                        <div class="text-lg font-bold text-green-600">${formatCurrencyAR(totalPagado)}</div>
-                    </div>
-                    <div class="bg-emerald-50 p-3 rounded-lg">
-                        <div class="text-xs text-slate-500">Total Propinas</div>
-                        <div class="text-lg font-bold text-emerald-600">${formatCurrencyAR(totalPropina)}</div>
-                    </div>
-                </div>
-                <div class="grid grid-cols-2 gap-3 mt-3">
-                    <div class="bg-blue-50 p-3 rounded-lg">
-                        <div class="text-xs text-slate-500">Total Tickets</div>
-                        <div class="text-lg font-bold text-blue-600">${totalTickets}</div>
-                    </div>
-                    <div class="bg-purple-50 p-3 rounded-lg">
-                        <div class="text-xs text-slate-500">Valor Total Procesado</div>
-                        <div class="text-lg font-bold text-purple-600">${formatCurrencyAR(totalValor)}</div>
-                    </div>
-                </div>
-                ${deudaPendiente > 0 ? `
-                <div class="bg-yellow-50 p-3 rounded-lg mt-3">
-                    <div class="text-xs text-slate-500">Deuda Pendiente Acumulada</div>
-                    <div class="text-xl font-bold text-yellow-600">${formatCurrencyAR(deudaPendiente)}</div>
-                </div>
-                ` : ''}
-            </div>
-        `;
-        document.getElementById('statsModal').classList.remove('hidden');
-        lucide.createIcons();
-    }
-
-    statsBadge.addEventListener('click', mostrarEstadisticas);
-    document.getElementById('statsBtn').addEventListener('click', mostrarEstadisticas);
-
-    function closeStatsModal() {
-        document.getElementById('statsModal').classList.add('hidden');
-    }
-
-    // ==================== EDICIÓN ====================
-    function openEditModal() {
-        const currentText = reporteDiv.textContent;
-        if (!currentText) {
-            showNotification('No hay reporte para editar', 'error');
-            return;
-        }
-        document.getElementById('editReportContent').value = currentText;
-        document.getElementById('editModal').classList.remove('hidden');
-    }
-
-    function closeEditModal() {
-        document.getElementById('editModal').classList.add('hidden');
-    }
-
-    function saveEditedReport() {
-        const newText = document.getElementById('editReportContent').value;
-        if (newText.trim()) {
-            reporteDiv.textContent = newText;
-            timestampElement.textContent = `Editado el: ${new Date().toLocaleString('es-AR')}`;
-            
-            const currentId = parseInt(reportIdSpan.textContent);
-            const index = historial.findIndex(h => h.id === currentId);
-            if (index !== -1) {
-                historial[index].text = newText;
-                historial[index].timestamp = new Date().toLocaleString('es-AR');
-                localStorage.setItem('ticketHistorial', JSON.stringify(historial));
-                actualizarHistorial(searchHistorial.value);
-                showNotification('Reporte actualizado');
+        // ==================== PERSONAL RECIENTE ====================
+        function checkLastStaffButton() {
+            const btn = document.getElementById('loadLastStaffBtn');
+            try {
+                const saved = JSON.parse(localStorage.getItem('lastStaffPalVar') || localStorage.getItem('lastClient') || 'null');
+                btn.classList.toggle('hidden', !(saved && (saved.nombre || saved.tipoCargo)));
+            } catch (e) {
+                btn.classList.add('hidden');
             }
         }
-        closeEditModal();
-    }
 
-    document.getElementById('editReportBtn').addEventListener('click', openEditModal);
-
-    // ==================== EXPORTAR PDF ====================
-    async function exportToPDF() {
-        if (!reporteDiv.textContent) {
-            showNotification('Genere un reporte primero', 'error');
-            return;
-        }
-        
-        const element = document.createElement('div');
-        element.innerHTML = `<div style="padding:20px;font-family:monospace;white-space:pre-wrap;">${reporteDiv.textContent}</div>`;
-        
-        const opt = {
-            margin: [0.5, 0.5, 0.5, 0.5],
-            filename: `reporte-tickets-${Date.now()}.pdf`,
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2 },
-            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-        };
-        
-        showNotification('Generando PDF...', 'info');
-        html2pdf().set(opt).from(element).save();
-    }
-
-    document.getElementById('exportPDFBtn').addEventListener('click', exportToPDF);
-    document.getElementById('printReportBtn').addEventListener('click', () => {
-        if (!reporteDiv.textContent) {
-            showNotification('No hay reporte para imprimir', 'error');
-            return;
-        }
-        const ventana = window.open('', '_blank');
-        ventana.document.write(`<html><head><title>Reporte de Tickets</title></head><body style="font-family:monospace;white-space:pre-wrap;padding:20px;">${reporteDiv.textContent}<\/body></html>`);
-        ventana.document.close();
-        ventana.print();
-    });
-
-    // ==================== COPIAR ====================
-    function copyReport() {
-        const texto = reporteDiv.textContent;
-        if (!texto) {
-            showNotification('Genera un reporte primero', 'error');
-            return;
-        }
-        navigator.clipboard.writeText(texto).then(() => {
-            showNotification('¡Copiado al portapapeles!');
-        }).catch(() => {
-            const textarea = document.createElement('textarea');
-            textarea.value = texto;
-            document.body.appendChild(textarea);
-            textarea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textarea);
-            showNotification('¡Copiado al portapapeles!');
-        });
-    }
-
-    document.getElementById('copiarBtn').addEventListener('click', copyReport);
-    document.getElementById('copiarReporteBtn').addEventListener('click', copyReport);
-
-    // ==================== RESET ====================
-    document.getElementById('resetBtn').addEventListener('click', (e) => {
-        if (!confirm('¿Limpiar todos los campos del formulario?')) {
-            e.preventDefault();
-            return;
-        }
-        reportContainer.classList.add('hidden');
-        noReport.classList.remove('hidden');
-        deudaIndicador.classList.add('hidden');
-        showNotification('Formulario limpiado', 'info');
-    });
-
-    // ==================== INICIO ====================
-    document.getElementById('inicioBtn').addEventListener('click', () => {
-        window.location.href = 'index.html';
-    });
-
-    // ==================== ATAJOS TECLADO ====================
-    document.addEventListener('keydown', (e) => {
-        if ((e.ctrlKey || e.metaKey) && e.key === 'g') {
-            e.preventDefault();
-            formTickets.requestSubmit();
-        }
-        if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
-            e.preventDefault();
-            copyReport();
-        }
-        if ((e.ctrlKey || e.metaKey) && e.key === 'r') {
-            e.preventDefault();
-            document.getElementById('resetBtn').click();
-        }
-    });
-
-    // ==================== CARGAR DATOS GUARDADOS ====================
-    function cargarHistorialGuardado() {
-        const saved = localStorage.getItem('ticketHistorial');
-        if (saved) {
+        document.getElementById('loadLastStaffBtn').addEventListener('click', () => {
             try {
-                historial = JSON.parse(saved);
-                if (!Array.isArray(historial)) historial = [];
-            } catch(e) {
+                const saved = JSON.parse(localStorage.getItem('lastStaffPalVar') || localStorage.getItem('lastClient') || 'null');
+                if (saved) {
+                    if (saved.tipoCargo || saved.cargo) tipoCargo.value = saved.tipoCargo || saved.cargo;
+                    if (saved.nombre) nombrePersona.value = saved.nombre;
+                    validateNombre();
+                    onLiveFieldChange();
+                    showNotification('Personal anterior cargado');
+                }
+            } catch (e) { }
+        });
+
+        // ==================== HISTORIAL ====================
+        function actualizarHistorial(filter = '') {
+            let filtrados = [...historial];
+            if (filter.trim()) {
+                const q = filter.trim().toLowerCase();
+                filtrados = filtrados.filter(item =>
+                    (item.nombre || '').toLowerCase().includes(q) ||
+                    (item.cliente || '').toLowerCase().includes(q) ||
+                    (item.cargo || '').toLowerCase().includes(q) ||
+                    (item.timestamp || '').toLowerCase().includes(q)
+                );
+            }
+
+            if (filtrados.length === 0) {
+                historyList.innerHTML = '';
+                noHistoryMsg.classList.remove('hidden');
+                return;
+            }
+
+            noHistoryMsg.classList.add('hidden');
+            historyList.innerHTML = filtrados.map(item => `
+                <div class="p-2.5 rounded-xl cursor-pointer transition bg-slate-50 dark:bg-slate-950 hover:bg-indigo-50/70 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800" onclick="cargarReporte(${Number(item.id)})">
+                    <div class="flex items-center justify-between gap-2">
+                        <div class="min-w-0 flex-1">
+                            <div class="text-xs font-semibold text-slate-800 dark:text-slate-100 truncate">${escapeHtml(item.nombre || '')} (${escapeHtml(item.cargo || '')})</div>
+                            <div class="text-[11px] text-slate-500 dark:text-slate-400 truncate">${escapeHtml(item.cliente || '')} · ${escapeHtml(item.timestamp || '')}</div>
+                            <div class="text-[11px] font-mono font-semibold text-indigo-600 dark:text-indigo-400 mt-0.5">${formatMoneyPlainAR(item.total || 0)} (${Number(item.cantidad || 0)} tk)</div>
+                        </div>
+                        <div class="flex items-center gap-1 shrink-0">
+                            <button type="button" onclick="event.stopPropagation(); rellenarFormularioDesdeHistorial(${Number(item.id)})" class="p-1.5 hover:bg-indigo-100 dark:hover:bg-slate-700 rounded-lg transition cursor-pointer text-slate-500 dark:text-slate-400 hover:text-indigo-600" title="Cargar datos al formulario">
+                                <i data-lucide="corner-up-left" class="w-3.5 h-3.5"></i>
+                            </button>
+                            <button type="button" onclick="event.stopPropagation(); eliminarReporte(${Number(item.id)})" class="p-1.5 hover:bg-rose-100 dark:hover:bg-rose-950 rounded-lg transition cursor-pointer text-rose-500" title="Eliminar">
+                                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function cargarReporte(id) {
+            const reporte = historial.find(h => h.id === id);
+            if (!reporte) return;
+            isViewingSavedOrEdited = true;
+            renderPlainIntoPreview(reporte.text);
+            timestampElement.textContent = `Visualizando reporte del: ${reporte.timestamp}`;
+            reportIdSpan.textContent = String(reporte.id).slice(-6);
+            reportIdBadge.classList.remove('hidden');
+            previewHeaderTitle.textContent = 'Reporte del Historial';
+            showNotification('Reporte cargado en vista previa');
+        }
+
+        function rellenarFormularioDesdeHistorial(id) {
+            const r = historial.find(h => h.id === id);
+            if (!r) return;
+            tipoCargo.value = r.cargo || '';
+            nombrePersona.value = r.nombre || '';
+            if (r.clienteGenero) clienteGenero.value = r.clienteGenero;
+            nombreCliente.value = r.nombreCliente || '';
+            cantidadTickets.value = r.cantidad || '';
+            valorTotal.value = formatInputDisplayAR(r.total || 0);
+            montoPagado.value = formatInputDisplayAR(r.pagado || 0);
+            if (r.propina && r.propina > 0) {
+                dejaPropinaSelect.value = 'si';
+                montoPropinaContainer.classList.remove('hidden');
+                montoPropinaInput.value = formatInputDisplayAR(r.propina);
+            } else {
+                dejaPropinaSelect.value = 'no';
+                montoPropinaContainer.classList.add('hidden');
+                montoPropinaInput.value = '';
+            }
+            validateNombre();
+            actualizarDeuda();
+            onLiveFieldChange();
+            showNotification('Datos restaurados en el formulario');
+        }
+
+        function eliminarReporte(id) {
+            historial = historial.filter(h => h.id !== id);
+            try {
+                localStorage.setItem('ticketHistorial', JSON.stringify(historial));
+            } catch (e) { }
+            actualizarHistorial(searchHistorial.value);
+            actualizarStatsBadge();
+            showNotification('Reporte eliminado');
+        }
+
+        document.getElementById('clearHistoryBtn').addEventListener('click', () => {
+            if (historial.length === 0) return;
+            if (confirm('¿Vaciar todo el historial de reportes guardado?')) {
+                historial = [];
+                try {
+                    localStorage.setItem('ticketHistorial', JSON.stringify(historial));
+                } catch (e) { }
+                actualizarHistorial();
+                actualizarStatsBadge();
+                showNotification('Historial vaciado');
+            }
+        });
+
+        searchHistorial.addEventListener('input', () => {
+            actualizarHistorial(searchHistorial.value);
+        });
+
+        // ==================== ESTADÍSTICAS Y CSV ====================
+        function actualizarStatsBadge() {
+            const total = historial.length;
+            statsBadge.textContent = `${total} ${total === 1 ? 'reporte' : 'reportes'}`;
+        }
+
+        function mostrarEstadisticas() {
+            const total = historial.length;
+            const totalPagado = historial.reduce((sum, h) => sum + (Number(h.pagado) || 0), 0);
+            const totalTickets = historial.reduce((sum, h) => sum + (Number(h.cantidad) || 0), 0);
+            const totalValor = historial.reduce((sum, h) => sum + (Number(h.total) || 0), 0);
+            const deudaPendiente = historial.reduce((sum, h) => sum + ((Number(h.saldo) || 0) > 0 ? Number(h.saldo) : 0), 0);
+            const totalPropina = historial.reduce((sum, h) => sum + (Number(h.propina) || 0), 0);
+
+            document.getElementById('statsContent').innerHTML = `
+                <div class="space-y-3">
+                    <div class="bg-indigo-50 dark:bg-indigo-950/50 p-3.5 rounded-xl border border-indigo-100 dark:border-indigo-900">
+                        <div class="text-xs text-slate-500 dark:text-slate-400">Total Reportes Registrados</div>
+                        <div class="text-2xl font-bold text-indigo-600 dark:text-indigo-400">${total}</div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="bg-emerald-50 dark:bg-emerald-950/40 p-3 rounded-xl border border-emerald-100 dark:border-emerald-900">
+                            <div class="text-xs text-slate-500 dark:text-slate-400">Total Pagado</div>
+                            <div class="text-base font-mono font-bold text-emerald-700 dark:text-emerald-400 mt-0.5">${formatMoneyPlainAR(totalPagado)}</div>
+                        </div>
+                        <div class="bg-teal-50 dark:bg-teal-950/40 p-3 rounded-xl border border-teal-100 dark:border-teal-900">
+                            <div class="text-xs text-slate-500 dark:text-slate-400">Total Propinas</div>
+                            <div class="text-base font-mono font-bold text-teal-700 dark:text-teal-400 mt-0.5">${formatMoneyPlainAR(totalPropina)}</div>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="bg-blue-50 dark:bg-blue-950/40 p-3 rounded-xl border border-blue-100 dark:border-blue-900">
+                            <div class="text-xs text-slate-500 dark:text-slate-400">Total Tickets</div>
+                            <div class="text-base font-mono font-bold text-blue-700 dark:text-blue-400 mt-0.5">${totalTickets}</div>
+                        </div>
+                        <div class="bg-purple-50 dark:bg-purple-950/40 p-3 rounded-xl border border-purple-100 dark:border-purple-900">
+                            <div class="text-xs text-slate-500 dark:text-slate-400">Valor Tickets</div>
+                            <div class="text-base font-mono font-bold text-purple-700 dark:text-purple-400 mt-0.5">${formatMoneyPlainAR(totalValor)}</div>
+                        </div>
+                    </div>
+                    ${deudaPendiente > 0 ? `
+                    <div class="bg-amber-50 dark:bg-amber-950/40 p-3 rounded-xl border border-amber-200 dark:border-amber-800">
+                        <div class="text-xs text-amber-800 dark:text-amber-300">Saldo Pendiente Acumulado</div>
+                        <div class="text-lg font-mono font-bold text-amber-700 dark:text-amber-400">${formatMoneyPlainAR(deudaPendiente)}</div>
+                    </div>` : ''}
+                </div>
+            `;
+            document.getElementById('statsModal').classList.remove('hidden');
+        }
+
+        statsBadge.addEventListener('click', mostrarEstadisticas);
+        document.getElementById('statsBtn').addEventListener('click', mostrarEstadisticas);
+
+        function closeStatsModal() {
+            document.getElementById('statsModal').classList.add('hidden');
+        }
+
+        function exportHistoryCSV() {
+            if (historial.length === 0) {
+                showNotification('No hay reportes en el historial para exportar', 'error');
+                return;
+            }
+            const headers = ['Fecha y Hora', 'Cargo', 'Personal', 'Cliente', 'Tickets', 'Valor Total', 'Monto Pagado', 'Propina', 'Texto Acta'];
+            const rows = historial.map(h => [
+                `"${String(h.timestamp || '').replace(/"/g, '""')}"`,
+                `"${String(h.cargo || '').replace(/"/g, '""')}"`,
+                `"${String(h.nombre || '').replace(/"/g, '""')}"`,
+                `"${String(h.cliente || '').replace(/"/g, '""')}"`,
+                Number(h.cantidad || 0),
+                Number(h.total || 0).toFixed(2).replace('.', ','),
+                Number(h.pagado || 0).toFixed(2).replace('.', ','),
+                Number(h.propina || 0).toFixed(2).replace('.', ','),
+                `"${String(h.text || '').replace(/\r?\n/g, ' | ').replace(/"/g, '""')}"`
+            ].join(';'));
+
+            const csv = '\uFEFF' + [headers.join(';'), ...rows].join('\r\n');
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `palvar_historial_${new Date().toISOString().slice(0, 10)}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showNotification('Historial CSV descargado');
+        }
+
+        // ==================== EDICIÓN MANUAL ====================
+        function openEditModal() {
+            const currentText = reporteDiv.textContent;
+            if (!currentText) return;
+            document.getElementById('editReportContent').value = currentText;
+            document.getElementById('editModal').classList.remove('hidden');
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').classList.add('hidden');
+        }
+
+        function saveEditedReport() {
+            const newText = document.getElementById('editReportContent').value.trim();
+            if (!newText) return;
+
+            isViewingSavedOrEdited = true;
+            renderPlainIntoPreview(newText);
+            timestampElement.textContent = `Editado manualmente el: ${new Date().toLocaleString('es-AR')}`;
+
+            if (!reportIdBadge.classList.contains('hidden')) {
+                const suffix = reportIdSpan.textContent;
+                const index = historial.findIndex(h => String(h.id).slice(-6) === suffix);
+                if (index !== -1) {
+                    historial[index].text = newText;
+                    historial[index].timestamp = new Date().toLocaleString('es-AR');
+                    try {
+                        localStorage.setItem('ticketHistorial', JSON.stringify(historial));
+                    } catch (e) { }
+                    actualizarHistorial(searchHistorial.value);
+                }
+            }
+            closeEditModal();
+            showNotification('Texto del reporte actualizado');
+        }
+
+        document.getElementById('editReportBtn').addEventListener('click', openEditModal);
+
+        // ==================== COPIAR, IMPRIMIR Y PDF ====================
+        async function copyTextSafe(text) {
+            if (navigator.clipboard && window.isSecureContext) {
+                try {
+                    await navigator.clipboard.writeText(text);
+                    return true;
+                } catch (e) { }
+            }
+            const fb = document.getElementById('clipboardFallback');
+            fb.value = text;
+            fb.select();
+            fb.setSelectionRange(0, 999999);
+            try {
+                return document.execCommand('copy');
+            } catch (e) {
+                return false;
+            }
+        }
+
+        async function copyReport() {
+            if (!isViewingSavedOrEdited) {
+                const draft = buildDraftData();
+                if (!validateFormBeforeGenerate(draft)) return;
+            }
+            const texto = reporteDiv.textContent.trim();
+            if (!texto) return;
+
+            const ok = await copyTextSafe(texto);
+            if (ok) showNotification('¡Acta copiada al portapapeles!');
+            else showNotification('No se pudo copiar automáticamente', 'error');
+        }
+
+        async function copyStageLine(lineIdx) {
+            const lines = reporteDiv.textContent.split(/\r?\n/);
+            const target = (lines[lineIdx] || '').trim();
+            if (!target) {
+                showNotification('No hay texto en esa línea', 'error');
+                return;
+            }
+            const ok = await copyTextSafe(target);
+            if (ok) showNotification(`${lineIdx + 1}° línea copiada al portapapeles`);
+        }
+
+        document.getElementById('copiarBtn').addEventListener('click', copyReport);
+        document.getElementById('copiarReporteBtn').addEventListener('click', copyReport);
+
+        function exportToPDF() {
+            const text = reporteDiv.textContent.trim();
+            if (!text) return;
+            if (!isViewingSavedOrEdited && !validateFormBeforeGenerate(buildDraftData())) return;
+
+            const element = document.createElement('div');
+            element.innerHTML = `
+                <div style="padding:28px;font-family:'Segoe UI',sans-serif;color:#0f172a;">
+                    <h2 style="margin:0 0 6px 0;font-size:18px;">Reporte de Pago Alto (Pal Var)</h2>
+                    <p style="margin:0 0 18px 0;font-size:12px;color:#64748b;">Fecha de emisión: ${escapeHtml(new Date().toLocaleString('es-AR'))}</p>
+                    <div style="padding:16px;border:1px solid #cbd5e1;border-radius:8px;font-family:monospace;font-size:13px;line-height:1.6;white-space:pre-wrap;">${escapeHtml(text)}</div>
+                </div>
+            `;
+
+            const opt = {
+                margin: [0.4, 0.4, 0.4, 0.4],
+                filename: `reporte-palvar-${Date.now()}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+            };
+
+            showNotification('Generando PDF...');
+            html2pdf().set(opt).from(element).save();
+        }
+
+        document.getElementById('exportPDFBtn').addEventListener('click', exportToPDF);
+
+        document.getElementById('printReportBtn').addEventListener('click', () => {
+            const text = reporteDiv.textContent.trim();
+            if (!text) return;
+            if (!isViewingSavedOrEdited && !validateFormBeforeGenerate(buildDraftData())) return;
+
+            const ventana = window.open('', '_blank');
+            if (!ventana) {
+                showNotification('Habilita las ventanas emergentes para imprimir', 'error');
+                return;
+            }
+            ventana.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Reporte Pal Var<\/title><\/head><body style="font-family:'Segoe UI',sans-serif;padding:32px;color:#0f172a;"><h2 style="margin:0 0 6px 0;">Reporte de Pago Alto - Pal Var<\/h2><p style="margin:0 0 20px 0;font-size:12px;color:#64748b;">Emitido: ${escapeHtml(new Date().toLocaleString('es-AR'))}<\/p><div style="font-family:monospace;white-space:pre-wrap;line-height:1.65;border:1px solid #cbd5e1;padding:16px;border-radius:8px;">${escapeHtml(text)}<\/div><\/body><\/html>`);
+            ventana.document.close();
+            ventana.focus();
+            ventana.print();
+        });
+
+        // ==================== LIMPIAR CON OPCIÓN DESHACER ====================
+        function resetAllFields() {
+            lastResetSnapshot = {
+                tipoCargo: tipoCargo.value,
+                nombrePersona: nombrePersona.value,
+                clienteGenero: clienteGenero.value,
+                nombreCliente: nombreCliente.value,
+                cantidadTickets: cantidadTickets.value,
+                valorTotal: valorTotal.value,
+                montoPagado: montoPagado.value,
+                dejaPropina: dejaPropinaSelect.value,
+                montoPropina: montoPropinaInput.value,
+                observaciones: observaciones.value
+            };
+
+            formTickets.reset();
+            montoPropinaContainer.classList.add('hidden');
+            montoPropinaInput.value = '';
+            charCounter.textContent = `0/${MAX_OBS}`;
+            charCounter.classList.remove('text-rose-500');
+            document.getElementById('nombreError').classList.add('hidden');
+            nombrePersona.classList.remove('border-rose-500');
+            deudaIndicador.classList.add('hidden');
+            timestampElement.textContent = 'Completa los datos y presiona "Generar y Guardar" para registrarlo en el historial.';
+
+            fillSequentialTimesNow();
+            onLiveFieldChange();
+            showNotification('Formulario limpiado', 'info', true);
+        }
+
+        function undoFormReset() {
+            if (!lastResetSnapshot) return;
+            tipoCargo.value = lastResetSnapshot.tipoCargo;
+            nombrePersona.value = lastResetSnapshot.nombrePersona;
+            clienteGenero.value = lastResetSnapshot.clienteGenero;
+            nombreCliente.value = lastResetSnapshot.nombreCliente;
+            cantidadTickets.value = lastResetSnapshot.cantidadTickets;
+            valorTotal.value = lastResetSnapshot.valorTotal;
+            montoPagado.value = lastResetSnapshot.montoPagado;
+            dejaPropinaSelect.value = lastResetSnapshot.dejaPropina;
+            montoPropinaInput.value = lastResetSnapshot.montoPropina;
+            montoPropinaContainer.classList.toggle('hidden', lastResetSnapshot.dejaPropina !== 'si');
+            observaciones.value = lastResetSnapshot.observaciones;
+            charCounter.textContent = `${observaciones.value.length}/${MAX_OBS}`;
+
+            lastResetSnapshot = null;
+            actualizarDeuda();
+            onLiveFieldChange();
+            showNotification('Datos restaurados');
+        }
+
+        document.getElementById('resetBtn').addEventListener('click', resetAllFields);
+
+        document.getElementById('inicioBtn').addEventListener('click', () => {
+            window.location.href = 'index.html';
+        });
+
+        // ==================== ATAJOS DE TECLADO (SIN BLOQUEAR COPIADO NATIVO) ====================
+        document.addEventListener('keydown', e => {
+            if (((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'g') || (e.altKey && e.key.toLowerCase() === 'g')) {
+                e.preventDefault();
+                generateReport();
+            } else if (e.altKey && e.key.toLowerCase() === 'l') {
+                e.preventDefault();
+                resetAllFields();
+            } else if (e.key === 'Escape') {
+                closeStatsModal();
+                closeEditModal();
+            }
+        });
+
+        // ==================== NOTIFICACIONES ====================
+        function showNotification(message, type = 'success', withUndo = false) {
+            const notification = document.getElementById('notification');
+            const undoBtn = document.getElementById('undoResetBtn');
+            document.getElementById('notification-text').textContent = message;
+            undoBtn.classList.toggle('hidden', !withUndo);
+
+            if (type === 'error') {
+                notification.className = 'fixed bottom-5 right-5 bg-rose-600 border-rose-400/40 text-white px-4 py-3 rounded-xl shadow-xl flex items-center gap-3 fade-in z-50 border';
+            } else if (type === 'info') {
+                notification.className = 'fixed bottom-5 right-5 bg-slate-800 border-slate-700 text-white px-4 py-3 rounded-xl shadow-xl flex items-center gap-3 fade-in z-50 border';
+            } else {
+                notification.className = 'fixed bottom-5 right-5 bg-emerald-600 border-emerald-400/40 text-white px-4 py-3 rounded-xl shadow-xl flex items-center gap-3 fade-in z-50 border';
+            }
+
+            clearTimeout(notifTimer);
+            notifTimer = setTimeout(() => {
+                notification.classList.add('hidden');
+            }, withUndo ? 5000 : 3000);
+        }
+
+        window.addEventListener('click', event => {
+            if (event.target.classList.contains('modal')) {
+                event.target.classList.add('hidden');
+            }
+        });
+
+        // ==================== INICIALIZAR ====================
+        function initApp() {
+            lucide.createIcons();
+            updateLiveClock();
+            setInterval(updateLiveClock, 1000);
+
+            try {
+                const saved = localStorage.getItem('ticketHistorial');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    if (Array.isArray(parsed)) historial = parsed;
+                }
+            } catch (e) {
                 historial = [];
             }
+
+            checkLastStaffButton();
+            fillSequentialTimesNow();
+            actualizarHistorial();
+            actualizarStatsBadge();
+            actualizarDeuda();
+            onLiveFieldChange();
         }
-        actualizarHistorial();
-        actualizarStatsBadge();
-    }
 
-    function cargarUltimoCliente() {
-        const lastClient = JSON.parse(localStorage.getItem('lastClient') || 'null');
-        if (lastClient) {
-            document.getElementById('nombrePersona').value = lastClient.nombre || '';
-            document.getElementById('clienteGenero').value = lastClient.clienteGenero || 'Cliente Sr.';
-            document.getElementById('nombreCliente').value = lastClient.nombreCliente || '';
-            if (lastClient.tipoCargo) document.getElementById('tipoCargo').value = lastClient.tipoCargo;
-        }
-    }
-
-    // ==================== NOTIFICACIONES ====================
-    function showNotification(message, type = 'success') {
-        const notification = document.getElementById('notification');
-        document.getElementById('notification-text').textContent = message;
-        notification.classList.remove('hidden');
-        if (type === 'error') {
-            notification.classList.remove('bg-green-100', 'text-green-800');
-            notification.classList.add('bg-red-100', 'text-red-800');
-        } else {
-            notification.classList.remove('bg-red-100', 'text-red-800');
-            notification.classList.add('bg-green-100', 'text-green-800');
-        }
-        setTimeout(() => notification.classList.add('hidden'), 3000);
-    }
-
-    // ==================== CIERRE MODALES ====================
-    window.onclick = function(event) {
-        if (event.target.classList.contains('modal')) {
-            event.target.classList.add('hidden');
-        }
-    };
-
-    // ==================== INICIALIZAR ====================
-    setupTheme();
-    cargarHistorialGuardado();
-    cargarUltimoCliente();
-    actualizarDeuda();
-</script>
-
+        initApp();
+    </script>
 </body>
+
 </html>
