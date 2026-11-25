@@ -33,6 +33,8 @@
     rel="stylesheet">
   <link rel="stylesheet" href="css/global.css">
   <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
 </head>
 
 <body
@@ -62,25 +64,31 @@
 
       <!-- Botones de Acción Global + Barra Universal -->
       <div class="flex flex-wrap items-center gap-2 no-print">
-        <button type="button" onclick="autocompletarHuecos()"
-          class="px-3 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-sm transition flex items-center gap-1.5 cursor-pointer"
-          title="Rellena automáticamente los minutos vacíos entre actividades">
-          <i data-lucide="sparkles" class="w-4 h-4"></i>
-          <span class="hidden sm:inline">Autocompletar</span>
+        <button type="button" id="btnGuardarNube" onclick="guardarAuditoriaEnSupabase()"
+          class="px-3 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold shadow-sm transition flex items-center gap-1.5 cursor-pointer"
+          title="Subir o actualizar esta auditoría en Supabase (Nube)">
+          <i data-lucide="cloud-upload" class="w-4 h-4"></i>
+          <span id="btnGuardarNubeLabel" class="hidden sm:inline">Subir Nube</span>
+        </button>
+
+        <button type="button" id="btnAbrirNube" onclick="abrirModalSupabase()"
+          class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer"
+          title="Explorador Supabase, Login y Configuración de Base de Datos">
+          <span id="cloudStatusDot" class="w-2 h-2 rounded-full bg-slate-400 shrink-0"></span>
+          <i data-lucide="database" class="w-4 h-4 text-sky-400"></i>
+          <span id="cloudStatusLabel" class="hidden lg:inline">Supabase</span>
         </button>
 
         <button type="button" onclick="guardarAuditoriaEnHistorial()"
-          class="px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-sm transition flex items-center gap-1.5 cursor-pointer"
-          title="Guardar auditoría actual en el historial local">
-          <i data-lucide="save" class="w-4 h-4"></i>
-          <span class="hidden md:inline">Guardar</span>
+          class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-slate-700 transition cursor-pointer"
+          title="Guardar copia rápida en el navegador (Local)">
+          <i data-lucide="save" class="w-5 h-5"></i>
         </button>
 
         <button type="button" onclick="abrirModalHistorial()"
-          class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer"
-          title="Ver auditorías guardadas">
+          class="px-2.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold transition flex items-center gap-1 cursor-pointer"
+          title="Ver copias locales en este navegador">
           <i data-lucide="folder-clock" class="w-4 h-4 text-indigo-400"></i>
-          <span class="hidden lg:inline">Historial</span>
           <span id="badgeHistorialCount" class="px-1.5 py-0.2 rounded-full bg-slate-700 text-[10px] font-mono">0</span>
         </button>
 
@@ -133,7 +141,7 @@
     <!-- Datalists -->
     <datalist id="salasDatalist">
       <option value="Sala Luxor"></option>
-      <option value="Casino Bulevard"></option>
+      <option value="Casino Boulevard"></option>
       <option value="Slots Salvador Mazza"></option>
       <option value="Slots Lajitas"></option>
       <option value="Slots Mosconi"></option>
@@ -149,6 +157,7 @@
       <div class="hidden print:block border-b-2 border-slate-800 pb-3 mb-4">
         <h1 class="text-xl font-bold text-slate-900">INFORME DE AUDITORÍA DE DESEMPEÑO Y CONTROL CCTV</h1>
         <p id="printFichaResumen" class="text-xs text-slate-700 mt-1 font-mono"></p>
+        <p id="printReferenciasResumen" class="hidden text-xs text-slate-700 mt-0.5 font-mono"></p>
       </div>
 
       <!-- 1. Ficha del Personal Auditado y Turno -->
@@ -160,16 +169,50 @@
             class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
             <i data-lucide="user-check" class="w-4 h-4"></i> Datos de la Auditoría (Personal, Sala y Turno)
           </h2>
-          <span class="text-[11px] text-slate-500 dark:text-slate-400">Soporta cruce de medianoche (00:00) en Turno
-            Noche</span>
+          <div class="flex flex-wrap items-center gap-3">
+            <label
+              class="inline-flex items-center gap-1.5 text-[11px] font-semibold text-sky-700 dark:text-sky-300 cursor-pointer"
+              title="Sincroniza automáticamente en Supabase cada cambio cuando tienes sesión iniciada">
+              <input type="checkbox" id="checkAutoSyncCloud" checked onchange="cambiarPreferenciaAutoSync()"
+                class="rounded text-sky-600 focus:ring-sky-500" />
+              <span>☁️ Autoguardado Nube</span>
+            </label>
+            <span id="autoSyncStatusBadge"
+              class="text-[11px] font-mono px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">Local
+              activo 💾</span>
+          </div>
+        </div>
+
+        <!-- Indicador de registro vinculado en Supabase -->
+        <div id="cloudActiveBanner"
+          class="hidden mb-3 px-3.5 py-2 rounded-xl bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-800/70 flex flex-wrap items-center justify-between gap-2 text-xs">
+          <div class="flex items-center gap-2 text-sky-800 dark:text-sky-200 font-medium">
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+            <span id="cloudActiveBannerText">Auditoría vinculada en Supabase</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <button type="button" onclick="guardarAuditoriaEnSupabase()"
+              class="px-2.5 py-1 rounded-lg bg-sky-600 hover:bg-sky-500 text-white font-semibold cursor-pointer">
+              Actualizar en nube
+            </button>
+            <button type="button" onclick="desvincularAuditoriaNube()"
+              class="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 border border-sky-200 dark:border-sky-700 text-sky-700 dark:text-sky-300 hover:bg-sky-100 font-semibold cursor-pointer"
+              title="Permite guardar una copia nueva sin sobrescribir la anterior">
+              Desvincular (guardar como nueva)
+            </button>
+          </div>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3">
-          <div class="lg:col-span-3">
+          <div class="lg:col-span-3 relative">
             <label for="fichaEmpleado"
               class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Personal Auditado</label>
-            <input type="text" id="fichaEmpleado" oninput="guardarFichaYActualizar()" placeholder="Ej: Gómez Juan"
+            <input type="text" id="fichaEmpleado" autocomplete="off" oninput="guardarFichaYActualizar()"
+              placeholder="Escribe 1 letra (ej: P, Padilla, 439)..."
               class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-3 py-2 text-xs text-slate-900 dark:text-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 outline-none" />
+            <div id="dropdownPersonalFicha"
+              class="hidden absolute left-0 right-0 top-full mt-1 z-50 max-h-64 overflow-y-auto rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-xl divide-y divide-slate-100 dark:divide-slate-800">
+            </div>
           </div>
 
           <div class="lg:col-span-3">
@@ -183,7 +226,7 @@
             <label for="fichaSala" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Sala /
               Objetivo</label>
             <input type="text" id="fichaSala" list="salasDatalist" oninput="guardarFichaYActualizar()"
-              placeholder="Ej: Sala Luxor"
+              onchange="guardarFichaYActualizar()" placeholder="Ej: Casino Boulevard"
               class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-3 py-2 text-xs text-slate-900 dark:text-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 outline-none" />
           </div>
 
@@ -203,6 +246,58 @@
               <option value="TURNO TARDE">Turno Tarde</option>
               <option value="TURNO NOCHE">Turno Noche (00:00)</option>
             </select>
+          </div>
+        </div>
+
+        <!-- Horarios de Referencia (No se contabilizan en el horario de la jornada) -->
+        <div
+          class="mt-3.5 pt-3.5 bg-slate-50/80 dark:bg-slate-950/50 rounded-xl p-3 border border-slate-200/80 dark:border-slate-800">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
+            <div class="flex flex-wrap items-center gap-2">
+              <span
+                class="text-[11px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-200 flex items-center gap-1.5">
+                <i data-lucide="clock" class="w-3.5 h-3.5 text-indigo-500"></i>
+                Horarios de Referencia (Fichada y Acceso)
+              </span>
+              <span
+                class="px-2 py-0.5 rounded-full bg-slate-200/80 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[10px] font-semibold">
+                Solo referencia · No se contabiliza en el horario
+              </span>
+            </div>
+            <div class="flex items-center gap-2.5">
+              <span id="badgeInfoReferencias"
+                class="hidden text-[11px] font-mono text-indigo-600 dark:text-indigo-400 font-semibold"></span>
+              <button type="button" id="btnLimpiarReferencias" onclick="limpiarHorariosReferencia()"
+                class="hidden text-[11px] font-semibold text-slate-500 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-400 transition cursor-pointer">
+                Limpiar referencias
+              </button>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label for="fichaMarcaIngreso"
+                class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">🟢 Marca Ingreso</label>
+              <input type="time" id="fichaMarcaIngreso" oninput="guardarFichaYActualizar()"
+                onchange="guardarFichaYActualizar()"
+                class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-xs font-mono-nums text-slate-900 dark:text-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 outline-none" />
+            </div>
+
+            <div>
+              <label for="fichaSaleSala" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">🚶
+                Sale a Sala</label>
+              <input type="time" id="fichaSaleSala" oninput="guardarFichaYActualizar()"
+                onchange="guardarFichaYActualizar()"
+                class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-xs font-mono-nums text-slate-900 dark:text-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 outline-none" />
+            </div>
+
+            <div>
+              <label for="fichaMarcaSalida"
+                class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">🔴 Marca Salida</label>
+              <input type="time" id="fichaMarcaSalida" oninput="guardarFichaYActualizar()"
+                onchange="guardarFichaYActualizar()"
+                class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-xs font-mono-nums text-slate-900 dark:text-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 outline-none" />
+            </div>
           </div>
         </div>
       </section>
@@ -313,6 +408,8 @@
               Jornada (Meta: 08:30 hs / 510 min)</h2>
             <p class="text-xs text-slate-500 dark:text-slate-400" id="rangoGlobalTexto">Rango cubierto: Sin registros
               cargados</p>
+            <div id="barraReferenciasResumen"
+              class="hidden flex flex-wrap items-center gap-1.5 pt-1.5 text-[11px] font-mono"></div>
           </div>
           <div class="flex flex-wrap items-center gap-3 text-xs font-medium text-slate-600 dark:text-slate-300">
             <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-emerald-500 inline-block"></span>
@@ -348,10 +445,6 @@
                 class="hidden px-2.5 py-1 bg-rose-600 hover:bg-rose-500 text-white rounded-lg font-semibold transition cursor-pointer">
                 Ajustar Solapamientos
               </button>
-              <button type="button" id="btnAutocompletarPanel" onclick="autocompletarHuecos()"
-                class="px-2.5 py-1 bg-amber-600 hover:bg-amber-500 text-white rounded-lg font-semibold transition cursor-pointer">
-                Rellenar Huecos Ahora
-              </button>
             </div>
           </div>
           <div id="listaAnomalias" class="flex flex-wrap gap-1.5 pt-1 max-h-28 overflow-y-auto"></div>
@@ -376,32 +469,40 @@
           </button>
         </div>
 
-        <div class="flex flex-wrap items-center justify-between gap-2">
-          <h2 class="text-sm font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
-            <i data-lucide="plus-circle" class="w-4 h-4 text-indigo-500"></i>
-            <span id="tituloFormulario">Registrar Tramo Horario / Cámara</span>
-          </h2>
+        <div
+          class="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
+          <div class="flex flex-wrap items-center gap-2">
+            <h2 class="text-sm font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+              <i data-lucide="plus-circle" class="w-4 h-4 text-indigo-500"></i>
+              <span id="tituloFormulario">Registrar Tramo Horario / Cámara</span>
+            </h2>
+            <span id="badgeModoBoulevard"
+              class="hidden px-2.5 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 text-[11px] font-semibold">
+              🎛️ Casino Boulevard · DVR 1–8 activo
+            </span>
+          </div>
 
           <div class="flex flex-wrap items-center gap-3">
             <!-- Botones rápidos para sumar minutos al Inicio -->
-            <div class="flex items-center gap-1 text-[11px]">
-              <span class="text-slate-500 dark:text-slate-400 font-medium mr-0.5">Duración rápida:</span>
+            <div
+              class="flex items-center gap-1 bg-slate-100/80 dark:bg-slate-800/80 px-2.5 py-1 rounded-xl border border-slate-200/80 dark:border-slate-700/70 text-[11px]">
+              <span class="text-slate-500 dark:text-slate-400 font-semibold mr-1">Duración rápida:</span>
               <button type="button" onclick="sumarDuracionRapida(1)"
-                class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 hover:bg-indigo-600 hover:text-white text-slate-700 dark:text-slate-200 font-mono font-semibold transition cursor-pointer">+1m</button>
+                class="px-2 py-0.5 rounded-md bg-white dark:bg-slate-900 hover:bg-indigo-600 hover:text-white text-slate-700 dark:text-slate-200 font-mono font-semibold shadow-2xs transition cursor-pointer">+1m</button>
               <button type="button" onclick="sumarDuracionRapida(2)"
-                class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 hover:bg-indigo-600 hover:text-white text-slate-700 dark:text-slate-200 font-mono font-semibold transition cursor-pointer">+2m</button>
+                class="px-2 py-0.5 rounded-md bg-white dark:bg-slate-900 hover:bg-indigo-600 hover:text-white text-slate-700 dark:text-slate-200 font-mono font-semibold shadow-2xs transition cursor-pointer">+2m</button>
               <button type="button" onclick="sumarDuracionRapida(5)"
-                class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 hover:bg-indigo-600 hover:text-white text-slate-700 dark:text-slate-200 font-mono font-semibold transition cursor-pointer">+5m</button>
+                class="px-2 py-0.5 rounded-md bg-white dark:bg-slate-900 hover:bg-indigo-600 hover:text-white text-slate-700 dark:text-slate-200 font-mono font-semibold shadow-2xs transition cursor-pointer">+5m</button>
               <button type="button" onclick="sumarDuracionRapida(10)"
-                class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 hover:bg-indigo-600 hover:text-white text-slate-700 dark:text-slate-200 font-mono font-semibold transition cursor-pointer">+10m</button>
+                class="px-2 py-0.5 rounded-md bg-white dark:bg-slate-900 hover:bg-indigo-600 hover:text-white text-slate-700 dark:text-slate-200 font-mono font-semibold shadow-2xs transition cursor-pointer">+10m</button>
               <button type="button" onclick="sumarDuracionRapida(15)"
-                class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 hover:bg-indigo-600 hover:text-white text-slate-700 dark:text-slate-200 font-mono font-semibold transition cursor-pointer">+15m</button>
+                class="px-2 py-0.5 rounded-md bg-white dark:bg-slate-900 hover:bg-indigo-600 hover:text-white text-slate-700 dark:text-slate-200 font-mono font-semibold shadow-2xs transition cursor-pointer">+15m</button>
               <button type="button" onclick="sumarDuracionRapida(30)"
-                class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 hover:bg-indigo-600 hover:text-white text-slate-700 dark:text-slate-200 font-mono font-semibold transition cursor-pointer">+30m</button>
+                class="px-2 py-0.5 rounded-md bg-white dark:bg-slate-900 hover:bg-indigo-600 hover:text-white text-slate-700 dark:text-slate-200 font-mono font-semibold shadow-2xs transition cursor-pointer">+30m</button>
             </div>
 
             <label
-              class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-600 dark:text-slate-300 cursor-pointer">
+              class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 dark:text-slate-300 cursor-pointer select-none">
               <input type="checkbox" id="checkEncadenar" checked
                 class="rounded text-indigo-600 focus:ring-indigo-500" />
               Encadenar inicio
@@ -410,17 +511,21 @@
         </div>
 
         <form id="formRegistro" onsubmit="agregarRegistro(event)"
-          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 items-end">
-          <div class="lg:col-span-2">
+          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3.5 items-end">
+          <!-- Fila 1: Clasificación, DVR (si aplica), Cámara e Inicio / Fin amplios -->
+          <div id="contenedorCampoCategoria" class="lg:col-span-3">
             <label for="inputCategoria"
-              class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Categoría</label>
+              class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">Categoría</label>
             <select id="inputCategoria" onchange="sincronizarEstadoPorCategoria()"
-              class="w-full rounded-xl border border-slate-300 dark:border-slate-700 px-2.5 py-2 text-xs bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white focus:border-indigo-500 outline-none">
+              class="w-full rounded-xl border border-slate-300 dark:border-slate-700 px-3 py-2.5 text-xs bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white focus:border-indigo-500 outline-none">
               <option value="Operativo">Operativo / Sala</option>
               <option value="Traslado">Transición / Traslado</option>
               <option value="Celular Trabajo">Celular de Trabajo</option>
               <option value="Descanso">Descanso Legal / Comida</option>
-              <option value="Charla">Charla / Conversación</option>
+              <option value="Baño">Baño / Sanitario</option>
+              <option value="Refrigerio">Cocina / Café / Gaseosa</option>
+              <option value="Charla">Habla / Conversación</option>
+              <option value="Permanencia">Permanece (Barra / Pitt)</option>
               <option value="Celular">Celular Personal</option>
               <option value="TV">Mira TV / Distracción</option>
               <option value="Ausencia">Ausencia de Sector</option>
@@ -428,91 +533,246 @@
           </div>
 
           <div class="lg:col-span-2">
-            <label for="inputTipo" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Estado
+            <label for="inputTipo" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">Estado
               Cómputo</label>
             <select id="inputTipo"
-              class="w-full rounded-xl border border-slate-300 dark:border-slate-700 px-2.5 py-2 text-xs font-semibold bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white focus:border-indigo-500 outline-none">
+              class="w-full rounded-xl border border-slate-300 dark:border-slate-700 px-2.5 py-2.5 text-xs font-semibold bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white focus:border-indigo-500 outline-none">
               <option value="ASISTE">🟢 ASISTE (Trabaja)</option>
               <option value="NO_ASISTE">🟠 NO ASISTE (Inactivo)</option>
             </select>
           </div>
 
-          <div class="lg:col-span-2">
-            <label for="inputCamara" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Cámara
+          <div id="contenedorCampoDvr" class="hidden lg:col-span-2">
+            <label for="inputDvr" class="block text-xs font-semibold text-indigo-700 dark:text-indigo-300 mb-1.5">Equipo
+              DVR</label>
+            <select id="inputDvr"
+              class="w-full rounded-xl border border-indigo-300 dark:border-indigo-700 px-3 py-2.5 text-xs font-bold bg-indigo-50/70 dark:bg-indigo-950/60 text-indigo-900 dark:text-indigo-200 focus:border-indigo-500 outline-none">
+              <option value="DVR 1">DVR 1</option>
+              <option value="DVR 2">DVR 2</option>
+              <option value="DVR 3">DVR 3</option>
+              <option value="DVR 4">DVR 4</option>
+              <option value="DVR 5">DVR 5</option>
+              <option value="DVR 6">DVR 6</option>
+              <option value="DVR 7">DVR 7</option>
+              <option value="DVR 8">DVR 8</option>
+            </select>
+          </div>
+
+          <div id="contenedorCampoCamara" class="lg:col-span-3">
+            <label for="inputCamara"
+              class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">Cámara
               (CCTV)</label>
-            <input type="text" id="inputCamara" list="camarasDatalist" placeholder="Ej: CAM-01 (Sala Gral)" required
-              class="w-full rounded-xl border border-slate-300 dark:border-slate-700 px-2.5 py-2 text-xs bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white focus:border-indigo-500 outline-none" />
+            <div class="relative">
+              <input type="text" id="inputCamara" list="camarasDatalist" placeholder="Ej: CAM-01 (Sala Gral)" required
+                class="w-full rounded-xl border border-slate-300 dark:border-slate-700 pl-3 pr-[76px] py-2.5 text-xs bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white focus:border-indigo-500 outline-none" />
+              <button type="button" onclick="abrirSelectorCamaras()"
+                class="absolute right-1.5 top-1/2 -translate-y-1/2 px-2 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-[11px] font-semibold shadow-sm transition cursor-pointer"
+                title="Elegir Casino → DVR → Cámara">
+                📹 Elegir
+              </button>
+            </div>
           </div>
 
-          <div class="lg:col-span-1">
-            <label for="inputInicio"
-              class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Inicio</label>
+          <div class="lg:col-span-2">
+            <label for="inputInicio" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">Hora
+              Inicio</label>
             <input type="time" id="inputInicio" required
-              class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-2 py-2 text-xs font-mono-nums text-slate-900 dark:text-white focus:border-indigo-500 outline-none" />
+              class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-3 py-2.5 text-xs font-mono-nums text-slate-900 dark:text-white focus:border-indigo-500 outline-none" />
           </div>
 
-          <div class="lg:col-span-1">
-            <label for="inputFin"
-              class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Fin</label>
+          <div class="lg:col-span-2">
+            <label for="inputFin" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">Hora
+              Fin</label>
             <input type="time" id="inputFin" required
-              class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-2 py-2 text-xs font-mono-nums text-slate-900 dark:text-white focus:border-indigo-500 outline-none" />
+              class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-3 py-2.5 text-xs font-mono-nums text-slate-900 dark:text-white focus:border-indigo-500 outline-none" />
           </div>
 
-          <div class="lg:col-span-3">
-            <label for="inputDetalle" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Sector
-              / Observación</label>
-            <input type="text" id="inputDetalle" required placeholder="Ej: Asiste a Cliente (Sala)"
-              class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-3 py-2 text-xs text-slate-900 dark:text-white focus:border-indigo-500 outline-none" />
+          <!-- Fila 2: Sector / Observación amplia + Botón Extraer DVR + Botón Añadir -->
+          <div id="contenedorCampoDetalle" class="sm:col-span-2 lg:col-span-8 relative">
+            <div class="flex items-center justify-between gap-2 mb-1.5">
+              <label for="inputDetalle" class="block text-xs font-semibold text-slate-600 dark:text-slate-300">Sector
+                / Observación Detallada</label>
+              <button type="button" onclick="abrirArmadorDesdeInputActual()"
+                class="px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950/60 text-[11px] font-semibold text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 hover:bg-indigo-100 transition cursor-pointer"
+                title="Elegir uno o varios empleados del padrón y el sector">
+                👥 Armar con 1 o + Personal / Sector
+              </button>
+            </div>
+            <input type="text" id="inputDetalle" autocomplete="off" required
+              placeholder="Ej: Habla en Sala con... (puedes encadenar varios con 'y' o ',')..."
+              class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-3.5 py-2.5 text-xs text-slate-900 dark:text-white focus:border-indigo-500 outline-none" />
+            <div id="dropdownSugerenciasDetalle"
+              class="hidden absolute left-0 right-0 top-full mt-1 z-50 max-h-64 overflow-y-auto rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-xl divide-y divide-slate-100 dark:divide-slate-800">
+            </div>
           </div>
 
-          <div class="lg:col-span-1 flex items-center gap-2">
-            <label
-              class="inline-flex items-center gap-1 text-xs text-slate-600 dark:text-slate-300 cursor-pointer shrink-0"
-              title="Marcar para extraer video del DVR">
-              <input type="checkbox" id="inputBajarVideo" class="rounded text-rose-600" />
-              <span>🎥</span>
+          <div class="sm:col-span-2 lg:col-span-4 flex items-center gap-2.5">
+            <label for="inputBajarVideo"
+              class="flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 hover:border-rose-400 has-[:checked]:bg-rose-50 dark:has-[:checked]:bg-rose-950/50 has-[:checked]:border-rose-400 has-[:checked]:text-rose-700 dark:has-[:checked]:text-rose-300 text-xs font-semibold text-slate-700 dark:text-slate-200 transition cursor-pointer select-none shrink-0"
+              title="Marcar este tramo para extraer video del DVR">
+              <input type="checkbox" id="inputBajarVideo" class="rounded text-rose-600 focus:ring-rose-500" />
+              <span>🎥 Extraer DVR</span>
             </label>
             <button type="submit" id="btnSubmitRegistro"
-              class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2 px-3 rounded-xl text-xs transition shadow-sm cursor-pointer">
-              Añadir
+              class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2.5 px-4 rounded-xl text-xs transition shadow-sm cursor-pointer whitespace-nowrap">
+              + Añadir Tramo
             </button>
           </div>
         </form>
 
-        <!-- Botonera de Carga Rápida (Presets Operativos) -->
-        <div class="pt-2.5 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center gap-2">
-          <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mr-1">Plantillas:</span>
-          <button type="button"
-            onclick="aplicarPlantilla('ASISTE','Operativo','CAM-01 (Sala Gral)','Asiste a Cliente - Recorre (Sala)')"
-            class="px-2.5 py-1 bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 rounded-lg text-xs font-medium transition cursor-pointer">+
-            Asiste Sala</button>
-          <button type="button"
-            onclick="aplicarPlantilla('ASISTE','Operativo','CAM-02 (Contadores)','Toma Contadores (Sala)')"
-            class="px-2.5 py-1 bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 rounded-lg text-xs font-medium transition cursor-pointer">+
-            Contadores</button>
-          <button type="button"
-            onclick="aplicarPlantilla('ASISTE','Operativo','CAM-08 (Caja)','Rinde efectivo en Caja')"
-            class="px-2.5 py-1 bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 rounded-lg text-xs font-medium transition cursor-pointer">+
-            Rinde Caja</button>
-          <button type="button"
-            onclick="aplicarPlantilla('NO_ASISTE','Celular','CAM-03 (Sector Bar)','Manipula Teléfono Celular')"
-            class="px-2.5 py-1 bg-amber-50 dark:bg-amber-950/50 hover:bg-amber-100 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800/60 rounded-lg text-xs font-medium transition cursor-pointer">+
-            Celular Personal</button>
-          <button type="button"
-            onclick="aplicarPlantilla('NO_ASISTE','Charla','CAM-04 (Recepción)','Permanece conversando en sector')"
-            class="px-2.5 py-1 bg-amber-50 dark:bg-amber-950/50 hover:bg-amber-100 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800/60 rounded-lg text-xs font-medium transition cursor-pointer">+
-            Charla</button>
-          <button type="button" onclick="aplicarPlantilla('NO_ASISTE','TV','CAM-03 (Sector Bar)','Mira TV en sector')"
-            class="px-2.5 py-1 bg-amber-50 dark:bg-amber-950/50 hover:bg-amber-100 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800/60 rounded-lg text-xs font-medium transition cursor-pointer">+
-            Mira TV</button>
-          <button type="button"
-            onclick="aplicarPlantilla('NO_ASISTE','Descanso','CAM-09 (Área Descanso)','Descanso / Refrigerio')"
-            class="px-2.5 py-1 bg-sky-50 dark:bg-sky-950/50 hover:bg-sky-100 text-sky-800 dark:text-sky-300 border border-sky-200 dark:border-sky-800/60 rounded-lg text-xs font-medium transition cursor-pointer">+
-            Descanso</button>
-          <span class="ml-auto text-[11px] text-slate-400 hidden md:inline">Clic en cualquier hueco amarillo para
-            cargarlo · <kbd
-              class="px-1 py-0.5 rounded bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 font-mono">Ctrl+Z</kbd>
-            deshacer</span>
+        <!-- Asistente Rápido: Conversación con Personal (1 o varios) / Firma Váucher / Sector -->
+        <div id="panelArmadorObservacion"
+          class="hidden bg-indigo-50/70 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-800/70 rounded-xl p-3.5 space-y-3">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div class="flex flex-wrap items-center gap-1.5 text-xs">
+              <span class="font-bold text-indigo-900 dark:text-indigo-200 mr-1">👥 Armador Rápido:</span>
+              <button type="button" id="btnModoHablaSala" onclick="cambiarModoArmador('HABLA_SALA')"
+                class="px-2.5 py-1 rounded-lg text-xs font-semibold transition cursor-pointer">
+                Habla en Sala con...
+              </button>
+              <button type="button" id="btnModoHablaSector" onclick="cambiarModoArmador('HABLA_SECTOR')"
+                class="px-2.5 py-1 rounded-lg text-xs font-semibold transition cursor-pointer">
+                Habla con... (Sector)
+              </button>
+              <button type="button" id="btnModoFirmaVaucher" onclick="cambiarModoArmador('FIRMA_VAUCHER')"
+                class="px-2.5 py-1 rounded-lg text-xs font-semibold transition cursor-pointer">
+                Firma Váucher en...
+              </button>
+            </div>
+            <button type="button" onclick="cerrarArmadorObservacion()"
+              class="text-xs font-semibold text-slate-500 hover:text-rose-600 dark:text-slate-400 px-2 py-0.5 rounded-lg cursor-pointer">
+              Cerrar ✕
+            </button>
+          </div>
+
+          <div id="bloquePersonalArmador" class="space-y-2">
+            <div class="relative">
+              <input type="text" id="inputBuscarPersonalArmador" autocomplete="off"
+                placeholder="Escribe 1 letra (apellido, nombre o legajo) para sumar uno o varios empleados..."
+                class="w-full rounded-xl border border-indigo-300 dark:border-indigo-700 bg-white dark:bg-slate-900 px-3 py-2 text-xs text-slate-900 dark:text-white focus:border-indigo-500 outline-none" />
+              <div id="dropdownPersonalArmador"
+                class="hidden absolute left-0 right-0 top-full mt-1 z-50 max-h-60 overflow-y-auto rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-xl divide-y divide-slate-100 dark:divide-slate-800">
+              </div>
+            </div>
+            <div class="flex flex-wrap items-center gap-1.5">
+              <span class="text-[11px] font-semibold text-slate-500 dark:text-slate-400">Personal en observación:</span>
+              <div id="chipsPersonalSeleccionado" class="flex flex-wrap items-center gap-1.5"></div>
+              <button type="button" id="btnLimpiarPersonalArmador" onclick="limpiarPersonalArmador()"
+                class="hidden text-[11px] text-rose-600 dark:text-rose-400 font-semibold hover:underline ml-1 cursor-pointer">
+                Quitar todos
+              </button>
+            </div>
+          </div>
+
+          <div id="bloqueSectorArmador" class="space-y-1.5">
+            <span class="block text-[11px] font-semibold text-slate-600 dark:text-slate-300">Sector (clic para asignar
+              sector y cámara):</span>
+            <div id="botonesSectoresArmador" class="flex flex-wrap items-center gap-1.5"></div>
+          </div>
+        </div>
+
+        <!-- Botonera de Carga Rápida (Plantillas Operativas y de Observación Alineadas) -->
+        <div
+          class="bg-slate-50/80 dark:bg-slate-950/50 rounded-xl p-3.5 border border-slate-200/80 dark:border-slate-800 space-y-3">
+          <div
+            class="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-slate-200/70 dark:border-slate-800">
+            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">⚡ Plantillas
+              de Carga Rápida</span>
+            <span class="text-[11px] text-slate-400">Clic en cualquier hueco amarillo para cargarlo · <kbd
+                class="px-1.5 py-0.5 rounded bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 font-mono text-[10px]">Ctrl+Z</kbd>
+              deshacer</span>
+          </div>
+
+          <div class="sm:grid sm:grid-cols-[130px_1fr] gap-2.5 items-start space-y-1.5 sm:space-y-0">
+            <div class="pt-1">
+              <span
+                class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-100/80 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 text-[10px] font-bold uppercase tracking-wider">
+                🟢 Operativo
+              </span>
+            </div>
+            <div class="flex flex-wrap items-center gap-1.5">
+              <button type="button"
+                onclick="aplicarPlantilla('ASISTE','Operativo','CAM-01 (Sala Gral)','Asiste a clientes en Sala')"
+                class="px-2.5 py-1 bg-white dark:bg-emerald-950/40 hover:bg-emerald-50 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/70 rounded-lg text-xs font-medium shadow-2xs transition cursor-pointer">+
+                Asiste a clientes en Sala</button>
+              <button type="button" onclick="aplicarPlantilla('ASISTE','Operativo','CAM-01 (Sala Gral)','Sala')"
+                class="px-2.5 py-1 bg-white dark:bg-emerald-950/40 hover:bg-emerald-50 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/70 rounded-lg text-xs font-medium shadow-2xs transition cursor-pointer">+
+                Sala</button>
+              <button type="button" onclick="aplicarPlantilla('ASISTE','Operativo','CAM-08 (Caja)','Caja')"
+                class="px-2.5 py-1 bg-white dark:bg-emerald-950/40 hover:bg-emerald-50 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/70 rounded-lg text-xs font-medium shadow-2xs transition cursor-pointer">+
+                Caja</button>
+              <button type="button"
+                onclick="aplicarPlantilla('ASISTE','Operativo','CAM-04 (Recepción)','Cubre Sector Recepción')"
+                class="px-2.5 py-1 bg-white dark:bg-emerald-950/40 hover:bg-emerald-50 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/70 rounded-lg text-xs font-medium shadow-2xs transition cursor-pointer">+
+                Cubre Sector Recepción</button>
+              <button type="button" onclick="aplicarPlantilla('ASISTE','Operativo','CAM-08 (Caja)','Cubre Sector Caja')"
+                class="px-2.5 py-1 bg-white dark:bg-emerald-950/40 hover:bg-emerald-50 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/70 rounded-lg text-xs font-medium shadow-2xs transition cursor-pointer">+
+                Cubre Sector Caja</button>
+              <button type="button" onclick="abrirArmadorObservacion('FIRMA_VAUCHER','Barra')"
+                class="px-2.5 py-1 bg-white dark:bg-emerald-950/40 hover:bg-emerald-50 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/70 rounded-lg text-xs font-semibold shadow-2xs transition cursor-pointer">+
+                Firma Váucher (Barra / Sector)</button>
+              <button type="button"
+                onclick="aplicarPlantilla('ASISTE','Operativo','CAM-06 (Oficina de Encargado)','Oficina de Encargado')"
+                class="px-2.5 py-1 bg-white dark:bg-emerald-950/40 hover:bg-emerald-50 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/70 rounded-lg text-xs font-medium shadow-2xs transition cursor-pointer">+
+                Oficina de Encargado</button>
+              <button type="button"
+                onclick="aplicarPlantilla('ASISTE','Operativo','CAM-05 (Oficina de Moya)','Oficina de Moya')"
+                class="px-2.5 py-1 bg-white dark:bg-emerald-950/40 hover:bg-emerald-50 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/70 rounded-lg text-xs font-medium shadow-2xs transition cursor-pointer">+
+                Oficina de Moya</button>
+              <button type="button"
+                onclick="aplicarPlantilla('ASISTE','Operativo','CAM-02 (Contadores)','Toma Contadores (Sala)')"
+                class="px-2.5 py-1 bg-white dark:bg-emerald-950/40 hover:bg-emerald-50 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/70 rounded-lg text-xs font-medium shadow-2xs transition cursor-pointer">+
+                Contadores</button>
+            </div>
+          </div>
+
+          <div
+            class="pt-2.5 border-t border-slate-200/70 dark:border-slate-800 sm:grid sm:grid-cols-[130px_1fr] gap-2.5 items-start space-y-1.5 sm:space-y-0">
+            <div class="pt-1">
+              <span
+                class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-100/80 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 text-[10px] font-bold uppercase tracking-wider">
+                🟠 Pausas / Obs.
+              </span>
+            </div>
+            <div class="flex flex-wrap items-center gap-1.5">
+              <button type="button" onclick="aplicarPlantilla('NO_ASISTE','Descanso','CAM-09 (Descanso)','Descanso')"
+                class="px-2.5 py-1 bg-white dark:bg-sky-950/40 hover:bg-sky-50 dark:hover:bg-sky-900/60 text-sky-800 dark:text-sky-300 border border-sky-200 dark:border-sky-800/70 rounded-lg text-xs font-medium shadow-2xs transition cursor-pointer">+
+                Descanso</button>
+              <button type="button" onclick="aplicarPlantilla('NO_ASISTE','Baño','CAM-13 (Sector Baño)','Baño')"
+                class="px-2.5 py-1 bg-white dark:bg-sky-950/40 hover:bg-sky-50 dark:hover:bg-sky-900/60 text-sky-800 dark:text-sky-300 border border-sky-200 dark:border-sky-800/70 rounded-lg text-xs font-medium shadow-2xs transition cursor-pointer">+
+                Baño</button>
+              <button type="button" onclick="abrirArmadorObservacion('HABLA_SALA','Sala')"
+                class="px-2.5 py-1 bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 text-indigo-800 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800/70 rounded-lg text-xs font-semibold shadow-2xs transition cursor-pointer">+
+                👥 Habla en Sala con...</button>
+              <button type="button" onclick="abrirArmadorObservacion('HABLA_SECTOR','Barra')"
+                class="px-2.5 py-1 bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 text-indigo-800 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800/70 rounded-lg text-xs font-semibold shadow-2xs transition cursor-pointer">+
+                👥 Habla con (Personal + Sector)</button>
+              <button type="button"
+                onclick="aplicarPlantilla('NO_ASISTE','Permanencia','CAM-03 (Barra)','Permanece en Barra')"
+                class="px-2.5 py-1 bg-white dark:bg-amber-950/40 hover:bg-amber-50 dark:hover:bg-amber-900/60 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800/70 rounded-lg text-xs font-medium shadow-2xs transition cursor-pointer">+
+                Permanece en Barra</button>
+              <button type="button"
+                onclick="aplicarPlantilla('NO_ASISTE','Permanencia','CAM-10 (Pitt)','Permanece en Pitt')"
+                class="px-2.5 py-1 bg-white dark:bg-amber-950/40 hover:bg-amber-50 dark:hover:bg-amber-900/60 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800/70 rounded-lg text-xs font-medium shadow-2xs transition cursor-pointer">+
+                Permanece en Pitt</button>
+              <button type="button" onclick="aplicarPlantilla('NO_ASISTE','TV','CAM-03 (Barra)','Mira Tv')"
+                class="px-2.5 py-1 bg-white dark:bg-amber-950/40 hover:bg-amber-50 dark:hover:bg-amber-900/60 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800/70 rounded-lg text-xs font-medium shadow-2xs transition cursor-pointer">+
+                Mira Tv</button>
+              <button type="button" onclick="aplicarPlantilla('NO_ASISTE','Refrigerio','CAM-12 (Cocina)','Cocina')"
+                class="px-2.5 py-1 bg-white dark:bg-amber-950/40 hover:bg-amber-50 dark:hover:bg-amber-900/60 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800/70 rounded-lg text-xs font-medium shadow-2xs transition cursor-pointer">+
+                Cocina</button>
+              <button type="button" onclick="aplicarPlantilla('NO_ASISTE','Refrigerio','CAM-03 (Barra)','Toma Café')"
+                class="px-2.5 py-1 bg-white dark:bg-amber-950/40 hover:bg-amber-50 dark:hover:bg-amber-900/60 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800/70 rounded-lg text-xs font-medium shadow-2xs transition cursor-pointer">+
+                Toma Café</button>
+              <button type="button" onclick="aplicarPlantilla('NO_ASISTE','Refrigerio','CAM-03 (Barra)','Toma Gaseosa')"
+                class="px-2.5 py-1 bg-white dark:bg-amber-950/40 hover:bg-amber-50 dark:hover:bg-amber-900/60 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800/70 rounded-lg text-xs font-medium shadow-2xs transition cursor-pointer">+
+                Toma Gaseosa</button>
+              <button type="button"
+                onclick="aplicarPlantilla('NO_ASISTE','Celular','CAM-03 (Barra)','Manipula Teléfono Celular')"
+                class="px-2.5 py-1 bg-white dark:bg-amber-950/40 hover:bg-amber-50 dark:hover:bg-amber-900/60 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800/70 rounded-lg text-xs font-medium shadow-2xs transition cursor-pointer">+
+                Celular Personal</button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -524,9 +784,22 @@
             <i data-lucide="search"
               class="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
             <input type="search" id="filtroTexto" oninput="actualizarTodo(true)"
-              placeholder="Filtrar por cámara, hora u observación..."
+              placeholder="Filtrar por DVR, cámara, hora u observación..."
               class="w-full pl-8 pr-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 text-xs text-slate-800 dark:text-slate-100 focus:border-indigo-500 outline-none" />
           </div>
+
+          <select id="filtroDvr" onchange="actualizarTodo(true)"
+            class="hidden rounded-xl border border-indigo-300 dark:border-indigo-700 bg-indigo-50/70 dark:bg-indigo-950/50 px-3 py-1.5 text-xs font-semibold text-indigo-900 dark:text-indigo-200 focus:border-indigo-500 outline-none">
+            <option value="TODOS">Todos los DVR (1–8)</option>
+            <option value="DVR 1">DVR 1</option>
+            <option value="DVR 2">DVR 2</option>
+            <option value="DVR 3">DVR 3</option>
+            <option value="DVR 4">DVR 4</option>
+            <option value="DVR 5">DVR 5</option>
+            <option value="DVR 6">DVR 6</option>
+            <option value="DVR 7">DVR 7</option>
+            <option value="DVR 8">DVR 8</option>
+          </select>
 
           <select id="filtroCategoria" onchange="actualizarTodo(true)"
             class="rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-3 py-1.5 text-xs text-slate-800 dark:text-slate-100 focus:border-indigo-500 outline-none">
@@ -535,7 +808,10 @@
             <option value="Traslado">Transición / Traslado</option>
             <option value="Celular Trabajo">Celular de Trabajo</option>
             <option value="Descanso">Descanso Legal</option>
-            <option value="Charla">Charla / Conversación</option>
+            <option value="Baño">Baño / Sanitario</option>
+            <option value="Refrigerio">Cocina / Café / Gaseosa</option>
+            <option value="Charla">Habla / Conversación</option>
+            <option value="Permanencia">Permanece (Barra / Pitt)</option>
             <option value="Celular">Celular Personal</option>
             <option value="TV">Mira TV / Distracción</option>
             <option value="Ausencia">Ausencia de Sector</option>
@@ -549,14 +825,28 @@
           </label>
         </div>
 
-        <button type="button" id="btnLimpiarFiltros" onclick="limpiarFiltrosTabla()"
-          class="hidden text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer">
-          Quitar filtros
-        </button>
+        <div class="flex flex-wrap items-center gap-2.5">
+          <button type="button" id="btnLimpiarFiltros" onclick="limpiarFiltrosTabla()"
+            class="hidden text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer">
+            Quitar filtros
+          </button>
+          <div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl"
+            title="Cómo mostrar las tablas ASISTE / NO ASISTE">
+            <button type="button" id="btnVistaApilada" onclick="cambiarVistaTablas('apilada')"
+              class="px-2.5 py-1 rounded-lg text-[11px] font-semibold transition cursor-pointer">☰ Apilada</button>
+            <button type="button" id="btnVistaLado" onclick="cambiarVistaTablas('lado')"
+              class="px-2.5 py-1 rounded-lg text-[11px] font-semibold transition cursor-pointer">◫ Lado a lado</button>
+          </div>
+          <button type="button" id="btnAlturaTablas" onclick="toggleAlturaTablas()"
+            class="px-2.5 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-[11px] font-semibold text-slate-700 dark:text-slate-200 transition cursor-pointer"
+            title="Mostrar todas las filas sin barra de desplazamiento">
+            ⤢ Ver todo
+          </button>
+        </div>
       </div>
 
       <!-- 6. Tablas comparativas: ASISTE vs NO ASISTE -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div id="gridTablasComparativas" class="grid grid-cols-1 gap-6">
 
         <!-- Columna ASISTE -->
         <div
@@ -569,16 +859,16 @@
             </div>
             <div class="text-sm font-bold font-mono-nums" id="subtotalAsiste">00:00 hs</div>
           </div>
-          <div class="overflow-x-auto flex-1 max-h-[520px] overflow-y-auto print:max-h-none">
+          <div class="contenedor-scroll-tabla overflow-x-auto flex-1 max-h-[480px] overflow-y-auto print:max-h-none">
             <table class="w-full text-left border-collapse text-xs">
               <thead class="sticky top-0 z-10">
                 <tr
                   class="bg-emerald-50 dark:bg-slate-950 text-emerald-950 dark:text-emerald-300 border-b border-emerald-200 dark:border-emerald-900/60 font-semibold">
-                  <th class="py-2.5 px-2.5">Horario</th>
-                  <th class="py-2.5 px-2.5">Cámara</th>
+                  <th class="py-2.5 px-2.5 w-[112px] whitespace-nowrap">Horario</th>
+                  <th class="py-2.5 px-2.5 w-[160px]">Cámara</th>
                   <th class="py-2.5 px-2.5">Sector / Actividad</th>
-                  <th class="py-2.5 px-2.5 text-right">Tiempo</th>
-                  <th class="py-2.5 px-2 text-center no-print">Acción</th>
+                  <th class="py-2.5 px-2.5 text-right w-[64px]">Tiempo</th>
+                  <th class="py-2.5 px-2 text-center no-print w-[108px]">Acción</th>
                 </tr>
               </thead>
               <tbody id="tbodyAsiste" class="divide-y divide-slate-100 dark:divide-slate-800"></tbody>
@@ -597,16 +887,16 @@
             </div>
             <div class="text-sm font-bold font-mono-nums" id="subtotalNoAsiste">00:00 hs</div>
           </div>
-          <div class="overflow-x-auto flex-1 max-h-[520px] overflow-y-auto print:max-h-none">
+          <div class="contenedor-scroll-tabla overflow-x-auto flex-1 max-h-[480px] overflow-y-auto print:max-h-none">
             <table class="w-full text-left border-collapse text-xs">
               <thead class="sticky top-0 z-10">
                 <tr
                   class="bg-amber-50 dark:bg-slate-950 text-amber-950 dark:text-amber-300 border-b border-amber-200 dark:border-amber-900/60 font-semibold">
-                  <th class="py-2.5 px-2.5">Horario</th>
-                  <th class="py-2.5 px-2.5">Cámara</th>
+                  <th class="py-2.5 px-2.5 w-[112px] whitespace-nowrap">Horario</th>
+                  <th class="py-2.5 px-2.5 w-[160px]">Cámara</th>
                   <th class="py-2.5 px-2.5">Observación</th>
-                  <th class="py-2.5 px-2.5 text-right">Tiempo</th>
-                  <th class="py-2.5 px-2 text-center no-print">Acción</th>
+                  <th class="py-2.5 px-2.5 text-right w-[64px]">Tiempo</th>
+                  <th class="py-2.5 px-2 text-center no-print w-[108px]">Acción</th>
                 </tr>
               </thead>
               <tbody id="tbodyNoAsiste" class="divide-y divide-slate-100 dark:divide-slate-800"></tbody>
@@ -697,6 +987,24 @@
     </main>
   </div>
 
+  <!-- Modal Selector de Cámara: Casino → DVR → Cámara -->
+  <div id="modalSelectorCctv" onclick="cerrarSelectorCamarasFondo(event)"
+    class="hidden fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm items-center justify-center p-4 no-print">
+    <div
+      class="w-full max-w-2xl bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col max-h-[85vh]">
+      <div class="px-5 py-3.5 bg-slate-900 dark:bg-slate-950 text-white flex items-center justify-between gap-2">
+        <h3 class="text-sm font-bold flex items-center gap-2">📹 Seleccionar Cámara <span
+            class="font-normal text-slate-400 text-xs">Casino → DVR → Cámara</span></h3>
+        <button type="button" onclick="cerrarSelectorCamaras()"
+          class="px-2 py-1 rounded-lg hover:bg-slate-700 text-slate-300 hover:text-white text-sm cursor-pointer">✕</button>
+      </div>
+      <div id="breadcrumbSelectorCctv"
+        class="px-5 py-2.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/60 flex flex-wrap items-center gap-1.5 text-xs">
+      </div>
+      <div id="cuerpoSelectorCctv" class="p-5 overflow-y-auto flex-1"></div>
+    </div>
+  </div>
+
   <!-- Modal de Confirmación para Limpiar Todo -->
   <div id="modalLimpiar"
     class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4 no-print">
@@ -750,6 +1058,252 @@
     </div>
   </div>
 
+  <!-- Modal Integral de Base de Datos en la Nube (Supabase) -->
+  <div id="modalSupabase"
+    class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm hidden items-center justify-center z-50 p-3 sm:p-5 no-print">
+    <div
+      class="bg-white dark:bg-slate-900 rounded-2xl max-w-4xl w-full shadow-2xl border border-slate-200 dark:border-slate-800 max-h-[90vh] flex flex-col overflow-hidden">
+
+      <!-- Cabecera del Modal Supabase -->
+      <div
+        class="bg-slate-900 dark:bg-slate-950 px-5 py-4 border-b border-slate-800 flex flex-wrap items-center justify-between gap-3 text-white">
+        <div class="flex items-center gap-2.5">
+          <div class="p-2 rounded-xl bg-sky-600 text-white">
+            <i data-lucide="database" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="text-sm sm:text-base font-bold leading-tight">Base de Datos en la Nube · Supabase</h3>
+            <p id="supaModalSubtitle" class="text-[11px] text-slate-400">Sincronización multi-PC, respaldo seguro con
+              RLS y estadísticas históricas</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <div class="inline-flex bg-slate-800 p-1 rounded-xl border border-slate-700 text-xs">
+            <button type="button" id="btnTabCloudExplorer" onclick="cambiarTabSupabase('explorer')"
+              class="px-3 py-1.5 rounded-lg font-semibold transition cursor-pointer bg-sky-600 text-white">
+              Auditorías Nube
+            </button>
+            <button type="button" id="btnTabCloudAuth" onclick="cambiarTabSupabase('auth')"
+              class="px-3 py-1.5 rounded-lg font-semibold transition cursor-pointer text-slate-300 hover:text-white">
+              Sesión Operador
+            </button>
+            <button type="button" id="btnTabCloudConfig" onclick="cambiarTabSupabase('config')"
+              class="px-3 py-1.5 rounded-lg font-semibold transition cursor-pointer text-slate-300 hover:text-white">
+              Conexión & SQL
+            </button>
+          </div>
+
+          <button type="button" onclick="cerrarModalSupabase()"
+            class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 cursor-pointer">
+            ✕
+          </button>
+        </div>
+      </div>
+
+      <!-- Cuerpo del Modal -->
+      <div class="p-5 overflow-y-auto flex-1 space-y-4 bg-slate-50 dark:bg-slate-900/60">
+
+        <!-- PESTAÑA 1: EXPLORADOR DE AUDITORÍAS EN SUPABASE -->
+        <div id="tabCloudExplorer" class="space-y-4">
+          <!-- Barra de Filtros SQL -->
+          <div
+            class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2.5 items-end">
+            <div class="lg:col-span-3">
+              <label for="cloudFiltroEmpleado"
+                class="block text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Empleado</label>
+              <input type="text" id="cloudFiltroEmpleado" placeholder="Ej: Gómez"
+                class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-3 py-1.5 text-xs text-slate-900 dark:text-white outline-none focus:border-sky-500" />
+            </div>
+            <div class="lg:col-span-2">
+              <label for="cloudFiltroSala"
+                class="block text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Sala</label>
+              <input type="text" id="cloudFiltroSala" list="salasDatalist" placeholder="Todas"
+                class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-3 py-1.5 text-xs text-slate-900 dark:text-white outline-none focus:border-sky-500" />
+            </div>
+            <div class="lg:col-span-2">
+              <label for="cloudFiltroDesde"
+                class="block text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Desde Fecha</label>
+              <input type="date" id="cloudFiltroDesde"
+                class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-2.5 py-1.5 text-xs font-mono text-slate-900 dark:text-white outline-none focus:border-sky-500" />
+            </div>
+            <div class="lg:col-span-2">
+              <label for="cloudFiltroHasta"
+                class="block text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Hasta Fecha</label>
+              <input type="date" id="cloudFiltroHasta"
+                class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-2.5 py-1.5 text-xs font-mono text-slate-900 dark:text-white outline-none focus:border-sky-500" />
+            </div>
+            <div class="lg:col-span-3 flex items-center gap-2">
+              <button type="button" onclick="cargarAuditoriasSupabase()"
+                class="flex-1 py-1.5 px-3 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold transition cursor-pointer">
+                🔍 Consultar
+              </button>
+              <button type="button" onclick="limpiarFiltrosCloud()"
+                class="py-1.5 px-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-600 dark:text-slate-300 text-xs font-semibold transition cursor-pointer">
+                Limpiar
+              </button>
+            </div>
+          </div>
+
+          <!-- Resumen Estadístico del Período Consultado -->
+          <div id="cloudStatsBar" class="hidden grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+            <div class="bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-800">
+              <span class="block text-[10px] font-bold uppercase text-slate-400">Auditorías</span>
+              <span id="cloudStatCount" class="text-base font-bold font-mono text-slate-800 dark:text-white">0</span>
+            </div>
+            <div class="bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-800">
+              <span class="block text-[10px] font-bold uppercase text-emerald-600 dark:text-emerald-400">Promedio
+                Asiste</span>
+              <span id="cloudStatAvgAsiste"
+                class="text-base font-bold font-mono text-emerald-600 dark:text-emerald-400">0%</span>
+            </div>
+            <div class="bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-800">
+              <span class="block text-[10px] font-bold uppercase text-indigo-600 dark:text-indigo-400">Acumulado
+                Trabajo</span>
+              <span id="cloudStatSumAsiste"
+                class="text-base font-bold font-mono text-indigo-600 dark:text-indigo-400">00:00 hs</span>
+            </div>
+            <div class="bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-800">
+              <span class="block text-[10px] font-bold uppercase text-amber-600 dark:text-amber-400">Acumulado
+                Distracción</span>
+              <span id="cloudStatSumDist" class="text-base font-bold font-mono text-amber-600 dark:text-amber-400">00:00
+                hs</span>
+            </div>
+          </div>
+
+          <!-- Contenedor de Resultados -->
+          <div id="listaAuditoriasCloud" class="space-y-2.5">
+            <p class="text-xs text-slate-500 dark:text-slate-400 text-center py-8 italic">Conecta tu proyecto e inicia
+              sesión para consultar las auditorías en la nube.</p>
+          </div>
+        </div>
+
+        <!-- PESTAÑA 2: SESIÓN DE OPERADOR (SUPABASE AUTH) -->
+        <div id="tabCloudAuth" class="hidden max-w-md mx-auto py-2 space-y-4">
+          <!-- Vista cuando ya inició sesión -->
+          <div id="boxSesionActiva"
+            class="hidden bg-white dark:bg-slate-900 p-5 rounded-2xl border border-emerald-200 dark:border-emerald-800/60 space-y-4 text-center">
+            <div
+              class="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto font-bold text-xl">
+              ✓
+            </div>
+            <div>
+              <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Sesión
+                Activa en Supabase</span>
+              <p id="supaUserEmail" class="text-sm font-mono font-bold text-slate-800 dark:text-white mt-1">
+                operador@cctv.com</p>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Ya puedes subir, actualizar y consultar
+                auditorías desde cualquier PC.</p>
+            </div>
+            <button type="button" onclick="cerrarSesionSupabase()"
+              class="w-full py-2.5 px-4 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold transition cursor-pointer">
+              Cerrar Sesión
+            </button>
+          </div>
+
+          <!-- Formulario de Login -->
+          <form id="formLoginSupabase" onsubmit="iniciarSesionSupabase(event)"
+            class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-4">
+            <div>
+              <h4 class="text-sm font-bold text-slate-800 dark:text-white">Acceso de Operadores CCTV</h4>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Protegido con Row Level Security (RLS).
+                Ingresa con el usuario creado en Supabase Authentication.</p>
+            </div>
+
+            <div>
+              <label for="supaEmail" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Correo
+                del Operador</label>
+              <input type="email" id="supaEmail" required autocomplete="username" placeholder="operador@casino.com"
+                class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-3 py-2 text-xs text-slate-900 dark:text-white outline-none focus:border-sky-500" />
+            </div>
+
+            <div>
+              <label for="supaPassword"
+                class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Contraseña</label>
+              <input type="password" id="supaPassword" required autocomplete="current-password" placeholder="••••••••"
+                class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-3 py-2 text-xs text-slate-900 dark:text-white outline-none focus:border-sky-500" />
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+              <button type="submit" id="btnSubmitLoginSupa"
+                class="w-full py-2.5 px-4 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold shadow-sm transition cursor-pointer">
+                Iniciar Sesión
+              </button>
+              <button type="button" id="btnRegisterSupa" onclick="registrarOperadorSupabase()"
+                class="w-full py-2.5 px-4 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-indigo-600 hover:text-white text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 text-xs font-semibold transition cursor-pointer">
+                Crear Cuenta Nueva
+              </button>
+            </div>
+            <p class="text-[11px] text-slate-400 text-center">Cada operador ve y administra únicamente sus propias
+              auditorías.</p>
+          </form>
+        </div>
+
+        <!-- PESTAÑA 3: CONFIGURACIÓN DE CREDENCIALES Y SCRIPT SQL -->
+        <div id="tabCloudConfig" class="hidden space-y-4">
+          <div
+            class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <h4 class="text-sm font-bold text-slate-800 dark:text-white">Credenciales del Proyecto Supabase</h4>
+                <p class="text-xs text-slate-500 dark:text-slate-400">Encuéntralas en tu panel de Supabase →
+                  <strong>Project Settings → API</strong>. También puedes fijarlas en <code
+                    class="font-mono">js/supabase-config.js</code>.</p>
+              </div>
+              <span id="supaConfigSourceBadge"
+                class="text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">Sin
+                configurar</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+              <div>
+                <label for="supaUrlInput"
+                  class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Project URL</label>
+                <input type="url" id="supaUrlInput" placeholder="https://tu-proyecto.supabase.co"
+                  class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-3 py-2 text-xs font-mono text-slate-900 dark:text-white outline-none focus:border-sky-500" />
+              </div>
+              <div>
+                <label for="supaKeyInput"
+                  class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">API Key Pública (anon /
+                  public)</label>
+                <input type="text" id="supaKeyInput" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                  class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-3 py-2 text-xs font-mono text-slate-900 dark:text-white outline-none focus:border-sky-500" />
+              </div>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2.5">
+              <button type="button" onclick="guardarConfigSupabaseManual()"
+                class="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold transition cursor-pointer">
+                Guardar y Conectar
+              </button>
+              <button type="button" onclick="copiarSqlInstalacion()"
+                class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition cursor-pointer">
+                📋 Copiar SQL de Instalación (Tabla + RLS)
+              </button>
+            </div>
+          </div>
+
+          <div
+            class="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/60 rounded-xl p-4 text-xs text-amber-900 dark:text-amber-200 space-y-1.5">
+            <div class="font-bold">Pasos rápidos por única vez en Supabase (2 minutos):</div>
+            <ol class="list-decimal list-inside space-y-1 text-amber-800 dark:text-amber-300">
+              <li>Crea un proyecto gratis en <strong>supabase.com</strong> y abre <strong>SQL Editor → New
+                  query</strong>.</li>
+              <li>Haz clic arriba en <strong>"Copiar SQL de Instalación"</strong> (o abre <code
+                  class="font-mono">supabase_setup.sql</code>), pégalo y presiona <strong>Run</strong>.</li>
+              <li>En <strong>Authentication → Users → Add user → Create new user</strong>, crea el correo y clave de tus
+                operadores (activando <em>Auto Confirm User</em>).</li>
+              <li>Copia la <strong>Project URL</strong> y la clave <strong>anon public</strong> de <em>Project Settings
+                  → API</em> y pégalas arriba (o en <code class="font-mono">js/supabase-config.js</code> para dejarlas
+                fijas en GitHub Pages).</li>
+            </ol>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
   <!-- Toast de Notificación con Soporte para Deshacer -->
   <div id="toast"
     class="no-print fixed bottom-5 right-5 bg-slate-900 dark:bg-slate-800 border border-slate-700 text-white px-4 py-3 rounded-xl shadow-2xl text-xs font-medium opacity-0 pointer-events-none transition-all duration-200 z-50 flex items-center gap-3">
@@ -766,17 +1320,136 @@
     const STORAGE_META_KEY = 'auditoria_cctv_meta_minutos';
     const STORAGE_FICHA_KEY = 'auditoria_cctv_ficha_v1';
     const STORAGE_HISTORIAL_KEY = 'auditoria_cctv_historial_v1';
+    const STORAGE_SUPA_CREDS_KEY = 'auditoria_cctv_supabase_creds_v1';
+    const STORAGE_CLOUD_ID_KEY = 'auditoria_cctv_cloud_active_id_v1';
+    const STORAGE_FORM_DRAFT_KEY = 'auditoria_cctv_form_draft_v1';
+    const STORAGE_CLOUD_PENDING_KEY = 'auditoria_cctv_cloud_pending_v1';
+    const STORAGE_AUTOSYNC_PREF_KEY = 'auditoria_cctv_autosync_pref_v1';
+    const SUPABASE_TABLE = 'auditorias_desempeno';
 
     const CAMARAS_BASE = [
       'CAM-01 (Sala Gral)',
       'CAM-02 (Contadores)',
-      'CAM-03 (Sector Bar)',
+      'CAM-03 (Barra)',
       'CAM-04 (Recepción)',
-      'CAM-05 (Oficina Moya)',
-      'CAM-06 (Oficina Enc.)',
-      'CAM-07 (Acceso/Puerta)',
+      'CAM-05 (Oficina de Moya)',
+      'CAM-06 (Oficina de Encargado)',
+      'CAM-07 (Acceso Personal)',
       'CAM-08 (Caja)',
-      'CAM-09 (Área Descanso)'
+      'CAM-09 (Descanso)',
+      'CAM-10 (Pitt)',
+      'CAM-11 (Tesoro)',
+      'CAM-12 (Cocina)',
+      'CAM-13 (Sector Baño)'
+    ];
+
+    const PERSONAL_RAW_LIST = [
+      "PADILLA, JORGE DAVID - 439 / SUPERVISOR DE CONTROL INTERNO (SEGURIDAD )",
+      "ROJAS, DOLLY DEL CARMEN - 442 / SUPERVISOR DE CONTROL INTERNO (SEGURIDAD )",
+      "URBANO, FELIX DANIEL - 444 / SUPERVISOR DE CONTROL INTERNO (SEGURIDAD )",
+      "CASTAÑO, PABLO HORACIO - 40 / AUX. CONTROL INTERNO (BOULEVARD SEGURIDAD)",
+      "DANNUNZIO, ROBERTO AGUSTIN - 1 / AUXILIAR ESPECIALIZADO B (SLOTS TECNICOS TRAGAMONEDAS)",
+      "ALTAMIRANO, FRANCISCO ROBERTO - 19 / ENCARGADO TECNICO (SLOTS TECNICOS TRAGAMONEDAS)",
+      "BENACCHIO, ANGEL ISMAEL - 370 / AUX. TECNICO A (SLOTS TECNICOS TRAGAMONEDAS)",
+      "CRUZ, SERGIO LEONARDO - 410 / PERSONAL AUXILIAR A (SLOTS TECNICOS TRAGAMONEDAS)",
+      "FIGUEROA, FEDERICO RAFAEL ERNESTO - 1041 / AUXILIAR TECNICO A ( SLOTS TECNICOS TRAGAMONEDAS )",
+      "GUANTAY, EMILIO JOSE - 6 / AUXILIAR ESPECIALIZADO B (SLOTS TECNICOS TRAGAMONEDAS)",
+      "LOPEZ RODRIGUEZ, SERGIO DAVID - 12 / PERSONAL AUXILIAR B (SLOTS TECNICOS TRAGAMONEDAS)",
+      "PORCEL, FRANCO - 309 / AUX. TECNICO A (SLOTS TECNICOS TRAGAMONEDAS)",
+      "TEJERINA, SERGIO MAURICIO - 170 / AUX. TECNICO A (SLOTS TECNICOS TRAGAMONEDAS)",
+      "USEDA, PEDRO MAXIMO - 10 / PERSONAL AUXILIAR B (SLOTS TECNICOS TRAGAMONEDAS)",
+      "MOYA VASMULAKYS, CARLOS GUSTAVO - 114 / RESPONSABLE DE CASINO BOULEVARD (BOULEVARD GERENCIA)",
+      "HERRERA, ALEJANDRA MERCEDES - 83 / JEFE DE CAJA B (BOULEVARD CAJAS)",
+      "YANELLO NASSER, CINTIA GRACIELA - 183 / JEFE DE CAJA B (BOULEVARD CAJAS)",
+      "PARRON, STELLA MARIS - 128 / ASISTENTE DE CAJA (BOULEVARD CAJAS)",
+      "PELOC, CLAUDIA MARIANA - 440 / ASISTENTE DE CAJA (BOULEVARD CAJAS)",
+      "PADILLA, SONIA RAQUEL - 125 / CAJERO A (BOULEVARD CAJAS)",
+      "PEÑALBA, MONICA RAQUEL - 240 / CAJERO B (BOULEVARD CAJAS)",
+      "PEREZ, CARMEN ELIZABETH - 130 / CAJERO B (BOULEVARD CAJAS)",
+      "DENZ GIMENEZ, DEBORA ADRIANA - 1035 / ENCARG.TURNO TRAGAMONEDAS A [Ti] ( TRAGAMONEDAS )",
+      "MOISES, ARIEL JESUS - 110 / ENCARG.TURNO TRAGAMONEDAS A (BOULEVARD TRAGAMONEDAS)",
+      "RODRIGUEZ, MONICA ELIANA - 149 / ENCARG.TURNO TRAGAMONEDAS A (BOULEVARD TRAGAMONEDAS)",
+      "ZAMBRANA, CARINA DEL VALLE - 185 / ENCARG.TURNO TRAGAMONEDAS A (BOULEVARD TRAGAMONEDAS)",
+      "MARTINEZ GUAYMAS, CAROLINA ALEJANDRA - 437 / ENCARG.TURNO TRAGAMONEDAS B (BOULEVARD TRAGAMONEDAS)",
+      "LAZARTE, LAURA LORENA - 93 / AS.SALA TRAGAMONEDAS A (BOULEVARD TRAGAMONEDAS)",
+      "ALONSO, JOSE ANTONIO SEBASTIAN - 432 / AS.SALA TRAGAMONEDAS B (BOULEVARD TRAGAMONEDAS)",
+      "CAMINOS, CINTIA SOLEDAD - 37 / AS.SALA TRAGAMONEDAS B (BOULEVARD TRAGAMONEDAS)",
+      "PARADA, JULIO ALBERTO - 127 / AS.SALA TRAGAMONEDAS B (BOULEVARD TRAGAMONEDAS)",
+      "RUIZ MATTEI, JOSE BALTASAR - 154 / ENCARG.SECTOR SERVICIOS (BOULEVARD MAESTRANZA Y SERVICIOS)",
+      "ACOSTA, CATALINA - 14 / AUX. MAEST. Y SERV. A (BOULEVARD MAESTRANZA Y SERVICIOS)",
+      "CORDOBA, RAFAEL ANTONIO - 233 / AUX. MAEST. Y SERV. A (BOULEVARD MAESTRANZA Y SERVICIOS)",
+      "GALVAN, IRIS JUDITH - 71 / AUX. MAEST. Y SERV. A (BOULEVARD MAESTRANZA Y SERVICIOS)",
+      "GUZMAN, DAYSI VANESSA - 192 / AUX. MAEST. Y SERV. A (BOULEVARD MAESTRANZA Y SERVICIOS)",
+      "NAVARRO, CLAUDIO FERNANDO - 255 / AUX. MAEST. Y SERV. A (BOULEVARD MAESTRANZA Y SERVICIOS)",
+      "RAMOS, ROSA PAULINA - 441 / AUX. MAEST. Y SERV. A (BOULEVARD MAESTRANZA Y SERVICIOS)",
+      "RUIZ, ALEJANDRA DEL VALLE - 226 / AUX. MAEST. Y SERV. A (BOULEVARD MAESTRANZA Y SERVICIOS)"
+    ];
+
+    function normalizarTextoBusqueda(txt) {
+      return String(txt || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .trim();
+    }
+
+    const DIRECTORIO_PERSONAL = PERSONAL_RAW_LIST.map((linea, index) => {
+      const [izq, der] = linea.split(' / ');
+      const idxGuion = izq.lastIndexOf(' - ');
+      const nombre = (idxGuion !== -1 ? izq.slice(0, idxGuion) : izq).trim();
+      const legajo = (idxGuion !== -1 ? izq.slice(idxGuion + 3) : '').trim();
+      const cargo = (der || '').replace(/\(\s+/g, '(').replace(/\s+\)/g, ')').trim();
+      const normNombre = normalizarTextoBusqueda(nombre);
+      const palabrasNombre = normNombre.split(/[\s,]+/).filter(Boolean);
+      return {
+        index,
+        raw: linea,
+        nombre,
+        legajo,
+        fichaLabel: legajo ? `${nombre} - ${legajo}` : nombre,
+        cargo,
+        normFull: normalizarTextoBusqueda(linea),
+        normNombre,
+        normLegajo: normalizarTextoBusqueda(legajo),
+        palabrasNombre
+      };
+    });
+
+    const SECTORES_CONVERSACION = [
+      { nombre: 'Barra', camara: 'CAM-03 (Barra)' },
+      { nombre: 'Pitt', camara: 'CAM-10 (Pitt)' },
+      { nombre: 'Caja', camara: 'CAM-08 (Caja)' },
+      { nombre: 'Recepción', camara: 'CAM-04 (Recepción)' },
+      { nombre: 'Acceso Personal', camara: 'CAM-07 (Acceso Personal)' },
+      { nombre: 'Tesoro', camara: 'CAM-11 (Tesoro)' },
+      { nombre: 'Cocina', camara: 'CAM-12 (Cocina)' },
+      { nombre: 'Sala', camara: 'CAM-01 (Sala Gral)' },
+      { nombre: 'Oficina de Encargado', camara: 'CAM-06 (Oficina de Encargado)' },
+      { nombre: 'Oficina de Moya', camara: 'CAM-05 (Oficina de Moya)' }
+    ];
+
+    const OBSERVACIONES_CATALOGO = [
+      { texto: 'Asiste a clientes en Sala', tipo: 'ASISTE', categoria: 'Operativo', camara: 'CAM-01 (Sala Gral)' },
+      { texto: 'Sala', tipo: 'ASISTE', categoria: 'Operativo', camara: 'CAM-01 (Sala Gral)' },
+      { texto: 'Habla en Sala con ', tipo: 'NO_ASISTE', categoria: 'Charla', camara: 'CAM-01 (Sala Gral)', requierePersonal: true, modoArmador: 'HABLA_SALA' },
+      { texto: 'Habla con ', tipo: 'NO_ASISTE', categoria: 'Charla', camara: 'CAM-03 (Barra)', requierePersonal: true, modoArmador: 'HABLA_SECTOR' },
+      { texto: 'Permanece en Barra', tipo: 'NO_ASISTE', categoria: 'Permanencia', camara: 'CAM-03 (Barra)' },
+      { texto: 'Permanece en Pitt', tipo: 'NO_ASISTE', categoria: 'Permanencia', camara: 'CAM-10 (Pitt)' },
+      { texto: 'Firma Váucher en Barra', tipo: 'ASISTE', categoria: 'Operativo', camara: 'CAM-03 (Barra)' },
+      { texto: 'Firma Váucher en Caja', tipo: 'ASISTE', categoria: 'Operativo', camara: 'CAM-08 (Caja)' },
+      { texto: 'Firma Váucher en Pitt', tipo: 'ASISTE', categoria: 'Operativo', camara: 'CAM-10 (Pitt)' },
+      { texto: 'Firma Váucher en Recepción', tipo: 'ASISTE', categoria: 'Operativo', camara: 'CAM-04 (Recepción)' },
+      { texto: 'Caja', tipo: 'ASISTE', categoria: 'Operativo', camara: 'CAM-08 (Caja)' },
+      { texto: 'Cubre Sector Recepción', tipo: 'ASISTE', categoria: 'Operativo', camara: 'CAM-04 (Recepción)' },
+      { texto: 'Cubre Sector Caja', tipo: 'ASISTE', categoria: 'Operativo', camara: 'CAM-08 (Caja)' },
+      { texto: 'Oficina de Encargado', tipo: 'ASISTE', categoria: 'Operativo', camara: 'CAM-06 (Oficina de Encargado)' },
+      { texto: 'Oficina de Moya', tipo: 'ASISTE', categoria: 'Operativo', camara: 'CAM-05 (Oficina de Moya)' },
+      { texto: 'Descanso', tipo: 'NO_ASISTE', categoria: 'Descanso', camara: 'CAM-09 (Descanso)' },
+      { texto: 'Baño', tipo: 'NO_ASISTE', categoria: 'Baño', camara: 'CAM-13 (Sector Baño)' },
+      { texto: 'Mira Tv', tipo: 'NO_ASISTE', categoria: 'TV', camara: 'CAM-03 (Barra)' },
+      { texto: 'Cocina', tipo: 'NO_ASISTE', categoria: 'Refrigerio', camara: 'CAM-12 (Cocina)' },
+      { texto: 'Toma Café', tipo: 'NO_ASISTE', categoria: 'Refrigerio', camara: 'CAM-03 (Barra)' },
+      { texto: 'Toma Gaseosa', tipo: 'NO_ASISTE', categoria: 'Refrigerio', camara: 'CAM-03 (Barra)' }
     ];
 
     let metaMinutos = META_MINUTOS_DEFAULT;
@@ -784,6 +1457,16 @@
     let editandoIndex = null;
     let ultimoRespaldo = null;
     let toastTimer = null;
+
+    // Estado Supabase y Autoguardado
+    let supabaseClient = null;
+    let supabaseSession = null;
+    let cloudAuditId = null;
+    let cloudResultadosCache = [];
+    let cloudAutoSyncTimer = null;
+    let isCloudSyncing = false;
+    let queuedSyncAfterCurrent = false;
+    let isBootstrappingApp = true;
 
     function obtenerFechaTurnoPorDefecto() {
       const ahora = new Date();
@@ -810,8 +1493,87 @@
         sala: document.getElementById('fichaSala').value.trim(),
         fechaIso,
         fechaDisplay: formatearFechaISO(fechaIso),
-        turno: document.getElementById('fichaTurno').value || def.turno
+        turno: document.getElementById('fichaTurno').value || def.turno,
+        marcaIngreso: document.getElementById('fichaMarcaIngreso')?.value || '',
+        saleSala: document.getElementById('fichaSaleSala')?.value || '',
+        marcaSalida: document.getElementById('fichaMarcaSalida')?.value || ''
       };
+    }
+
+    function aplicarFichaEnInputs(f) {
+      if (!f || typeof f !== 'object') return;
+      const def = obtenerFechaTurnoPorDefecto();
+      document.getElementById('fichaEmpleado').value = f.empleado || '';
+      document.getElementById('fichaCargo').value = f.cargo || '';
+      document.getElementById('fichaSala').value = f.sala || '';
+      document.getElementById('fichaFecha').value = f.fechaIso || def.iso;
+      document.getElementById('fichaTurno').value = f.turno || def.turno;
+      document.getElementById('fichaMarcaIngreso').value = f.marcaIngreso || '';
+      document.getElementById('fichaSaleSala').value = f.saleSala || '';
+      document.getElementById('fichaMarcaSalida').value = f.marcaSalida || '';
+    }
+
+    function tieneHorariosReferencia(ficha) {
+      return Boolean(ficha && (ficha.marcaIngreso || ficha.saleSala || ficha.marcaSalida));
+    }
+
+    function formatearTextoReferencias(ficha) {
+      if (!tieneHorariosReferencia(ficha)) return '';
+      const partes = [];
+      partes.push(`Marca Ingreso: ${ficha.marcaIngreso ? ficha.marcaIngreso + ' hs' : 'S/D'}`);
+      partes.push(`Sale a Sala: ${ficha.saleSala ? ficha.saleSala + ' hs' : 'S/D'}`);
+      partes.push(`Marca Salida: ${ficha.marcaSalida ? ficha.marcaSalida + ' hs' : 'S/D'}`);
+      return partes.join(' | ');
+    }
+
+    window.limpiarHorariosReferencia = function () {
+      document.getElementById('fichaMarcaIngreso').value = '';
+      document.getElementById('fichaSaleSala').value = '';
+      document.getElementById('fichaMarcaSalida').value = '';
+      guardarFichaYActualizar();
+      mostrarToast('Horarios de referencia limpiados');
+    };
+
+    const DVRS_BOULEVARD = ['DVR 1', 'DVR 2', 'DVR 3', 'DVR 4', 'DVR 5', 'DVR 6', 'DVR 7', 'DVR 8'];
+
+    function esSalaBoulevard(salaStr) {
+      return /b(ou)?levard/i.test(String(salaStr || '').trim());
+    }
+
+    function obtenerOrdenNumericoDvr(dvrStr) {
+      const m = String(dvrStr || '').match(/(\d+)/);
+      return m ? parseInt(m[1], 10) : 999;
+    }
+
+    function actualizarVisibilidadDvrBoulevard(ficha) {
+      const esBoulevard = esSalaBoulevard(ficha?.sala);
+      const contDvr = document.getElementById('contenedorCampoDvr');
+      const contCat = document.getElementById('contenedorCampoCategoria');
+      const contCam = document.getElementById('contenedorCampoCamara');
+      const badgeBoulevard = document.getElementById('badgeModoBoulevard');
+      const filtroDvrEl = document.getElementById('filtroDvr');
+
+      if (contDvr) contDvr.classList.toggle('hidden', !esBoulevard);
+      if (badgeBoulevard) badgeBoulevard.classList.toggle('hidden', !esBoulevard);
+      if (contCat) {
+        contCat.classList.toggle('lg:col-span-3', !esBoulevard);
+        contCat.classList.toggle('lg:col-span-2', esBoulevard);
+      }
+      if (contCam) {
+        contCam.classList.toggle('lg:col-span-3', !esBoulevard);
+        contCam.classList.toggle('lg:col-span-2', esBoulevard);
+      }
+
+      const hayRegistrosConDvr = registros.some(r => Boolean(r.dvr));
+      const mostrarFiltroDvr = esBoulevard || hayRegistrosConDvr;
+      if (filtroDvrEl) {
+        filtroDvrEl.classList.toggle('hidden', !mostrarFiltroDvr);
+        if (!mostrarFiltroDvr && filtroDvrEl.value !== 'TODOS') {
+          filtroDvrEl.value = 'TODOS';
+        }
+      }
+
+      return esBoulevard;
     }
 
     window.guardarFichaYActualizar = function () {
@@ -820,13 +1582,67 @@
         localStorage.setItem(STORAGE_FICHA_KEY, JSON.stringify(f));
       } catch (e) { }
       actualizarTodo(true);
+      if (!isBootstrappingApp && registros.length > 0) {
+        programarAutoSyncNube();
+      }
     };
+
+    // ==================== GUARDADO LETRA POR LETRA DEL BORRADOR DEL FORMULARIO ====================
+    function guardarBorradorFormulario() {
+      if (isBootstrappingApp) return;
+      try {
+        const draft = {
+          categoria: document.getElementById('inputCategoria')?.value || 'Operativo',
+          tipo: document.getElementById('inputTipo')?.value || 'ASISTE',
+          dvr: document.getElementById('inputDvr')?.value || 'DVR 1',
+          camara: document.getElementById('inputCamara')?.value || '',
+          inicio: document.getElementById('inputInicio')?.value || '',
+          fin: document.getElementById('inputFin')?.value || '',
+          detalle: document.getElementById('inputDetalle')?.value || '',
+          bajarVideo: Boolean(document.getElementById('inputBajarVideo')?.checked),
+          encadenar: Boolean(document.getElementById('checkEncadenar')?.checked)
+        };
+        localStorage.setItem(STORAGE_FORM_DRAFT_KEY, JSON.stringify(draft));
+      } catch (e) { }
+    }
+
+    function limpiarBorradorFormulario() {
+      try {
+        localStorage.removeItem(STORAGE_FORM_DRAFT_KEY);
+      } catch (e) { }
+    }
+
+    function restaurarBorradorFormulario() {
+      try {
+        const raw = localStorage.getItem(STORAGE_FORM_DRAFT_KEY);
+        if (!raw) return;
+        const d = JSON.parse(raw);
+        if (!d || typeof d !== 'object') return;
+        if (typeof d.encadenar === 'boolean') {
+          document.getElementById('checkEncadenar').checked = d.encadenar;
+        }
+        if (d.dvr && DVRS_BOULEVARD.includes(d.dvr)) {
+          document.getElementById('inputDvr').value = d.dvr;
+        }
+        const teniaCargaEnCurso = Boolean((d.detalle && d.detalle.trim()) || d.fin);
+        if (!teniaCargaEnCurso) return;
+
+        if (d.categoria) document.getElementById('inputCategoria').value = d.categoria;
+        if (d.tipo) document.getElementById('inputTipo').value = d.tipo;
+        if (d.camara) document.getElementById('inputCamara').value = d.camara;
+        if (d.inicio) document.getElementById('inputInicio').value = d.inicio;
+        if (d.fin) document.getElementById('inputFin').value = d.fin;
+        if (d.detalle) document.getElementById('inputDetalle').value = d.detalle;
+        document.getElementById('inputBajarVideo').checked = Boolean(d.bajarVideo);
+      } catch (e) { }
+    }
 
     function guardarSnapshotUndo(etiqueta) {
       ultimoRespaldo = {
         etiqueta,
         registros: JSON.parse(JSON.stringify(registros)),
-        metaMinutos
+        metaMinutos,
+        ficha: obtenerFichaActual()
       };
     }
 
@@ -834,6 +1650,10 @@
       if (!ultimoRespaldo) return;
       registros = ultimoRespaldo.registros;
       metaMinutos = ultimoRespaldo.metaMinutos;
+      if (ultimoRespaldo.ficha) {
+        aplicarFichaEnInputs(ultimoRespaldo.ficha);
+        try { localStorage.setItem(STORAGE_FICHA_KEY, JSON.stringify(ultimoRespaldo.ficha)); } catch (e) { }
+      }
       const etq = ultimoRespaldo.etiqueta;
       ultimoRespaldo = null;
       cancelarEdicion(true);
@@ -1042,8 +1862,9 @@
 
     window.sincronizarEstadoPorCategoria = function () {
       const cat = document.getElementById('inputCategoria').value;
-      const catsInactivas = ['Descanso', 'Charla', 'Celular', 'TV', 'Ausencia'];
+      const catsInactivas = ['Descanso', 'Baño', 'Refrigerio', 'Charla', 'Permanencia', 'Celular', 'TV', 'Ausencia'];
       document.getElementById('inputTipo').value = catsInactivas.includes(cat) ? 'NO_ASISTE' : 'ASISTE';
+      guardarBorradorFormulario();
     };
 
     window.sumarDuracionRapida = function (deltaMin) {
@@ -1055,6 +1876,7 @@
       }
       const base = finInput.value ? horaAMinutos(finInput.value) : horaAMinutos(iniInput.value);
       finInput.value = minutosAReloj24(base + deltaMin);
+      guardarBorradorFormulario();
       document.getElementById('inputDetalle').focus();
     };
 
@@ -1088,6 +1910,7 @@
 
       // Encabezado dinámico y ficha impresa
       const ficha = obtenerFichaActual();
+      actualizarVisibilidadDvrBoulevard(ficha);
       const partesHeader = [`${ficha.fechaDisplay} · ${ficha.turno}`];
       if (ficha.empleado) partesHeader.push(ficha.empleado);
       if (ficha.sala) partesHeader.push(ficha.sala);
@@ -1095,11 +1918,60 @@
       document.getElementById('printFichaResumen').textContent =
         `Auditado: ${ficha.empleado || 'Sin especificar'} (${ficha.cargo || 'S/C'}) | Sala: ${ficha.sala || 'General'} | Fecha: ${ficha.fechaDisplay} | ${ficha.turno}`;
 
+      const hayRefs = tieneHorariosReferencia(ficha);
+      const printRefsEl = document.getElementById('printReferenciasResumen');
+      const barraRefsEl = document.getElementById('barraReferenciasResumen');
+      const btnLimpiarRefs = document.getElementById('btnLimpiarReferencias');
+      const badgeInfoRefs = document.getElementById('badgeInfoReferencias');
+
+      if (btnLimpiarRefs) btnLimpiarRefs.classList.toggle('hidden', !hayRefs);
+
+      if (badgeInfoRefs) {
+        if (ficha.marcaIngreso && ficha.saleSala) {
+          const diffIngresoSala = (ficha.marcaIngreso === ficha.saleSala) ? 0 : calcularMinutos(ficha.marcaIngreso, ficha.saleSala);
+          if (diffIngresoSala >= 0 && diffIngresoSala <= 240) {
+            badgeInfoRefs.textContent = `Ingreso → Sala: ${diffIngresoSala} min (no computa)`;
+            badgeInfoRefs.classList.remove('hidden');
+          } else {
+            badgeInfoRefs.classList.add('hidden');
+          }
+        } else {
+          badgeInfoRefs.classList.add('hidden');
+        }
+      }
+
+      if (printRefsEl) {
+        printRefsEl.textContent = hayRefs ? `Horarios de Referencia (No computables): ${formatearTextoReferencias(ficha)}` : '';
+        printRefsEl.classList.toggle('hidden', !hayRefs);
+      }
+
+      if (barraRefsEl) {
+        if (hayRefs) {
+          const pills = [];
+          if (ficha.marcaIngreso) {
+            pills.push(`<span class="px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 font-semibold">🟢 Marca Ingreso: ${escapeHTML(ficha.marcaIngreso)} hs</span>`);
+          }
+          if (ficha.saleSala) {
+            pills.push(`<span class="px-2 py-0.5 rounded-md bg-sky-50 dark:bg-sky-950/50 text-sky-800 dark:text-sky-300 border border-sky-200 dark:border-sky-800/60 font-semibold">🚶 Sale a Sala: ${escapeHTML(ficha.saleSala)} hs</span>`);
+          }
+          if (ficha.marcaSalida) {
+            pills.push(`<span class="px-2 py-0.5 rounded-md bg-rose-50 dark:bg-rose-950/50 text-rose-800 dark:text-rose-300 border border-rose-200 dark:border-rose-800/60 font-semibold">🔴 Marca Salida: ${escapeHTML(ficha.marcaSalida)} hs</span>`);
+          }
+          pills.push(`<span class="text-slate-400 dark:text-slate-500 text-[10px] font-sans italic">(Referencia · No suma al horario)</span>`);
+          barraRefsEl.innerHTML = pills.join('');
+          barraRefsEl.classList.remove('hidden');
+        } else {
+          barraRefsEl.innerHTML = '';
+          barraRefsEl.classList.add('hidden');
+        }
+      }
+
       // Filtros activos
       const qTexto = (document.getElementById('filtroTexto')?.value || '').trim().toLowerCase();
+      const qDvr = document.getElementById('filtroDvr')?.value || 'TODOS';
       const qCat = document.getElementById('filtroCategoria')?.value || 'TODAS';
       const soloDvr = Boolean(document.getElementById('filtroSoloDvr')?.checked);
-      const hayFiltro = Boolean(qTexto) || qCat !== 'TODAS' || soloDvr;
+      const hayFiltro = Boolean(qTexto) || qDvr !== 'TODOS' || qCat !== 'TODAS' || soloDvr;
       document.getElementById('btnLimpiarFiltros').classList.toggle('hidden', !hayFiltro);
 
       const tbodyAsiste = document.getElementById('tbodyAsiste');
@@ -1132,10 +2004,11 @@
         }
 
         // Aplicar filtro visual en tablas (sin alterar KPIs globales)
+        if (qDvr !== 'TODOS' && (reg.dvr || '') !== qDvr) return;
         if (qCat !== 'TODAS' && reg.categoria !== qCat) return;
         if (soloDvr && !reg.bajarVideo) return;
         if (qTexto) {
-          const buscable = `${reg.inicio} ${reg.fin} ${reg.camara} ${reg.categoria} ${reg.detalle}`.toLowerCase();
+          const buscable = `${reg.inicio} ${reg.fin} ${reg.dvr || ''} ${reg.camara} ${reg.categoria} ${reg.detalle}`.toLowerCase();
           if (!buscable.includes(qTexto)) return;
         }
 
@@ -1153,6 +2026,10 @@
           ? `<span class="inline-block mr-1.5 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">${escapeHTML(reg.categoria)}</span>`
           : '';
 
+        const badgeDvr = reg.dvr
+          ? `<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-600 text-white whitespace-nowrap">${escapeHTML(reg.dvr)}</span>`
+          : '';
+
         const camBadgeClass = reg.tipo === 'ASISTE'
           ? "bg-emerald-50 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800/60"
           : "bg-amber-50 dark:bg-amber-950/50 text-amber-900 dark:text-amber-300 border-amber-200 dark:border-amber-800/60";
@@ -1164,11 +2041,14 @@
         tr.innerHTML = `
           <td class="py-2 px-2.5 font-mono-nums font-medium text-slate-700 dark:text-slate-200 whitespace-nowrap">${reg.inicio} - ${reg.fin}</td>
           <td class="py-2 px-2.5">
-            <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold border whitespace-nowrap ${camBadgeClass}">
-              ${escapeHTML(reg.camara || 'S/C')}
-            </span>
+            <div class="flex flex-wrap items-center gap-1">
+              ${badgeDvr}
+              <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold border whitespace-nowrap ${camBadgeClass}">
+                ${escapeHTML(reg.camara || 'S/C')}
+              </span>
+            </div>
           </td>
-          <td class="py-2 px-2.5 text-slate-800 dark:text-slate-200">${badgeCat}${escapeHTML(reg.detalle)}</td>
+          <td class="py-2 px-2.5 text-slate-800 dark:text-slate-200 leading-relaxed">${badgeCat}${resaltarPersonalEnTexto(reg.detalle)}</td>
           <td class="py-2 px-2.5 text-right font-mono-nums font-bold ${durColorClass}">${minutosADuracionStr(duracion)}</td>
           <td class="py-2 px-2 text-center no-print whitespace-nowrap">
             <button type="button" onclick="toggleBajarVideo(${index})" class="px-1.5 py-1 rounded text-xs transition mr-0.5 cursor-pointer ${btnDvrClass}" title="Marcar/Desmarcar para extracción DVR">
@@ -1279,6 +2159,9 @@
         try {
           localStorage.setItem(STORAGE_REGISTROS_KEY, JSON.stringify(registros));
         } catch (e) { }
+        if (!isBootstrappingApp) {
+          programarAutoSyncNube();
+        }
       }
     }
 
@@ -1288,7 +2171,6 @@
       const resumenEl = document.getElementById('resumenAnomalias');
       const panelEl = document.getElementById('panelAnomalias');
       const btnSolapa = document.getElementById('btnCorregirSolapamientos');
-      const btnHuecos = document.getElementById('btnAutocompletarPanel');
       listaEl.innerHTML = '';
 
       if (registros.length === 0) {
@@ -1297,7 +2179,6 @@
         resumenEl.className = "font-medium text-slate-600 dark:text-slate-300";
         document.getElementById('rangoGlobalTexto').innerText = "Rango cubierto: Sin registros cargados";
         btnSolapa.classList.add('hidden');
-        btnHuecos.classList.add('hidden');
         return { huecos: [], solapamientos: [] };
       }
 
@@ -1349,7 +2230,6 @@
       }
 
       btnSolapa.classList.toggle('hidden', solapamientos.length === 0);
-      btnHuecos.classList.toggle('hidden', huecos.length === 0 && (registros.reduce((a, r) => a + r.minutos, 0) >= metaMinutos));
 
       if (huecos.length === 0 && solapamientos.length === 0) {
         panelEl.className = "bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/60 rounded-xl p-3.5 text-xs";
@@ -1396,6 +2276,7 @@
       cancelarEdicion(true);
       document.getElementById('inputInicio').value = desde;
       document.getElementById('inputFin').value = hasta;
+      guardarBorradorFormulario();
       document.getElementById('inputDetalle').focus();
       document.getElementById('cardFormulario').scrollIntoView({ behavior: 'smooth', block: 'center' });
       mostrarToast(`Hueco ${desde} → ${hasta} cargado en el formulario`);
@@ -1433,75 +2314,14 @@
       mostrarToast('✓ Solapamientos horarios corregidos', true);
     };
 
-    window.autocompletarHuecos = function () {
-      if (registros.length === 0) {
-        mostrarToast('Primero registra al menos un tramo para autocompletar');
-        return;
-      }
-
-      const modoNoche = esModoNocturno();
-      registros.sort((a, b) => obtenerIntervaloLineal(a, modoNoche).ini - obtenerIntervaloLineal(b, modoNoche).ini);
-
-      const nuevosTramos = [];
-      let cursorFin = obtenerIntervaloLineal(registros[0], modoNoche).fin;
-      let cursorFinStr = registros[0].fin;
-      let cursorCam = registros[0].camara || 'CAM-01 (Sala Gral)';
-
-      for (let i = 1; i < registros.length; i++) {
-        const sig = obtenerIntervaloLineal(registros[i], modoNoche);
-        if (sig.ini > cursorFin) {
-          const d = sig.ini - cursorFin;
-          nuevosTramos.push({
-            tipo: 'ASISTE',
-            inicio: cursorFinStr,
-            fin: registros[i].inicio,
-            detalle: 'Transición / Traslado entre sectores (Autocompletado)',
-            camara: cursorCam,
-            categoria: 'Traslado',
-            minutos: d,
-            bajarVideo: false
-          });
-        }
-        if (sig.fin > cursorFin) {
-          cursorFin = sig.fin;
-          cursorFinStr = registros[i].fin;
-          cursorCam = registros[i].camara || cursorCam;
-        }
-      }
-
-      const totalActual = registros.reduce((acc, r) => acc + calcularMinutos(r.inicio, r.fin), 0) +
-        nuevosTramos.reduce((acc, r) => acc + r.minutos, 0);
-
-      if (totalActual < metaMinutos) {
-        const faltante = metaMinutos - totalActual;
-        nuevosTramos.push({
-          tipo: 'ASISTE',
-          inicio: cursorFinStr,
-          fin: minutosAReloj24(cursorFin + faltante),
-          detalle: 'Cierre de jornada / Fichada de salida',
-          camara: 'CAM-07 (Acceso/Puerta)',
-          categoria: 'Operativo',
-          minutos: faltante,
-          bajarVideo: false
-        });
-      }
-
-      if (nuevosTramos.length === 0) {
-        mostrarToast('No hay huecos ni minutos faltantes para autocompletar');
-        return;
-      }
-
-      guardarSnapshotUndo('autocompletar huecos');
-      registros = registros.concat(nuevosTramos);
-      actualizarTodo();
-      mostrarToast(`⚡ Se completaron ${nuevosTramos.length} tramo(s)`, true);
-    };
-
     // ==================== AGREGAR Y EDITAR SIN PÉRDIDA DE DATOS ====================
     window.agregarRegistro = function (e) {
       e.preventDefault();
+      const fichaActual = obtenerFichaActual();
+      const usarDvrBoulevard = esSalaBoulevard(fichaActual.sala);
       const tipo = document.getElementById('inputTipo').value;
       const categoria = document.getElementById('inputCategoria').value;
+      const dvr = usarDvrBoulevard ? (document.getElementById('inputDvr').value || 'DVR 1') : '';
       const camara = document.getElementById('inputCamara').value.trim() || 'CAM-01 (Sala Gral)';
       const inicio = document.getElementById('inputInicio').value;
       const fin = document.getElementById('inputFin').value;
@@ -1514,12 +2334,13 @@
         return;
       }
 
-      const nuevoObj = { tipo, categoria, camara, inicio, fin, detalle, minutos, bajarVideo };
+      const nuevoObj = { tipo, categoria, dvr, camara, inicio, fin, detalle, minutos, bajarVideo };
 
       if (editandoIndex !== null && registros[editandoIndex]) {
         guardarSnapshotUndo('edición de tramo');
         registros[editandoIndex] = nuevoObj;
         cancelarEdicion(true);
+        limpiarBorradorFormulario();
         actualizarTodo();
         mostrarToast('✏️ Tramo actualizado correctamente', true);
       } else {
@@ -1527,6 +2348,9 @@
         document.getElementById('inputDetalle').value = '';
         document.getElementById('inputFin').value = '';
         document.getElementById('inputBajarVideo').checked = false;
+        armadorEstado.personas = [];
+        renderizarEstadoArmador(false);
+        limpiarBorradorFormulario();
         actualizarTodo();
         mostrarToast('✓ Tramo horario agregado');
       }
@@ -1539,15 +2363,19 @@
 
       document.getElementById('inputTipo').value = reg.tipo;
       document.getElementById('inputCategoria').value = reg.categoria || 'Operativo';
+      if (reg.dvr && DVRS_BOULEVARD.includes(reg.dvr)) {
+        document.getElementById('inputDvr').value = reg.dvr;
+      }
       document.getElementById('inputCamara').value = reg.camara || 'CAM-01 (Sala Gral)';
       document.getElementById('inputInicio').value = reg.inicio;
       document.getElementById('inputFin').value = reg.fin;
       document.getElementById('inputDetalle').value = reg.detalle;
       document.getElementById('inputBajarVideo').checked = !!reg.bajarVideo;
 
+      const etqCamDvr = reg.dvr ? `${reg.dvr} · ${reg.camara}` : reg.camara;
       document.getElementById('bannerEdicion').classList.remove('hidden');
-      document.getElementById('textoBannerEdicion').textContent = `Editando tramo ${reg.inicio} - ${reg.fin} (${reg.camara})`;
-      document.getElementById('btnSubmitRegistro').textContent = 'Guardar';
+      document.getElementById('textoBannerEdicion').textContent = `Editando tramo ${reg.inicio} - ${reg.fin} (${etqCamDvr})`;
+      document.getElementById('btnSubmitRegistro').textContent = 'Guardar Cambios';
       document.getElementById('tituloFormulario').textContent = 'Modificar Tramo Seleccionado';
 
       actualizarTodo(true);
@@ -1558,7 +2386,7 @@
     window.cancelarEdicion = function (silencioso = false) {
       editandoIndex = null;
       document.getElementById('bannerEdicion').classList.add('hidden');
-      document.getElementById('btnSubmitRegistro').textContent = 'Añadir';
+      document.getElementById('btnSubmitRegistro').textContent = '+ Añadir Tramo';
       document.getElementById('tituloFormulario').textContent = 'Registrar Tramo Horario / Cámara';
       document.getElementById('inputDetalle').value = '';
       document.getElementById('inputFin').value = '';
@@ -1578,18 +2406,444 @@
       mostrarToast('🗑️ Registro eliminado', true);
     };
 
+    // ==================== SELECTOR DE CÁMARA: CASINO → DVR → CÁMARA ====================
+    const STORAGE_CATALOGO_CCTV_KEY = 'auditoria_cctv_catalogo_camaras_v1';
+    const SALAS_CCTV = ['Casino Boulevard', 'Sala Luxor', 'Slots Salvador Mazza', 'Slots Lajitas', 'Slots Mosconi', 'Slots Refinor', 'Sala VIP'];
+    let catalogoCctv = null;
+    const selectorCctv = { paso: 1, sala: '', dvr: '', filtro: '', editando: false, listaSalas: [], listaDvrs: [], listaCams: [] };
+
+    function generarCamarasGenericas(n) {
+      return Array.from({ length: n }, (_, i) => `CAM ${String(i + 1).padStart(2, '0')}`);
+    }
+
+    function construirCatalogoCctvPorDefecto() {
+      const cat = {};
+      SALAS_CCTV.forEach(s => {
+        if (esSalaBoulevard(s)) {
+          cat[s] = {};
+          DVRS_BOULEVARD.forEach(d => { cat[s][d] = generarCamarasGenericas(16); });
+        } else {
+          cat[s] = { 'DVR 1': CAMARAS_BASE.slice() };
+        }
+      });
+      return cat;
+    }
+
+    function obtenerCatalogoCctv() {
+      if (catalogoCctv) return catalogoCctv;
+      const base = construirCatalogoCctvPorDefecto();
+      try {
+        const guardado = JSON.parse(localStorage.getItem(STORAGE_CATALOGO_CCTV_KEY) || 'null');
+        if (guardado && typeof guardado === 'object') {
+          Object.keys(guardado).forEach(s => {
+            if (guardado[s] && typeof guardado[s] === 'object') {
+              base[s] = Object.assign({}, base[s] || {}, guardado[s]);
+            }
+          });
+        }
+      } catch (e) { }
+      catalogoCctv = base;
+      return catalogoCctv;
+    }
+
+    function guardarCatalogoCctv() {
+      try { localStorage.setItem(STORAGE_CATALOGO_CCTV_KEY, JSON.stringify(catalogoCctv)); } catch (e) { }
+    }
+
+    function resolverSalaCatalogo(sala) {
+      if (!sala) return '';
+      const cat = obtenerCatalogoCctv();
+      if (esSalaBoulevard(sala)) return Object.keys(cat).find(k => esSalaBoulevard(k)) || '';
+      return Object.keys(cat).find(k => normalizarTextoBusqueda(k) === normalizarTextoBusqueda(sala)) || '';
+    }
+
+    function ordenarDvrs(lista) {
+      return lista.slice().sort((a, b) => obtenerOrdenNumericoDvr(a) - obtenerOrdenNumericoDvr(b) || a.localeCompare(b));
+    }
+
+    window.abrirSelectorCamaras = function () {
+      const cat = obtenerCatalogoCctv();
+      const sala = resolverSalaCatalogo(obtenerFichaActual().sala);
+      selectorCctv.filtro = '';
+      selectorCctv.editando = false;
+      if (sala) {
+        selectorCctv.sala = sala;
+        const dvrs = ordenarDvrs(Object.keys(cat[sala] || {}));
+        const dvrActual = document.getElementById('inputDvr')?.value || '';
+        if (dvrs.length === 1) {
+          selectorCctv.dvr = dvrs[0];
+          selectorCctv.paso = 3;
+        } else {
+          selectorCctv.dvr = dvrs.includes(dvrActual) ? dvrActual : '';
+          selectorCctv.paso = 2;
+        }
+      } else {
+        selectorCctv.sala = '';
+        selectorCctv.dvr = '';
+        selectorCctv.paso = 1;
+      }
+      const m = document.getElementById('modalSelectorCctv');
+      m.classList.remove('hidden');
+      m.classList.add('flex');
+      renderizarSelectorCctv();
+    };
+
+    window.cerrarSelectorCamaras = function () {
+      const m = document.getElementById('modalSelectorCctv');
+      if (!m) return;
+      m.classList.add('hidden');
+      m.classList.remove('flex');
+    };
+
+    window.cerrarSelectorCamarasFondo = function (e) {
+      if (e.target && e.target.id === 'modalSelectorCctv') cerrarSelectorCamaras();
+    };
+
+    window.irPasoSelectorCctv = function (paso) {
+      if (paso >= 2 && !selectorCctv.sala) return;
+      if (paso === 3 && !selectorCctv.dvr) return;
+      selectorCctv.paso = paso;
+      selectorCctv.editando = false;
+      selectorCctv.filtro = '';
+      renderizarSelectorCctv();
+    };
+
+    function contarCamarasSala(objSala) {
+      return Object.values(objSala || {}).reduce((acc, l) => acc + (Array.isArray(l) ? l.length : 0), 0);
+    }
+
+    function renderizarSelectorCctv() {
+      const cat = obtenerCatalogoCctv();
+      const bc = document.getElementById('breadcrumbSelectorCctv');
+      const body = document.getElementById('cuerpoSelectorCctv');
+      if (!bc || !body) return;
+      const paso = selectorCctv.paso;
+
+      const chip = (n, txt, activo, habil, fn) => {
+        const cls = activo
+          ? 'bg-indigo-600 text-white shadow-sm'
+          : (habil ? 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 hover:bg-indigo-50 dark:hover:bg-indigo-950 cursor-pointer' : 'bg-transparent text-slate-400 border border-dashed border-slate-300 dark:border-slate-700');
+        return `<button type="button" ${habil ? `onclick="${fn}"` : 'disabled'} class="px-2.5 py-1 rounded-lg font-semibold transition ${cls}">${n}. ${escapeHTML(txt)}</button>`;
+      };
+      const sep = '<span class="text-slate-400">›</span>';
+      bc.innerHTML = [
+        chip(1, selectorCctv.sala || 'Casino', paso === 1, true, 'irPasoSelectorCctv(1)'),
+        sep,
+        chip(2, selectorCctv.dvr || 'DVR', paso === 2, Boolean(selectorCctv.sala), 'irPasoSelectorCctv(2)'),
+        sep,
+        chip(3, 'Cámara', paso === 3, Boolean(selectorCctv.sala && selectorCctv.dvr), 'irPasoSelectorCctv(3)')
+      ].join('');
+
+      const btnCardBase = 'text-left p-3 rounded-xl border transition cursor-pointer';
+      const btnCardOff = 'border-slate-200 dark:border-slate-700 hover:border-indigo-400 hover:bg-slate-50 dark:hover:bg-slate-800';
+      const btnCardOn = 'border-indigo-500 bg-indigo-50 dark:bg-indigo-950/50 ring-1 ring-indigo-500/40';
+      const btnAgregar = 'p-3 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 text-xs font-semibold text-slate-500 dark:text-slate-400 hover:border-indigo-400 hover:text-indigo-600 transition cursor-pointer';
+
+      if (paso === 1) {
+        selectorCctv.listaSalas = Object.keys(cat);
+        body.innerHTML = `
+          <p class="text-xs text-slate-500 dark:text-slate-400 mb-3">Paso 1: elegí el casino / sala.</p>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            ${selectorCctv.listaSalas.map((s, i) => `
+              <button type="button" onclick="elegirSalaCctv(${i})" class="${btnCardBase} ${s === selectorCctv.sala ? btnCardOn : btnCardOff}">
+                <span class="block text-xs font-bold text-slate-900 dark:text-white">${escapeHTML(s)}</span>
+                <span class="block text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">${Object.keys(cat[s] || {}).length} DVR · ${contarCamarasSala(cat[s])} cámaras</span>
+              </button>`).join('')}
+            <button type="button" onclick="agregarCasinoCctv()" class="${btnAgregar}">➕ Agregar casino</button>
+          </div>`;
+        return;
+      }
+
+      if (paso === 2) {
+        selectorCctv.listaDvrs = ordenarDvrs(Object.keys(cat[selectorCctv.sala] || {}));
+        body.innerHTML = `
+          <p class="text-xs text-slate-500 dark:text-slate-400 mb-3">Paso 2: elegí el DVR de <b>${escapeHTML(selectorCctv.sala)}</b>.</p>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            ${selectorCctv.listaDvrs.map((d, i) => `
+              <button type="button" onclick="elegirDvrCctv(${i})" class="${btnCardBase} ${d === selectorCctv.dvr ? btnCardOn : btnCardOff}">
+                <span class="block text-sm font-bold text-indigo-700 dark:text-indigo-300">${escapeHTML(d)}</span>
+                <span class="block text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">${(cat[selectorCctv.sala][d] || []).length} cámaras</span>
+              </button>`).join('')}
+            <button type="button" onclick="agregarDvrCctv()" class="${btnAgregar}">➕ Agregar DVR</button>
+          </div>`;
+        return;
+      }
+
+      // Paso 3: Cámaras
+      const camsDvr = (cat[selectorCctv.sala] || {})[selectorCctv.dvr] || [];
+      if (selectorCctv.editando) {
+        body.innerHTML = `
+          <p class="text-xs text-slate-500 dark:text-slate-400 mb-2">Editá las cámaras de <b>${escapeHTML(selectorCctv.sala)} · ${escapeHTML(selectorCctv.dvr)}</b> (una por renglón, ej: <span class="font-mono">CAM 01 - Sala Gral</span>).</p>
+          <textarea id="textareaCamarasCctv" rows="12" spellcheck="false"
+            class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 p-3 text-xs font-mono text-slate-900 dark:text-white focus:border-indigo-500 outline-none">${escapeHTML(camsDvr.join('\n'))}</textarea>
+          <div class="flex flex-wrap items-center justify-between gap-2 mt-3">
+            <button type="button" onclick="restaurarCamarasDvrCctv()" class="text-xs font-semibold text-slate-500 hover:text-rose-600 cursor-pointer">↺ Restaurar lista por defecto</button>
+            <div class="flex items-center gap-2">
+              <button type="button" onclick="cancelarEdicionCamarasCctv()" class="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-200 cursor-pointer">Cancelar</button>
+              <button type="button" onclick="guardarEdicionCamarasCctv()" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold cursor-pointer">Guardar cámaras</button>
+            </div>
+          </div>`;
+        setTimeout(() => document.getElementById('textareaCamarasCctv')?.focus(), 30);
+        return;
+      }
+
+      body.innerHTML = `
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+          <p class="text-xs text-slate-500 dark:text-slate-400">Paso 3: elegí la cámara de <b>${escapeHTML(selectorCctv.sala)} · ${escapeHTML(selectorCctv.dvr)}</b>.</p>
+          <button type="button" onclick="editarCamarasDvrCctv()" class="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer">✏️ Editar cámaras de este DVR</button>
+        </div>
+        <input type="search" id="buscadorCamarasCctv" autocomplete="off" placeholder="Buscar cámara (Enter elige la primera)..."
+          oninput="filtrarCamarasCctv(this.value)" onkeydown="teclaBuscadorCamarasCctv(event)"
+          class="w-full mb-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-3 py-2 text-xs text-slate-900 dark:text-white focus:border-indigo-500 outline-none" />
+        <div id="gridCamarasCctv" class="grid grid-cols-2 sm:grid-cols-4 gap-2"></div>`;
+      filtrarCamarasCctv(selectorCctv.filtro);
+      setTimeout(() => document.getElementById('buscadorCamarasCctv')?.focus(), 30);
+    }
+
+    window.filtrarCamarasCctv = function (q) {
+      selectorCctv.filtro = q || '';
+      const cat = obtenerCatalogoCctv();
+      const cams = (cat[selectorCctv.sala] || {})[selectorCctv.dvr] || [];
+      const qn = normalizarTextoBusqueda(selectorCctv.filtro);
+      selectorCctv.listaCams = cams.filter(c => !qn || normalizarTextoBusqueda(c).includes(qn));
+      const grid = document.getElementById('gridCamarasCctv');
+      if (!grid) return;
+      const camActual = document.getElementById('inputCamara')?.value || '';
+      if (!cams.length) {
+        grid.innerHTML = `<p class="col-span-full text-xs text-slate-400 italic text-center py-6">Este DVR no tiene cámaras cargadas. Usá "✏️ Editar cámaras de este DVR" para agregarlas.</p>`;
+        return;
+      }
+      grid.innerHTML = selectorCctv.listaCams.length
+        ? selectorCctv.listaCams.map((c, i) => `
+            <button type="button" onclick="elegirCamaraCctv(${i})"
+              class="text-left px-3 py-2.5 rounded-xl border text-xs font-semibold transition cursor-pointer ${c === camActual ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-800 dark:text-indigo-200' : 'border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 hover:border-indigo-400 hover:bg-slate-50 dark:hover:bg-slate-800'}">
+              📹 ${escapeHTML(c)}
+            </button>`).join('')
+        : `<p class="col-span-full text-xs text-slate-400 italic text-center py-6">Sin coincidencias.</p>`;
+    };
+
+    window.teclaBuscadorCamarasCctv = function (e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        if (selectorCctv.listaCams.length) elegirCamaraCctv(0);
+      }
+    };
+
+    window.elegirSalaCctv = function (i) {
+      const sala = selectorCctv.listaSalas[i];
+      if (!sala) return;
+      const cat = obtenerCatalogoCctv();
+      const dvrs = ordenarDvrs(Object.keys(cat[sala] || {}));
+      if (sala !== selectorCctv.sala) selectorCctv.dvr = '';
+      selectorCctv.sala = sala;
+      selectorCctv.filtro = '';
+      selectorCctv.editando = false;
+      if (dvrs.length === 1) {
+        selectorCctv.dvr = dvrs[0];
+        selectorCctv.paso = 3;
+      } else {
+        if (!dvrs.includes(selectorCctv.dvr)) selectorCctv.dvr = '';
+        selectorCctv.paso = 2;
+      }
+      renderizarSelectorCctv();
+    };
+
+    window.elegirDvrCctv = function (i) {
+      const dvr = selectorCctv.listaDvrs[i];
+      if (!dvr) return;
+      selectorCctv.dvr = dvr;
+      selectorCctv.filtro = '';
+      selectorCctv.editando = false;
+      selectorCctv.paso = 3;
+      renderizarSelectorCctv();
+    };
+
+    window.elegirCamaraCctv = function (i) {
+      const cam = selectorCctv.listaCams[i];
+      if (!cam) return;
+      const salaElegida = selectorCctv.sala;
+      const dvrElegido = selectorCctv.dvr;
+
+      // Si el casino elegido no coincide con la Sala de la ficha, se actualiza la ficha
+      const salaFichaInput = document.getElementById('fichaSala');
+      if (salaFichaInput && resolverSalaCatalogo(salaFichaInput.value) !== salaElegida) {
+        salaFichaInput.value = salaElegida;
+        guardarFichaYActualizar();
+      }
+
+      document.getElementById('inputCamara').value = cam;
+      const inputDvr = document.getElementById('inputDvr');
+      if (inputDvr && esSalaBoulevard(salaElegida) && DVRS_BOULEVARD.includes(dvrElegido)) {
+        inputDvr.value = dvrElegido;
+      }
+      guardarBorradorFormulario();
+      cerrarSelectorCamaras();
+
+      const finInput = document.getElementById('inputFin');
+      if (finInput && !finInput.value) finInput.focus();
+      else document.getElementById('inputDetalle')?.focus();
+      mostrarToast(`📹 ${salaElegida} · ${dvrElegido} · ${cam}`);
+    };
+
+    window.agregarCasinoCctv = function () {
+      const nombre = (prompt('Nombre del casino / sala:') || '').trim();
+      if (!nombre) return;
+      const cat = obtenerCatalogoCctv();
+      if (Object.keys(cat).some(k => normalizarTextoBusqueda(k) === normalizarTextoBusqueda(nombre))) {
+        mostrarToast('⚠️ Ese casino ya existe en la lista');
+        return;
+      }
+      cat[nombre] = { 'DVR 1': [] };
+      guardarCatalogoCctv();
+      selectorCctv.sala = nombre;
+      selectorCctv.dvr = 'DVR 1';
+      selectorCctv.paso = 3;
+      selectorCctv.editando = true;
+      renderizarSelectorCctv();
+    };
+
+    window.agregarDvrCctv = function () {
+      const cat = obtenerCatalogoCctv();
+      const sala = selectorCctv.sala;
+      if (!sala) return;
+      const existentes = Object.keys(cat[sala] || {});
+      const maxNum = existentes.reduce((m, d) => Math.max(m, obtenerOrdenNumericoDvr(d) === 999 ? 0 : obtenerOrdenNumericoDvr(d)), 0);
+      const nombre = (prompt('Nombre del DVR:', `DVR ${maxNum + 1}`) || '').trim();
+      if (!nombre) return;
+      if (existentes.includes(nombre)) {
+        mostrarToast('⚠️ Ese DVR ya existe en este casino');
+        return;
+      }
+      cat[sala] = cat[sala] || {};
+      cat[sala][nombre] = [];
+      guardarCatalogoCctv();
+      selectorCctv.dvr = nombre;
+      selectorCctv.paso = 3;
+      selectorCctv.editando = true;
+      renderizarSelectorCctv();
+    };
+
+    window.editarCamarasDvrCctv = function () {
+      selectorCctv.editando = true;
+      renderizarSelectorCctv();
+    };
+
+    window.cancelarEdicionCamarasCctv = function () {
+      selectorCctv.editando = false;
+      renderizarSelectorCctv();
+    };
+
+    window.guardarEdicionCamarasCctv = function () {
+      const txt = document.getElementById('textareaCamarasCctv')?.value || '';
+      const lineas = Array.from(new Set(txt.split(/\r?\n/).map(l => l.trim()).filter(Boolean)));
+      const cat = obtenerCatalogoCctv();
+      cat[selectorCctv.sala] = cat[selectorCctv.sala] || {};
+      cat[selectorCctv.sala][selectorCctv.dvr] = lineas;
+      guardarCatalogoCctv();
+      selectorCctv.editando = false;
+      renderizarSelectorCctv();
+      mostrarToast(`✓ ${lineas.length} cámara(s) guardadas en ${selectorCctv.dvr}`);
+    };
+
+    window.restaurarCamarasDvrCctv = function () {
+      const porDefecto = (construirCatalogoCctvPorDefecto()[selectorCctv.sala] || {})[selectorCctv.dvr] || [];
+      const ta = document.getElementById('textareaCamarasCctv');
+      if (ta) ta.value = porDefecto.join('\n');
+    };
+
+    // ==================== VISTA DE TABLAS (APILADA / LADO A LADO) Y ALTURA ====================
+    const STORAGE_VISTA_TABLAS_KEY = 'auditoria_cctv_vista_tablas_v1';
+    const STORAGE_ALTURA_TABLAS_KEY = 'auditoria_cctv_altura_tablas_v1';
+    let vistaTablasActual = 'apilada';
+    let tablasExpandidas = false;
+    let regexPersonalCache = null;
+
+    function resaltarPersonalEnTexto(texto) {
+      let html = escapeHTML(texto);
+      if (!regexPersonalCache) {
+        regexPersonalCache = DIRECTORIO_PERSONAL
+          .slice()
+          .sort((a, b) => b.nombre.length - a.nombre.length)
+          .map(p => new RegExp(escapeHTML(p.nombre).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'));
+      }
+      const marcas = [];
+      regexPersonalCache.forEach(re => {
+        html = html.replace(re, m => {
+          marcas.push(m);
+          return `\u0001${marcas.length - 1}\u0002`;
+        });
+      });
+      return html.replace(/\u0001(\d+)\u0002/g, (_, i) =>
+        `<span class="font-semibold text-slate-950 dark:text-white">${marcas[Number(i)]}</span>`);
+    }
+
+    function aplicarPreferenciasVistaTablas() {
+      const grid = document.getElementById('gridTablasComparativas');
+      const btnApilada = document.getElementById('btnVistaApilada');
+      const btnLado = document.getElementById('btnVistaLado');
+      const btnAltura = document.getElementById('btnAlturaTablas');
+      const clsOn = 'px-2.5 py-1 rounded-lg text-[11px] font-semibold transition cursor-pointer bg-white dark:bg-slate-900 text-indigo-700 dark:text-indigo-300 shadow-sm';
+      const clsOff = 'px-2.5 py-1 rounded-lg text-[11px] font-semibold transition cursor-pointer text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200';
+
+      if (grid) grid.classList.toggle('lg:grid-cols-2', vistaTablasActual === 'lado');
+      if (btnApilada) btnApilada.className = vistaTablasActual === 'apilada' ? clsOn : clsOff;
+      if (btnLado) btnLado.className = vistaTablasActual === 'lado' ? clsOn : clsOff;
+
+      document.querySelectorAll('.contenedor-scroll-tabla').forEach(el => {
+        el.classList.toggle('max-h-[480px]', !tablasExpandidas);
+        el.classList.toggle('overflow-y-auto', !tablasExpandidas);
+      });
+      if (btnAltura) btnAltura.textContent = tablasExpandidas ? '⤡ Compactar' : '⤢ Ver todo';
+    }
+
+    window.cambiarVistaTablas = function (modo) {
+      vistaTablasActual = modo === 'lado' ? 'lado' : 'apilada';
+      try { localStorage.setItem(STORAGE_VISTA_TABLAS_KEY, vistaTablasActual); } catch (e) { }
+      aplicarPreferenciasVistaTablas();
+    };
+
+    window.toggleAlturaTablas = function () {
+      tablasExpandidas = !tablasExpandidas;
+      try { localStorage.setItem(STORAGE_ALTURA_TABLAS_KEY, tablasExpandidas ? '1' : '0'); } catch (e) { }
+      aplicarPreferenciasVistaTablas();
+    };
+
+    function cargarPreferenciasVistaTablas() {
+      try {
+        const v = localStorage.getItem(STORAGE_VISTA_TABLAS_KEY);
+        if (v === 'lado' || v === 'apilada') vistaTablasActual = v;
+        tablasExpandidas = localStorage.getItem(STORAGE_ALTURA_TABLAS_KEY) === '1';
+      } catch (e) { }
+      aplicarPreferenciasVistaTablas();
+    }
+
     window.limpiarFiltrosTabla = function () {
       document.getElementById('filtroTexto').value = '';
+      document.getElementById('filtroDvr').value = 'TODOS';
       document.getElementById('filtroCategoria').value = 'TODAS';
       document.getElementById('filtroSoloDvr').checked = false;
       actualizarTodo(true);
     };
 
     // ==================== ORDEN DVR, ESTADÍSTICAS Y RESUMEN EJECUTIVO ====================
+    function obtenerMarcadosDvrOrdenados() {
+      const modoNoche = esModoNocturno();
+      const marcados = registros.filter(r => r.bajarVideo).slice();
+      if (marcados.some(r => Boolean(r.dvr))) {
+        marcados.sort((a, b) => {
+          const da = obtenerOrdenNumericoDvr(a.dvr);
+          const db = obtenerOrdenNumericoDvr(b.dvr);
+          if (da !== db) return da - db;
+          return obtenerIntervaloLineal(a, modoNoche).ini - obtenerIntervaloLineal(b, modoNoche).ini;
+        });
+      }
+      return marcados;
+    }
+
     function renderizarOrdenDvr() {
       const cont = document.getElementById('contenedorDvr');
       const badge = document.getElementById('badgeCountDvr');
-      const marcados = registros.filter(r => r.bajarVideo);
+      const marcados = obtenerMarcadosDvrOrdenados();
       badge.innerText = `${marcados.length} clips`;
 
       if (marcados.length === 0) {
@@ -1601,6 +2855,7 @@
         <div class="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs">
           <div class="flex items-center gap-2 min-w-0">
             <span class="font-mono-nums font-bold text-rose-600 dark:text-rose-400 shrink-0">#${i + 1}</span>
+            ${r.dvr ? `<span class="px-1.5 py-0.5 rounded bg-indigo-600 text-white font-bold text-[10px] shrink-0">${escapeHTML(r.dvr)}</span>` : ''}
             <span class="px-2 py-0.5 rounded bg-slate-900 dark:bg-indigo-950 text-white dark:text-indigo-200 border border-slate-700 font-semibold text-[11px] shrink-0">${escapeHTML(r.camara)}</span>
             <span class="font-mono-nums font-bold text-slate-800 dark:text-slate-100 shrink-0">${r.inicio} a ${r.fin}</span>
             <span class="text-slate-600 dark:text-slate-400 truncate">${escapeHTML(r.detalle)}</span>
@@ -1618,7 +2873,7 @@
       let totalMin = 0;
 
       registros.forEach(r => {
-        const cam = r.camara || 'Sin Cámara';
+        const cam = (r.dvr ? `${r.dvr} · ` : '') + (r.camara || 'Sin Cámara');
         const cat = r.categoria || (r.tipo === 'ASISTE' ? 'Operativo' : 'Observación');
         mapaCam[cam] = (mapaCam[cam] || 0) + r.minutos;
         mapaCat[cat] = (mapaCat[cat] || 0) + r.minutos;
@@ -1630,7 +2885,10 @@
         'Traslado': 'bg-teal-500',
         'Celular Trabajo': 'bg-cyan-500',
         'Descanso': 'bg-sky-500',
+        'Baño': 'bg-blue-500',
+        'Refrigerio': 'bg-violet-500',
         'Charla': 'bg-amber-500',
+        'Permanencia': 'bg-yellow-500',
         'Celular': 'bg-rose-500',
         'TV': 'bg-orange-500',
         'Ausencia': 'bg-red-600'
@@ -1701,7 +2959,7 @@
         .filter(r => r.tipo === 'NO_ASISTE' && r.categoria !== 'Descanso' && r.minutos >= 5)
         .sort((a, b) => b.minutos - a.minutos)
         .slice(0, 6)
-        .map(r => `  • ${r.inicio} a ${r.fin} (${r.minutos} min) [${r.camara}]: ${r.detalle}`);
+        .map(r => `  • ${r.inicio} a ${r.fin} (${r.minutos} min) [${r.dvr ? r.dvr + ' · ' : ''}${r.camara}]: ${r.detalle}`);
 
       const balanceStr = diferencia === 0
         ? `Jornada exacta (${minutosADuracionStr(metaMinutos)} hs)`
@@ -1710,7 +2968,12 @@
       const lineas = [
         `INFORME DE AUDITORÍA DE TURNO - CCTV`,
         `Fecha: ${ficha.fechaDisplay} | ${ficha.turno}${ficha.sala ? ` | Sala: ${ficha.sala}` : ''}`,
-        `Personal Auditado: ${ficha.empleado || 'Sin especificar'}${ficha.cargo ? ` (${ficha.cargo})` : ''}`,
+        `Personal Auditado: ${ficha.empleado || 'Sin especificar'}${ficha.cargo ? ` (${ficha.cargo})` : ''}`
+      ];
+      if (tieneHorariosReferencia(ficha)) {
+        lineas.push(`Referencias de Fichada (No computan): ${formatearTextoReferencias(ficha)}`);
+      }
+      lineas.push(
         `Horario Registrado: ${registros[0].inicio} a ${registros[registros.length - 1].fin} (Total computado: ${minutosADuracionStr(totalRegistrado)} hs — ${balanceStr})`,
         ``,
         `RESUMEN DE TIEMPOS:`,
@@ -1718,7 +2981,7 @@
         `• Descansos Permitidos: ${minutosADuracionStr(minDescanso)} hs (${minDescanso} min en ${countDescansos} pausa/s)`,
         `• Distracción / Inactividad Neta: ${minutosADuracionStr(minDistraccionNeta)} hs (${minDistraccionNeta} min — ${porcDistraccion}%)`,
         `  Desglose inactividad: ${detalleDistraccion}.`
-      ];
+      );
 
       if (topInactivos.length > 0) {
         lineas.push(``, `PRINCIPALES OBSERVACIONES (≥ 5 MIN):`, ...topInactivos);
@@ -1778,7 +3041,7 @@
     };
 
     window.copiarOrdenDvr = function () {
-      const marcados = registros.filter(r => r.bajarVideo);
+      const marcados = obtenerMarcadosDvrOrdenados();
       if (marcados.length === 0) {
         mostrarToast('No hay clips marcados para copiar');
         return;
@@ -1787,18 +3050,549 @@
       const cabecera = `ORDEN DE EXTRACCIÓN DE VIDEO (CCTV - ${f.fechaDisplay} - ${f.turno})` +
         (f.empleado ? `\nAuditado: ${f.empleado}${f.sala ? ` | Sala: ${f.sala}` : ''}` : '');
       const texto = cabecera + '\n' +
-        marcados.map((r, i) => `${i + 1}. [${r.camara}] de ${r.inicio} a ${r.fin} (${r.minutos} min / ${minutosADuracionStr(r.minutos)} hs) - ${r.detalle}`).join('\n');
+        marcados.map((r, i) => `${i + 1}. [${r.dvr ? r.dvr + ' · ' : ''}${r.camara}] de ${r.inicio} a ${r.fin} (${r.minutos} min / ${minutosADuracionStr(r.minutos)} hs) - ${r.detalle}`).join('\n');
 
       copiarTextoPortapapeles(texto, '📋 Orden DVR copiada al portapapeles');
     };
 
     window.aplicarPlantilla = function (tipo, categoria, camara, detalle) {
+      cerrarArmadorObservacion();
       document.getElementById('inputTipo').value = tipo;
       document.getElementById('inputCategoria').value = categoria;
       document.getElementById('inputCamara').value = camara;
       document.getElementById('inputDetalle').value = detalle;
       document.getElementById('inputFin').focus();
+      guardarBorradorFormulario();
       mostrarToast('Plantilla aplicada: ingresa la hora de Fin (o usa +5m / +10m)');
+    };
+
+    // ==================== AUTOCOMPLETADO DE PERSONAL (1 LETRA) Y ARMADOR DE OBSERVACIONES ====================
+    const armadorEstado = {
+      abierto: false,
+      modo: 'HABLA_SECTOR', // 'HABLA_SALA' | 'HABLA_SECTOR' | 'FIRMA_VAUCHER'
+      personas: [],
+      sector: 'Barra'
+    };
+
+    let sugerenciasDetalleActuales = [];
+    let indiceActivoFicha = -1;
+    let indiceActivoArmador = -1;
+    let indiceActivoDetalle = -1;
+
+    function buscarPersonalPorQuery(query, excluirNombres = []) {
+      const q = normalizarTextoBusqueda(query);
+      const excluidos = new Set(excluirNombres);
+      const base = DIRECTORIO_PERSONAL.filter(p => !excluidos.has(p.nombre));
+      if (!q) return base.slice(0, 15);
+
+      const prioridad1 = []; // Empieza por el apellido
+      const prioridad2 = []; // Empieza por algún nombre o coincide legajo exacto/prefijo
+      const prioridad3 = []; // Contiene el texto en cualquier parte
+
+      base.forEach(p => {
+        if (p.normNombre.startsWith(q) || p.normLegajo.startsWith(q)) {
+          prioridad1.push(p);
+        } else if (p.palabrasNombre.some(w => w.startsWith(q))) {
+          prioridad2.push(p);
+        } else if (p.normFull.includes(q)) {
+          prioridad3.push(p);
+        }
+      });
+
+      return [...prioridad1, ...prioridad2, ...prioridad3].slice(0, 15);
+    }
+
+    function formatearListaNombres(nombres) {
+      if (!nombres.length) return '';
+      if (nombres.length === 1) return nombres[0];
+      return `${nombres.slice(0, -1).join(' / ')} y ${nombres[nombres.length - 1]}`;
+    }
+
+    function obtenerCamaraDeSector(nombreSector) {
+      const encontrado = SECTORES_CONVERSACION.find(s => normalizarTextoBusqueda(s.nombre) === normalizarTextoBusqueda(nombreSector));
+      return encontrado ? encontrado.camara : 'CAM-01 (Sala Gral)';
+    }
+
+    function cerrarTodosLosDropdowns() {
+      document.getElementById('dropdownPersonalFicha')?.classList.add('hidden');
+      document.getElementById('dropdownPersonalArmador')?.classList.add('hidden');
+      document.getElementById('dropdownSugerenciasDetalle')?.classList.add('hidden');
+      indiceActivoFicha = -1;
+      indiceActivoArmador = -1;
+      indiceActivoDetalle = -1;
+    }
+
+    // --- 1. Autocompletado en Personal Auditado (#fichaEmpleado) ---
+    function renderizarDropdownPersonalFicha() {
+      const input = document.getElementById('fichaEmpleado');
+      const menu = document.getElementById('dropdownPersonalFicha');
+      if (!input || !menu) return;
+
+      const q = input.value.trim();
+      if (!q) {
+        menu.classList.add('hidden');
+        return;
+      }
+
+      const resultados = buscarPersonalPorQuery(q);
+      if (!resultados.length) {
+        menu.classList.add('hidden');
+        return;
+      }
+
+      if (indiceActivoFicha >= resultados.length) indiceActivoFicha = 0;
+
+      menu.innerHTML = resultados.map((p, idx) => {
+        const activoCls = idx === indiceActivoFicha ? 'bg-indigo-50 dark:bg-indigo-950/70' : 'hover:bg-slate-50 dark:hover:bg-slate-800/70';
+        return `
+          <button type="button" onmousedown="event.preventDefault(); seleccionarPersonalFichaPorIndice(${p.index})"
+            class="w-full text-left px-3 py-2 transition flex flex-col gap-0.5 cursor-pointer ${activoCls}">
+            <span class="text-xs font-bold text-slate-900 dark:text-white">${escapeHTML(p.nombre)} <span class="text-indigo-600 dark:text-indigo-400 font-mono font-semibold">· Leg. ${escapeHTML(p.legajo)}</span></span>
+            <span class="text-[10px] text-slate-500 dark:text-slate-400 truncate">${escapeHTML(p.cargo)}</span>
+          </button>
+        `;
+      }).join('');
+      menu.classList.remove('hidden');
+    }
+
+    window.seleccionarPersonalFichaPorIndice = function (dirIndex) {
+      const p = DIRECTORIO_PERSONAL[dirIndex];
+      if (!p) return;
+      document.getElementById('fichaEmpleado').value = p.fichaLabel;
+      document.getElementById('fichaCargo').value = p.cargo;
+      const salaInput = document.getElementById('fichaSala');
+      if (salaInput && !salaInput.value.trim() && /boulevard/i.test(p.cargo)) {
+        salaInput.value = 'Casino Boulevard';
+      }
+      document.getElementById('dropdownPersonalFicha')?.classList.add('hidden');
+      indiceActivoFicha = -1;
+      guardarFichaYActualizar();
+      mostrarToast(`👤 Auditado: ${p.nombre}`);
+    };
+
+    // --- 2. Armador Rápido (Habla en Sala con / Habla con [varios] + Sector / Firma Váucher) ---
+    window.abrirArmadorObservacion = function (modo = 'HABLA_SECTOR', sectorInicial = '') {
+      armadorEstado.abierto = true;
+      armadorEstado.modo = modo;
+      if (sectorInicial) armadorEstado.sector = sectorInicial;
+
+      const panel = document.getElementById('panelArmadorObservacion');
+      panel?.classList.remove('hidden');
+
+      sincronizarCamposPorModoArmador();
+      renderizarEstadoArmador(true);
+
+      if (modo === 'FIRMA_VAUCHER') {
+        document.getElementById('inputFin')?.focus();
+      } else {
+        setTimeout(() => document.getElementById('inputBuscarPersonalArmador')?.focus(), 30);
+      }
+    };
+
+    window.cerrarArmadorObservacion = function () {
+      armadorEstado.abierto = false;
+      document.getElementById('panelArmadorObservacion')?.classList.add('hidden');
+      document.getElementById('dropdownPersonalArmador')?.classList.add('hidden');
+    };
+
+    window.cambiarModoArmador = function (modo) {
+      armadorEstado.modo = modo;
+      if (modo === 'HABLA_SALA') armadorEstado.sector = 'Sala';
+      sincronizarCamposPorModoArmador();
+      renderizarEstadoArmador(true);
+      if (modo !== 'FIRMA_VAUCHER') {
+        document.getElementById('inputBuscarPersonalArmador')?.focus();
+      }
+    };
+
+    function sincronizarCamposPorModoArmador() {
+      if (armadorEstado.modo === 'FIRMA_VAUCHER') {
+        document.getElementById('inputTipo').value = 'ASISTE';
+        document.getElementById('inputCategoria').value = 'Operativo';
+        document.getElementById('inputCamara').value = obtenerCamaraDeSector(armadorEstado.sector);
+      } else if (armadorEstado.modo === 'HABLA_SALA') {
+        document.getElementById('inputTipo').value = 'NO_ASISTE';
+        document.getElementById('inputCategoria').value = 'Charla';
+        document.getElementById('inputCamara').value = 'CAM-01 (Sala Gral)';
+      } else {
+        document.getElementById('inputTipo').value = 'NO_ASISTE';
+        document.getElementById('inputCategoria').value = 'Charla';
+        document.getElementById('inputCamara').value = obtenerCamaraDeSector(armadorEstado.sector);
+      }
+    }
+
+    function construirTextoDesdeArmador() {
+      const listaNombres = formatearListaNombres(armadorEstado.personas);
+      if (armadorEstado.modo === 'HABLA_SALA') {
+        return listaNombres ? `Habla en Sala con ${listaNombres}` : 'Habla en Sala con ';
+      }
+      if (armadorEstado.modo === 'FIRMA_VAUCHER') {
+        const base = `Firma Váucher en ${armadorEstado.sector}`;
+        return listaNombres ? `${base} con ${listaNombres}` : base;
+      }
+      // HABLA_SECTOR
+      if (listaNombres) {
+        return `Habla con ${listaNombres} (${armadorEstado.sector})`;
+      }
+      return `Habla con (${armadorEstado.sector})`;
+    }
+
+    function renderizarEstadoArmador(actualizarInput = true) {
+      const btnSala = document.getElementById('btnModoHablaSala');
+      const btnSec = document.getElementById('btnModoHablaSector');
+      const btnFirma = document.getElementById('btnModoFirmaVaucher');
+      const bloqueSector = document.getElementById('bloqueSectorArmador');
+      const chipsCont = document.getElementById('chipsPersonalSeleccionado');
+      const btnLimpiarP = document.getElementById('btnLimpiarPersonalArmador');
+      const sectoresCont = document.getElementById('botonesSectoresArmador');
+
+      const clsOn = 'px-2.5 py-1 rounded-lg text-xs font-semibold transition cursor-pointer bg-indigo-600 text-white shadow-sm';
+      const clsOff = 'px-2.5 py-1 rounded-lg text-xs font-semibold transition cursor-pointer bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-indigo-200 dark:border-indigo-800 hover:bg-indigo-100';
+
+      if (btnSala) btnSala.className = armadorEstado.modo === 'HABLA_SALA' ? clsOn : clsOff;
+      if (btnSec) btnSec.className = armadorEstado.modo === 'HABLA_SECTOR' ? clsOn : clsOff;
+      if (btnFirma) btnFirma.className = armadorEstado.modo === 'FIRMA_VAUCHER' ? clsOn : clsOff;
+
+      if (bloqueSector) {
+        bloqueSector.classList.toggle('hidden', armadorEstado.modo === 'HABLA_SALA');
+      }
+
+      if (chipsCont) {
+        if (armadorEstado.personas.length === 0) {
+          chipsCont.innerHTML = `<span class="text-[11px] text-slate-400 italic">Ninguno aún (escribe una letra arriba para elegir)</span>`;
+        } else {
+          chipsCont.innerHTML = armadorEstado.personas.map((nom, pos) => `
+            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-indigo-600 text-white text-[11px] font-semibold">
+              ${escapeHTML(nom)}
+              <button type="button" onclick="quitarPersonalArmadorPorIndice(${pos})" class="hover:text-rose-200 font-bold cursor-pointer" title="Quitar">✕</button>
+            </span>
+          `).join('');
+        }
+      }
+
+      if (btnLimpiarP) {
+        btnLimpiarP.classList.toggle('hidden', armadorEstado.personas.length < 2);
+      }
+
+      if (sectoresCont) {
+        sectoresCont.innerHTML = SECTORES_CONVERSACION.map((s, idx) => {
+          const act = s.nombre === armadorEstado.sector;
+          const c = act
+            ? 'px-2.5 py-1 rounded-lg bg-indigo-600 text-white text-xs font-semibold shadow-sm cursor-pointer'
+            : 'px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 hover:bg-indigo-100 dark:hover:bg-indigo-950 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 text-xs font-medium cursor-pointer';
+          return `<button type="button" onclick="seleccionarSectorArmador(${idx})" class="${c}">${escapeHTML(s.nombre)}</button>`;
+        }).join('');
+      }
+
+      if (actualizarInput && armadorEstado.abierto) {
+        document.getElementById('inputDetalle').value = construirTextoDesdeArmador();
+        guardarBorradorFormulario();
+      }
+    }
+
+    function renderizarDropdownPersonalArmador() {
+      const inp = document.getElementById('inputBuscarPersonalArmador');
+      const menu = document.getElementById('dropdownPersonalArmador');
+      if (!inp || !menu) return;
+
+      const q = inp.value.trim();
+      if (!q) {
+        menu.classList.add('hidden');
+        return;
+      }
+
+      const resultados = buscarPersonalPorQuery(q, armadorEstado.personas);
+      if (!resultados.length) {
+        menu.classList.add('hidden');
+        return;
+      }
+
+      if (indiceActivoArmador >= resultados.length) indiceActivoArmador = 0;
+
+      menu.innerHTML = resultados.map((p, idx) => {
+        const activoCls = idx === indiceActivoArmador ? 'bg-indigo-50 dark:bg-indigo-950/70' : 'hover:bg-slate-50 dark:hover:bg-slate-800/70';
+        return `
+          <button type="button" onmousedown="event.preventDefault(); agregarPersonalArmadorPorIndice(${p.index})"
+            class="w-full text-left px-3 py-2 transition flex flex-col gap-0.5 cursor-pointer ${activoCls}">
+            <span class="text-xs font-bold text-slate-900 dark:text-white">${escapeHTML(p.nombre)} <span class="text-indigo-600 dark:text-indigo-400 font-mono">· Leg. ${escapeHTML(p.legajo)}</span></span>
+            <span class="text-[10px] text-slate-500 dark:text-slate-400 truncate">${escapeHTML(p.cargo)}</span>
+          </button>
+        `;
+      }).join('');
+      menu.classList.remove('hidden');
+    }
+
+    window.agregarPersonalArmadorPorIndice = function (dirIndex) {
+      const p = DIRECTORIO_PERSONAL[dirIndex];
+      if (!p) return;
+      if (!armadorEstado.personas.includes(p.nombre)) {
+        armadorEstado.personas.push(p.nombre);
+      }
+      const inp = document.getElementById('inputBuscarPersonalArmador');
+      if (inp) {
+        inp.value = '';
+        inp.focus();
+      }
+      document.getElementById('dropdownPersonalArmador')?.classList.add('hidden');
+      indiceActivoArmador = -1;
+      renderizarEstadoArmador(true);
+    };
+
+    window.quitarPersonalArmadorPorIndice = function (pos) {
+      armadorEstado.personas.splice(pos, 1);
+      renderizarEstadoArmador(true);
+    };
+
+    window.limpiarPersonalArmador = function () {
+      armadorEstado.personas = [];
+      renderizarEstadoArmador(true);
+    };
+
+    window.seleccionarSectorArmador = function (idxSector) {
+      const sec = SECTORES_CONVERSACION[idxSector];
+      if (!sec) return;
+      armadorEstado.sector = sec.nombre;
+      document.getElementById('inputCamara').value = sec.camara;
+      renderizarEstadoArmador(true);
+    };
+
+    // --- 3. Autocompletado directo letra por letra en #inputDetalle (Sectores + 1 o Varios Empleados) ---
+    function enmascararNombresConocidos(texto) {
+      let enmascarado = String(texto || '');
+      const incluidos = [];
+      const ordenados = DIRECTORIO_PERSONAL.slice().sort((a, b) => b.nombre.length - a.nombre.length);
+
+      ordenados.forEach(p => {
+        const upperActual = enmascarado.toUpperCase();
+        const target = p.nombre.toUpperCase();
+        let pos = upperActual.indexOf(target);
+        while (pos !== -1) {
+          if (!incluidos.includes(p.nombre)) incluidos.push(p.nombre);
+          enmascarado = enmascarado.slice(0, pos) + '@'.repeat(p.nombre.length) + enmascarado.slice(pos + p.nombre.length);
+          pos = enmascarado.toUpperCase().indexOf(target, pos + p.nombre.length);
+        }
+      });
+
+      const textoUpperOrig = String(texto || '').toUpperCase();
+      incluidos.sort((a, b) => textoUpperOrig.indexOf(a.toUpperCase()) - textoUpperOrig.indexOf(b.toUpperCase()));
+      return { enmascarado, incluidos };
+    }
+
+    window.abrirArmadorDesdeInputActual = function () {
+      const actual = (document.getElementById('inputDetalle')?.value || '').trim();
+      const { incluidos } = enmascararNombresConocidos(actual);
+      if (incluidos.length > 0) {
+        armadorEstado.personas = incluidos;
+      }
+      let modoDetectado = 'HABLA_SECTOR';
+      if (/^habla\s+en\s+sala/i.test(actual)) {
+        modoDetectado = 'HABLA_SALA';
+      } else if (/^firma\s+v[aá]ucher/i.test(actual)) {
+        modoDetectado = 'FIRMA_VAUCHER';
+      }
+      const sectorEncontrado = SECTORES_CONVERSACION.find(s =>
+        normalizarTextoBusqueda(actual).includes(`(${normalizarTextoBusqueda(s.nombre)})`) ||
+        normalizarTextoBusqueda(actual).endsWith(`en ${normalizarTextoBusqueda(s.nombre)}`)
+      );
+      abrirArmadorObservacion(modoDetectado, sectorEncontrado ? sectorEncontrado.nombre : (modoDetectado === 'HABLA_SALA' ? 'Sala' : armadorEstado.sector));
+    };
+
+    function renderizarDropdownSugerenciasDetalle(modoContinuacionOpcional = false) {
+      const input = document.getElementById('inputDetalle');
+      const menu = document.getElementById('dropdownSugerenciasDetalle');
+      if (!input || !menu) return;
+
+      const valor = input.value;
+      if (!valor || !valor.trim()) {
+        menu.classList.add('hidden');
+        sugerenciasDetalleActuales = [];
+        return;
+      }
+
+      sugerenciasDetalleActuales = [];
+      const { enmascarado, incluidos } = enmascararNombresConocidos(valor);
+
+      // A) ¿Está eligiendo un sector al final tras "(" o tras "Firma Váucher en " / "... en "?
+      const matchParenSector = enmascarado.match(/^(.*\(\s*)([^()]*)$/);
+      const matchEnSector = !matchParenSector
+        ? enmascarado.match(/^(.*(?:Firma\s+V[aá]ucher|@)\s+en\s+)([^()]*)$/i)
+        : null;
+
+      // B) ¿Está agregando una 2.ª, 3.ª o más personas tras un nombre ya cargado (ej: "... ADRIANA y", "... ADRIANA y p", "... ADRIANA, p", "... ADRIANA / p")?
+      const matchOtraPersona = (!matchParenSector && !matchEnSector)
+        ? enmascarado.match(/^(.*@)(\s*(?:(?:\by|\be)(?:\s+|$)|[,\/+;]\s*|\s+-\s*))([^@()]*)$/i)
+        : null;
+
+      // C) ¿Está escribiendo la 1.ª persona tras "con " o "junto a " (ej: "Habla en Sala con " o "Habla con d")?
+      const matchPrimeraPersona = (!matchParenSector && !matchEnSector && !matchOtraPersona)
+        ? enmascarado.match(/^(.*(?:\bcon\s+|\bjunto\s+a\s+))([^@()]*)$/i)
+        : null;
+
+      // D) ¿Acaba de completar un nombre de personal y podemos ofrecer "+ Agregar otra persona" o "+ Sector"?
+      const matchRecienCompletado = (!matchParenSector && !matchEnSector && !matchOtraPersona && !matchPrimeraPersona)
+        ? enmascarado.match(/^(.*@)\s*$/)
+        : null;
+
+      if (matchParenSector || matchEnSector) {
+        const m = matchParenSector || matchEnSector;
+        const prefijoReal = valor.slice(0, m[1].length);
+        const qSec = normalizarTextoBusqueda(m[2]);
+        const cierraParen = matchParenSector ? ')' : '';
+        SECTORES_CONVERSACION
+          .filter(s => !qSec || normalizarTextoBusqueda(s.nombre).includes(qSec))
+          .forEach(s => {
+            sugerenciasDetalleActuales.push({
+              etiqueta: s.nombre,
+              subtitulo: `Cámara sugerida: ${s.camara}`,
+              badge: '📍 Sector',
+              reemplazo: `${prefijoReal}${s.nombre}${cierraParen}`,
+              camara: s.camara
+            });
+          });
+      } else if (matchOtraPersona) {
+        const baseAntesConector = valor.slice(0, matchOtraPersona[1].length);
+        const conectorRaw = matchOtraPersona[2].trim();
+        const tokenPersona = matchOtraPersona[3].trim();
+        const conectorLimpio = (conectorRaw === ',' ? ', ' : (/^[\/+;-]$/.test(conectorRaw) ? ` ${conectorRaw} ` : ` ${conectorRaw} `));
+
+        // Si ya había "A y B" y agrega un 3.º con "y", formatear el anterior " y " como " / " para lectura natural
+        let baseNormalizada = baseAntesConector;
+        if (/^y$/i.test(conectorRaw)) {
+          const idxPrevY = enmascarado.slice(0, matchOtraPersona[1].length).lastIndexOf('@ y @');
+          if (idxPrevY !== -1) {
+            baseNormalizada = baseAntesConector.slice(0, idxPrevY + 1) + ' / ' + baseAntesConector.slice(idxPrevY + 4);
+          }
+        }
+
+        const personas = buscarPersonalPorQuery(tokenPersona, incluidos);
+        personas.forEach(p => {
+          sugerenciasDetalleActuales.push({
+            etiqueta: `+ ${p.nombre}`,
+            subtitulo: `Leg. ${p.legajo} · ${p.cargo}`,
+            badge: `👥 Persona #${incluidos.length + 1}`,
+            reemplazo: `${baseNormalizada}${conectorLimpio}${p.nombre}`,
+            esPersonaAgregada: true
+          });
+        });
+      } else if (matchPrimeraPersona) {
+        const prefijoReal = valor.slice(0, matchPrimeraPersona[1].length);
+        const tokenPersona = matchPrimeraPersona[2].trim();
+        const personas = buscarPersonalPorQuery(tokenPersona, incluidos);
+        personas.forEach(p => {
+          sugerenciasDetalleActuales.push({
+            etiqueta: p.nombre,
+            subtitulo: `Leg. ${p.legajo} · ${p.cargo}`,
+            badge: '👤 Personal',
+            reemplazo: `${prefijoReal}${p.nombre}`,
+            esPersonaAgregada: true
+          });
+        });
+      } else if (matchRecienCompletado && (modoContinuacionOpcional || valor.endsWith(' '))) {
+        const baseLimpia = valor.trimEnd();
+        sugerenciasDetalleActuales.push({
+          etiqueta: '➕ Habla también con otra persona (... y ...)',
+          subtitulo: 'Clic para sumar un 2.º, 3.º o más empleados a esta misma observación',
+          badge: '👥 + Persona',
+          reemplazo: `${baseLimpia} y `,
+          mantenerAbierto: true
+        });
+        if (!/^habla\s+en\s+sala/i.test(baseLimpia) && !/\([^)]+\)\s*$/.test(baseLimpia)) {
+          sugerenciasDetalleActuales.push({
+            etiqueta: '📍 Agregar Sector al final (... (Barra, Pitt, Caja...))',
+            subtitulo: 'Clic para elegir el sector donde conversan y su cámara',
+            badge: '📍 + Sector',
+            reemplazo: `${baseLimpia} (`,
+            mantenerAbierto: true
+          });
+        }
+        // Dejar índice en -1 para que Enter envíe el formulario si el usuario ya terminó de cargar personas
+        indiceActivoDetalle = -1;
+      } else if (!matchRecienCompletado) {
+        const qNorm = normalizarTextoBusqueda(valor);
+        // 1) Coincidencias de Sectores / Observaciones predefinidas
+        OBSERVACIONES_CATALOGO
+          .filter(item => normalizarTextoBusqueda(item.texto).includes(qNorm) && normalizarTextoBusqueda(item.texto) !== qNorm)
+          .slice(0, 8)
+          .forEach(item => {
+            sugerenciasDetalleActuales.push({
+              etiqueta: item.requierePersonal ? `${item.texto}(1 o varios del Personal...)` : item.texto,
+              subtitulo: `${item.tipo === 'ASISTE' ? '🟢 ASISTE' : '🟠 NO ASISTE'} · ${item.categoria} · ${item.camara}`,
+              badge: '📋 Plantilla',
+              reemplazo: item.texto,
+              tipo: item.tipo,
+              categoria: item.categoria,
+              camara: item.camara,
+              modoArmador: item.modoArmador || ''
+            });
+          });
+
+        // 2) Coincidencias directas de Personal al escribir desde 1 letra
+        buscarPersonalPorQuery(valor).slice(0, 8).forEach(p => {
+          sugerenciasDetalleActuales.push({
+            etiqueta: `Habla con ${p.nombre}`,
+            subtitulo: `Leg. ${p.legajo} · ${p.cargo}`,
+            badge: '👤 Personal',
+            reemplazo: `Habla con ${p.nombre}`,
+            tipo: 'NO_ASISTE',
+            categoria: 'Charla',
+            esPersonaAgregada: true
+          });
+        });
+      }
+
+      if (!sugerenciasDetalleActuales.length) {
+        menu.classList.add('hidden');
+        return;
+      }
+
+      if (!matchRecienCompletado && indiceActivoDetalle >= sugerenciasDetalleActuales.length) {
+        indiceActivoDetalle = 0;
+      }
+
+      menu.innerHTML = sugerenciasDetalleActuales.map((item, idx) => {
+        const actCls = idx === indiceActivoDetalle ? 'bg-indigo-50 dark:bg-indigo-950/70' : 'hover:bg-slate-50 dark:hover:bg-slate-800/70';
+        return `
+          <button type="button" onmousedown="event.preventDefault(); aplicarSugerenciaDetallePorIndice(${idx})"
+            class="w-full text-left px-3 py-2 transition flex items-center justify-between gap-2 cursor-pointer ${actCls}">
+            <span class="min-w-0 flex flex-col">
+              <span class="text-xs font-bold text-slate-900 dark:text-white truncate">${escapeHTML(item.etiqueta)}</span>
+              <span class="text-[10px] text-slate-500 dark:text-slate-400 truncate">${escapeHTML(item.subtitulo || '')}</span>
+            </span>
+            <span class="shrink-0 text-[10px] font-semibold px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">${escapeHTML(item.badge)}</span>
+          </button>
+        `;
+      }).join('');
+      menu.classList.remove('hidden');
+    }
+
+    window.aplicarSugerenciaDetallePorIndice = function (idx) {
+      const item = sugerenciasDetalleActuales[idx];
+      if (!item) return;
+      const input = document.getElementById('inputDetalle');
+      input.value = item.reemplazo;
+      if (item.tipo) document.getElementById('inputTipo').value = item.tipo;
+      if (item.categoria) document.getElementById('inputCategoria').value = item.categoria;
+      if (item.camara) document.getElementById('inputCamara').value = item.camara;
+
+      guardarBorradorFormulario();
+
+      if (item.modoArmador) {
+        document.getElementById('dropdownSugerenciasDetalle')?.classList.add('hidden');
+        indiceActivoDetalle = -1;
+        abrirArmadorObservacion(item.modoArmador, item.modoArmador === 'HABLA_SALA' ? 'Sala' : 'Barra');
+      } else if (item.mantenerAbierto) {
+        indiceActivoDetalle = 0;
+        input.focus();
+        renderizarDropdownSugerenciasDetalle();
+      } else if (item.esPersonaAgregada) {
+        // Mostrar opción rápida para sumar otra persona ("+ otra persona") o sector sin bloquear Enter
+        input.focus();
+        renderizarDropdownSugerenciasDetalle(true);
+      } else {
+        document.getElementById('dropdownSugerenciasDetalle')?.classList.add('hidden');
+        indiceActivoDetalle = -1;
+        input.focus();
+      }
     };
 
     // ==================== LIMPIAR, EJEMPLO Y EXPORTAR CSV ====================
@@ -1815,13 +3609,21 @@
     };
 
     window.confirmarLimpiarTodo = function () {
-      if (registros.length > 0) {
+      const fActual = obtenerFichaActual();
+      if (registros.length > 0 || tieneHorariosReferencia(fActual)) {
         guardarSnapshotUndo('limpieza completa de planilla');
       }
       cancelarEdicion(true);
+      limpiarBorradorFormulario();
+      try { localStorage.removeItem(STORAGE_CLOUD_PENDING_KEY); } catch (e) { }
       registros = [];
       metaMinutos = META_MINUTOS_DEFAULT;
+      establecerCloudAuditId(null);
+      document.getElementById('fichaMarcaIngreso').value = '';
+      document.getElementById('fichaSaleSala').value = '';
+      document.getElementById('fichaMarcaSalida').value = '';
       try {
+        localStorage.setItem(STORAGE_FICHA_KEY, JSON.stringify(obtenerFichaActual()));
         localStorage.setItem(STORAGE_REGISTROS_KEY, JSON.stringify([]));
         localStorage.setItem(STORAGE_META_KEY, String(META_MINUTOS_DEFAULT));
       } catch (e) { }
@@ -1844,6 +3646,7 @@
         guardarSnapshotUndo('cargar planilla de ejemplo');
       }
       cancelarEdicion(true);
+      establecerCloudAuditId(null);
       registros = prepararDatosIniciales();
       actualizarTodo();
       mostrarToast('Planilla de ejemplo cargada', Boolean(ultimoRespaldo));
@@ -1855,20 +3658,37 @@
         return;
       }
       const f = obtenerFichaActual();
-      let csv = `Fecha Auditada,${f.fechaDisplay},Turno,${f.turno},Personal,"${f.empleado.replace(/"/g, '""')}",Sala,"${f.sala.replace(/"/g, '""')}"\n\n`;
-      csv += "Estado,Categoria,Camara,Inicio,Fin,Duracion (HH:MM),Minutos,Bajar Video DVR,Observacion\n";
+      const incluirColumnaDvr = esSalaBoulevard(f.sala) || registros.some(r => Boolean(r.dvr));
+      let csv = `Fecha Auditada,${f.fechaDisplay},Turno,${f.turno},Personal,"${f.empleado.replace(/"/g, '""')}",Sala,"${f.sala.replace(/"/g, '""')}"\n`;
+      csv += `Horarios Referencia (No computan),Marca Ingreso,${f.marcaIngreso || '-'},Sale a Sala,${f.saleSala || '-'},Marca Salida,${f.marcaSalida || '-'}\n\n`;
+      csv += incluirColumnaDvr
+        ? "Estado,Categoria,DVR,Camara,Inicio,Fin,Duracion (HH:MM),Minutos,Bajar Video DVR,Observacion\n"
+        : "Estado,Categoria,Camara,Inicio,Fin,Duracion (HH:MM),Minutos,Bajar Video DVR,Observacion\n";
       registros.forEach(r => {
-        const fila = [
-          r.tipo,
-          `"${(r.categoria || '').replace(/"/g, '""')}"`,
-          `"${(r.camara || '').replace(/"/g, '""')}"`,
-          r.inicio,
-          r.fin,
-          minutosADuracionStr(r.minutos),
-          r.minutos,
-          r.bajarVideo ? 'SI' : 'NO',
-          `"${(r.detalle || '').replace(/"/g, '""')}"`
-        ];
+        const fila = incluirColumnaDvr
+          ? [
+            r.tipo,
+            `"${(r.categoria || '').replace(/"/g, '""')}"`,
+            `"${(r.dvr || '').replace(/"/g, '""')}"`,
+            `"${(r.camara || '').replace(/"/g, '""')}"`,
+            r.inicio,
+            r.fin,
+            minutosADuracionStr(r.minutos),
+            r.minutos,
+            r.bajarVideo ? 'SI' : 'NO',
+            `"${(r.detalle || '').replace(/"/g, '""')}"`
+          ]
+          : [
+            r.tipo,
+            `"${(r.categoria || '').replace(/"/g, '""')}"`,
+            `"${(r.camara || '').replace(/"/g, '""')}"`,
+            r.inicio,
+            r.fin,
+            minutosADuracionStr(r.minutos),
+            r.minutos,
+            r.bajarVideo ? 'SI' : 'NO',
+            `"${(r.detalle || '').replace(/"/g, '""')}"`
+          ];
         csv += fila.join(",") + "\n";
       });
 
@@ -1957,6 +3777,7 @@
             <div class="text-slate-500 dark:text-slate-400 font-mono text-[11px] mt-0.5">
               ${escapeHTML(item.ficha?.fechaDisplay || '')} · ${escapeHTML(item.ficha?.turno || '')} · ${escapeHTML(item.resumen || '')}
             </div>
+            ${tieneHorariosReferencia(item.ficha) ? `<div class="text-slate-500 dark:text-slate-400 font-mono text-[10px] mt-0.5">🕒 ${escapeHTML(formatearTextoReferencias(item.ficha))}</div>` : ''}
           </div>
           <div class="flex items-center gap-1.5 shrink-0">
             <button type="button" onclick="cargarAuditoriaDeHistorial(${Number(item.id)})" class="px-2.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold cursor-pointer">
@@ -1979,14 +3800,11 @@
       registros = JSON.parse(JSON.stringify(item.registros || []));
       metaMinutos = item.metaMinutos || META_MINUTOS_DEFAULT;
       if (item.ficha) {
-        document.getElementById('fichaEmpleado').value = item.ficha.empleado || '';
-        document.getElementById('fichaCargo').value = item.ficha.cargo || '';
-        document.getElementById('fichaSala').value = item.ficha.sala || '';
-        document.getElementById('fichaFecha').value = item.ficha.fechaIso || obtenerFechaTurnoPorDefecto().iso;
-        document.getElementById('fichaTurno').value = item.ficha.turno || 'TURNO MAÑANA';
-        try { localStorage.setItem(STORAGE_FICHA_KEY, JSON.stringify(item.ficha)); } catch (e) { }
+        aplicarFichaEnInputs(item.ficha);
+        try { localStorage.setItem(STORAGE_FICHA_KEY, JSON.stringify(obtenerFichaActual())); } catch (e) { }
       }
       try { localStorage.setItem(STORAGE_META_KEY, String(metaMinutos)); } catch (e) { }
+      establecerCloudAuditId(null);
       cancelarEdicion(true);
       cerrarModalHistorial();
       actualizarTodo();
@@ -2000,6 +3818,652 @@
       } catch (e) { }
       renderizarListaHistorial();
       actualizarBadgeHistorial();
+    };
+
+    // ==================== INTEGRACIÓN SUPABASE (NUBE + AUTH + EXPLORADOR SQL) ====================
+    function obtenerCredencialesSupabase() {
+      const cfgArchivo = window.SUPABASE_CONFIG || {};
+      if (cfgArchivo.url && cfgArchivo.anonKey) {
+        return { url: cfgArchivo.url.trim(), anonKey: cfgArchivo.anonKey.trim(), source: 'archivo (js/supabase-config.js)' };
+      }
+      try {
+        const raw = localStorage.getItem(STORAGE_SUPA_CREDS_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed?.url && parsed?.anonKey) {
+            return { url: parsed.url.trim(), anonKey: parsed.anonKey.trim(), source: 'navegador (localStorage)' };
+          }
+        }
+      } catch (e) { }
+      return { url: '', anonKey: '', source: '' };
+    }
+
+    function establecerCloudAuditId(id, textoExtra = '') {
+      cloudAuditId = id || null;
+      try {
+        if (cloudAuditId) localStorage.setItem(STORAGE_CLOUD_ID_KEY, cloudAuditId);
+        else localStorage.removeItem(STORAGE_CLOUD_ID_KEY);
+      } catch (e) { }
+
+      const banner = document.getElementById('cloudActiveBanner');
+      const bannerTxt = document.getElementById('cloudActiveBannerText');
+      const btnLbl = document.getElementById('btnGuardarNubeLabel');
+      if (cloudAuditId) {
+        banner.classList.remove('hidden');
+        const shortId = String(cloudAuditId).slice(0, 8);
+        bannerTxt.textContent = `☁️ Vinculada en Supabase (#${shortId})${textoExtra ? ` · ${textoExtra}` : ''}`;
+        if (btnLbl) btnLbl.textContent = 'Actualizar Nube';
+      } else {
+        banner.classList.add('hidden');
+        if (btnLbl) btnLbl.textContent = 'Subir Nube';
+      }
+    }
+
+    window.desvincularAuditoriaNube = function () {
+      establecerCloudAuditId(null);
+      mostrarToast('Desvinculada: el próximo envío creará un registro nuevo en Supabase');
+    };
+
+    function actualizarEstadoVisualSupabase() {
+      const dot = document.getElementById('cloudStatusDot');
+      const lbl = document.getElementById('cloudStatusLabel');
+      const badgeSrc = document.getElementById('supaConfigSourceBadge');
+      const boxActiva = document.getElementById('boxSesionActiva');
+      const formLogin = document.getElementById('formLoginSupabase');
+      const creds = obtenerCredencialesSupabase();
+
+      if (badgeSrc) {
+        badgeSrc.textContent = creds.source ? `Origen: ${creds.source}` : 'Sin credenciales';
+      }
+
+      if (!supabaseClient) {
+        dot.className = 'w-2 h-2 rounded-full bg-slate-400 shrink-0';
+        if (lbl) lbl.textContent = 'Configurar Nube';
+        boxActiva?.classList.add('hidden');
+        formLogin?.classList.remove('hidden');
+        return;
+      }
+
+      if (supabaseSession?.user) {
+        dot.className = 'w-2 h-2 rounded-full bg-emerald-400 shrink-0';
+        if (lbl) lbl.textContent = 'Nube Activa';
+        boxActiva?.classList.remove('hidden');
+        formLogin?.classList.add('hidden');
+        const emailEl = document.getElementById('supaUserEmail');
+        if (emailEl) emailEl.textContent = supabaseSession.user.email || 'Usuario autenticado';
+      } else {
+        dot.className = 'w-2 h-2 rounded-full bg-amber-400 shrink-0';
+        if (lbl) lbl.textContent = 'Iniciar Sesión';
+        boxActiva?.classList.add('hidden');
+        formLogin?.classList.remove('hidden');
+      }
+    }
+
+    async function inicializarSupabase() {
+      const creds = obtenerCredencialesSupabase();
+      const urlInp = document.getElementById('supaUrlInput');
+      const keyInp = document.getElementById('supaKeyInput');
+      if (urlInp && creds.url) urlInp.value = creds.url;
+      if (keyInp && creds.anonKey) keyInp.value = creds.anonKey;
+
+      if (!creds.url || !creds.anonKey || !window.supabase?.createClient) {
+        supabaseClient = null;
+        supabaseSession = null;
+        actualizarEstadoVisualSupabase();
+        return;
+      }
+
+      try {
+        supabaseClient = window.supabase.createClient(creds.url, creds.anonKey);
+        const { data } = await supabaseClient.auth.getSession();
+        supabaseSession = data?.session || null;
+        actualizarEstadoVisualSupabase();
+
+        supabaseClient.auth.onAuthStateChange((_event, session) => {
+          supabaseSession = session;
+          actualizarEstadoVisualSupabase();
+          if (session?.user) verificarEnvioPendienteNube();
+        });
+
+        if (supabaseSession?.user) {
+          verificarEnvioPendienteNube();
+        }
+      } catch (err) {
+        console.warn('Error inicializando Supabase:', err);
+        supabaseClient = null;
+        actualizarEstadoVisualSupabase();
+      }
+    }
+
+    function actualizarIndicadorAutoSync(texto, tono = 'neutral') {
+      const el = document.getElementById('autoSyncStatusBadge');
+      if (!el) return;
+      el.textContent = texto;
+      if (tono === 'ok') {
+        el.className = 'text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60';
+      } else if (tono === 'sync') {
+        el.className = 'text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-sky-100 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800/60';
+      } else if (tono === 'warn') {
+        el.className = 'text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800/60';
+      } else {
+        el.className = 'text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400';
+      }
+    }
+
+    window.cambiarPreferenciaAutoSync = function () {
+      const activo = Boolean(document.getElementById('checkAutoSyncCloud')?.checked);
+      try {
+        localStorage.setItem(STORAGE_AUTOSYNC_PREF_KEY, activo ? '1' : '0');
+      } catch (e) { }
+      if (activo && registros.length > 0) {
+        programarAutoSyncNube();
+      } else if (!activo) {
+        clearTimeout(cloudAutoSyncTimer);
+        actualizarIndicadorAutoSync('Solo guardado local 💾', 'neutral');
+      }
+    };
+
+    function programarAutoSyncNube() {
+      if (!document.getElementById('checkAutoSyncCloud')?.checked) return;
+      if (registros.length === 0) {
+        actualizarIndicadorAutoSync('Local activo 💾', 'neutral');
+        return;
+      }
+
+      // Marcar cambio pendiente de inmediato (protege ante corte de luz instantáneo)
+      try { localStorage.setItem(STORAGE_CLOUD_PENDING_KEY, '1'); } catch (e) { }
+
+      if (!supabaseClient || !supabaseSession?.user) {
+        actualizarIndicadorAutoSync('Guardado en PC (inicia sesión p/ nube)', 'warn');
+        return;
+      }
+
+      const f = obtenerFichaActual();
+      if (!f.empleado && !cloudAuditId) {
+        actualizarIndicadorAutoSync('Completa Personal p/ subir solo ☁️', 'warn');
+        return;
+      }
+
+      if (!navigator.onLine) {
+        actualizarIndicadorAutoSync('Sin red · Pendiente de subir ⏳', 'warn');
+        return;
+      }
+
+      actualizarIndicadorAutoSync('Sincronizando nube... ☁️', 'sync');
+      clearTimeout(cloudAutoSyncTimer);
+      cloudAutoSyncTimer = setTimeout(() => {
+        guardarAuditoriaEnSupabase(true);
+      }, 1500);
+    }
+
+    function verificarEnvioPendienteNube() {
+      try {
+        if (localStorage.getItem(STORAGE_CLOUD_PENDING_KEY) === '1' && registros.length > 0) {
+          programarAutoSyncNube();
+        }
+      } catch (e) { }
+    }
+
+    window.addEventListener('online', () => {
+      verificarEnvioPendienteNube();
+    });
+
+    window.abrirModalSupabase = function (tabForzada) {
+      const m = document.getElementById('modalSupabase');
+      m.classList.remove('hidden');
+      m.classList.add('flex');
+
+      const creds = obtenerCredencialesSupabase();
+      if (tabForzada) {
+        cambiarTabSupabase(tabForzada);
+      } else if (!creds.url || !creds.anonKey) {
+        cambiarTabSupabase('config');
+      } else if (!supabaseSession?.user) {
+        cambiarTabSupabase('auth');
+      } else {
+        cambiarTabSupabase('explorer');
+        cargarAuditoriasSupabase();
+      }
+    };
+
+    window.cerrarModalSupabase = function () {
+      const m = document.getElementById('modalSupabase');
+      m.classList.add('hidden');
+      m.classList.remove('flex');
+    };
+
+    window.cambiarTabSupabase = function (tab) {
+      const map = {
+        explorer: { panel: 'tabCloudExplorer', btn: 'btnTabCloudExplorer' },
+        auth: { panel: 'tabCloudAuth', btn: 'btnTabCloudAuth' },
+        config: { panel: 'tabCloudConfig', btn: 'btnTabCloudConfig' }
+      };
+      Object.keys(map).forEach(k => {
+        const isAct = k === tab;
+        document.getElementById(map[k].panel).classList.toggle('hidden', !isAct);
+        document.getElementById(map[k].btn).className = isAct
+          ? 'px-3 py-1.5 rounded-lg font-semibold transition cursor-pointer bg-sky-600 text-white'
+          : 'px-3 py-1.5 rounded-lg font-semibold transition cursor-pointer text-slate-300 hover:text-white';
+      });
+    };
+
+    window.guardarConfigSupabaseManual = async function () {
+      const url = document.getElementById('supaUrlInput').value.trim();
+      const anonKey = document.getElementById('supaKeyInput').value.trim();
+      if (!url || !anonKey) {
+        mostrarToast('⚠️ Ingresa tanto el Project URL como la API Key anon');
+        return;
+      }
+      try {
+        localStorage.setItem(STORAGE_SUPA_CREDS_KEY, JSON.stringify({ url, anonKey }));
+      } catch (e) { }
+      await inicializarSupabase();
+      if (supabaseClient) {
+        mostrarToast('✓ Proyecto Supabase conectado. Ahora inicia sesión.');
+        cambiarTabSupabase(supabaseSession?.user ? 'explorer' : 'auth');
+      } else {
+        mostrarToast('⚠️ No se pudo inicializar el cliente Supabase');
+      }
+    };
+
+    window.iniciarSesionSupabase = async function (e) {
+      e.preventDefault();
+      if (!supabaseClient) {
+        mostrarToast('Primero configura la URL y API Key en la pestaña Conexión');
+        cambiarTabSupabase('config');
+        return;
+      }
+      const email = document.getElementById('supaEmail').value.trim();
+      const password = document.getElementById('supaPassword').value;
+      const btn = document.getElementById('btnSubmitLoginSupa');
+      btn.disabled = true;
+      btn.textContent = 'Verificando credenciales...';
+
+      const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+      btn.disabled = false;
+      btn.textContent = 'Iniciar Sesión en Supabase';
+
+      if (error) {
+        mostrarToast(`⚠️ Error de acceso: ${error.message}`);
+        return;
+      }
+      supabaseSession = data.session;
+      document.getElementById('supaPassword').value = '';
+      actualizarEstadoVisualSupabase();
+      mostrarToast(`☁️ Bienvenido, ${data.user.email}`);
+      cambiarTabSupabase('explorer');
+      cargarAuditoriasSupabase();
+    };
+
+    window.registrarOperadorSupabase = async function () {
+      if (!supabaseClient) {
+        mostrarToast('Primero verifica la conexión en la pestaña Conexión');
+        cambiarTabSupabase('config');
+        return;
+      }
+      const email = document.getElementById('supaEmail').value.trim();
+      const password = document.getElementById('supaPassword').value;
+      if (!email || password.length < 6) {
+        mostrarToast('⚠️ Ingresa un correo válido y una contraseña de al menos 6 caracteres');
+        return;
+      }
+      const btn = document.getElementById('btnRegisterSupa');
+      btn.disabled = true;
+      btn.textContent = 'Creando cuenta...';
+
+      const { data, error } = await supabaseClient.auth.signUp({ email, password });
+      btn.disabled = false;
+      btn.textContent = 'Crear Cuenta Nueva';
+
+      if (error) {
+        mostrarToast(`⚠️ No se pudo registrar: ${error.message}`);
+        return;
+      }
+      if (data?.session) {
+        supabaseSession = data.session;
+        document.getElementById('supaPassword').value = '';
+        actualizarEstadoVisualSupabase();
+        mostrarToast(`✓ Cuenta creada y sesión iniciada (${email})`);
+        cambiarTabSupabase('explorer');
+      } else {
+        mostrarToast(`📧 Cuenta creada. Revisa tu correo (${email}) para confirmar el enlace de activación.`);
+      }
+    };
+
+    window.cerrarSesionSupabase = async function () {
+      if (supabaseClient) {
+        await supabaseClient.auth.signOut();
+      }
+      supabaseSession = null;
+      actualizarEstadoVisualSupabase();
+      mostrarToast('Sesión cerrada');
+    };
+
+    window.guardarAuditoriaEnSupabase = async function (silencioso = false) {
+      if (registros.length === 0) {
+        if (!silencioso) mostrarToast('⚠️ Agrega al menos un tramo antes de subir a la nube');
+        return;
+      }
+      if (!supabaseClient) {
+        if (!silencioso) {
+          mostrarToast('Configura tu proyecto Supabase para subir a la nube');
+          abrirModalSupabase('config');
+        }
+        return;
+      }
+      if (!supabaseSession?.user) {
+        if (!silencioso) {
+          mostrarToast('Inicia sesión con tu usuario de operador para guardar en la nube');
+          abrirModalSupabase('auth');
+        }
+        return;
+      }
+
+      const f = obtenerFichaActual();
+      if (!f.empleado && !cloudAuditId) {
+        if (!silencioso) {
+          document.getElementById('fichaEmpleado').focus();
+          mostrarToast('⚠️ Ingresa el nombre del Personal Auditado antes de subir a la nube');
+        } else {
+          actualizarIndicadorAutoSync('Completa Personal p/ subir solo ☁️', 'warn');
+        }
+        return;
+      }
+
+      // Evitar doble INSERT simultáneo si el operador carga tramos muy rápido
+      if (isCloudSyncing) {
+        queuedSyncAfterCurrent = true;
+        return;
+      }
+      isCloudSyncing = true;
+      actualizarIndicadorAutoSync('Guardando en nube... ☁️', 'sync');
+
+      let minAsiste = 0;
+      let minNoAsiste = 0;
+      let minDescanso = 0;
+      let clipsDvr = 0;
+      registros.forEach(r => {
+        const dur = calcularMinutos(r.inicio, r.fin);
+        if (r.bajarVideo) clipsDvr++;
+        if (r.tipo === 'ASISTE') minAsiste += dur;
+        else {
+          minNoAsiste += dur;
+          if (r.categoria === 'Descanso') minDescanso += dur;
+        }
+      });
+
+      const minDistraccion = Math.max(0, minNoAsiste - minDescanso);
+      const totalRegistrado = minAsiste + minNoAsiste;
+      const porcAsiste = totalRegistrado > 0 ? Number(((minAsiste / totalRegistrado) * 100).toFixed(2)) : 0;
+
+      const payload = {
+        created_by: supabaseSession.user.id,
+        operator_email: supabaseSession.user.email || '',
+        empleado: f.empleado || 'Sin especificar',
+        cargo: f.cargo,
+        sala: f.sala,
+        fecha_auditada: f.fechaIso,
+        turno: f.turno,
+        marca_ingreso: f.marcaIngreso || '',
+        sale_a_sala: f.saleSala || '',
+        marca_salida: f.marcaSalida || '',
+        meta_minutos: metaMinutos,
+        min_asiste: minAsiste,
+        min_descanso: minDescanso,
+        min_distraccion: minDistraccion,
+        total_registrado: totalRegistrado,
+        porc_asiste: porcAsiste,
+        cantidad_tramos: registros.length,
+        clips_dvr: clipsDvr,
+        resumen_texto: document.getElementById('resumenEjecutivoTexto').value || '',
+        registros: registros
+      };
+
+      const btn = document.getElementById('btnGuardarNube');
+      if (btn) btn.disabled = true;
+
+      let res;
+      try {
+        if (cloudAuditId) {
+          res = await supabaseClient
+            .from(SUPABASE_TABLE)
+            .update(payload)
+            .eq('id', cloudAuditId)
+            .select('id')
+            .single();
+        } else {
+          res = await supabaseClient
+            .from(SUPABASE_TABLE)
+            .insert(payload)
+            .select('id')
+            .single();
+        }
+      } catch (netErr) {
+        res = { error: { message: 'Sin conexión a internet' } };
+      }
+
+      if (btn) btn.disabled = false;
+      isCloudSyncing = false;
+
+      if (res.error) {
+        console.warn('Supabase sync pendiente:', res.error);
+        actualizarIndicadorAutoSync('Pendiente de red ⏳ (guardado en PC)', 'warn');
+        if (!silencioso) mostrarToast(`⚠️ Error en Supabase: ${res.error.message}`);
+        return;
+      }
+
+      try { localStorage.removeItem(STORAGE_CLOUD_PENDING_KEY); } catch (e) { }
+      const horaEnvio = new Date().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      establecerCloudAuditId(res.data.id, `Sincronizado ${horaEnvio}`);
+      actualizarIndicadorAutoSync(`☁️ Nube al día (${horaEnvio})`, 'ok');
+      if (!silencioso) mostrarToast('☁️ ¡Auditoría sincronizada en Supabase correctamente!');
+
+      if (queuedSyncAfterCurrent) {
+        queuedSyncAfterCurrent = false;
+        programarAutoSyncNube();
+      }
+    };
+
+    window.limpiarFiltrosCloud = function () {
+      document.getElementById('cloudFiltroEmpleado').value = '';
+      document.getElementById('cloudFiltroSala').value = '';
+      document.getElementById('cloudFiltroDesde').value = '';
+      document.getElementById('cloudFiltroHasta').value = '';
+      cargarAuditoriasSupabase();
+    };
+
+    window.cargarAuditoriasSupabase = async function () {
+      const cont = document.getElementById('listaAuditoriasCloud');
+      const statsBar = document.getElementById('cloudStatsBar');
+      if (!supabaseClient || !supabaseSession?.user) {
+        statsBar.classList.add('hidden');
+        cont.innerHTML = '<p class="text-xs text-slate-500 text-center py-8 italic">Inicia sesión en la pestaña "Sesión Operador" para consultar la base de datos.</p>';
+        return;
+      }
+
+      cont.innerHTML = '<p class="text-xs text-sky-600 dark:text-sky-400 text-center py-8 font-medium">Consultando Supabase...</p>';
+
+      let query = supabaseClient
+        .from(SUPABASE_TABLE)
+        .select('*')
+        .order('fecha_auditada', { ascending: false })
+        .order('created_at', { ascending: false })
+        .limit(100);
+
+      const emp = document.getElementById('cloudFiltroEmpleado').value.trim();
+      const sala = document.getElementById('cloudFiltroSala').value.trim();
+      const desde = document.getElementById('cloudFiltroDesde').value;
+      const hasta = document.getElementById('cloudFiltroHasta').value;
+
+      if (emp) query = query.ilike('empleado', `%${emp}%`);
+      if (sala) query = query.ilike('sala', `%${sala}%`);
+      if (desde) query = query.gte('fecha_auditada', desde);
+      if (hasta) query = query.lte('fecha_auditada', hasta);
+
+      const { data, error } = await query;
+
+      if (error) {
+        statsBar.classList.add('hidden');
+        cont.innerHTML = `<div class="p-4 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-xs text-rose-700 dark:text-rose-300">Error consultando tabla <b>${SUPABASE_TABLE}</b>: ${escapeHTML(error.message)}. Verifica haber ejecutado el SQL de instalación.</div>`;
+        return;
+      }
+
+      cloudResultadosCache = data || [];
+
+      if (cloudResultadosCache.length === 0) {
+        statsBar.classList.add('hidden');
+        cont.innerHTML = '<p class="text-xs text-slate-500 dark:text-slate-400 text-center py-8 italic">No se encontraron auditorías en Supabase con esos criterios.</p>';
+        return;
+      }
+
+      // Calcular estadísticas agregadas del resultado
+      let sumAsiste = 0;
+      let sumDist = 0;
+      let sumPorc = 0;
+      cloudResultadosCache.forEach(row => {
+        sumAsiste += Number(row.min_asiste) || 0;
+        sumDist += Number(row.min_distraccion) || 0;
+        sumPorc += Number(row.porc_asiste) || 0;
+      });
+      const avgPorc = (sumPorc / cloudResultadosCache.length).toFixed(1);
+
+      document.getElementById('cloudStatCount').textContent = String(cloudResultadosCache.length);
+      document.getElementById('cloudStatAvgAsiste').textContent = `${avgPorc}%`;
+      document.getElementById('cloudStatSumAsiste').textContent = `${minutosADuracionStr(sumAsiste)} hs`;
+      document.getElementById('cloudStatSumDist').textContent = `${minutosADuracionStr(sumDist)} hs`;
+      statsBar.classList.remove('hidden');
+
+      cont.innerHTML = cloudResultadosCache.map((row, idx) => {
+        const isCurrent = cloudAuditId === row.id;
+        return `
+          <div class="p-3.5 rounded-xl bg-white dark:bg-slate-900 border ${isCurrent ? 'border-sky-500 ring-1 ring-sky-500/40' : 'border-slate-200 dark:border-slate-800'} flex flex-wrap items-center justify-between gap-3 text-xs">
+            <div class="min-w-0 space-y-1">
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="font-bold text-slate-900 dark:text-white text-sm">${escapeHTML(row.empleado || 'Sin nombre')}</span>
+                ${row.cargo ? `<span class="text-slate-500 dark:text-slate-400">(${escapeHTML(row.cargo)})</span>` : ''}
+                ${row.sala ? `<span class="px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 font-semibold">${escapeHTML(row.sala)}</span>` : ''}
+                <span class="font-mono text-slate-500 dark:text-slate-400">${escapeHTML(formatearFechaISO(row.fecha_auditada))} · ${escapeHTML(row.turno || '')}</span>
+              </div>
+              <div class="flex flex-wrap items-center gap-3 font-mono text-[11px]">
+                <span class="text-emerald-600 dark:text-emerald-400 font-semibold">Asiste: ${minutosADuracionStr(row.min_asiste || 0)} (${Number(row.porc_asiste || 0).toFixed(1)}%)</span>
+                <span class="text-sky-600 dark:text-sky-400">Descanso: ${minutosADuracionStr(row.min_descanso || 0)}</span>
+                <span class="text-amber-600 dark:text-amber-400 font-semibold">Distracción: ${minutosADuracionStr(row.min_distraccion || 0)}</span>
+                <span class="text-slate-400">${Number(row.cantidad_tramos || 0)} tramos · 🎥 ${Number(row.clips_dvr || 0)}</span>
+              </div>
+              ${(row.marca_ingreso || row.sale_a_sala || row.marca_salida) ? `
+              <div class="font-mono text-[10px] text-slate-500 dark:text-slate-400">
+                🕒 Ingreso: ${escapeHTML(row.marca_ingreso || 'S/D')} · Sale a Sala: ${escapeHTML(row.sale_a_sala || 'S/D')} · Salida: ${escapeHTML(row.marca_salida || 'S/D')}
+              </div>` : ''}
+            </div>
+            <div class="flex items-center gap-1.5 shrink-0">
+              <button type="button" onclick="abrirAuditoriaDesdeSupabase(${idx})" class="px-3 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-white font-semibold cursor-pointer">
+                Abrir
+              </button>
+              <button type="button" onclick="copiarInformeCloud(${idx})" class="px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-200 font-semibold cursor-pointer" title="Copiar Resumen Ejecutivo">
+                📋
+              </button>
+              <button type="button" onclick="eliminarAuditoriaSupabase(${idx})" class="px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-rose-600 hover:text-white text-slate-500 dark:text-slate-300 font-semibold cursor-pointer" title="Eliminar de Supabase">
+                🗑️
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    };
+
+    window.abrirAuditoriaDesdeSupabase = function (idx) {
+      const row = cloudResultadosCache[idx];
+      if (!row) return;
+      if (registros.length > 0) guardarSnapshotUndo('cargar auditoría de Supabase');
+
+      registros = Array.isArray(row.registros) ? JSON.parse(JSON.stringify(row.registros)) : [];
+      metaMinutos = Number(row.meta_minutos) || META_MINUTOS_DEFAULT;
+
+      aplicarFichaEnInputs({
+        empleado: row.empleado || '',
+        cargo: row.cargo || '',
+        sala: row.sala || '',
+        fechaIso: row.fecha_auditada || obtenerFechaTurnoPorDefecto().iso,
+        turno: row.turno || 'TURNO MAÑANA',
+        marcaIngreso: row.marca_ingreso || '',
+        saleSala: row.sale_a_sala || '',
+        marcaSalida: row.marca_salida || ''
+      });
+
+      try {
+        localStorage.setItem(STORAGE_FICHA_KEY, JSON.stringify(obtenerFichaActual()));
+        localStorage.setItem(STORAGE_META_KEY, String(metaMinutos));
+      } catch (e) { }
+
+      establecerCloudAuditId(row.id, `Cargada de nube`);
+      cancelarEdicion(true);
+      cerrarModalSupabase();
+      actualizarTodo();
+      mostrarToast(`☁️ Auditoría de ${row.empleado} cargada desde Supabase`, Boolean(ultimoRespaldo));
+    };
+
+    window.copiarInformeCloud = function (idx) {
+      const row = cloudResultadosCache[idx];
+      if (!row || !row.resumen_texto) {
+        mostrarToast('Este registro no contiene resumen de texto');
+        return;
+      }
+      copiarTextoPortapapeles(row.resumen_texto, `📋 Informe de ${row.empleado} copiado`);
+    };
+
+    window.eliminarAuditoriaSupabase = async function (idx) {
+      const row = cloudResultadosCache[idx];
+      if (!row || !supabaseClient) return;
+      if (!confirm(`¿Eliminar definitivamente de Supabase la auditoría de "${row.empleado}" (${formatearFechaISO(row.fecha_auditada)})?`)) return;
+
+      const { error } = await supabaseClient.from(SUPABASE_TABLE).delete().eq('id', row.id);
+      if (error) {
+        mostrarToast(`⚠️ No se pudo eliminar: ${error.message}`);
+        return;
+      }
+      if (cloudAuditId === row.id) establecerCloudAuditId(null);
+      mostrarToast('🗑️ Auditoría eliminada de Supabase');
+      cargarAuditoriasSupabase();
+    };
+
+    window.copiarSqlInstalacion = function () {
+      const sql = [
+        "create extension if not exists pgcrypto;",
+        "create table if not exists public.auditorias_desempeno (",
+        "  id uuid primary key default gen_random_uuid(),",
+        "  created_at timestamptz not null default now(),",
+        "  updated_at timestamptz not null default now(),",
+        "  created_by uuid not null references auth.users(id) on delete cascade default auth.uid(),",
+        "  operator_email text,",
+        "  empleado text not null default '',",
+        "  cargo text not null default '',",
+        "  sala text not null default '',",
+        "  fecha_auditada date not null default current_date,",
+        "  turno text not null default 'TURNO MAÑANA',",
+        "  marca_ingreso text not null default '',",
+        "  sale_a_sala text not null default '',",
+        "  marca_salida text not null default '',",
+        "  meta_minutos integer not null default 510,",
+        "  min_asiste integer not null default 0,",
+        "  min_descanso integer not null default 0,",
+        "  min_distraccion integer not null default 0,",
+        "  total_registrado integer not null default 0,",
+        "  porc_asiste numeric(5,2) not null default 0,",
+        "  cantidad_tramos integer not null default 0,",
+        "  clips_dvr integer not null default 0,",
+        "  resumen_texto text not null default '',",
+        "  registros jsonb not null default '[]'::jsonb",
+        ");",
+        "create index if not exists idx_auditorias_desempeno_created_by on public.auditorias_desempeno (created_by);",
+        "revoke all on table public.auditorias_desempeno from anon;",
+        "grant select, insert, update, delete on table public.auditorias_desempeno to authenticated;",
+        "alter table public.auditorias_desempeno enable row level security;",
+        "create policy \"Operador ve solo sus auditorias\" on public.auditorias_desempeno for select to authenticated using ((select auth.uid()) = created_by);",
+        "create policy \"Operador inserta solo sus auditorias\" on public.auditorias_desempeno for insert to authenticated with check ((select auth.uid()) = created_by);",
+        "create policy \"Operador actualiza solo sus auditorias\" on public.auditorias_desempeno for update to authenticated using ((select auth.uid()) = created_by) with check ((select auth.uid()) = created_by);",
+        "create policy \"Operador elimina solo sus auditorias\" on public.auditorias_desempeno for delete to authenticated using ((select auth.uid()) = created_by);"
+      ].join('\n');
+      copiarTextoPortapapeles(sql, '📋 SQL de instalación copiado (pégalo en Supabase SQL Editor)');
     };
 
     // ==================== NOTIFICACIONES Y ATAJOS DE TECLADO ====================
@@ -2024,11 +4488,115 @@
           deshacerUltimaAccion();
         }
       } else if (e.key === 'Escape') {
+        cerrarTodosLosDropdowns();
+        cerrarSelectorCamaras();
         cerrarModalLimpiar();
         cerrarModalHistorial();
+        cerrarModalSupabase();
         if (editandoIndex !== null) cancelarEdicion();
       }
     });
+
+    function inicializarEventosAutocompletado() {
+      const fichaInp = document.getElementById('fichaEmpleado');
+      const armadorInp = document.getElementById('inputBuscarPersonalArmador');
+      const detalleInp = document.getElementById('inputDetalle');
+
+      if (fichaInp) {
+        fichaInp.addEventListener('input', () => {
+          indiceActivoFicha = 0;
+          renderizarDropdownPersonalFicha();
+        });
+        fichaInp.addEventListener('focus', () => {
+          if (fichaInp.value.trim()) renderizarDropdownPersonalFicha();
+        });
+        fichaInp.addEventListener('blur', () => {
+          setTimeout(() => document.getElementById('dropdownPersonalFicha')?.classList.add('hidden'), 150);
+        });
+        fichaInp.addEventListener('keydown', e => {
+          const menu = document.getElementById('dropdownPersonalFicha');
+          if (!menu || menu.classList.contains('hidden')) return;
+          const resultados = buscarPersonalPorQuery(fichaInp.value.trim());
+          if (!resultados.length) return;
+          if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            indiceActivoFicha = (indiceActivoFicha + 1) % resultados.length;
+            renderizarDropdownPersonalFicha();
+          } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            indiceActivoFicha = (indiceActivoFicha - 1 + resultados.length) % resultados.length;
+            renderizarDropdownPersonalFicha();
+          } else if (e.key === 'Enter' && indiceActivoFicha >= 0 && resultados[indiceActivoFicha]) {
+            e.preventDefault();
+            seleccionarPersonalFichaPorIndice(resultados[indiceActivoFicha].index);
+          }
+        });
+      }
+
+      if (armadorInp) {
+        armadorInp.addEventListener('input', () => {
+          indiceActivoArmador = 0;
+          renderizarDropdownPersonalArmador();
+        });
+        armadorInp.addEventListener('focus', () => {
+          if (armadorInp.value.trim()) renderizarDropdownPersonalArmador();
+        });
+        armadorInp.addEventListener('blur', () => {
+          setTimeout(() => document.getElementById('dropdownPersonalArmador')?.classList.add('hidden'), 150);
+        });
+        armadorInp.addEventListener('keydown', e => {
+          const menu = document.getElementById('dropdownPersonalArmador');
+          const resultados = buscarPersonalPorQuery(armadorInp.value.trim(), armadorEstado.personas);
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            if (menu && !menu.classList.contains('hidden') && resultados.length) {
+              const elegido = resultados[Math.max(0, indiceActivoArmador)] || resultados[0];
+              agregarPersonalArmadorPorIndice(elegido.index);
+            }
+            return;
+          }
+          if (!menu || menu.classList.contains('hidden') || !resultados.length) return;
+          if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            indiceActivoArmador = (indiceActivoArmador + 1) % resultados.length;
+            renderizarDropdownPersonalArmador();
+          } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            indiceActivoArmador = (indiceActivoArmador - 1 + resultados.length) % resultados.length;
+            renderizarDropdownPersonalArmador();
+          }
+        });
+      }
+
+      if (detalleInp) {
+        detalleInp.addEventListener('input', () => {
+          indiceActivoDetalle = 0;
+          renderizarDropdownSugerenciasDetalle();
+        });
+        detalleInp.addEventListener('focus', () => {
+          if (detalleInp.value.trim()) renderizarDropdownSugerenciasDetalle();
+        });
+        detalleInp.addEventListener('blur', () => {
+          setTimeout(() => document.getElementById('dropdownSugerenciasDetalle')?.classList.add('hidden'), 150);
+        });
+        detalleInp.addEventListener('keydown', e => {
+          const menu = document.getElementById('dropdownSugerenciasDetalle');
+          if (!menu || menu.classList.contains('hidden') || !sugerenciasDetalleActuales.length) return;
+          if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            indiceActivoDetalle = (indiceActivoDetalle + 1) % sugerenciasDetalleActuales.length;
+            renderizarDropdownSugerenciasDetalle();
+          } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            indiceActivoDetalle = (indiceActivoDetalle - 1 + sugerenciasDetalleActuales.length) % sugerenciasDetalleActuales.length;
+            renderizarDropdownSugerenciasDetalle();
+          } else if (e.key === 'Enter' && indiceActivoDetalle >= 0 && sugerenciasDetalleActuales[indiceActivoDetalle]) {
+            e.preventDefault();
+            aplicarSugerenciaDetallePorIndice(indiceActivoDetalle);
+          }
+        });
+      }
+    }
 
     // ==================== INICIALIZACIÓN ====================
     window.addEventListener('DOMContentLoaded', function () {
@@ -2036,17 +4604,34 @@
       document.getElementById('fichaFecha').value = def.iso;
       document.getElementById('fichaTurno').value = def.turno;
       document.getElementById('inputCamara').value = 'CAM-01 (Sala Gral)';
+      inicializarEventosAutocompletado();
+      renderizarEstadoArmador(false);
+      cargarPreferenciasVistaTablas();
+
+      try {
+        const savedAutoPref = localStorage.getItem(STORAGE_AUTOSYNC_PREF_KEY);
+        if (savedAutoPref !== null) {
+          document.getElementById('checkAutoSyncCloud').checked = savedAutoPref !== '0';
+        }
+        const savedCloudId = localStorage.getItem(STORAGE_CLOUD_ID_KEY);
+        if (savedCloudId) establecerCloudAuditId(savedCloudId);
+      } catch (e) { }
+
+      // Escuchar tipeo en vivo del formulario para no perder renglones a medias ante cortes de luz
+      ['inputCategoria', 'inputTipo', 'inputDvr', 'inputCamara', 'inputInicio', 'inputFin', 'inputDetalle', 'inputBajarVideo', 'checkEncadenar'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.addEventListener('input', guardarBorradorFormulario);
+          el.addEventListener('change', guardarBorradorFormulario);
+        }
+      });
 
       try {
         const fichaGuardada = localStorage.getItem(STORAGE_FICHA_KEY);
         if (fichaGuardada) {
           const f = JSON.parse(fichaGuardada);
           if (f && typeof f === 'object') {
-            document.getElementById('fichaEmpleado').value = f.empleado || '';
-            document.getElementById('fichaCargo').value = f.cargo || '';
-            document.getElementById('fichaSala').value = f.sala || '';
-            if (f.fechaIso) document.getElementById('fichaFecha').value = f.fechaIso;
-            if (f.turno) document.getElementById('fichaTurno').value = f.turno;
+            aplicarFichaEnInputs(f);
           }
         }
 
@@ -2067,6 +4652,9 @@
               document.getElementById('inputInicio').value = def.turno === 'TURNO NOCHE' ? '22:00' : (def.turno === 'TURNO TARDE' ? '14:00' : '07:00');
             }
             actualizarTodo();
+            restaurarBorradorFormulario();
+            isBootstrappingApp = false;
+            inicializarSupabase();
             if (window.lucide) lucide.createIcons();
             return;
           }
@@ -2076,6 +4664,9 @@
       registros = [];
       document.getElementById('inputInicio').value = '07:00';
       actualizarTodo();
+      restaurarBorradorFormulario();
+      isBootstrappingApp = false;
+      inicializarSupabase();
       if (window.lucide) lucide.createIcons();
     });
   </script>
