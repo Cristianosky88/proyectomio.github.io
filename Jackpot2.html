@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jackpot · Modelo N° 2 (Progresivo)</title>
+    <title>Jackpot · Modelo N° 2 (Progresivo) · CCTV</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -29,7 +29,33 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/jackpot.css">
     <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .report-font {
+            font-family: 'JetBrains Mono', Consolas, monospace;
+        }
+        .history-item {
+            transition: all 0.16s ease;
+            border-left: 3px solid transparent;
+        }
+        .history-item:hover {
+            border-left-color: #6366f1;
+        }
+        @media print {
+            body {
+                background: #ffffff !important;
+                color: #0f172a !important;
+                padding: 0 !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+            #printSheet {
+                display: block !important;
+            }
+        }
+    </style>
 </head>
 <body class="bg-slate-100 dark:bg-slate-950 p-3 sm:p-5 md:p-8 text-slate-800 dark:text-slate-100 min-h-screen font-sans transition-colors duration-200">
 
@@ -42,7 +68,7 @@
                     <i data-lucide="zap" class="w-6 h-6 text-white"></i>
                 </div>
                 <div>
-                    <h1 class="text-lg sm:text-xl font-bold leading-tight text-white flex items-center gap-2">
+                    <h1 class="text-lg sm:text-xl font-bold leading-tight text-white flex items-center gap-2 flex-wrap">
                         Jackpot · Modelo N° 2
                         <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Autoguardado</span>
                     </h1>
@@ -51,14 +77,17 @@
             </div>
 
             <div class="flex flex-wrap items-center gap-2">
-                <a href="jackpot.html" class="px-3 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-xl transition text-white text-xs font-semibold flex items-center gap-1.5" title="Ir a Jackpot Modelo 1">
+                <a href="jackpot.html" class="px-3 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-xl transition text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm" title="Ir a Jackpot Modelo 1">
                     <i data-lucide="trophy" class="w-4 h-4"></i>
                     <span class="hidden sm:inline">Modelo 1</span>
                 </a>
                 <a href="jackpotluxor.html" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl transition text-slate-200 text-xs font-semibold flex items-center gap-1.5" title="Ir a Jackpot Luxor">
-                    <i data-lucide="coins" class="w-4 h-4 text-indigo-400"></i>
+                    <i data-lucide="coins" class="w-4 h-4 text-amber-400"></i>
                     <span class="hidden sm:inline">Luxor</span>
                 </a>
+                <button type="button" onclick="limpiarFormularioJp2()" class="p-2 bg-slate-800 hover:bg-rose-600 border border-slate-700 rounded-xl transition text-slate-200 hover:text-white cursor-pointer" title="Limpiar formulario">
+                    <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
+                </button>
                 <div class="hidden md:flex items-center gap-2 bg-slate-800/90 border border-slate-700 px-3 py-1.5 rounded-xl text-xs font-mono text-slate-200">
                     <i data-lucide="clock" class="w-3.5 h-3.5 text-indigo-400"></i>
                     <span data-cctv-clock class="tabular-nums">00:00:00 Hs.</span>
@@ -82,17 +111,29 @@
             <option value="de Caja Principal"></option>
         </datalist>
 
-        <main class="grid grid-cols-1 lg:grid-cols-12 rounded-b-2xl overflow-hidden">
+        <!-- Hoja exclusiva de Impresión -->
+        <div id="printSheet" class="hidden p-8 space-y-4">
+            <div class="border-b-2 border-slate-800 pb-3 flex justify-between items-start">
+                <div>
+                    <h2 class="text-lg font-bold uppercase">Acta CCTV · Pago de Jackpot Progresivo (Modelo N° 2)</h2>
+                    <p class="text-xs text-slate-600">Registro Operativo de Monitoreo</p>
+                </div>
+                <span id="printFechaHora" class="text-xs font-mono text-slate-600"></span>
+            </div>
+            <pre id="printTexto" class="report-font whitespace-pre-wrap text-sm leading-relaxed p-4 border border-slate-300 rounded-lg bg-slate-50"></pre>
+        </div>
+
+        <main class="no-print grid grid-cols-1 lg:grid-cols-12 rounded-b-2xl overflow-hidden">
 
             <!-- Formulario -->
-            <div class="lg:col-span-7 p-5 sm:p-6 bg-slate-50 dark:bg-slate-900/60 no-print">
-                <form id="textForm" class="space-y-4" onsubmit="event.preventDefault(); generateText();">
+            <div class="lg:col-span-7 p-4 sm:p-6 bg-slate-50 dark:bg-slate-900/60">
+                <form id="textForm" class="space-y-4" onsubmit="event.preventDefault(); copyText();">
 
                     <!-- 1. Datos Principales y Montos -->
                     <div class="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 space-y-4">
                         <div class="flex flex-wrap items-center justify-between gap-2">
                             <h2 class="font-bold text-slate-800 dark:text-slate-100 text-sm flex items-center gap-2">
-                                <span class="bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">1</span>
+                                <span class="bg-indigo-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">1</span>
                                 Aviso, Máquina y Montos del Premio
                             </h2>
                             <span id="previewTotalBadge" class="text-xs font-mono font-bold px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
@@ -102,42 +143,49 @@
 
                         <div class="grid grid-cols-1 sm:grid-cols-12 gap-3.5">
                             <div class="sm:col-span-4">
-                                <label for="hora1" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Hora Aviso</label>
+                                <label for="hora1" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">⏰ Hora Aviso</label>
                                 <div class="flex items-stretch">
-                                    <input type="time" id="hora1" class="w-full min-w-0 px-2.5 py-2 bg-slate-50 dark:bg-slate-950 border border-r-0 border-slate-300 dark:border-slate-700 rounded-l-xl text-xs font-mono dark:text-white outline-none">
-                                    <button type="button" onclick="ponerHoraJackpot('hora1')" class="px-2.5 bg-slate-200 dark:bg-slate-800 hover:bg-indigo-600 hover:text-white rounded-r-xl text-[11px] font-semibold transition cursor-pointer">Ahora</button>
+                                    <input type="time" id="hora1" class="w-full min-w-0 px-2.5 py-2 bg-slate-50 dark:bg-slate-950 border border-r-0 border-slate-300 dark:border-slate-700 rounded-l-xl text-xs font-mono text-slate-900 dark:text-white outline-none">
+                                    <button type="button" onclick="ponerHoraJackpot('hora1')" class="px-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-r-xl text-[11px] font-semibold transition cursor-pointer">Ahora</button>
                                 </div>
                             </div>
                             <div class="sm:col-span-8 relative">
                                 <label for="nombrePersonal" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Cargo y Nombre de quien informa (1 letra p/ buscar)</label>
-                                <input type="text" id="nombrePersonal" autocomplete="off" placeholder="Ej: Enc. Turno Moises Ariel / Asist. Lazarte..." oninput="buscarStaffJackpot('nombrePersonal','dropPersonalJp','sala')" onfocus="buscarStaffJackpot('nombrePersonal','dropPersonalJp','sala')" onblur="ocultarDropJp('dropPersonalJp')" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white outline-none focus:border-indigo-500">
+                                <input type="text" id="nombrePersonal" autocomplete="off" placeholder="Ej: Enc. Turno Moises Ariel / Asist. Lazarte..."
+                                    oninput="buscarStaffJackpot('nombrePersonal','dropPersonalJp','sala')"
+                                    onfocus="buscarStaffJackpot('nombrePersonal','dropPersonalJp','sala')"
+                                    onblur="ocultarDropJp('dropPersonalJp')"
+                                    class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white outline-none focus:border-indigo-500">
                                 <div id="dropPersonalJp" class="hidden absolute left-0 right-0 top-full mt-1 z-50 max-h-48 overflow-y-auto rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-xl divide-y divide-slate-100 dark:divide-slate-800"></div>
                             </div>
                         </div>
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                             <div>
-                                <label for="nombreMaquina" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">N° Máquina</label>
-                                <input type="text" id="nombreMaquina" placeholder="Ej: 120305" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-mono font-semibold text-slate-900 dark:text-white outline-none focus:border-indigo-500">
+                                <div class="flex items-center justify-between mb-1">
+                                    <label for="nombreMaquina" class="text-xs font-semibold text-slate-600 dark:text-slate-300">🎰 N° Máquina</label>
+                                    <span id="maqMemChipJp2" class="hidden text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">✓ Juego en memoria</span>
+                                </div>
+                                <input type="text" id="nombreMaquina" oninput="alEscribirMaqJp2(this)" placeholder="Ej: 120305" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-mono font-semibold text-slate-900 dark:text-white outline-none focus:border-indigo-500">
                             </div>
                             <div>
                                 <label for="ventanilla" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Ventanilla de Pago</label>
-                                <input type="text" id="ventanilla" list="ventanillasList" placeholder="Ej: de Caja N° 1" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white outline-none focus:border-indigo-500">
+                                <input type="text" id="ventanilla" list="ventanillasList" placeholder="Ej: de Caja N° 1 (vacío = de caja)" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white outline-none focus:border-indigo-500">
                             </div>
                         </div>
 
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
                             <div>
                                 <label for="valorDe" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Valor Base ($)</label>
-                                <input type="text" inputmode="decimal" id="valorDe" placeholder="Ej: 500.000,00" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-mono text-slate-900 dark:text-white outline-none focus:border-indigo-500">
+                                <input type="text" inputmode="decimal" id="valorDe" onblur="formatearMontoBlurJp2(this)" placeholder="Ej: 500.000,00" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-mono text-slate-900 dark:text-white outline-none focus:border-indigo-500">
                             </div>
                             <div>
                                 <label for="progresivoValor" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Progresivo ($)</label>
-                                <input type="text" inputmode="decimal" id="progresivoValor" placeholder="Ej: 1.250.340,50" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-mono text-slate-900 dark:text-white outline-none focus:border-indigo-500">
+                                <input type="text" inputmode="decimal" id="progresivoValor" onblur="formatearMontoBlurJp2(this)" placeholder="Ej: 1.250.340,50" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-mono text-slate-900 dark:text-white outline-none focus:border-indigo-500">
                             </div>
                             <div>
-                                <label for="totalPremio" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Total Premio ($ · opcional)</label>
-                                <input type="text" inputmode="decimal" id="totalPremio" placeholder="Auto (Base + Prog.)" class="w-full px-3 py-2 bg-emerald-50/50 dark:bg-emerald-950/30 border border-emerald-300 dark:border-emerald-800 rounded-xl text-xs font-mono font-bold text-emerald-900 dark:text-emerald-200 outline-none focus:border-emerald-500">
+                                <label for="totalPremio" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Total Premio ($ · opc.)</label>
+                                <input type="text" inputmode="decimal" id="totalPremio" onblur="formatearMontoBlurJp2(this)" placeholder="Auto (Base + Prog.)" class="w-full px-3 py-2 bg-emerald-50/50 dark:bg-emerald-950/30 border border-emerald-300 dark:border-emerald-800 rounded-xl text-xs font-mono font-bold text-emerald-900 dark:text-emerald-200 outline-none focus:border-emerald-500">
                             </div>
                         </div>
                     </div>
@@ -146,43 +194,42 @@
                     <div class="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 space-y-4">
                         <div class="flex flex-wrap items-center justify-between gap-2">
                             <h2 class="font-bold text-slate-800 dark:text-slate-100 text-sm flex items-center gap-2">
-                                <span class="bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">2</span>
+                                <span class="bg-indigo-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">2</span>
                                 Revisión, Pago y Descarga
                             </h2>
-                            <button type="button" onclick="autocompletarSecuenciaHoraria()" class="px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 text-[11px] font-semibold text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 transition cursor-pointer" title="Sugiere Revisión (+2m), Pago (+6m) y Descarga (+8m) a partir de Hora Aviso">
+                            <button type="button" onclick="autocompletarSecuenciaHoraria()" class="px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 text-[11px] font-semibold text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 transition cursor-pointer" title="Sugiere Revisión (-1m), Pago (+5m) y Descarga (+7m) a partir de Hora Aviso">
                                 ⚡ Sugerir secuencia desde Aviso
                             </button>
                         </div>
 
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
                             <div>
-                                <label for="hora2" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Hora Revisión</label>
+                                <div class="flex items-center justify-between mb-1">
+                                    <label for="hora2" class="text-xs font-semibold text-slate-600 dark:text-slate-300">Hora Salida / Rev.</label>
+                                    <button type="button" onclick="ajustarDesdeAvisoJp2('hora2', -1)" class="text-[10px] font-mono font-semibold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer">-1m</button>
+                                </div>
                                 <div class="flex items-stretch">
-                                    <input type="time" id="hora2" class="w-full min-w-0 px-2.5 py-2 bg-slate-50 dark:bg-slate-950 border border-r-0 border-slate-300 dark:border-slate-700 rounded-l-xl text-xs font-mono dark:text-white outline-none">
+                                    <input type="time" id="hora2" class="w-full min-w-0 px-2.5 py-2 bg-slate-50 dark:bg-slate-950 border border-r-0 border-slate-300 dark:border-slate-700 rounded-l-xl text-xs font-mono text-slate-900 dark:text-white outline-none">
                                     <button type="button" onclick="ponerHoraJackpot('hora2')" class="px-2 bg-slate-200 dark:bg-slate-800 hover:bg-indigo-600 hover:text-white rounded-r-xl text-[10px] font-semibold cursor-pointer">⏱</button>
                                 </div>
                             </div>
                             <div>
                                 <label for="hora3" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Hora Pago</label>
                                 <div class="flex items-stretch">
-                                    <input type="time" id="hora3" class="w-full min-w-0 px-2.5 py-2 bg-slate-50 dark:bg-slate-950 border border-r-0 border-slate-300 dark:border-slate-700 rounded-l-xl text-xs font-mono dark:text-white outline-none">
+                                    <input type="time" id="hora3" class="w-full min-w-0 px-2.5 py-2 bg-slate-50 dark:bg-slate-950 border border-r-0 border-slate-300 dark:border-slate-700 rounded-l-xl text-xs font-mono text-slate-900 dark:text-white outline-none">
                                     <button type="button" onclick="ponerHoraJackpot('hora3')" class="px-2 bg-slate-200 dark:bg-slate-800 hover:bg-indigo-600 hover:text-white rounded-r-xl text-[10px] font-semibold cursor-pointer">⏱</button>
                                 </div>
                             </div>
                             <div>
                                 <label for="hora4" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Hora Descarga</label>
                                 <div class="flex items-stretch">
-                                    <input type="time" id="hora4" class="w-full min-w-0 px-2.5 py-2 bg-slate-50 dark:bg-slate-950 border border-r-0 border-slate-300 dark:border-slate-700 rounded-l-xl text-xs font-mono dark:text-white outline-none">
+                                    <input type="time" id="hora4" class="w-full min-w-0 px-2.5 py-2 bg-slate-50 dark:bg-slate-950 border border-r-0 border-slate-300 dark:border-slate-700 rounded-l-xl text-xs font-mono text-slate-900 dark:text-white outline-none">
                                     <button type="button" onclick="ponerHoraJackpot('hora4')" class="px-2 bg-slate-200 dark:bg-slate-800 hover:bg-indigo-600 hover:text-white rounded-r-xl text-[10px] font-semibold cursor-pointer">⏱</button>
                                 </div>
                             </div>
                         </div>
 
                         <div class="grid grid-cols-1 sm:grid-cols-12 gap-3.5">
-                            <div class="sm:col-span-8">
-                                <label for="cliente" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Nombre del Cliente / Ganador</label>
-                                <input type="text" id="cliente" placeholder="Apellido y nombre" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white outline-none focus:border-indigo-500">
-                            </div>
                             <div class="sm:col-span-4">
                                 <label for="tipoCliente" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Tratamiento</label>
                                 <select id="tipoCliente" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-900 dark:text-white outline-none">
@@ -190,17 +237,35 @@
                                     <option value="clienta">Clienta (la Sra.)</option>
                                 </select>
                             </div>
+                            <div class="sm:col-span-8">
+                                <label for="cliente" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Nombre del Cliente / Ganador</label>
+                                <input type="text" id="cliente" placeholder="Apellido y nombre" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white outline-none focus:border-indigo-500">
+                            </div>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                            <div class="relative">
-                                <label for="jefeCaja" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Jefe de Caja / Cajero (1 letra p/ buscar)</label>
-                                <input type="text" id="jefeCaja" autocomplete="off" placeholder="Ej: Herrera Alejandra, Yanello..." oninput="buscarStaffJackpot('jefeCaja','dropCajaJp','caja')" onfocus="buscarStaffJackpot('jefeCaja','dropCajaJp','caja')" onblur="ocultarDropJp('dropCajaJp')" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white outline-none focus:border-indigo-500">
+                        <div class="grid grid-cols-1 sm:grid-cols-12 gap-3.5">
+                            <div class="sm:col-span-3">
+                                <label for="rolCajaJp2" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Cargo Caja</label>
+                                <select id="rolCajaJp2" class="w-full px-2.5 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-900 dark:text-white outline-none">
+                                    <option value="Jefe de Caja">Jefe de Caja</option>
+                                    <option value="Jefa de Caja">Jefa de Caja</option>
+                                    <option value="Cajera">Cajera</option>
+                                    <option value="Cajero">Cajero</option>
+                                    <option value="Asistente de Caja">Asist. Caja</option>
+                                </select>
+                            </div>
+                            <div class="sm:col-span-5 relative">
+                                <label for="jefeCaja" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Nombre en Caja (1 letra)</label>
+                                <input type="text" id="jefeCaja" autocomplete="off" placeholder="Ej: Herrera Alejandra..."
+                                    oninput="buscarStaffJackpot('jefeCaja','dropCajaJp','caja')"
+                                    onfocus="buscarStaffJackpot('jefeCaja','dropCajaJp','caja')"
+                                    onblur="ocultarDropJp('dropCajaJp')"
+                                    class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white outline-none focus:border-indigo-500">
                                 <div id="dropCajaJp" class="hidden absolute left-0 right-0 top-full mt-1 z-50 max-h-48 overflow-y-auto rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-xl divide-y divide-slate-100 dark:divide-slate-800"></div>
                             </div>
-                            <div>
+                            <div class="sm:col-span-4">
                                 <label for="responsableDescarga" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Responsable Descarga</label>
-                                <input type="text" id="responsableDescarga" placeholder="Vacío = mismo que informa aviso" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white outline-none focus:border-indigo-500">
+                                <input type="text" id="responsableDescarga" placeholder="Vacío = mismo de aviso" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white outline-none focus:border-indigo-500">
                             </div>
                         </div>
                     </div>
@@ -209,18 +274,23 @@
                     <div class="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 space-y-3.5">
                         <div class="flex flex-wrap items-center justify-between gap-2">
                             <h2 class="font-bold text-slate-800 dark:text-slate-100 text-sm flex items-center gap-2">
-                                <span class="bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">3</span>
+                                <span class="bg-indigo-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">3</span>
                                 Ficha Técnica y Apéndice
                             </h2>
-                            <label class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 dark:text-slate-300 cursor-pointer">
-                                <input type="checkbox" id="checkFichaTecnica" checked class="rounded text-indigo-600">
-                                Incluir al pie del acta
-                            </label>
+                            <div class="flex items-center gap-3">
+                                <button type="button" onclick="recordarFichaMaqJp2()" class="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer">
+                                    💾 Asociar Máq/Juego
+                                </button>
+                                <label class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 dark:text-slate-300 cursor-pointer">
+                                    <input type="checkbox" id="checkFichaTecnica" checked class="rounded text-indigo-600">
+                                    Incluir al pie
+                                </label>
+                            </div>
                         </div>
 
                         <div id="gridFichaTecnicaJp" class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
                             <div>
-                                <label for="maquinaInfo" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Detalle Máquina</label>
+                                <label for="maquinaInfo" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Marca / Gabinete</label>
                                 <input type="text" id="maquinaInfo" placeholder="Ej: IGT / Aristocrat" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white outline-none">
                             </div>
                             <div>
@@ -229,78 +299,118 @@
                             </div>
                             <div>
                                 <label for="pagoManualInfo" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Pago Manual / Ticket</label>
-                                <input type="text" id="pagoManualInfo" placeholder="Ej: N° Comprobante" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white outline-none">
+                                <input type="text" id="pagoManualInfo" placeholder="Ej: 00125" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-mono text-slate-900 dark:text-white outline-none">
                             </div>
                         </div>
-                    </div>
-
-                    <div class="flex flex-wrap gap-2.5 pt-1">
-                        <button type="button" id="btnLimpiar" class="px-4 py-2 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 text-xs font-semibold rounded-xl transition flex items-center gap-1.5 cursor-pointer">
-                            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Limpiar Formulario
-                        </button>
                     </div>
                 </form>
             </div>
 
-            <!-- Vista previa -->
-            <div class="lg:col-span-5 bg-slate-100/80 dark:bg-slate-950/60 border-t lg:border-t-0 lg:border-l border-slate-200 dark:border-slate-800 flex flex-col">
-                <div class="p-5 sm:p-6 sticky top-4 space-y-4">
-                    <div class="flex flex-wrap items-center justify-between gap-2">
-                        <div class="flex items-center gap-2">
-                            <h2 class="font-bold text-slate-800 dark:text-slate-100 text-sm">📄 Acta Jackpot</h2>
-                            <span id="badgeEstadoJp2" class="text-[11px] bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 px-2.5 py-0.5 rounded-full font-semibold">En vivo</span>
+            <!-- Vista previa e Historial -->
+            <div class="lg:col-span-5 bg-slate-100/80 dark:bg-slate-950/60 border-t lg:border-t-0 lg:border-l border-slate-200 dark:border-slate-800 p-4 sm:p-6 flex flex-col justify-between space-y-4">
+                <div class="space-y-4">
+                    <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-4 space-y-3">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-pulse"></span>
+                                <h2 class="font-bold text-slate-700 dark:text-slate-200 text-xs uppercase tracking-wider">Acta Progresivo</h2>
+                                <span id="badgeEstadoJp2" class="text-[10px] bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 px-2 py-0.5 rounded-full font-semibold">En vivo</span>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <button type="button" onclick="restaurarAutoJp2()" class="px-2 py-1 rounded-lg text-[11px] font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition inline-flex items-center gap-1 cursor-pointer">
+                                    <i data-lucide="refresh-cw" class="w-3 h-3"></i> Restaurar
+                                </button>
+                                <button type="button" onclick="descargarJpTXT()" class="px-2 py-1 rounded-lg text-[11px] font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition inline-flex items-center gap-1 cursor-pointer">
+                                    <i data-lucide="download" class="w-3 h-3"></i> TXT
+                                </button>
+                                <button type="button" onclick="window.print()" class="px-2 py-1 rounded-lg text-[11px] font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition inline-flex items-center gap-1 cursor-pointer" title="Imprimir">
+                                    <i data-lucide="printer" class="w-3 h-3"></i>
+                                </button>
+                            </div>
                         </div>
-                        <div class="flex items-center gap-1.5 no-print">
-                            <button type="button" onclick="window.print()" class="px-2.5 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 cursor-pointer flex items-center gap-1">
-                                <i data-lucide="printer" class="w-3.5 h-3.5"></i> Imprimir
+
+                        <textarea id="outputText" rows="13" oninput="actualizarImpresionJp2()"
+                            class="report-font w-full min-h-[290px] p-3.5 text-xs sm:text-sm leading-relaxed bg-slate-50 dark:bg-slate-950 border-2 border-indigo-200 dark:border-indigo-900/80 rounded-xl text-slate-800 dark:text-slate-100 resize-y outline-none focus:ring-2 focus:ring-indigo-500" spellcheck="false"></textarea>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-12 gap-2">
+                            <button type="button" onclick="copyText()" class="sm:col-span-8 py-2.5 px-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl shadow-md transition flex items-center justify-center gap-2 cursor-pointer font-bold text-xs sm:text-sm active:scale-[0.99]">
+                                <i data-lucide="copy" class="w-4 h-4"></i>
+                                <span>Copiar y Guardar</span>
                             </button>
-                            <button type="button" onclick="descargarJpTXT()" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-semibold cursor-pointer flex items-center gap-1">
-                                <i data-lucide="download" class="w-3.5 h-3.5"></i> TXT
+                            <button type="button" onclick="copiarWhatsAppJp2()" class="sm:col-span-4 py-2.5 px-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl shadow-sm transition flex items-center justify-center gap-1.5 cursor-pointer font-bold text-xs active:scale-[0.99]">
+                                <i data-lucide="message-square" class="w-3.5 h-3.5"></i>
+                                <span>WhatsApp</span>
                             </button>
                         </div>
                     </div>
 
-                    <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-3 space-y-3">
-                        <textarea id="outputText" rows="14" class="report-font w-full p-3 text-xs sm:text-sm leading-relaxed bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 resize-y outline-none focus:ring-2 focus:ring-indigo-500" spellcheck="false"></textarea>
-                        <button type="button" onclick="copyText()" class="no-print w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl shadow-sm transition flex items-center justify-center gap-2 cursor-pointer font-bold text-xs sm:text-sm">
-                            <i data-lucide="copy" class="w-4 h-4"></i>
-                            <span>Copiar Informe Jackpot</span>
-                        </button>
-                    </div>
-
-                    <div id="toast" class="hidden bg-emerald-100 dark:bg-emerald-950 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200 px-4 py-3 rounded-xl text-xs font-semibold flex items-center gap-2">
-                        <i data-lucide="check-circle" class="w-4 h-4"></i>
-                        <span id="toastMsgJp">Copiado al portapapeles.</span>
+                    <!-- Historial Modelo 2 -->
+                    <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-4 space-y-3">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-200 flex items-center gap-1.5">
+                                <i data-lucide="history" class="w-4 h-4 text-indigo-500"></i>
+                                Historial Modelo 2 (<span id="countHistJp2">0</span>)
+                            </h3>
+                            <div class="flex items-center gap-1.5">
+                                <button type="button" onclick="exportarCsvJp2()" class="px-2 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-300 text-[11px] font-semibold transition inline-flex items-center gap-1 cursor-pointer">
+                                    <i data-lucide="sheet" class="w-3 h-3"></i> CSV
+                                </button>
+                                <button type="button" onclick="vaciarHistorialJp2()" class="p-1 rounded-lg text-slate-400 hover:text-rose-500 transition cursor-pointer" title="Vaciar historial">
+                                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div id="listaHistJp2" class="space-y-1.5 max-h-52 overflow-y-auto pr-0.5 text-xs">
+                            <p class="text-slate-400 text-center py-3">Sin progresivos guardados</p>
+                        </div>
                     </div>
                 </div>
             </div>
         </main>
     </div>
 
+    <!-- TOAST -->
+    <div id="toast" class="no-print hidden fixed bottom-5 right-5 bg-slate-900 dark:bg-slate-800 border border-slate-700 text-white px-4 py-3 rounded-xl shadow-2xl text-xs font-semibold flex items-center gap-2 z-50">
+        <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>
+        <span id="toastMsgJp">Copiado al portapapeles.</span>
+    </div>
+
     <script>
         const STORAGE_JP2_KEY = 'cctv_jackpot2_state_v2';
+        const STORAGE_JP2_HIST = 'jackpot_m2_history_v1';
+        const SHARED_MACHINES_KEY = 'cctv_jackpot_machines_catalog_v1';
 
         const STAFF_SALA_JP = [
-            'Enc. Turno DENZ GIMENEZ, DEBORA ADRIANA',
-            'Enc. Turno MOISES, ARIEL JESUS',
-            'Enc. Turno RODRIGUEZ, MONICA ELIANA',
-            'Enc. Turno ZAMBRANA, CARINA DEL VALLE',
-            'Enc. Turno MARTINEZ GUAYMAS, CAROLINA ALEJANDRA',
-            'Asist. de Sala LAZARTE, LAURA LORENA',
-            'Asist. de Sala ALONSO, JOSE ANTONIO SEBASTIAN',
-            'Asist. de Sala CAMINOS, CINTIA SOLEDAD',
-            'Asist. de Sala PARADA, JULIO ALBERTO'
+            { texto: 'Enc. Turno DENZ GIMENEZ, DEBORA ADRIANA' },
+            { texto: 'Enc. Turno MOISES, ARIEL JESUS' },
+            { texto: 'Enc. Turno RODRIGUEZ, MONICA ELIANA' },
+            { texto: 'Enc. Turno ZAMBRANA, CARINA DEL VALLE' },
+            { texto: 'Enc. Turno MARTINEZ GUAYMAS, CAROLINA ALEJANDRA' },
+            { texto: 'Asist. de Sala LAZARTE, LAURA LORENA' },
+            { texto: 'Asist. de Sala ALONSO, JOSE ANTONIO SEBASTIAN' },
+            { texto: 'Asist. de Sala CAMINOS, CINTIA SOLEDAD' },
+            { texto: 'Asist. de Sala PARADA, JULIO ALBERTO' }
         ];
 
         const STAFF_CAJA_JP = [
-            'HERRERA, ALEJANDRA MERCEDES',
-            'YANELLO NASSER, CINTIA GRACIELA',
-            'PARRON, STELLA MARIS',
-            'PELOC, CLAUDIA MARIANA',
-            'PADILLA, SONIA RAQUEL',
-            'PEÑALBA, MONICA RAQUEL',
-            'PEREZ, CARMEN ELIZABETH'
+            { texto: 'CARRIZO, NATALIA VALERIA', rol: 'Jefa de Caja' },
+            { texto: 'HERRERA, ALEJANDRA MERCEDES', rol: 'Jefa de Caja' },
+            { texto: 'YANELLO NASSER, CINTIA GRACIELA', rol: 'Cajera' },
+            { texto: 'CHOCOBAR, GISELA NOEMI', rol: 'Cajera' },
+            { texto: 'FLORES, ROMINA PAOLA', rol: 'Cajera' },
+            { texto: 'MAMANI, SILVANA SOLEDAD', rol: 'Cajera' },
+            { texto: 'PARRON, STELLA MARIS', rol: 'Cajera' },
+            { texto: 'PELOC, CLAUDIA MARIANA', rol: 'Cajera' },
+            { texto: 'PADILLA, SONIA RAQUEL', rol: 'Cajera' },
+            { texto: 'PEÑALBA, MONICA RAQUEL', rol: 'Cajera' },
+            { texto: 'PEREZ, CARMEN ELIZABETH', rol: 'Cajera' }
         ];
+
+        const CARGOS_CAJA_REGEX = /^(Jefe(?:a)?\s+de\s+Caja|Cajero(?:a)?|Asist(?:ente)?\.?\s+de\s+Caja|Op(?:erador(?:a)?)?\.?\s+de\s+Caja)\s+/i;
+
+        let historialJp2 = [];
+        let catalogoMaquinasJp2 = {};
+        let textoAutoJp2 = '';
 
         function normJp(s) {
             return String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
@@ -310,25 +420,29 @@
             return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
         }
 
-        // Acepta formato argentino (1.250.430,50) e internacional (1250430.50)
+        // Parseo seguro Argentino e Internacional (corrige el bug de "500.000" -> 500)
         function parseMontoAR(raw) {
-            const s = String(raw || '').replace(/[^\d.,-]/g, '').trim();
+            if (raw === null || raw === undefined) return NaN;
+            let s = String(raw).trim().replace(/[$\s]/g, '').replace(/[.,]+$/, '');
             if (!s) return NaN;
-            const lastComma = s.lastIndexOf(',');
-            const lastDot = s.lastIndexOf('.');
-            let normalized = s;
-            if (lastComma !== -1 && lastDot !== -1) {
-                if (lastComma > lastDot) {
-                    normalized = s.replace(/\./g, '').replace(',', '.');
-                } else {
-                    normalized = s.replace(/,/g, '');
-                }
-            } else if (lastComma !== -1) {
-                normalized = s.replace(',', '.');
-            } else if ((s.match(/\./g) || []).length > 1) {
-                normalized = s.replace(/\./g, '');
+
+            if (s.includes(',') && s.includes('.')) {
+                return s.lastIndexOf(',') > s.lastIndexOf('.')
+                    ? parseFloat(s.replace(/\./g, '').replace(',', '.'))
+                    : parseFloat(s.replace(/,/g, ''));
             }
-            const num = parseFloat(normalized);
+            if (s.includes(',')) {
+                return parseFloat(s.replace(',', '.'));
+            }
+            if (s.includes('.')) {
+                const parts = s.split('.');
+                // Un solo punto con 1 o 2 dígitos (ej. 500.50) es decimal; 3 dígitos (ej. 500.000) es miles argentino
+                if (parts.length === 2 && parts[1].length !== 3) {
+                    return parseFloat(s);
+                }
+                return parseFloat(s.replace(/\./g, ''));
+            }
+            const num = parseFloat(s);
             return isNaN(num) ? NaN : num;
         }
 
@@ -339,6 +453,14 @@
                 maximumFractionDigits: 2
             }).format(isNaN(amount) ? 0 : amount);
         }
+
+        window.formatearMontoBlurJp2 = function (inp) {
+            const v = parseMontoAR(inp.value);
+            if (!isNaN(v) && v > 0) {
+                inp.value = formatCurrency(v);
+                generateText();
+            }
+        };
 
         function horaActualJp(offset = 0) {
             const d = new Date();
@@ -361,15 +483,49 @@
             }
         };
 
+        window.ajustarDesdeAvisoJp2 = function (targetId, delta) {
+            const base = document.getElementById('hora1').value || horaActualJp();
+            document.getElementById(targetId).value = sumarMinutosJp(base, delta);
+            generateText();
+        };
+
         window.autocompletarSecuenciaHoraria = function () {
             const h1El = document.getElementById('hora1');
             if (!h1El.value) h1El.value = horaActualJp();
             const base = h1El.value;
-            if (!document.getElementById('hora2').value) document.getElementById('hora2').value = sumarMinutosJp(base, 2);
-            if (!document.getElementById('hora3').value) document.getElementById('hora3').value = sumarMinutosJp(base, 6);
-            if (!document.getElementById('hora4').value) document.getElementById('hora4').value = sumarMinutosJp(base, 8);
+            if (!document.getElementById('hora2').value) document.getElementById('hora2').value = sumarMinutosJp(base, -1);
+            if (!document.getElementById('hora3').value) document.getElementById('hora3').value = sumarMinutosJp(base, 5);
+            if (!document.getElementById('hora4').value) document.getElementById('hora4').value = sumarMinutosJp(base, 7);
             generateText();
             mostrarAvisoJp('⚡ Secuencia horaria completada');
+        };
+
+        // Memoria compartida de máquinas
+        window.alEscribirMaqJp2 = function (inp) {
+            const maq = inp.value.trim();
+            const chip = document.getElementById('maqMemChipJp2');
+            if (catalogoMaquinasJp2[maq]) {
+                if (catalogoMaquinasJp2[maq].marca) document.getElementById('maquinaInfo').value = catalogoMaquinasJp2[maq].marca;
+                if (catalogoMaquinasJp2[maq].juego) document.getElementById('juegoInfo').value = catalogoMaquinasJp2[maq].juego;
+                chip.classList.remove('hidden');
+            } else {
+                chip.classList.add('hidden');
+            }
+            generateText();
+        };
+
+        window.recordarFichaMaqJp2 = function (silencioso = false) {
+            const maq = document.getElementById('nombreMaquina').value.trim();
+            const marca = document.getElementById('maquinaInfo').value.trim();
+            const juego = document.getElementById('juegoInfo').value.trim();
+            if (!maq || (!marca && !juego)) {
+                if (!silencioso) mostrarAvisoJp('Ingresa N° Máquina y Marca o Juego primero');
+                return;
+            }
+            catalogoMaquinasJp2[maq] = { marca, juego };
+            try { localStorage.setItem(SHARED_MACHINES_KEY, JSON.stringify(catalogoMaquinasJp2)); } catch (e) {}
+            document.getElementById('maqMemChipJp2').classList.remove('hidden');
+            if (!silencioso) mostrarAvisoJp(`Máq. ${maq} guardada en memoria`);
         };
 
         window.buscarStaffJackpot = function (inputId, dropId, tipoLista) {
@@ -377,31 +533,29 @@
             const menu = document.getElementById(dropId);
             if (!inp || !menu) return;
             const q = normJp(inp.value);
-            if (!q) {
-                menu.classList.add('hidden');
-                return;
-            }
+            if (!q) { menu.classList.add('hidden'); return; }
             const fuente = tipoLista === 'caja' ? STAFF_CAJA_JP : STAFF_SALA_JP;
-            const matches = fuente.filter(item => normJp(item).includes(q) && normJp(item) !== q);
-            if (!matches.length) {
-                menu.classList.add('hidden');
-                return;
-            }
+            const matches = fuente.filter(item => normJp(item.texto).includes(q) && normJp(item.texto) !== q);
+            if (!matches.length) { menu.classList.add('hidden'); return; }
             menu._matches = matches;
-            menu.innerHTML = matches.map((nom, i) => `
-                <button type="button" onmousedown="event.preventDefault(); elegirStaffJackpot('${inputId}','${dropId}',${i})"
-                    class="w-full text-left px-3 py-2 text-xs font-semibold text-slate-800 dark:text-slate-100 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 transition cursor-pointer">
-                    ${escJp(nom)}
+            menu.innerHTML = matches.map((it, i) => `
+                <button type="button" onmousedown="event.preventDefault(); elegirStaffJackpot('${inputId}','${dropId}','${tipoLista}',${i})"
+                    class="w-full text-left px-3 py-2 text-xs font-semibold text-slate-800 dark:text-slate-100 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 flex items-center justify-between transition cursor-pointer">
+                    <span>${escJp(it.texto)}</span>
+                    ${it.rol ? `<span class="text-[10px] text-indigo-500 font-normal">${escJp(it.rol)}</span>` : ''}
                 </button>
             `).join('');
             menu.classList.remove('hidden');
         };
 
-        window.elegirStaffJackpot = function (inputId, dropId, idx) {
+        window.elegirStaffJackpot = function (inputId, dropId, tipoLista, idx) {
             const menu = document.getElementById(dropId);
-            const val = menu?._matches?.[idx];
-            if (!val) return;
-            document.getElementById(inputId).value = val;
+            const it = menu?._matches?.[idx];
+            if (!it) return;
+            document.getElementById(inputId).value = it.texto;
+            if (tipoLista === 'caja' && it.rol) {
+                document.getElementById('rolCajaJp2').value = it.rol;
+            }
             menu.classList.add('hidden');
             generateText();
         };
@@ -412,11 +566,21 @@
 
         function guardarBorradorJp2() {
             try {
-                const campos = ['hora1', 'hora2', 'hora3', 'hora4', 'nombrePersonal', 'nombreMaquina', 'ventanilla', 'valorDe', 'progresivoValor', 'totalPremio', 'cliente', 'tipoCliente', 'jefeCaja', 'responsableDescarga', 'maquinaInfo', 'juegoInfo', 'pagoManualInfo'];
+                const campos = ['hora1', 'hora2', 'hora3', 'hora4', 'nombrePersonal', 'nombreMaquina', 'ventanilla', 'valorDe', 'progresivoValor', 'totalPremio', 'cliente', 'tipoCliente', 'rolCajaJp2', 'jefeCaja', 'responsableDescarga', 'maquinaInfo', 'juegoInfo', 'pagoManualInfo'];
                 const obj = { checkFichaTecnica: document.getElementById('checkFichaTecnica').checked };
                 campos.forEach(id => { obj[id] = document.getElementById(id)?.value || ''; });
                 localStorage.setItem(STORAGE_JP2_KEY, JSON.stringify(obj));
             } catch (e) {}
+        }
+
+        function formatearVentanillaFrase(rawVent) {
+            if (!rawVent) return 'en ventanilla de caja';
+            const limpia = rawVent.replace(/^(por\s+|en\s+)?ventanilla\s*/i, '').trim();
+            if (!limpia) return 'en ventanilla de caja';
+            if (/^de\s+/i.test(limpia) || /^n°/i.test(limpia) || /^\d/.test(limpia)) {
+                return `en ventanilla ${limpia}`;
+            }
+            return `en ventanilla de ${limpia}`;
         }
 
         window.generateText = function () {
@@ -442,17 +606,19 @@
 
             const valorDe = isNaN(vBaseParsed) ? 0 : vBaseParsed;
             const progresivoValor = isNaN(vProgParsed) ? 0 : vProgParsed;
-            const totalPremio = isNaN(vTotParsed) ? (valorDe + progresivoValor) : vTotParsed;
+            const totalPremio = (!isNaN(vTotParsed) && vTotParsed > 0) ? vTotParsed : (valorDe + progresivoValor);
 
             document.getElementById('previewTotalBadge').textContent = `Total: $ ${formatCurrency(totalPremio)}`;
 
             const rawCli = document.getElementById('cliente').value.trim();
             const cliente = rawCli || '___';
             const tipoCliente = document.getElementById('tipoCliente').value;
-            const rawJefe = document.getElementById('jefeCaja').value.trim();
-            const jefeCaja = rawJefe || '___';
-            const rawVent = document.getElementById('ventanilla').value.trim();
-            const ventanilla = rawVent || '___';
+
+            const rolCaja = document.getElementById('rolCajaJp2').value || 'Jefe de Caja';
+            const rawJefe = document.getElementById('jefeCaja').value.trim().replace(CARGOS_CAJA_REGEX, '').trim();
+            const jefeCajaCompleto = `${rolCaja} ${rawJefe || '___'}`;
+
+            const fraseVentanilla = formatearVentanillaFrase(document.getElementById('ventanilla').value.trim());
 
             const incluirFicha = document.getElementById('checkFichaTecnica').checked;
             document.getElementById('gridFichaTecnicaJp')?.classList.toggle('opacity-50', !incluirFicha);
@@ -463,33 +629,47 @@
 
             const prefijo = tipoCliente === 'clienta' ? 'la Sra.' : 'el Sr.';
 
-            let texto = `A las ${hora1} Hs. CCTV recibe llamada de ${nombrePersonal}, informa Jackpot en Máq. ${nombreMaquina} por un valor de $${formatCurrency(valorDe)}, se suma progresivo de $${formatCurrency(progresivoValor)} alcanzando un total de $${formatCurrency(totalPremio)}.-
-(A las ${hora2} Hs.) Revisión muestra que ${prefijo} ${cliente} jugaba en Máq. ${nombreMaquina} al salir el premio.-
-A las ${hora3} Hs. Jefe de Caja ${jefeCaja} cancela en ventanilla ${ventanilla} $${formatCurrency(totalPremio)} a ${prefijo} ${cliente}.-
-A las ${hora4} Hs. ${responsableDescarga} registra y descarga el premio de Máq. ${nombreMaquina}.-`;
+            let texto = `A las ${hora1} Hs. CCTV recibe llamada de ${nombrePersonal}, informa Jackpot en Máq. ${nombreMaquina} por un valor de $${formatCurrency(valorDe)}, se suma progresivo de $${formatCurrency(progresivoValor)} alcanzando un total de $${formatCurrency(totalPremio)}.-\n` +
+                `(A las ${hora2} Hs.) Revisión muestra que ${prefijo} ${cliente} jugaba en Máq. ${nombreMaquina} al salir el premio.-\n` +
+                `A las ${hora3} Hs. ${jefeCajaCompleto} cancela ${fraseVentanilla} $${formatCurrency(totalPremio)} a ${prefijo} ${cliente}.-\n` +
+                `A las ${hora4} Hs. ${responsableDescarga} registra y descarga el premio de Máq. ${nombreMaquina}.-`;
 
             if (incluirFicha) {
                 texto += `\n\nMáquina: ${maquinaInfo}\nJuego: ${juegoInfo}\nPago manual: ${pagoManualInfo}\n\nApéndice 1: Fotos.-`;
             }
 
+            textoAutoJp2 = texto;
             document.getElementById('outputText').value = texto;
 
             let faltantes = 0;
-            [rH1, rH2, rH3, rH4, rawPersonal, rawMaq, rawCli, rawJefe, rawVent].forEach(v => { if (!v) faltantes++; });
+            [rH1, rH2, rH3, rH4, rawPersonal, rawMaq, rawCli, rawJefe].forEach(v => { if (!v) faltantes++; });
             if (totalPremio <= 0) faltantes++;
 
             const bEst = document.getElementById('badgeEstadoJp2');
-            if (bEst) {
-                if (faltantes === 0) {
-                    bEst.textContent = '✓ Completo p/ copiar';
-                    bEst.className = 'text-[11px] bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 px-2.5 py-0.5 rounded-full font-semibold';
-                } else {
-                    bEst.textContent = `${faltantes} dato(s) pendiente(s)`;
-                    bEst.className = 'text-[11px] bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 px-2.5 py-0.5 rounded-full font-semibold';
-                }
+            if (faltantes === 0) {
+                bEst.textContent = '✓ Completo';
+                bEst.className = 'text-[10px] bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 px-2 py-0.5 rounded-full font-semibold';
+            } else {
+                bEst.textContent = `${faltantes} pendiente(s)`;
+                bEst.className = 'text-[10px] bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 px-2 py-0.5 rounded-full font-semibold';
             }
 
             guardarBorradorJp2();
+            actualizarImpresionJp2();
+        };
+
+        window.actualizarImpresionJp2 = function () {
+            const area = document.getElementById('outputText');
+            area.style.height = 'auto';
+            area.style.height = Math.max(290, area.scrollHeight + 6) + 'px';
+            document.getElementById('printTexto').textContent = area.value;
+            document.getElementById('printFechaHora').textContent = new Date().toLocaleString('es-AR');
+        };
+
+        window.restaurarAutoJp2 = function () {
+            document.getElementById('outputText').value = textoAutoJp2;
+            actualizarImpresionJp2();
+            mostrarAvisoJp('Texto automático restaurado');
         };
 
         function mostrarAvisoJp(msg) {
@@ -500,34 +680,143 @@ A las ${hora4} Hs. ${responsableDescarga} registra y descarga el premio de Máq.
             toast._t = setTimeout(() => toast.classList.add('hidden'), 2800);
         }
 
-        window.copyText = async function () {
-            const area = document.getElementById('outputText');
+        async function escribirClipJp2(txt) {
             try {
                 if (navigator.clipboard && window.isSecureContext) {
-                    await navigator.clipboard.writeText(area.value);
-                } else {
-                    area.select();
-                    document.execCommand('copy');
+                    await navigator.clipboard.writeText(txt);
+                    return true;
                 }
-            } catch (e) {
-                area.select();
-                document.execCommand('copy');
+            } catch (e) {}
+            const t = document.createElement('textarea');
+            t.value = txt;
+            t.style.position = 'fixed';
+            t.style.opacity = '0';
+            document.body.appendChild(t);
+            t.select();
+            const ok = document.execCommand('copy');
+            t.remove();
+            return ok;
+        }
+
+        function guardarEnHistorialJp2(texto) {
+            recordarFichaMaqJp2(true);
+            if (historialJp2.length > 0 && historialJp2[0].texto === texto) return;
+            const vBase = parseMontoAR(document.getElementById('valorDe').value) || 0;
+            const vProg = parseMontoAR(document.getElementById('progresivoValor').value) || 0;
+            const vTot = parseMontoAR(document.getElementById('totalPremio').value);
+            const tot = (!isNaN(vTot) && vTot > 0) ? vTot : (vBase + vProg);
+
+            historialJp2.unshift({
+                id: Date.now(),
+                fechaHora: new Date().toLocaleString('es-AR'),
+                maquina: document.getElementById('nombreMaquina').value.trim() || 'S/N',
+                total: `$${formatCurrency(tot)}`,
+                cliente: document.getElementById('cliente').value.trim() || 'Sin especificar',
+                texto
+            });
+            historialJp2 = historialJp2.slice(0, 50);
+            try { localStorage.setItem(STORAGE_JP2_HIST, JSON.stringify(historialJp2)); } catch (e) {}
+            renderizarHistorialJp2();
+        }
+
+        window.copyText = async function () {
+            const txt = document.getElementById('outputText').value.trim();
+            if (!txt) return;
+            const ok = await escribirClipJp2(txt);
+            if (ok) {
+                guardarEnHistorialJp2(txt);
+                mostrarAvisoJp('📋 Acta Progresivo copiada y guardada.');
             }
-            mostrarAvisoJp('📋 Acta Jackpot copiada al portapapeles.');
         };
+
+        window.copiarWhatsAppJp2 = async function () {
+            const txt = document.getElementById('outputText').value.trim();
+            if (!txt) return;
+            const ok = await escribirClipJp2(`⚡ *JACKPOT PROGRESIVO (MODELO N° 2) - CCTV*\n\n${txt}`);
+            if (ok) {
+                guardarEnHistorialJp2(txt);
+                mostrarAvisoJp('Copiado con formato WhatsApp');
+            }
+        };
+
+        function renderizarHistorialJp2() {
+            document.getElementById('countHistJp2').textContent = String(historialJp2.length);
+            const lista = document.getElementById('listaHistJp2');
+            if (!historialJp2.length) {
+                lista.innerHTML = '<p class="text-slate-400 text-center py-3">Sin progresivos guardados</p>';
+                return;
+            }
+            lista.innerHTML = historialJp2.map((h, idx) => `
+                <div class="history-item bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800 rounded-lg p-2.5 flex items-center justify-between gap-2">
+                    <button type="button" onclick="cargarItemJp2(${idx})" class="min-w-0 flex-1 text-left cursor-pointer">
+                        <div class="font-bold text-slate-800 dark:text-slate-100 truncate">Máq. ${escJp(h.maquina)} · <span class="text-emerald-600 dark:text-emerald-400 font-mono">${escJp(h.total)}</span></div>
+                        <div class="text-[11px] text-slate-500 dark:text-slate-400 truncate">${escJp(h.cliente)} · ${escJp(h.fechaHora)}</div>
+                    </button>
+                    <div class="flex items-center gap-1 shrink-0">
+                        <button type="button" onclick="recopiarItemJp2(${idx})" class="p-1.5 rounded-md text-slate-500 hover:text-indigo-600 cursor-pointer" title="Copiar">
+                            <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                        </button>
+                        <button type="button" onclick="eliminarItemJp2(${idx})" class="p-1.5 rounded-md text-slate-400 hover:text-rose-500 cursor-pointer" title="Eliminar">
+                            <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+            lucide.createIcons({ nodes: [lista] });
+        }
+
+        window.cargarItemJp2 = function (idx) {
+            const it = historialJp2[idx];
+            if (!it) return;
+            document.getElementById('outputText').value = it.texto;
+            actualizarImpresionJp2();
+            mostrarAvisoJp(`Cargado premio de Máq. ${it.maquina}`);
+        };
+
+        window.recopiarItemJp2 = async function (idx) {
+            const it = historialJp2[idx];
+            if (!it) return;
+            await escribirClipJp2(it.texto);
+            mostrarAvisoJp('Registro copiado del historial');
+        };
+
+        window.eliminarItemJp2 = function (idx) {
+            historialJp2.splice(idx, 1);
+            try { localStorage.setItem(STORAGE_JP2_HIST, JSON.stringify(historialJp2)); } catch (e) {}
+            renderizarHistorialJp2();
+        };
+
+        window.vaciarHistorialJp2 = function () {
+            if (!historialJp2.length || !confirm('¿Vaciar el historial de Jackpots Modelo 2?')) return;
+            historialJp2 = [];
+            try { localStorage.removeItem(STORAGE_JP2_HIST); } catch (e) {}
+            renderizarHistorialJp2();
+        };
+
+        function descargarBlobJp2(contenido, nombre, mime) {
+            const blob = new Blob([contenido], { type: mime });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = nombre;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
 
         window.descargarJpTXT = function () {
             const txt = document.getElementById('outputText').value.trim();
             if (!txt) return;
-            const blob = new Blob([txt], { type: 'text/plain;charset=utf-8' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
             const maq = (document.getElementById('nombreMaquina').value.trim() || 'maq').replace(/\s+/g, '_');
-            a.download = `jackpot_mod2_${maq}_${new Date().toISOString().split('T')[0]}.txt`;
-            a.click();
-            URL.revokeObjectURL(url);
+            descargarBlobJp2(txt, `jackpot_mod2_${maq}_${new Date().toISOString().split('T')[0]}.txt`, 'text/plain;charset=utf-8');
             mostrarAvisoJp('📥 Archivo TXT descargado.');
+        };
+
+        window.exportarCsvJp2 = function () {
+            if (!historialJp2.length) return mostrarAvisoJp('No hay registros para exportar');
+            const esc = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
+            const rows = [['Fecha Hora', 'Máquina', 'Total Premio', 'Cliente', 'Acta Completa']];
+            historialJp2.forEach(h => rows.push([h.fechaHora, h.maquina, h.total, h.cliente, h.texto]));
+            descargarBlobJp2('\uFEFF' + rows.map(r => r.map(esc).join(';')).join('\r\n'), `jackpots_mod2_${new Date().toISOString().split('T')[0]}.csv`, 'text/csv;charset=utf-8');
         };
 
         window.toggleTheme = function () {
@@ -538,22 +827,32 @@ A las ${hora4} Hs. ${responsableDescarga} registra y descarga el premio de Máq.
             document.documentElement.classList.toggle('dark');
         };
 
-        document.getElementById('btnLimpiar').addEventListener('click', () => {
-            if (!confirm('¿Limpiar todos los datos del formulario de Jackpot?')) return;
+        window.limpiarFormularioJp2 = function () {
+            if ((document.getElementById('nombreMaquina').value.trim() || document.getElementById('valorDe').value.trim()) &&
+                !confirm('¿Limpiar todos los datos del formulario de Jackpot?')) {
+                return;
+            }
             document.querySelectorAll('#textForm input, #textForm select').forEach(el => {
                 if (el.type === 'checkbox') el.checked = true;
                 else if (el.type === 'select-one') el.selectedIndex = 0;
                 else el.value = '';
             });
+            document.getElementById('maqMemChipJp2').classList.add('hidden');
+            try { localStorage.removeItem(STORAGE_JP2_KEY); } catch (e) {}
             generateText();
             mostrarAvisoJp('Formulario reiniciado.');
-        });
+        };
 
         document.getElementById('textForm').addEventListener('input', generateText);
         document.getElementById('textForm').addEventListener('change', generateText);
 
         window.addEventListener('DOMContentLoaded', function () {
             document.getElementById('fechaActual').textContent = new Date().toLocaleDateString('es-AR');
+            try {
+                catalogoMaquinasJp2 = JSON.parse(localStorage.getItem(SHARED_MACHINES_KEY) || '{}');
+                historialJp2 = JSON.parse(localStorage.getItem(STORAGE_JP2_HIST) || '[]');
+            } catch (e) {}
+
             try {
                 const raw = localStorage.getItem(STORAGE_JP2_KEY);
                 if (raw) {
@@ -569,7 +868,16 @@ A las ${hora4} Hs. ${responsableDescarga} registra y descarga el premio de Máq.
                     }
                 }
             } catch (e) {}
+
+            renderizarHistorialJp2();
             generateText();
+
+            document.addEventListener('keydown', (e) => {
+                if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                    e.preventDefault();
+                    copyText();
+                }
+            });
             if (window.lucide) lucide.createIcons();
         });
     </script>

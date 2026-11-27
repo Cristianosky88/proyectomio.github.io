@@ -1,11 +1,57 @@
-/* ===== ESTILOS GENERALES ===== */
-* {
+/* ===== ESTILOS COMPARTIDOS MÓDULOS JACKPOT (CCTV) ===== */
+*,
+*::before,
+*::after {
     box-sizing: border-box;
 }
 
-body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    line-height: 1.6;
-    color: #212529;
-    background-color: #f8f9fa;
+/* Ocultar flechas nativas en inputs numéricos de arqueo */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    appearance: none;
+    margin: 0;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+/* Barras de desplazamiento sutiles adaptadas a modo claro y oscuro (cctv_theme) */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+html.dark ::-webkit-scrollbar-track {
+    background: #0f172a;
+}
+
+html.dark ::-webkit-scrollbar-thumb {
+    background: #334155;
+}
+
+html.dark ::-webkit-scrollbar-thumb:hover {
+    background: #475569;
+}
+
+/* Soporte limpio para impresión de actas */
+@media print {
+    .no-print {
+        display: none !important;
+    }
 }

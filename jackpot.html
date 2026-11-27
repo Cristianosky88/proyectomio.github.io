@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="es" class="">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro de Jackpot - Modelo N° 1</title>
+    <title>Jackpot · Modelo N° 1 · CCTV</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -13,80 +12,51 @@
                 extend: {
                     fontFamily: {
                         sans: ['Inter', 'Segoe UI', 'sans-serif'],
-                        mono: ['JetBrains Mono', 'Consolas', 'monospace'],
+                        mono: ['JetBrains Mono', 'Consolas', 'monospace']
                     }
                 }
             }
         };
-    </script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/global.css">
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <style>
-        body {
-            font-family: 'Inter', 'Segoe UI', sans-serif;
-        }
-
-        .fade-in {
-            animation: fadeIn 0.25s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-8px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: #f1f5f9;
-        }
-
-        .dark ::-webkit-scrollbar-track {
-            background: #0f172a;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 4px;
-        }
-
-        .dark ::-webkit-scrollbar-thumb {
-            background: #334155;
-        }
-
-        @media print {
-            .no-print {
-                display: none !important;
-            }
-            body {
-                background: #ffffff !important;
-                padding: 0 !important;
-            }
-        }
-    </style>
-    <script>
         (function () {
             try {
                 if (localStorage.getItem('cctv_theme') === 'dark') {
                     document.documentElement.classList.add('dark');
                 }
-            } catch (e) { }
+            } catch (e) {}
         })();
     </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/jackpot.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .report-font {
+            font-family: 'JetBrains Mono', Consolas, monospace;
+        }
+        .history-item {
+            transition: all 0.16s ease;
+            border-left: 3px solid transparent;
+        }
+        .history-item:hover {
+            border-left-color: #6366f1;
+        }
+        @media print {
+            body {
+                background: #ffffff !important;
+                color: #0f172a !important;
+                padding: 0 !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+            #printSheet {
+                display: block !important;
+            }
+        }
+    </style>
 </head>
-
 <body class="bg-slate-100 dark:bg-slate-950 p-3 sm:p-5 md:p-8 text-slate-800 dark:text-slate-100 min-h-screen font-sans transition-colors duration-200">
 
     <div class="max-w-6xl mx-auto bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 transition-colors duration-200">
@@ -98,21 +68,28 @@
                     <i data-lucide="trophy" class="w-6 h-6 text-white"></i>
                 </div>
                 <div>
-                    <h1 class="text-lg sm:text-xl font-bold leading-tight text-white">Jackpot · Modelo N° 1</h1>
-                    <p class="text-slate-400 text-xs uppercase tracking-wider">CCTV · Planilla de Premio Mayor (<span id="fechaActual">--/--/----</span>)</p>
+                    <h1 class="text-lg sm:text-xl font-bold leading-tight text-white flex items-center gap-2 flex-wrap">
+                        Jackpot · Modelo N° 1
+                        <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Autoguardado</span>
+                    </h1>
+                    <p class="text-slate-400 text-xs uppercase tracking-wider">CCTV · Planilla de Premio Fijo / Directo (<span id="fechaActual">--/--/----</span>)</p>
                 </div>
             </div>
 
-            <div class="no-print flex flex-wrap items-center gap-2">
-                <a href="Jackpot2.html" id="btnJackpot2Header" class="px-3 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-semibold text-xs transition shadow-sm flex items-center gap-1.5">
+            <div class="flex flex-wrap items-center gap-2">
+                <a href="Jackpot2.html" id="btnJackpot2Header" class="px-3 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-semibold text-xs transition shadow-sm flex items-center gap-1.5" title="Ir a Jackpot Modelo 2 (Progresivo)">
                     <i data-lucide="zap" class="w-4 h-4"></i>
                     <span class="hidden sm:inline">Modelo 2</span>
                 </a>
 
-                <a href="jackpotluxor.html" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 rounded-xl font-semibold text-xs transition flex items-center gap-1.5" title="Abrir Jackpot Luxor">
-                    <i data-lucide="coins" class="w-4 h-4 text-indigo-400"></i>
+                <a href="jackpotluxor.html" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 rounded-xl font-semibold text-xs transition flex items-center gap-1.5" title="Abrir Jackpot Sala Luxor">
+                    <i data-lucide="coins" class="w-4 h-4 text-amber-400"></i>
                     <span class="hidden sm:inline">Luxor</span>
                 </a>
+
+                <button type="button" onclick="limpiarFormularioJp1()" class="p-2 bg-slate-800 hover:bg-rose-600 border border-slate-700 rounded-xl transition text-slate-200 hover:text-white cursor-pointer" title="Limpiar formulario">
+                    <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
+                </button>
 
                 <div class="hidden md:flex items-center gap-2 bg-slate-800/90 border border-slate-700 px-3 py-1.5 rounded-xl text-xs font-mono text-slate-200">
                     <i data-lucide="clock" class="w-3.5 h-3.5 text-indigo-400"></i>
@@ -133,302 +110,382 @@
             </div>
         </header>
 
-        <!-- Contenido Principal -->
-        <div class="rounded-b-2xl overflow-hidden">
-            <form id="formJackpot" class="no-print divide-y divide-slate-200 dark:divide-slate-800" autocomplete="off" novalidate>
-
-                <!-- 1. INFORMACIÓN DE CONTACTO CCTV -->
-                <div class="p-5 sm:p-6">
-                    <h2 class="font-bold text-slate-800 dark:text-slate-100 text-base sm:text-lg mb-4 flex items-center gap-2.5">
-                        <span class="bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold">1</span>
-                        Información de Contacto CCTV
-                    </h2>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div>
-                            <label for="hora_cctv" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">Hora de Aviso a CCTV <span class="text-rose-500">*</span></label>
-                            <div class="flex gap-1.5">
-                                <input type="time" id="hora_cctv" name="hora_cctv" required class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm font-mono text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none">
-                                <button type="button" onclick="ponerHoraActual('hora_cctv')" title="Poner hora actual" class="px-3 bg-indigo-50 dark:bg-indigo-950/70 hover:bg-indigo-100 text-indigo-600 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 rounded-xl text-xs font-semibold cursor-pointer">⚡</button>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label for="quien_llama" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">Quién Llama <span class="text-rose-500">*</span></label>
-                            <select id="quien_llama" name="quien_llama" required class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none">
-                                <option value="">Seleccionar...</option>
-                                <option value="Encargado">Encargado</option>
-                                <option value="Encargada">Encargada</option>
-                                <option value="Supervisor">Supervisor</option>
-                                <option value="Asistente">Asistente</option>
-                                <option value="Operador">Operador</option>
-                                <option value="Operadora">Operadora</option>
-                                <option value="Otro">Otro (especificar)</option>
-                            </select>
-                            <input type="text" id="quien_llama_otro" placeholder="Especificar cargo (ej. Jefe de Sala)" class="w-full p-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none mt-2 hidden">
-                        </div>
-
-                        <div>
-                            <label for="nombre_llama" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">Nombre del Personal <span class="text-rose-500">*</span></label>
-                            <input type="text" id="nombre_llama" name="nombre_llama" placeholder="Nombre y apellido" required class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none">
-                        </div>
-                    </div>
+        <!-- Hoja exclusiva de Impresión -->
+        <div id="printSheet" class="hidden p-8 space-y-4">
+            <div class="border-b-2 border-slate-800 pb-3 flex justify-between items-start">
+                <div>
+                    <h2 class="text-lg font-bold uppercase">Acta CCTV · Pago de Jackpot (Modelo N° 1)</h2>
+                    <p class="text-xs text-slate-600">Registro Operativo de Monitoreo</p>
                 </div>
+                <span id="printFechaHora" class="text-xs font-mono text-slate-600"></span>
+            </div>
+            <pre id="printTexto" class="report-font whitespace-pre-wrap text-sm leading-relaxed p-4 border border-slate-300 rounded-lg bg-slate-50"></pre>
+        </div>
 
-                <!-- 2. INFORMACIÓN DEL JACKPOT -->
-                <div class="p-5 sm:p-6">
-                    <h2 class="font-bold text-slate-800 dark:text-slate-100 text-base sm:text-lg mb-4 flex items-center gap-2.5">
-                        <span class="bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold">2</span>
-                        Información del Jackpot
-                    </h2>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div>
-                            <label for="nro_maquina" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">N° de Máquina (6 dígitos) <span class="text-rose-500">*</span></label>
-                            <input type="text" id="nro_maquina" name="nro_maquina" maxlength="6" inputmode="numeric" placeholder="120305" required oninput="validarMaquinaInput(this)" class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm font-mono text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none">
-                            <small id="maqHelper" class="text-slate-500 dark:text-slate-400 text-xs mt-1 block">Exactamente 6 dígitos numéricos (0/6)</small>
+        <main class="no-print grid grid-cols-1 lg:grid-cols-12 rounded-b-2xl overflow-hidden">
+
+            <!-- COLUMNA IZQUIERDA: FORMULARIO (7/12) -->
+            <div class="lg:col-span-7 p-4 sm:p-6 bg-slate-50 dark:bg-slate-900/60">
+                <form id="formJackpot" class="space-y-4" autocomplete="off" onsubmit="event.preventDefault(); copiarInforme();">
+
+                    <!-- 1. Aviso CCTV, Máquina e Importe -->
+                    <div class="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 space-y-4">
+                        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-2.5">
+                            <h2 class="font-bold text-slate-800 dark:text-slate-100 text-sm flex items-center gap-2">
+                                <span class="bg-indigo-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">1</span>
+                                Aviso a CCTV, Máquina e Importe
+                            </h2>
+                            <span id="maqMemoryChip" class="hidden text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                                ✓ Máquina reconocida
+                            </span>
                         </div>
 
-                        <div>
-                            <label for="importe" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">Importe Jackpot ($) <span class="text-rose-500">*</span></label>
-                            <div class="relative">
-                                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-emerald-600 dark:text-emerald-400 font-mono text-sm font-bold">$</span>
-                                <input type="text" id="importe" name="importe" inputmode="decimal" placeholder="0,00" required oninput="formatearImporteVivo(this)" class="w-full pl-7 pr-3 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm font-mono font-bold text-emerald-700 dark:text-emerald-400 focus:ring-2 focus:ring-indigo-500 outline-none">
+                        <div class="grid grid-cols-1 sm:grid-cols-12 gap-3.5">
+                            <div class="sm:col-span-4">
+                                <label for="hora_cctv" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">⏰ Hora Aviso CCTV</label>
+                                <div class="flex items-stretch">
+                                    <input type="time" id="hora_cctv" oninput="generarEnVivo()" class="w-full min-w-0 px-2.5 py-2 bg-slate-50 dark:bg-slate-950 border border-r-0 border-slate-300 dark:border-slate-700 rounded-l-xl text-xs font-mono text-slate-900 dark:text-white outline-none focus:border-indigo-500">
+                                    <button type="button" onclick="ponerHoraActual('hora_cctv')" class="px-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-r-xl text-[11px] font-semibold transition cursor-pointer shrink-0">Ahora</button>
+                                </div>
                             </div>
-                            <small class="text-slate-500 dark:text-slate-400 text-xs mt-1 block">Separador de miles automático · usa coma para centavos</small>
-                        </div>
 
-                        <div>
-                            <label for="hora_revision" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">Hora de Salida / Revisión <span class="text-rose-500">*</span></label>
-                            <div class="flex gap-1.5">
-                                <input type="time" id="hora_revision" name="hora_revision" required class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm font-mono text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none">
-                                <button type="button" onclick="sumarMinutosDesde('hora_cctv', 'hora_revision', -1)" title="1 min antes del aviso CCTV" class="px-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-mono font-semibold cursor-pointer">-1m</button>
-                                <button type="button" onclick="ponerHoraActual('hora_revision')" title="Poner hora actual" class="px-2.5 bg-indigo-50 dark:bg-indigo-950/70 hover:bg-indigo-100 text-indigo-600 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 rounded-xl text-xs font-semibold cursor-pointer">⚡</button>
+                            <div class="sm:col-span-3">
+                                <label for="quien_llama" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Cargo Aviso</label>
+                                <select id="quien_llama" onchange="alCambiarSelectOtro('quien_llama','quien_llama_otro','Otro'); sincronizarDescargaAuto(); generarEnVivo()" class="w-full px-2.5 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-900 dark:text-white outline-none focus:border-indigo-500">
+                                    <option value="Encargado">Enc. (M)</option>
+                                    <option value="Encargada">Enc. (F)</option>
+                                    <option value="Asistente">Asist.</option>
+                                    <option value="Supervisor">Sup.</option>
+                                    <option value="Operador">Op. (M)</option>
+                                    <option value="Operadora">Op. (F)</option>
+                                    <option value="Otro">Otro...</option>
+                                </select>
+                                <input type="text" id="quien_llama_otro" oninput="sincronizarDescargaAuto(); generarEnVivo()" placeholder="Especificar cargo" class="w-full px-2.5 py-1.5 mt-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-xs text-slate-900 dark:text-white outline-none hidden">
                             </div>
-                            <small class="text-slate-500 dark:text-slate-400 text-xs mt-1 block">Hora en grabación al salir el premio</small>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- 3. INFORMACIÓN DEL CLIENTE -->
-                <div class="p-5 sm:p-6">
-                    <h2 class="font-bold text-slate-800 dark:text-slate-100 text-base sm:text-lg mb-4 flex items-center gap-2.5">
-                        <span class="bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold">3</span>
-                        Información del Cliente
-                    </h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label for="tipo_cliente" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">Género / Trato <span class="text-rose-500">*</span></label>
-                            <select id="tipo_cliente" name="tipo_cliente" required class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none">
-                                <option value="">Seleccionar...</option>
-                                <option value="Cliente">Sr. (Masculino)</option>
-                                <option value="Clienta">Sra. (Femenino)</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label for="nombre_cliente" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">Nombre del Cliente <span class="text-rose-500">*</span></label>
-                            <input type="text" id="nombre_cliente" name="nombre_cliente" placeholder="Nombre completo del ganador/a" required class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 4. INFORMACIÓN DE PAGO Y DESCARGA -->
-                <div class="p-5 sm:p-6">
-                    <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
-                        <h2 class="font-bold text-slate-800 dark:text-slate-100 text-base sm:text-lg flex items-center gap-2.5">
-                            <span class="bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold">4</span>
-                            Información de Pago y Descarga
-                        </h2>
-                        <span id="duracionTotalBadge" class="text-xs font-mono bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-2.5 py-1 rounded-lg">
-                            Duración Aviso → Pago: -- min
-                        </span>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <div>
-                            <label for="hora_pago" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">Hora de Pago <span class="text-rose-500">*</span></label>
-                            <div class="flex gap-1">
-                                <input type="time" id="hora_pago" name="hora_pago" required class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm font-mono text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none">
-                                <button type="button" onclick="ponerHoraActual('hora_pago')" title="Hora actual" class="px-2.5 bg-indigo-50 dark:bg-indigo-950/70 hover:bg-indigo-100 text-indigo-600 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 rounded-xl text-xs font-semibold cursor-pointer">⚡</button>
+                            <div class="sm:col-span-5 relative">
+                                <label for="nombre_llama" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Nombre de quien informa (1 letra)</label>
+                                <input type="text" id="nombre_llama" autocomplete="off" placeholder="Ej: Moises Ariel / Lazarte Laura..."
+                                    oninput="buscarStaffM1('nombre_llama','dropLlamaM1','sala'); sincronizarDescargaAuto(); generarEnVivo()"
+                                    onfocus="buscarStaffM1('nombre_llama','dropLlamaM1','sala')"
+                                    onblur="ocultarDropM1('dropLlamaM1')"
+                                    class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white outline-none focus:border-indigo-500">
+                                <div id="dropLlamaM1" class="hidden absolute left-0 right-0 top-full mt-1 z-50 max-h-48 overflow-y-auto rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-xl divide-y divide-slate-100 dark:divide-slate-800"></div>
                             </div>
                         </div>
 
-                        <div>
-                            <label for="quien_paga" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">Quién Paga (Caja) <span class="text-rose-500">*</span></label>
-                            <select id="quien_paga" name="quien_paga" required class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none">
-                                <option value="">Seleccionar...</option>
-                                <option value="Jefe de Caja">Jefe de Caja</option>
-                                <option value="Asistente de Caja">Asistente de Caja</option>
-                                <option value="Cajero">Cajero</option>
-                                <option value="Cajera">Cajera</option>
-                                <option value="Supervisor">Supervisor</option>
-                                <option value="Otro">Otro (especificar)</option>
-                            </select>
-                            <input type="text" id="quien_paga_otro" placeholder="Especificar cargo de pago" class="w-full p-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none mt-2 hidden">
-                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-12 gap-3.5">
+                            <div class="sm:col-span-4">
+                                <div class="flex items-center justify-between mb-1">
+                                    <label for="nro_maquina" class="text-xs font-semibold text-slate-600 dark:text-slate-300">🎰 N° Máquina</label>
+                                    <span id="maqHelper" class="text-[10px] font-mono text-slate-400">0 díg.</span>
+                                </div>
+                                <input type="text" id="nro_maquina" maxlength="8" inputmode="numeric" placeholder="Ej: 120305"
+                                    oninput="alEscribirMaquinaM1(this)"
+                                    class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs sm:text-sm font-mono font-bold text-slate-900 dark:text-white outline-none focus:border-indigo-500">
+                            </div>
 
-                        <div>
-                            <label for="nombre_paga" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">Nombre de Quién Paga <span class="text-rose-500">*</span></label>
-                            <input type="text" id="nombre_paga" name="nombre_paga" placeholder="Nombre del cajero/a" required class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none">
-                        </div>
+                            <div class="sm:col-span-4">
+                                <label for="importe" class="block text-xs font-bold text-emerald-700 dark:text-emerald-400 mb-1">💵 Importe Jackpot ($)</label>
+                                <input type="text" id="importe" inputmode="decimal" placeholder="Ej: 1.250.000,00"
+                                    oninput="generarEnVivo()" onblur="formatearCampoMontoBlur(this)"
+                                    class="w-full px-3 py-2 bg-emerald-50/50 dark:bg-emerald-950/30 border border-emerald-300 dark:border-emerald-800 rounded-xl text-xs sm:text-sm font-mono font-bold text-emerald-800 dark:text-emerald-300 outline-none focus:border-emerald-500">
+                            </div>
 
-                        <div>
-                            <label for="hora_descarga" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">Hora Descarga <span class="text-rose-500">*</span></label>
-                            <div class="flex gap-1">
-                                <input type="time" id="hora_descarga" name="hora_descarga" required class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm font-mono text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none">
-                                <button type="button" onclick="ponerHoraActual('hora_descarga')" title="Hora actual" class="px-2.5 bg-indigo-50 dark:bg-indigo-950/70 hover:bg-indigo-100 text-indigo-600 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 rounded-xl text-xs font-semibold cursor-pointer">⚡</button>
+                            <div class="sm:col-span-4">
+                                <div class="flex items-center justify-between mb-1">
+                                    <label for="hora_revision" class="text-xs font-semibold text-slate-600 dark:text-slate-300">🎥 Hora Salida Premio</label>
+                                    <button type="button" onclick="sumarMinutosDesde('hora_cctv', 'hora_revision', -1)" class="text-[10px] font-mono font-semibold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer">-1m</button>
+                                </div>
+                                <div class="flex items-stretch">
+                                    <input type="time" id="hora_revision" oninput="generarEnVivo()" class="w-full min-w-0 px-2.5 py-2 bg-slate-50 dark:bg-slate-950 border border-r-0 border-slate-300 dark:border-slate-700 rounded-l-xl text-xs font-mono text-slate-900 dark:text-white outline-none focus:border-indigo-500">
+                                    <button type="button" onclick="ponerHoraActual('hora_revision')" class="px-2 bg-slate-200 dark:bg-slate-800 hover:bg-indigo-600 hover:text-white rounded-r-xl text-[10px] font-semibold cursor-pointer">⏱</button>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    <!-- 2. Cliente, Pago en Caja y Descarga -->
+                    <div class="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 space-y-4">
+                        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-2.5">
+                            <h2 class="font-bold text-slate-800 dark:text-slate-100 text-sm flex items-center gap-2">
+                                <span class="bg-indigo-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">2</span>
+                                Cliente, Pago en Caja y Descarga
+                                <span id="duracionTotalBadge" class="hidden text-[11px] font-mono px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800"></span>
+                            </h2>
+                            <button type="button" onclick="autocompletarHorariosM1()" class="px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 text-[11px] font-semibold text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 transition cursor-pointer" title="Completa Salida (-1m), Pago (+5m) y Descarga (+7m) desde Hora Aviso">
+                                ⚡ Sugerir secuencia horaria
+                            </button>
+                        </div>
+
+                        <!-- Cliente -->
+                        <div class="grid grid-cols-1 sm:grid-cols-12 gap-3.5">
+                            <div class="sm:col-span-4">
+                                <label for="tipo_cliente" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Trato Cliente</label>
+                                <select id="tipo_cliente" onchange="generarEnVivo()" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-900 dark:text-white outline-none focus:border-indigo-500">
+                                    <option value="Cliente">Sr. (Cliente)</option>
+                                    <option value="Clienta">Sra. (Clienta)</option>
+                                </select>
+                            </div>
+                            <div class="sm:col-span-8">
+                                <label for="nombre_cliente" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Nombre y Apellido del Ganador/a</label>
+                                <input type="text" id="nombre_cliente" oninput="generarEnVivo()" placeholder="Ej: Gómez Juan Carlos"
+                                    class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white outline-none focus:border-indigo-500">
+                            </div>
+                        </div>
+
+                        <!-- Pago en Caja -->
+                        <div class="grid grid-cols-1 sm:grid-cols-12 gap-3.5">
+                            <div class="sm:col-span-4">
+                                <label for="hora_pago" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">⏰ Hora Pago</label>
+                                <div class="flex items-stretch">
+                                    <input type="time" id="hora_pago" oninput="generarEnVivo()" class="w-full min-w-0 px-2.5 py-2 bg-slate-50 dark:bg-slate-950 border border-r-0 border-slate-300 dark:border-slate-700 rounded-l-xl text-xs font-mono text-slate-900 dark:text-white outline-none">
+                                    <button type="button" onclick="ponerHoraActual('hora_pago')" class="px-2 bg-slate-200 dark:bg-slate-800 hover:bg-indigo-600 hover:text-white rounded-r-xl text-[10px] font-semibold cursor-pointer">⏱</button>
+                                </div>
+                            </div>
+
+                            <div class="sm:col-span-3">
+                                <label for="quien_paga" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Cargo Caja</label>
+                                <select id="quien_paga" onchange="alCambiarSelectOtro('quien_paga','quien_paga_otro','Otro'); generarEnVivo()" class="w-full px-2.5 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-900 dark:text-white outline-none">
+                                    <option value="Jefe de Caja">Jefe de Caja</option>
+                                    <option value="Jefa de Caja">Jefa de Caja</option>
+                                    <option value="Cajera">Cajera</option>
+                                    <option value="Cajero">Cajero</option>
+                                    <option value="Asistente de Caja">Asist. Caja</option>
+                                    <option value="Supervisor">Supervisor</option>
+                                    <option value="Otro">Otro...</option>
+                                </select>
+                                <input type="text" id="quien_paga_otro" oninput="generarEnVivo()" placeholder="Especificar cargo" class="w-full px-2.5 py-1.5 mt-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-xs text-slate-900 dark:text-white outline-none hidden">
+                            </div>
+
+                            <div class="sm:col-span-5 relative">
+                                <label for="nombre_paga" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Nombre Cajero/a (1 letra)</label>
+                                <input type="text" id="nombre_paga" autocomplete="off" placeholder="Ej: Herrera Alejandra / Carrizo..."
+                                    oninput="buscarStaffM1('nombre_paga','dropCajaM1','caja'); generarEnVivo()"
+                                    onfocus="buscarStaffM1('nombre_paga','dropCajaM1','caja')"
+                                    onblur="ocultarDropM1('dropCajaM1')"
+                                    class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white outline-none focus:border-indigo-500">
+                                <div id="dropCajaM1" class="hidden absolute left-0 right-0 top-full mt-1 z-50 max-h-48 overflow-y-auto rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-xl divide-y divide-slate-100 dark:divide-slate-800"></div>
+                            </div>
+                        </div>
+
+                        <!-- Descarga -->
+                        <div class="grid grid-cols-1 sm:grid-cols-12 gap-3.5">
+                            <div class="sm:col-span-4">
+                                <label for="hora_descarga" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">⏰ Hora Descarga</label>
+                                <div class="flex items-stretch">
+                                    <input type="time" id="hora_descarga" oninput="generarEnVivo()" class="w-full min-w-0 px-2.5 py-2 bg-slate-50 dark:bg-slate-950 border border-r-0 border-slate-300 dark:border-slate-700 rounded-l-xl text-xs font-mono text-slate-900 dark:text-white outline-none">
+                                    <button type="button" onclick="ponerHoraActual('hora_descarga')" class="px-2 bg-slate-200 dark:bg-slate-800 hover:bg-indigo-600 hover:text-white rounded-r-xl text-[10px] font-semibold cursor-pointer">⏱</button>
+                                </div>
+                            </div>
+
+                            <div class="sm:col-span-3">
+                                <label for="quien_descarga" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Cargo Descarga</label>
+                                <select id="quien_descarga" onchange=" this.dataset.manual='1'; alCambiarSelectOtro('quien_descarga','quien_descarga_otro','Otro'); generarEnVivo()" class="w-full px-2.5 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-900 dark:text-white outline-none">
+                                    <option value="Encargado">Enc. (M)</option>
+                                    <option value="Encargada">Enc. (F)</option>
+                                    <option value="Asistente">Asist.</option>
+                                    <option value="Supervisor">Sup.</option>
+                                    <option value="Operador">Op. (M)</option>
+                                    <option value="Operadora">Op. (F)</option>
+                                    <option value="Otro">Otro...</option>
+                                </select>
+                                <input type="text" id="quien_descarga_otro" oninput="generarEnVivo()" placeholder="Especificar cargo" class="w-full px-2.5 py-1.5 mt-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-xs text-slate-900 dark:text-white outline-none hidden">
+                            </div>
+
+                            <div class="sm:col-span-5">
+                                <div class="flex items-center justify-between mb-1">
+                                    <label for="nombre_descarga" class="text-xs font-semibold text-slate-600 dark:text-slate-300">Nombre Descarga</label>
+                                    <button type="button" onclick="copiarPersonalLlamadaADescarga()" class="text-[10px] font-semibold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer">= Igual aviso</button>
+                                </div>
+                                <input type="text" id="nombre_descarga" oninput="this.dataset.manual='1'; generarEnVivo()" placeholder="Igual a quien informó"
+                                    class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white outline-none focus:border-indigo-500">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. Ficha Técnica (Juego, Marca, Pago Manual y Observaciones) -->
+                    <div class="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 space-y-3.5">
+                        <div class="flex items-center justify-between">
+                            <h2 class="font-bold text-slate-800 dark:text-slate-100 text-sm flex items-center gap-2">
+                                <span class="bg-indigo-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">3</span>
+                                Ficha Técnica de Máquina y Apéndice
+                            </h2>
+                            <button type="button" onclick="recordarFichaMaquinaM1()" class="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer" title="Recordar Marca y Juego para este N° de Máquina">
+                                💾 Asociar Máq/Juego
+                            </button>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                            <div>
+                                <label for="maquina_independiente" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Marca / Gabinete</label>
+                                <select id="maquina_independiente" onchange="alCambiarSelectOtro('maquina_independiente','maquina_personalizada','OTRO'); generarEnVivo()" class="w-full px-2.5 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white outline-none">
+                                    <option value="">Opcional...</option>
+                                    <option value="IGT">IGT</option>
+                                    <option value="ARISTOCRAT">ARISTOCRAT</option>
+                                    <option value="BALLY">BALLY</option>
+                                    <option value="KONAMI">KONAMI</option>
+                                    <option value="SCIENTIFIC GAMES">SCIENTIFIC GAMES</option>
+                                    <option value="AINSWORTH">AINSWORTH</option>
+                                    <option value="NOVOMATIC">NOVOMATIC</option>
+                                    <option value="ZITRO">ZITRO</option>
+                                    <option value="EGT">EGT</option>
+                                    <option value="OTRO">Otro...</option>
+                                </select>
+                                <input type="text" id="maquina_personalizada" oninput="generarEnVivo()" placeholder="Especificar marca" class="w-full px-2.5 py-1.5 mt-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-xs text-slate-900 dark:text-white outline-none hidden">
+                            </div>
+
+                            <div>
+                                <label for="juego" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Juego</label>
+                                <select id="juego" onchange="alCambiarSelectOtro('juego','juego_personalizado','OTRO'); generarEnVivo()" class="w-full px-2.5 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white outline-none">
+                                    <option value="">Opcional...</option>
+                                    <option value="88 FORTUNE">88 FORTUNE</option>
+                                    <option value="BUFFALO">BUFFALO</option>
+                                    <option value="DRAGON LINK">DRAGON LINK</option>
+                                    <option value="LIGHTNING LINK">LIGHTNING LINK</option>
+                                    <option value="LINK KING">LINK KING</option>
+                                    <option value="WHEEL OF FORTUNE">WHEEL OF FORTUNE</option>
+                                    <option value="GOLDEN GODDESS">GOLDEN GODDESS</option>
+                                    <option value="CASH BURST">CASH BURST</option>
+                                    <option value="LUCKY LUCKY">LUCKY LUCKY</option>
+                                    <option value="OTRO">Otro...</option>
+                                </select>
+                                <input type="text" id="juego_personalizado" oninput="generarEnVivo()" placeholder="Especificar juego" class="w-full px-2.5 py-1.5 mt-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-xs text-slate-900 dark:text-white outline-none hidden">
+                            </div>
+
+                            <div>
+                                <label for="pago_manual" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">N° Pago Manual</label>
+                                <input type="text" id="pago_manual" oninput="generarEnVivo()" placeholder="Ej: 00125" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-mono text-slate-900 dark:text-white outline-none">
+                            </div>
+                        </div>
+
                         <div>
-                            <div class="flex items-center justify-between mb-1.5">
-                                <label for="quien_descarga" class="text-xs font-semibold text-slate-600 dark:text-slate-300">Quién Registra / Descarga <span class="text-rose-500">*</span></label>
-                                <button type="button" onclick="copiarPersonalLlamadaADescarga()" class="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer">
-                                    Igual a quien llamó
+                            <div class="flex items-center justify-between mb-1">
+                                <label for="observaciones" class="text-xs font-semibold text-slate-600 dark:text-slate-300">Observaciones Adicionales (Opcional)</label>
+                                <span class="text-[10px] font-mono text-slate-400"><span id="charCount">0</span>/250</span>
+                            </div>
+                            <input type="text" id="observaciones" maxlength="250" oninput="generarEnVivo()" placeholder="Ej: Confecciona DDJJ en caja / Verificado por cámara..."
+                                class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white outline-none">
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- COLUMNA DERECHA: VISTA PREVIA EN VIVO E HISTORIAL (5/12) -->
+            <div class="lg:col-span-5 bg-slate-100/80 dark:bg-slate-950/60 border-t lg:border-t-0 lg:border-l border-slate-200 dark:border-slate-800 p-4 sm:p-6 flex flex-col justify-between space-y-4">
+                <div class="space-y-4">
+
+                    <!-- Vista Previa Editable -->
+                    <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-4 space-y-3">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-pulse"></span>
+                                <h2 class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-200">Acta en Vivo</h2>
+                                <span id="badgeEstadoM1" class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300">En carga</span>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <button type="button" onclick="restaurarAutoM1()" class="px-2 py-1 rounded-lg text-[11px] font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition inline-flex items-center gap-1 cursor-pointer">
+                                    <i data-lucide="refresh-cw" class="w-3 h-3"></i> Restaurar
+                                </button>
+                                <button type="button" onclick="descargarTxtM1()" class="px-2 py-1 rounded-lg text-[11px] font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition inline-flex items-center gap-1 cursor-pointer">
+                                    <i data-lucide="download" class="w-3 h-3"></i> TXT
+                                </button>
+                                <button type="button" onclick="window.print()" class="px-2 py-1 rounded-lg text-[11px] font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition inline-flex items-center gap-1 cursor-pointer" title="Imprimir">
+                                    <i data-lucide="printer" class="w-3 h-3"></i>
                                 </button>
                             </div>
-                            <select id="quien_descarga" name="quien_descarga" required class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none">
-                                <option value="">Seleccionar...</option>
-                                <option value="Encargado">Encargado</option>
-                                <option value="Encargada">Encargada</option>
-                                <option value="Supervisor">Supervisor</option>
-                                <option value="Asistente">Asistente</option>
-                                <option value="Operador">Operador</option>
-                                <option value="Operadora">Operadora</option>
-                                <option value="Otro">Otro (especificar)</option>
-                            </select>
-                            <input type="text" id="quien_descarga_otro" placeholder="Especificar cargo de descarga" class="w-full p-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none mt-2 hidden">
                         </div>
 
-                        <div>
-                            <label for="nombre_descarga" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">Nombre de Quién Registra / Descarga <span class="text-rose-500">*</span></label>
-                            <input type="text" id="nombre_descarga" name="nombre_descarga" placeholder="Nombre completo" required class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none">
+                        <textarea id="resumen" rows="13" spellcheck="false" oninput="actualizarImpresionM1()"
+                            class="report-font w-full min-h-[290px] p-3.5 bg-slate-50 dark:bg-slate-950 border-2 border-indigo-200 dark:border-indigo-900/80 rounded-xl text-xs sm:text-sm leading-relaxed text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-indigo-500 resize-y"></textarea>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-12 gap-2">
+                            <button type="button" id="btnCopiarM1" onclick="copiarInforme()" class="sm:col-span-8 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold text-xs sm:text-sm transition flex items-center justify-center gap-2 shadow-md cursor-pointer active:scale-[0.99]">
+                                <i data-lucide="copy" class="w-4 h-4"></i>
+                                <span>Copiar y Guardar</span>
+                            </button>
+                            <button type="button" onclick="copiarWhatsAppM1()" class="sm:col-span-4 px-3 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-sm cursor-pointer active:scale-[0.99]">
+                                <i data-lucide="message-square" class="w-3.5 h-3.5"></i>
+                                <span>WhatsApp</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Historial Modelo 1 -->
+                    <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-4 space-y-3">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-200 flex items-center gap-1.5">
+                                <i data-lucide="history" class="w-4 h-4 text-indigo-500"></i>
+                                Historial Modelo 1 (<span id="countHistM1">0</span>)
+                            </h3>
+                            <div class="flex items-center gap-1.5">
+                                <button type="button" onclick="exportarCsvM1()" class="px-2 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-300 text-[11px] font-semibold transition inline-flex items-center gap-1 cursor-pointer">
+                                    <i data-lucide="sheet" class="w-3 h-3"></i> CSV
+                                </button>
+                                <button type="button" onclick="vaciarHistorial()" class="p-1 rounded-lg text-slate-400 hover:text-rose-500 transition cursor-pointer" title="Vaciar historial">
+                                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div id="historialLista" class="space-y-1.5 max-h-52 overflow-y-auto pr-0.5 text-xs">
+                            <p class="text-slate-400 text-center py-3">Sin premios guardados</p>
                         </div>
                     </div>
                 </div>
-
-                <!-- 5. INFORMACIÓN ADICIONAL Y OBSERVACIONES -->
-                <div class="p-5 sm:p-6 space-y-4">
-                    <h2 class="font-bold text-slate-800 dark:text-slate-100 text-base sm:text-lg flex items-center gap-2.5">
-                        <span class="bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold">5</span>
-                        Información Adicional de Máquina y Observaciones
-                    </h2>
-
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div>
-                            <label for="juego" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">Juego</label>
-                            <select id="juego" name="juego" class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none">
-                                <option value="">Seleccionar...</option>
-                                <option value="88 FORTUNE">88 FORTUNE</option>
-                                <option value="BUFFALO">BUFFALO</option>
-                                <option value="DRAGON LINK">DRAGON LINK</option>
-                                <option value="LIGHTNING LINK">LIGHTNING LINK</option>
-                                <option value="WHEEL OF FORTUNE">WHEEL OF FORTUNE</option>
-                                <option value="GOLDEN GODDESS">GOLDEN GODDESS</option>
-                                <option value="CASH BURST">CASH BURST</option>
-                                <option value="LUCKY LUCKY">LUCKY LUCKY</option>
-                                <option value="OTRO">Otro (especificar)</option>
-                            </select>
-                            <input type="text" id="juego_personalizado" name="juego_personalizado" placeholder="Ingrese nombre del juego" class="w-full p-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none mt-2 hidden">
-                        </div>
-
-                        <div>
-                            <label for="maquina_independiente" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">Marca de Máquina</label>
-                            <select id="maquina_independiente" name="maquina_independiente" class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none">
-                                <option value="">Seleccionar...</option>
-                                <option value="BALLY">BALLY</option>
-                                <option value="ARISTOCRAT">ARISTOCRAT</option>
-                                <option value="IGT">IGT</option>
-                                <option value="KONAMI">KONAMI</option>
-                                <option value="SCIENTIFIC GAMES">SCIENTIFIC GAMES</option>
-                                <option value="AINSWORTH">AINSWORTH</option>
-                                <option value="NOVOMATIC">NOVOMATIC</option>
-                                <option value="OTRO">Otro (especificar)</option>
-                            </select>
-                            <input type="text" id="maquina_personalizada" name="maquina_personalizada" placeholder="Ingrese marca de máquina" class="w-full p-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none mt-2 hidden">
-                        </div>
-
-                        <div>
-                            <label for="pago_manual" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">N° Pago Manual</label>
-                            <input type="text" id="pago_manual" name="pago_manual" placeholder="Ej: 00125" class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm font-mono text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none">
-                        </div>
-                    </div>
-
-                    <div>
-                        <div class="flex items-center justify-between mb-1">
-                            <label for="observaciones" class="text-xs font-semibold text-slate-600 dark:text-slate-300">Observaciones Adicionales <span class="font-normal text-slate-400">(Opcional)</span></label>
-                            <span class="text-[11px] font-mono text-slate-400"><span id="charCount">0</span>/250</span>
-                        </div>
-                        <textarea id="observaciones" name="observaciones" maxlength="250" rows="2" placeholder="Aclaraciones opcionales para agregar al final del informe..." class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none resize-y"></textarea>
-                    </div>
-                </div>
-
-                <!-- 6. BOTONES DE ACCIÓN -->
-                <div class="bg-slate-50 dark:bg-slate-900/70 p-5 sm:p-6">
-                    <div class="flex flex-wrap gap-3 justify-center items-center">
-                        <button type="button" id="btnGenerarResumen" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold text-sm shadow-sm transition flex items-center gap-2 cursor-pointer">
-                            <i data-lucide="file-check-2" class="w-4 h-4"></i> Generar Informe
-                        </button>
-                        <button type="button" id="btnCopiarDirecto" onclick="copiarInforme()" class="hidden px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-semibold text-sm shadow-sm transition flex items-center gap-2 cursor-pointer">
-                            <i data-lucide="copy" class="w-4 h-4"></i> Copiar Informe
-                        </button>
-                        <button type="button" id="btnLimpiarTodo" class="px-5 py-2.5 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl font-semibold text-sm transition flex items-center gap-2 cursor-pointer">
-                            <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Limpiar Formulario
-                        </button>
-                    </div>
-                </div>
-            </form>
-
-            <!-- PANEL DE INFORME GENERADO -->
-            <div id="resumenContainer" class="hidden border-t border-indigo-200 dark:border-slate-800 bg-indigo-50/70 dark:bg-slate-950/80 p-5 sm:p-6 space-y-3">
-                <div class="no-print flex flex-wrap items-center justify-between gap-2">
-                    <span class="text-xs font-bold uppercase tracking-wider text-indigo-700 dark:text-indigo-300 flex items-center gap-2">
-                        <i data-lucide="check-circle" class="w-4 h-4 text-emerald-500"></i>
-                        Informe Generado (Editable antes de copiar)
-                    </span>
-                    <div class="flex items-center gap-2">
-                        <button type="button" onclick="copiarInforme()" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer">
-                            <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copiar Todo
-                        </button>
-                        <button type="button" onclick="window.print()" class="px-3.5 py-1.5 bg-slate-700 hover:bg-slate-800 text-white rounded-lg text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer">
-                            <i data-lucide="printer" class="w-3.5 h-3.5"></i> Imprimir
-                        </button>
-                    </div>
-                </div>
-
-                <textarea id="resumen" rows="10" class="w-full p-4 bg-white dark:bg-slate-900 border border-indigo-200 dark:border-slate-700 rounded-xl text-xs sm:text-sm font-mono leading-relaxed text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-indigo-500 resize-y"></textarea>
             </div>
-
-            <!-- HISTORIAL RECIENTE DE JACKPOTS DEL TURNO -->
-            <div id="historialSection" class="no-print hidden border-t border-slate-200 dark:border-slate-800 p-5 sm:p-6 bg-slate-50/50 dark:bg-slate-900/40">
-                <div class="flex items-center justify-between mb-3">
-                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 flex items-center gap-1.5">
-                        <i data-lucide="history" class="w-4 h-4"></i> Historial Reciente de Jackpots
-                    </h3>
-                    <button type="button" onclick="vaciarHistorial()" class="text-xs font-semibold text-rose-500 hover:underline cursor-pointer">Vaciar historial</button>
-                </div>
-                <div id="historialLista" class="grid grid-cols-1 md:grid-cols-2 gap-2.5"></div>
-            </div>
-
-        </div>
+        </main>
     </div>
 
     <textarea id="clipboardFallback" class="fixed -top-96 left-0 opacity-0 pointer-events-none" aria-hidden="true"></textarea>
 
-    <!-- TOAST NOTIFICACIONES -->
-    <div id="notification" class="no-print hidden fixed bottom-5 right-5 px-4 py-3 rounded-xl shadow-xl flex items-center gap-3 fade-in z-50 border">
-        <span id="notification-text" class="text-xs sm:text-sm font-medium">Operación exitosa</span>
+    <!-- TOAST -->
+    <div id="notification" class="no-print hidden fixed bottom-5 right-5 px-4 py-3 rounded-xl shadow-2xl flex items-center gap-2.5 z-50 border bg-slate-900 dark:bg-slate-800 border-slate-700 text-white text-xs font-semibold">
+        <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>
+        <span id="notification-text">Operación exitosa</span>
     </div>
 
     <script>
-        const form = document.getElementById('formJackpot');
-        const inputsHora = ['hora_cctv', 'hora_revision', 'hora_pago', 'hora_descarga'];
         const STORAGE_HIST_KEY = 'jackpot_m1_history';
+        const STORAGE_DRAFT_M1 = 'jackpot_m1_draft_v2';
+        const SHARED_MACHINES_KEY = 'cctv_jackpot_machines_catalog_v1';
+
+        const STAFF_SALA_M1 = [
+            { nombre: 'DENZ GIMENEZ, DEBORA ADRIANA', cargo: 'Encargada' },
+            { nombre: 'MOISES, ARIEL JESUS', cargo: 'Encargado' },
+            { nombre: 'RODRIGUEZ, MONICA ELIANA', cargo: 'Encargada' },
+            { nombre: 'ZAMBRANA, CARINA DEL VALLE', cargo: 'Encargada' },
+            { nombre: 'MARTINEZ GUAYMAS, CAROLINA ALEJANDRA', cargo: 'Encargada' },
+            { nombre: 'LAZARTE, LAURA LORENA', cargo: 'Asistente' },
+            { nombre: 'ALONSO, JOSE ANTONIO SEBASTIAN', cargo: 'Asistente' },
+            { nombre: 'CAMINOS, CINTIA SOLEDAD', cargo: 'Asistente' },
+            { nombre: 'PARADA, JULIO ALBERTO', cargo: 'Asistente' }
+        ];
+
+        const STAFF_CAJA_M1 = [
+            { nombre: 'CARRIZO, NATALIA VALERIA', cargo: 'Jefa de Caja' },
+            { nombre: 'HERRERA, ALEJANDRA MERCEDES', cargo: 'Jefa de Caja' },
+            { nombre: 'YANELLO NASSER, CINTIA GRACIELA', cargo: 'Cajera' },
+            { nombre: 'CHOCOBAR, GISELA NOEMI', cargo: 'Cajera' },
+            { nombre: 'FLORES, ROMINA PAOLA', cargo: 'Cajera' },
+            { nombre: 'MAMANI, SILVANA SOLEDAD', cargo: 'Cajera' },
+            { nombre: 'PARRON, STELLA MARIS', cargo: 'Cajera' },
+            { nombre: 'PELOC, CLAUDIA MARIANA', cargo: 'Cajera' },
+            { nombre: 'PADILLA, SONIA RAQUEL', cargo: 'Cajera' },
+            { nombre: 'PEÑALBA, MONICA RAQUEL', cargo: 'Cajera' },
+            { nombre: 'PEREZ, CARMEN ELIZABETH', cargo: 'Cajera' }
+        ];
+
         let historialJackpots = [];
+        let catalogoMaquinas = {};
+        let textoAutoM1 = '';
         let notifTimeout = null;
 
+        function normStr(s) {
+            return String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+        }
+
         function escapeHtml(str) {
-            return String(str)
+            return String(str ?? '')
                 .replace(/&/g, '&amp;')
                 .replace(/</g, '&lt;')
                 .replace(/>/g, '&gt;')
@@ -436,205 +493,212 @@
                 .replace(/'/g, '&#39;');
         }
 
-        // ===== MODO CLARO / OSCURO (compartido en todo el sitio) =====
         function toggleTheme() {
             if (window.CCTVTheme) {
                 window.CCTVTheme.toggle();
                 return;
             }
             const isDark = document.documentElement.classList.toggle('dark');
-            try {
-                localStorage.setItem('cctv_theme', isDark ? 'dark' : 'light');
-            } catch (e) { }
+            try { localStorage.setItem('cctv_theme', isDark ? 'dark' : 'light'); } catch (e) {}
         }
 
-        // ===== FECHA ACTUAL =====
-        function actualizarFecha() {
-            const now = new Date();
-            document.getElementById('fechaActual').textContent = now.toLocaleDateString('es-AR', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric'
-            });
-        }
+        // Parseo seguro de moneda Argentina e Internacional (corrige bug del punto decimal del teclado numérico)
+        function parseMontoSeguroAR(raw) {
+            if (raw === null || raw === undefined) return NaN;
+            let s = String(raw).trim().replace(/[$\s]/g, '').replace(/[.,]+$/, '');
+            if (!s) return NaN;
 
-        // ===== NOTIFICACIONES =====
-        function showNotification(message, type = 'success') {
-            const notification = document.getElementById('notification');
-            document.getElementById('notification-text').textContent = message;
-
-            if (type === 'error') {
-                notification.className = 'no-print fixed bottom-5 right-5 bg-rose-600 border-rose-400/40 text-white px-4 py-3 rounded-xl shadow-xl flex items-center gap-3 fade-in z-50 border';
-            } else {
-                notification.className = 'no-print fixed bottom-5 right-5 bg-emerald-600 border-emerald-400/40 text-white px-4 py-3 rounded-xl shadow-xl flex items-center gap-3 fade-in z-50 border';
+            if (s.includes(',') && s.includes('.')) {
+                return s.lastIndexOf(',') > s.lastIndexOf('.')
+                    ? parseFloat(s.replace(/\./g, '').replace(',', '.'))
+                    : parseFloat(s.replace(/,/g, ''));
             }
-
-            clearTimeout(notifTimeout);
-            notifTimeout = setTimeout(() => notification.classList.add('hidden'), 3200);
+            if (s.includes(',')) {
+                return parseFloat(s.replace(',', '.'));
+            }
+            if (s.includes('.')) {
+                const parts = s.split('.');
+                // Un único punto con 1 o 2 decimales (ej. 250000.50 o 10.5) es decimal; 3 dígitos (ej. 250.000) es miles
+                if (parts.length === 2 && parts[1].length !== 3) {
+                    return parseFloat(s);
+                }
+                return parseFloat(s.replace(/\./g, ''));
+            }
+            return parseFloat(s);
         }
 
-        // ===== DESPLEGABLES CON OPCIÓN "OTRO" =====
-        function vincularSelectOtro(selectId, inputOtroId, valorOtro = 'OTRO') {
+        function formatMonedaAR(num) {
+            if (typeof num !== 'number' || isNaN(num) || !isFinite(num)) return '0,00';
+            return num.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        window.formatearCampoMontoBlur = function (inp) {
+            const val = parseMontoSeguroAR(inp.value);
+            if (!isNaN(val) && val > 0) {
+                inp.value = formatMonedaAR(val);
+                generarEnVivo();
+            }
+        };
+
+        // Autocompletado de Personal Sala / Caja
+        window.buscarStaffM1 = function (inputId, dropId, tipo) {
+            const inp = document.getElementById(inputId);
+            const dd = document.getElementById(dropId);
+            if (!inp || !dd) return;
+            const q = normStr(inp.value);
+            if (!q) { dd.classList.add('hidden'); return; }
+            const fuente = tipo === 'caja' ? STAFF_CAJA_M1 : STAFF_SALA_M1;
+            const matches = fuente.filter(p => normStr(p.nombre).includes(q) && normStr(p.nombre) !== q);
+            if (!matches.length) { dd.classList.add('hidden'); return; }
+            dd._matches = matches;
+            dd.innerHTML = matches.map((p, idx) => `
+                <button type="button" onmousedown="event.preventDefault(); elegirStaffM1('${inputId}','${dropId}','${tipo}',${idx})"
+                    class="w-full text-left px-3 py-2 text-xs font-semibold text-slate-800 dark:text-slate-100 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 flex items-center justify-between cursor-pointer">
+                    <span>${escapeHtml(p.nombre)}</span>
+                    <span class="text-[10px] text-indigo-500 font-normal">${escapeHtml(p.cargo)}</span>
+                </button>
+            `).join('');
+            dd.classList.remove('hidden');
+        };
+
+        window.elegirStaffM1 = function (inputId, dropId, tipo, idx) {
+            const dd = document.getElementById(dropId);
+            const item = dd?._matches?.[idx];
+            if (!item) return;
+            document.getElementById(inputId).value = item.nombre;
+            if (tipo === 'sala') {
+                document.getElementById('quien_llama').value = item.cargo;
+                sincronizarDescargaAuto();
+            } else {
+                document.getElementById('quien_paga').value = item.cargo;
+            }
+            dd.classList.add('hidden');
+            generarEnVivo();
+        };
+
+        window.ocultarDropM1 = function (dropId) {
+            setTimeout(() => document.getElementById(dropId)?.classList.add('hidden'), 150);
+        };
+
+        window.alCambiarSelectOtro = function (selectId, inputOtroId, valorOtro) {
             const sel = document.getElementById(selectId);
             const inp = document.getElementById(inputOtroId);
-            sel.addEventListener('change', () => {
-                const esOtro = sel.value.toUpperCase() === valorOtro.toUpperCase();
-                inp.classList.toggle('hidden', !esOtro);
-                inp.required = esOtro;
-                if (!esOtro) inp.value = '';
-                else inp.focus();
-            });
-        }
+            const activo = sel.value.toUpperCase() === valorOtro.toUpperCase();
+            inp.classList.toggle('hidden', !activo);
+            if (!activo) inp.value = '';
+            else inp.focus();
+        };
 
-        vincularSelectOtro('juego', 'juego_personalizado', 'OTRO');
-        vincularSelectOtro('maquina_independiente', 'maquina_personalizada', 'OTRO');
-        vincularSelectOtro('quien_llama', 'quien_llama_otro', 'Otro');
-        vincularSelectOtro('quien_paga', 'quien_paga_otro', 'Otro');
-        vincularSelectOtro('quien_descarga', 'quien_descarga_otro', 'Otro');
+        window.sincronizarDescargaAuto = function () {
+            const nomDesc = document.getElementById('nombre_descarga');
+            const selDesc = document.getElementById('quien_descarga');
+            if (!nomDesc.dataset.manual) {
+                nomDesc.value = document.getElementById('nombre_llama').value;
+            }
+            if (!selDesc.dataset.manual) {
+                selDesc.value = document.getElementById('quien_llama').value;
+                alCambiarSelectOtro('quien_descarga', 'quien_descarga_otro', 'Otro');
+                document.getElementById('quien_descarga_otro').value = document.getElementById('quien_llama_otro').value;
+            }
+        };
 
-        // ===== VALIDACIÓN EN VIVO DE MÁQUINA (6 DÍGITOS) =====
-        function validarMaquinaInput(input) {
-            input.value = input.value.replace(/\D/g, '').slice(0, 6);
-            const len = input.value.length;
+        window.copiarPersonalLlamadaADescarga = function () {
+            const nomDesc = document.getElementById('nombre_descarga');
+            const selDesc = document.getElementById('quien_descarga');
+            delete nomDesc.dataset.manual;
+            delete selDesc.dataset.manual;
+            sincronizarDescargaAuto();
+            generarEnVivo();
+            showNotification('Personal igualado al aviso');
+        };
+
+        // Memoria compartida de Máquina -> Marca / Juego
+        window.alEscribirMaquinaM1 = function (input) {
+            input.value = input.value.replace(/\D/g, '').slice(0, 8);
+            const maq = input.value;
+            const len = maq.length;
             const helper = document.getElementById('maqHelper');
-            if (len === 6) {
-                helper.textContent = '✓ Número de máquina válido (6/6)';
-                helper.className = 'text-emerald-600 dark:text-emerald-400 text-xs mt-1 block font-medium';
+            helper.textContent = len === 6 ? '✓ 6/6' : `${len} díg.`;
+            helper.className = len >= 5 ? 'text-[10px] font-mono font-bold text-emerald-600 dark:text-emerald-400' : 'text-[10px] font-mono text-slate-400';
+
+            const memChip = document.getElementById('maqMemoryChip');
+            if (catalogoMaquinas[maq]) {
+                const info = catalogoMaquinas[maq];
+                aplicarValorSelectOExtendido('maquina_independiente', 'maquina_personalizada', info.marca);
+                aplicarValorSelectOExtendido('juego', 'juego_personalizado', info.juego);
+                memChip.classList.remove('hidden');
             } else {
-                helper.textContent = `Exactamente 6 dígitos numéricos (${len}/6)`;
-                helper.className = 'text-slate-500 dark:text-slate-400 text-xs mt-1 block';
+                memChip.classList.add('hidden');
+            }
+            generarEnVivo();
+        };
+
+        function aplicarValorSelectOExtendido(selId, customId, valor) {
+            if (!valor) return;
+            const sel = document.getElementById(selId);
+            const custom = document.getElementById(customId);
+            const existe = Array.from(sel.options).some(o => o.value.toUpperCase() === valor.toUpperCase());
+            if (existe) {
+                const opt = Array.from(sel.options).find(o => o.value.toUpperCase() === valor.toUpperCase());
+                sel.value = opt.value;
+                custom.classList.add('hidden');
+                custom.value = '';
+            } else {
+                sel.value = 'OTRO';
+                custom.classList.remove('hidden');
+                custom.value = valor;
             }
         }
 
-        // ===== FORMATEO SEGURO DE IMPORTE ARGENTINO (SIN ROMPER "250.000") =====
-        function parseImporteAR(rawValue) {
-            const val = String(rawValue || '').replace(/[^\d.,]/g, '');
-            if (!val) return { numeric: 0, formatted: '' };
+        window.recordarFichaMaquinaM1 = function (silencioso = false) {
+            const maq = document.getElementById('nro_maquina').value.trim();
+            const marcaSel = document.getElementById('maquina_independiente').value;
+            const marca = marcaSel === 'OTRO' ? document.getElementById('maquina_personalizada').value.trim() : marcaSel;
+            const juegoSel = document.getElementById('juego').value;
+            const juego = juegoSel === 'OTRO' ? document.getElementById('juego_personalizado').value.trim() : juegoSel;
 
-            let intDigits = '';
-            let decDigits = null;
-
-            if (val.includes(',')) {
-                const parts = val.split(',');
-                intDigits = parts[0].replace(/\D/g, '');
-                decDigits = parts.slice(1).join('').replace(/\D/g, '').slice(0, 2);
-            } else {
-                const dotParts = val.split('.');
-                if (dotParts.length === 2 && dotParts[1].length <= 2 && dotParts[0].length >= 4) {
-                    intDigits = dotParts[0].replace(/\D/g, '');
-                    decDigits = dotParts[1].replace(/\D/g, '');
-                } else {
-                    intDigits = val.replace(/\D/g, '');
-                }
-            }
-
-            if (!intDigits && decDigits === null) return { numeric: 0, formatted: '' };
-
-            const cleanedInt = intDigits.replace(/^0+(?=\d)/, '');
-            const intFormatted = cleanedInt ? cleanedInt.replace(/\B(?=(\d{3})+(?!\d))/g, '.') : (decDigits !== null ? '0' : '');
-            const intNum = cleanedInt ? parseInt(cleanedInt, 10) : 0;
-            const decNum = decDigits ? parseInt(decDigits.padEnd(2, '0'), 10) / 100 : 0;
-            const numeric = intNum + decNum;
-
-            return {
-                numeric,
-                formatted: decDigits !== null ? `${intFormatted},${decDigits}` : intFormatted
-            };
-        }
-
-        function formatearImporteVivo(input) {
-            const { formatted } = parseImporteAR(input.value);
-            input.value = formatted;
-        }
-
-        function formatImporteParaReporte(num) {
-            const totalCents = Math.round((Number(num) || 0) * 100);
-            const intPart = String(Math.floor(totalCents / 100)).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-            const decPart = String(totalCents % 100).padStart(2, '0');
-            return `${intPart},${decPart}`;
-        }
-
-        // ===== HORAS Y DURACIÓN (SOPORTA MEDIANOCHE 00:00) =====
-        function ponerHoraActual(id) {
-            const now = new Date();
-            document.getElementById(id).value = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-            calcularDuracion();
-        }
-
-        function sumarMinutosDesde(refId, targetId, deltaMin) {
-            const refVal = document.getElementById(refId).value;
-            const d = new Date();
-            if (refVal && refVal.includes(':')) {
-                const [h, m] = refVal.split(':').map(Number);
-                d.setHours(h, m + deltaMin, 0, 0);
-            } else {
-                d.setMinutes(d.getMinutes() + deltaMin);
-            }
-            document.getElementById(targetId).value = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
-            calcularDuracion();
-        }
-
-        function copiarPersonalLlamadaADescarga() {
-            const cargo = document.getElementById('quien_llama').value;
-            const cargoOtro = document.getElementById('quien_llama_otro').value;
-            const nombre = document.getElementById('nombre_llama').value;
-
-            if (!cargo && !nombre) {
-                showNotification('Completa primero los datos de quién llamó a CCTV', 'error');
+            if (!maq || (!marca && !juego)) {
+                if (!silencioso) showNotification('Ingresa N° Máquina y Marca o Juego primero', 'error');
                 return;
             }
+            catalogoMaquinas[maq] = { marca, juego };
+            try { localStorage.setItem(SHARED_MACHINES_KEY, JSON.stringify(catalogoMaquinas)); } catch (e) {}
+            document.getElementById('maqMemoryChip').classList.remove('hidden');
+            if (!silencioso) showNotification(`Máq. ${maq} asociada en memoria`);
+        };
 
-            const selDesc = document.getElementById('quien_descarga');
-            const inpDescOtro = document.getElementById('quien_descarga_otro');
-            selDesc.value = cargo;
-            if (cargo === 'Otro') {
-                inpDescOtro.classList.remove('hidden');
-                inpDescOtro.required = true;
-                inpDescOtro.value = cargoOtro;
-            } else {
-                inpDescOtro.classList.add('hidden');
-                inpDescOtro.required = false;
-                inpDescOtro.value = '';
-            }
-            document.getElementById('nombre_descarga').value = nombre;
-            showNotification('Personal copiado a sección de descarga');
+        // Horarios
+        function getHoraActualStr() {
+            const now = new Date();
+            return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
         }
 
-        function calcularDuracion() {
-            const toMin = val => {
-                if (!val || !val.includes(':')) return null;
-                const [h, m] = val.split(':').map(Number);
-                return isNaN(h) || isNaN(m) ? null : h * 60 + m;
-            };
+        window.ponerHoraActual = function (id) {
+            document.getElementById(id).value = getHoraActualStr();
+            generarEnVivo();
+        };
 
-            const tAviso = toMin(document.getElementById('hora_cctv').value);
-            const tPago = toMin(document.getElementById('hora_pago').value);
-            const badge = document.getElementById('duracionTotalBadge');
+        window.sumarMinutosDesde = function (refId, targetId, deltaMin) {
+            const refVal = document.getElementById(refId).value || getHoraActualStr();
+            const [h, m] = refVal.split(':').map(Number);
+            const tot = ((h * 60 + m + deltaMin) % 1440 + 1440) % 1440;
+            document.getElementById(targetId).value = `${String(Math.floor(tot / 60)).padStart(2, '0')}:${String(tot % 60).padStart(2, '0')}`;
+            generarEnVivo();
+        };
 
-            if (tAviso !== null && tPago !== null) {
-                const diff = (tPago - tAviso + 1440) % 1440;
-                badge.textContent = `Duración Aviso → Pago: ${diff} min`;
-            } else {
-                badge.textContent = 'Duración Aviso → Pago: -- min';
-            }
-        }
+        window.autocompletarHorariosM1 = function () {
+            const hBaseEl = document.getElementById('hora_cctv');
+            if (!hBaseEl.value) hBaseEl.value = getHoraActualStr();
+            if (!document.getElementById('hora_revision').value) sumarMinutosDesde('hora_cctv', 'hora_revision', -1);
+            if (!document.getElementById('hora_pago').value) sumarMinutosDesde('hora_cctv', 'hora_pago', 5);
+            if (!document.getElementById('hora_descarga').value) sumarMinutosDesde('hora_cctv', 'hora_descarga', 7);
+            generarEnVivo();
+            showNotification('⚡ Secuencia horaria sugerida');
+        };
 
-        inputsHora.forEach(id => {
-            document.getElementById(id).addEventListener('input', calcularDuracion);
-            document.getElementById(id).addEventListener('change', calcularDuracion);
-        });
-
-        document.getElementById('observaciones').addEventListener('input', e => {
-            document.getElementById('charCount').textContent = String(e.target.value.length);
-        });
-
-        // ===== GENERAR Y VALIDAR INFORME =====
         function resolverCargo(selectId, otroInputId) {
             const val = document.getElementById(selectId).value.trim();
-            if (val === 'Otro') {
-                return document.getElementById(otroInputId).value.trim();
-            }
-            return val;
+            return val === 'Otro' ? document.getElementById(otroInputId).value.trim() : val;
         }
 
         function abreviarRol(rol) {
@@ -649,221 +713,332 @@
             return mapa[rol] || rol;
         }
 
-        document.getElementById('btnGenerarResumen').addEventListener('click', () => {
-            const hora_cctv = document.getElementById('hora_cctv').value.trim();
-            const quien_llama = resolverCargo('quien_llama', 'quien_llama_otro');
-            const nombre_llama = document.getElementById('nombre_llama').value.trim();
-            const nro_maquina = document.getElementById('nro_maquina').value.trim();
-            const importeNum = parseImporteAR(document.getElementById('importe').value).numeric;
-            const hora_revision = document.getElementById('hora_revision').value.trim();
-            const tipo_cliente = document.getElementById('tipo_cliente').value.trim();
-            const nombre_cliente = document.getElementById('nombre_cliente').value.trim();
-            const hora_pago = document.getElementById('hora_pago').value.trim();
-            const quien_paga = resolverCargo('quien_paga', 'quien_paga_otro');
-            const nombre_paga = document.getElementById('nombre_paga').value.trim();
-            const hora_descarga = document.getElementById('hora_descarga').value.trim();
-            const quien_descarga = resolverCargo('quien_descarga', 'quien_descarga_otro');
-            const nombre_descarga = document.getElementById('nombre_descarga').value.trim();
+        // Generador en Vivo del Acta Modelo 1
+        window.generarEnVivo = function () {
+            const obsVal = document.getElementById('observaciones').value;
+            document.getElementById('charCount').textContent = String(obsVal.length);
+
+            const hCctv = document.getElementById('hora_cctv').value || '--:--';
+            const hRev = document.getElementById('hora_revision').value || '--:--';
+            const hPago = document.getElementById('hora_pago').value || '--:--';
+            const hDesc = document.getElementById('hora_descarga').value || '--:--';
+
+            // Calcular duración Aviso -> Pago
+            const badgeDur = document.getElementById('duracionTotalBadge');
+            if (document.getElementById('hora_cctv').value && document.getElementById('hora_pago').value) {
+                const [a1, b1] = hCctv.split(':').map(Number);
+                const [a2, b2] = hPago.split(':').map(Number);
+                const diff = ((a2 * 60 + b2) - (a1 * 60 + b1) + 1440) % 1440;
+                badgeDur.textContent = `${diff} min Aviso→Pago`;
+                badgeDur.classList.remove('hidden');
+            } else {
+                badgeDur.classList.add('hidden');
+            }
+
+            const cargoLlama = resolverCargo('quien_llama', 'quien_llama_otro') || 'Enc.';
+            const nomLlama = document.getElementById('nombre_llama').value.trim() || '___';
+            const maqNum = document.getElementById('nro_maquina').value.trim() || '______';
+
+            const impParsed = parseMontoSeguroAR(document.getElementById('importe').value);
+            const impStr = (!isNaN(impParsed) && impParsed > 0) ? formatMonedaAR(impParsed) : '0,00';
+
+            const esClienta = document.getElementById('tipo_cliente').value === 'Clienta';
+            const tipoWord = esClienta ? 'clienta' : 'cliente';
+            const tratamiento = esClienta ? 'a la Sra.' : 'al Sr.';
+            const nomCliente = document.getElementById('nombre_cliente').value.trim() || '___';
+
+            const cargoPaga = resolverCargo('quien_paga', 'quien_paga_otro') || 'Jefe de Caja';
+            const nomPaga = document.getElementById('nombre_paga').value.trim() || '___';
+
+            const cargoDesc = resolverCargo('quien_descarga', 'quien_descarga_otro') || cargoLlama;
+            const nomDesc = document.getElementById('nombre_descarga').value.trim() || nomLlama;
 
             const juegoSel = document.getElementById('juego').value;
             const juego = juegoSel === 'OTRO' ? document.getElementById('juego_personalizado').value.trim() : juegoSel;
             const maqSel = document.getElementById('maquina_independiente').value;
-            const maquina = maqSel === 'OTRO' ? document.getElementById('maquina_personalizada').value.trim() : maqSel;
-            const pago_manual = document.getElementById('pago_manual').value.trim();
-            const observaciones = document.getElementById('observaciones').value.trim();
-
-            // Validaciones paso a paso con foco automático en el primer campo faltante
-            const checks = [
-                [!hora_cctv, 'hora_cctv', 'Ingresa la Hora de Aviso a CCTV'],
-                [!quien_llama, document.getElementById('quien_llama').value === 'Otro' ? 'quien_llama_otro' : 'quien_llama', 'Selecciona o especifica quién llama a CCTV'],
-                [!nombre_llama, 'nombre_llama', 'Ingresa el nombre del personal que llama'],
-                [!/^\d{6}$/.test(nro_maquina), 'nro_maquina', 'El N° de Máquina debe tener exactamente 6 dígitos'],
-                [importeNum <= 0, 'importe', 'Ingresa un Importe de Jackpot mayor a $0'],
-                [!hora_revision, 'hora_revision', 'Ingresa la Hora de Salida / Revisión'],
-                [!tipo_cliente, 'tipo_cliente', 'Selecciona el trato del cliente (Sr. / Sra.)'],
-                [!nombre_cliente, 'nombre_cliente', 'Ingresa el nombre del cliente'],
-                [!hora_pago, 'hora_pago', 'Ingresa la Hora de Pago'],
-                [!quien_paga, document.getElementById('quien_paga').value === 'Otro' ? 'quien_paga_otro' : 'quien_paga', 'Selecciona o especifica quién paga en caja'],
-                [!nombre_paga, 'nombre_paga', 'Ingresa el nombre de quién paga'],
-                [!hora_descarga, 'hora_descarga', 'Ingresa la Hora de Descarga'],
-                [!quien_descarga, document.getElementById('quien_descarga').value === 'Otro' ? 'quien_descarga_otro' : 'quien_descarga', 'Selecciona o especifica quién registra/descarga'],
-                [!nombre_descarga, 'nombre_descarga', 'Ingresa el nombre de quién registra/descarga'],
-                [juegoSel === 'OTRO' && !juego, 'juego_personalizado', 'Especifica el nombre del juego'],
-                [maqSel === 'OTRO' && !maquina, 'maquina_personalizada', 'Especifica la marca de la máquina']
-            ];
-
-            for (const [failed, fieldId, msg] of checks) {
-                if (failed) {
-                    showNotification(msg, 'error');
-                    document.getElementById(fieldId)?.focus();
-                    return;
-                }
-            }
-
-            const importeFormateado = formatImporteParaReporte(importeNum);
-            document.getElementById('importe').value = importeFormateado;
-
-            const esClienta = tipo_cliente === 'Clienta';
-            const tipoWord = esClienta ? 'clienta' : 'cliente';
-            const tratamiento = esClienta ? 'a la Sra.' : 'al Sr.';
+            const marcaMaq = maqSel === 'OTRO' ? document.getElementById('maquina_personalizada').value.trim() : maqSel;
+            const pagoManual = document.getElementById('pago_manual').value.trim();
+            const obs = obsVal.trim();
 
             const lineas = [
-                `A las ${hora_cctv} Hs. CCTV recibe llamada de ${abreviarRol(quien_llama)} ${nombre_llama}, informa Jackpot en Máq. ${nro_maquina} por un valor de $${importeFormateado}.-`,
-                `(A las ${hora_revision} Hs.) Revisión muestra que ${tipoWord} juega en Máq. ${nro_maquina} al salir el premio.-`,
-                `A las ${hora_pago} Hs. ${quien_paga} ${nombre_paga}, cancela en ventanilla de caja $${importeFormateado} ${tratamiento} ${nombre_cliente}.-`,
-                `A las ${hora_descarga} Hs. ${abreviarRol(quien_descarga)} ${nombre_descarga} registra y descarga el premio de Máq. ${nro_maquina}.-`
+                `A las ${hCctv} Hs. CCTV recibe llamada de ${abreviarRol(cargoLlama)} ${nomLlama}, informa Jackpot en Máq. ${maqNum} por un valor de $${impStr}.-`,
+                `(A las ${hRev} Hs.) Revisión muestra que ${tipoWord} juega en Máq. ${maqNum} al salir el premio.-`,
+                `A las ${hPago} Hs. ${cargoPaga} ${nomPaga}, cancela en ventanilla de caja $${impStr} ${tratamiento} ${nomCliente}.-`,
+                `A las ${hDesc} Hs. ${abreviarRol(cargoDesc)} ${nomDesc} registra y descarga el premio de Máq. ${maqNum}.-`
             ];
 
-            if (maquina || juego || pago_manual || observaciones) {
+            if (marcaMaq || juego || pagoManual || obs) {
                 lineas.push('');
-                if (maquina) lineas.push(`Máquina: ${maquina}.-`);
+                if (marcaMaq) lineas.push(`Máquina: ${marcaMaq}.-`);
                 if (juego) lineas.push(`Juego: ${juego}.-`);
-                if (pago_manual) lineas.push(`Pago Manual: ${pago_manual}.-`);
-                if (observaciones) lineas.push(`Observaciones: ${observaciones}`);
+                if (pagoManual) lineas.push(`Pago Manual: ${pagoManual}.-`);
+                if (obs) lineas.push(`Observaciones: ${obs}`);
             }
 
             lineas.push('');
             lineas.push('Apéndice 1: Fotos.-');
 
-            const textoFinal = lineas.join('\n');
-            const resumenArea = document.getElementById('resumen');
-            resumenArea.value = textoFinal;
+            textoAutoM1 = lineas.join('\n');
+            document.getElementById('resumen').value = textoAutoM1;
 
-            document.getElementById('resumenContainer').classList.remove('hidden');
-            document.getElementById('btnCopiarDirecto').classList.remove('hidden');
-            document.getElementById('resumenContainer').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            // Estado de completitud
+            let pendientes = 0;
+            [
+                document.getElementById('hora_cctv').value,
+                document.getElementById('nombre_llama').value.trim(),
+                document.getElementById('nro_maquina').value.trim(),
+                (!isNaN(impParsed) && impParsed > 0) ? 'ok' : '',
+                document.getElementById('hora_revision').value,
+                document.getElementById('nombre_cliente').value.trim(),
+                document.getElementById('hora_pago').value,
+                document.getElementById('nombre_paga').value.trim(),
+                document.getElementById('hora_descarga').value
+            ].forEach(v => { if (!v) pendientes++; });
 
-            guardarEnHistorial({
-                id: Date.now(),
-                fechaHora: new Date().toLocaleString('es-AR'),
-                maquina: nro_maquina,
-                importe: `$${importeFormateado}`,
-                cliente: nombre_cliente,
-                texto: textoFinal
+            const bEst = document.getElementById('badgeEstadoM1');
+            if (pendientes === 0) {
+                bEst.textContent = '✓ Completo';
+                bEst.className = 'text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300';
+            } else {
+                bEst.textContent = `${pendientes} pendiente(s)`;
+                bEst.className = 'text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300';
+            }
+
+            guardarBorradorM1();
+            actualizarImpresionM1();
+        };
+
+        window.actualizarImpresionM1 = function () {
+            const area = document.getElementById('resumen');
+            area.style.height = 'auto';
+            area.style.height = Math.max(290, area.scrollHeight + 6) + 'px';
+            document.getElementById('printTexto').textContent = area.value;
+            document.getElementById('printFechaHora').textContent = new Date().toLocaleString('es-AR');
+        };
+
+        window.restaurarAutoM1 = function () {
+            document.getElementById('resumen').value = textoAutoM1;
+            actualizarImpresionM1();
+            showNotification('Texto automático restaurado');
+        };
+
+        // Autoguardado e Historial
+        function guardarBorradorM1() {
+            const ids = [
+                'hora_cctv', 'quien_llama', 'quien_llama_otro', 'nombre_llama',
+                'nro_maquina', 'importe', 'hora_revision', 'tipo_cliente', 'nombre_cliente',
+                'hora_pago', 'quien_paga', 'quien_paga_otro', 'nombre_paga',
+                'hora_descarga', 'quien_descarga', 'quien_descarga_otro', 'nombre_descarga',
+                'maquina_independiente', 'maquina_personalizada', 'juego', 'juego_personalizado',
+                'pago_manual', 'observaciones'
+            ];
+            const obj = {};
+            ids.forEach(id => { obj[id] = document.getElementById(id)?.value || ''; });
+            try { localStorage.setItem(STORAGE_DRAFT_M1, JSON.stringify(obj)); } catch (e) {}
+        }
+
+        function inicializarM1() {
+            document.getElementById('fechaActual').textContent = new Date().toLocaleDateString('es-AR', {
+                day: '2-digit', month: '2-digit', year: 'numeric'
             });
 
-            showNotification('Informe de Jackpot generado correctamente');
-        });
+            try {
+                catalogoMaquinas = JSON.parse(localStorage.getItem(SHARED_MACHINES_KEY) || '{}');
+            } catch (e) { catalogoMaquinas = {}; }
 
-        // ===== COPIAR AL PORTAPAPELES =====
+            try {
+                const hist = JSON.parse(localStorage.getItem(STORAGE_HIST_KEY) || '[]');
+                if (Array.isArray(hist)) historialJackpots = hist;
+            } catch (e) { historialJackpots = []; }
+
+            try {
+                const saved = JSON.parse(localStorage.getItem(STORAGE_DRAFT_M1) || 'null');
+                if (saved && typeof saved === 'object') {
+                    Object.keys(saved).forEach(k => {
+                        const el = document.getElementById(k);
+                        if (el && saved[k] !== undefined) el.value = saved[k];
+                    });
+                    alCambiarSelectOtro('quien_llama', 'quien_llama_otro', 'Otro');
+                    alCambiarSelectOtro('quien_paga', 'quien_paga_otro', 'Otro');
+                    alCambiarSelectOtro('quien_descarga', 'quien_descarga_otro', 'Otro');
+                    alCambiarSelectOtro('maquina_independiente', 'maquina_personalizada', 'OTRO');
+                    alCambiarSelectOtro('juego', 'juego_personalizado', 'OTRO');
+                }
+            } catch (e) {}
+
+            renderizarHistorial();
+            generarEnVivo();
+        }
+
         async function copiarTextoSeguro(texto) {
             if (navigator.clipboard && window.isSecureContext) {
                 try {
                     await navigator.clipboard.writeText(texto);
                     return true;
-                } catch (e) { }
+                } catch (e) {}
             }
             const fb = document.getElementById('clipboardFallback');
             fb.value = texto;
             fb.select();
             fb.setSelectionRange(0, 999999);
-            try {
-                return document.execCommand('copy');
-            } catch (e) {
-                return false;
-            }
+            try { return document.execCommand('copy'); } catch (e) { return false; }
         }
 
-        async function copiarInforme() {
+        function registrarEnHistorialM1(texto) {
+            recordarFichaMaquinaM1(true);
+            if (historialJackpots.length > 0 && historialJackpots[0].texto === texto) return;
+            const impParsed = parseMontoSeguroAR(document.getElementById('importe').value);
+            historialJackpots.unshift({
+                id: Date.now(),
+                fechaHora: new Date().toLocaleString('es-AR'),
+                maquina: document.getElementById('nro_maquina').value.trim() || 'S/N',
+                importe: !isNaN(impParsed) && impParsed > 0 ? `$${formatMonedaAR(impParsed)}` : '$0,00',
+                cliente: document.getElementById('nombre_cliente').value.trim() || 'Sin especificar',
+                texto
+            });
+            historialJackpots = historialJackpots.slice(0, 50);
+            try { localStorage.setItem(STORAGE_HIST_KEY, JSON.stringify(historialJackpots)); } catch (e) {}
+            renderizarHistorial();
+        }
+
+        window.copiarInforme = async function () {
             const texto = document.getElementById('resumen').value.trim();
-            if (!texto) {
-                showNotification('Primero genera el informe', 'error');
-                return;
-            }
+            if (!texto) return;
             const ok = await copiarTextoSeguro(texto);
-            if (ok) showNotification('¡Informe copiado al portapapeles!');
-            else showNotification('No se pudo copiar automáticamente', 'error');
-        }
+            if (!ok) return showNotification('No se pudo copiar automáticamente', 'error');
+            registrarEnHistorialM1(texto);
+            showNotification('¡Acta Jackpot Modelo 1 copiada y guardada!');
+        };
 
-        // ===== HISTORIAL LOCAL =====
-        function cargarHistorial() {
-            try {
-                const raw = localStorage.getItem(STORAGE_HIST_KEY);
-                if (raw) {
-                    const parsed = JSON.parse(raw);
-                    if (Array.isArray(parsed)) historialJackpots = parsed;
-                }
-            } catch (e) {
-                historialJackpots = [];
+        window.copiarWhatsAppM1 = async function () {
+            const texto = document.getElementById('resumen').value.trim();
+            if (!texto) return;
+            const ok = await copiarTextoSeguro(`🏆 *JACKPOT MODELO N° 1 - CCTV*\n\n${texto}`);
+            if (ok) {
+                registrarEnHistorialM1(texto);
+                showNotification('Copiado con formato WhatsApp');
             }
-            renderizarHistorial();
-        }
-
-        function guardarEnHistorial(item) {
-            historialJackpots.unshift(item);
-            if (historialJackpots.length > 15) historialJackpots.pop();
-            try {
-                localStorage.setItem(STORAGE_HIST_KEY, JSON.stringify(historialJackpots));
-            } catch (e) { }
-            renderizarHistorial();
-        }
+        };
 
         function renderizarHistorial() {
-            const sec = document.getElementById('historialSection');
+            document.getElementById('countHistM1').textContent = String(historialJackpots.length);
             const lista = document.getElementById('historialLista');
             if (!historialJackpots.length) {
-                sec.classList.add('hidden');
+                lista.innerHTML = '<p class="text-slate-400 text-center py-3">Sin premios guardados</p>';
                 return;
             }
-            sec.classList.remove('hidden');
-            lista.innerHTML = historialJackpots.map(h => `
-                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 flex items-center justify-between gap-2 text-xs">
-                    <div class="min-w-0">
+            lista.innerHTML = historialJackpots.map((h, idx) => `
+                <div class="history-item bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800 rounded-lg p-2.5 flex items-center justify-between gap-2">
+                    <button type="button" onclick="cargarItemHistorialM1(${idx})" class="min-w-0 flex-1 text-left cursor-pointer">
                         <div class="font-bold text-slate-800 dark:text-slate-100 truncate">Máq. ${escapeHtml(h.maquina)} · <span class="text-emerald-600 dark:text-emerald-400 font-mono">${escapeHtml(h.importe)}</span></div>
-                        <div class="text-slate-500 dark:text-slate-400 truncate">${escapeHtml(h.cliente)} · ${escapeHtml(h.fechaHora)}</div>
-                    </div>
-                    <button type="button" onclick="copiarItemHistorial(${Number(h.id)})" class="px-2.5 py-1.5 bg-indigo-50 dark:bg-slate-800 hover:bg-indigo-600 text-indigo-700 dark:text-slate-200 hover:text-white rounded-lg font-semibold transition shrink-0 cursor-pointer">
-                        Copiar
+                        <div class="text-[11px] text-slate-500 dark:text-slate-400 truncate">${escapeHtml(h.cliente)} · ${escapeHtml(h.fechaHora)}</div>
                     </button>
+                    <div class="flex items-center gap-1 shrink-0">
+                        <button type="button" onclick="copiarItemHistorial(${Number(h.id)})" class="p-1.5 rounded-md text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 cursor-pointer" title="Copiar">
+                            <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                        </button>
+                        <button type="button" onclick="eliminarItemM1(${idx})" class="p-1.5 rounded-md text-slate-400 hover:text-rose-500 cursor-pointer" title="Eliminar">
+                            <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
                 </div>
             `).join('');
+            lucide.createIcons({ nodes: [lista] });
         }
 
-        async function copiarItemHistorial(id) {
+        window.cargarItemHistorialM1 = function (idx) {
+            const it = historialJackpots[idx];
+            if (!it) return;
+            document.getElementById('resumen').value = it.texto;
+            actualizarImpresionM1();
+            showNotification(`Cargado premio de Máq. ${it.maquina}`);
+        };
+
+        window.copiarItemHistorial = async function (id) {
             const item = historialJackpots.find(x => x.id === id);
             if (!item) return;
-            document.getElementById('resumen').value = item.texto;
-            document.getElementById('resumenContainer').classList.remove('hidden');
             await copiarTextoSeguro(item.texto);
             showNotification(`Copiado Jackpot de Máq. ${item.maquina}`);
+        };
+
+        window.eliminarItemM1 = function (idx) {
+            historialJackpots.splice(idx, 1);
+            try { localStorage.setItem(STORAGE_HIST_KEY, JSON.stringify(historialJackpots)); } catch (e) {}
+            renderizarHistorial();
+        };
+
+        window.vaciarHistorial = function () {
+            if (!historialJackpots.length || !confirm('¿Vaciar el historial de Jackpots Modelo 1?')) return;
+            historialJackpots = [];
+            try { localStorage.removeItem(STORAGE_HIST_KEY); } catch (e) {}
+            renderizarHistorial();
+        };
+
+        function descargarBlob(contenido, nombre, mime) {
+            const blob = new Blob([contenido], { type: mime });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = nombre;
+            a.click();
+            URL.revokeObjectURL(url);
         }
 
-        function vaciarHistorial() {
-            if (!historialJackpots.length) return;
-            if (confirm('¿Vaciar el historial de Jackpots guardado?')) {
-                historialJackpots = [];
-                try { localStorage.removeItem(STORAGE_HIST_KEY); } catch (e) { }
-                renderizarHistorial();
-                showNotification('Historial vaciado');
+        window.descargarTxtM1 = function () {
+            const txt = document.getElementById('resumen').value.trim();
+            if (!txt) return;
+            const maq = document.getElementById('nro_maquina').value.trim() || 'maq';
+            descargarBlob(txt, `jackpot_mod1_${maq}_${new Date().toISOString().split('T')[0]}.txt`, 'text/plain;charset=utf-8');
+        };
+
+        window.exportarCsvM1 = function () {
+            if (!historialJackpots.length) return showNotification('No hay premios en historial para exportar', 'error');
+            const esc = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
+            const rows = [['Fecha Hora', 'Máquina', 'Importe', 'Cliente', 'Acta Completa']];
+            historialJackpots.forEach(h => rows.push([h.fechaHora, h.maquina, h.importe, h.cliente, h.texto]));
+            descargarBlob('\uFEFF' + rows.map(r => r.map(esc).join(';')).join('\r\n'), `jackpots_mod1_${new Date().toISOString().split('T')[0]}.csv`, 'text/csv;charset=utf-8');
+        };
+
+        window.limpiarFormularioJp1 = function () {
+            if ((document.getElementById('nro_maquina').value.trim() || document.getElementById('importe').value.trim()) &&
+                !confirm('¿Limpiar los datos del Jackpot actual?')) {
+                return;
             }
-        }
-
-        // ===== LIMPIAR FORMULARIO =====
-        document.getElementById('btnLimpiarTodo').addEventListener('click', () => {
-            form.reset();
+            document.getElementById('formJackpot').reset();
             ['juego_personalizado', 'maquina_personalizada', 'quien_llama_otro', 'quien_paga_otro', 'quien_descarga_otro'].forEach(id => {
                 const el = document.getElementById(id);
                 el.classList.add('hidden');
-                el.required = false;
                 el.value = '';
             });
-            document.getElementById('resumenContainer').classList.add('hidden');
-            document.getElementById('btnCopiarDirecto').classList.add('hidden');
-            document.getElementById('resumen').value = '';
-            document.getElementById('charCount').textContent = '0';
-            document.getElementById('maqHelper').textContent = 'Exactamente 6 dígitos numéricos (0/6)';
-            document.getElementById('maqHelper').className = 'text-slate-500 dark:text-slate-400 text-xs mt-1 block';
-            document.getElementById('duracionTotalBadge').textContent = 'Duración Aviso → Pago: -- min';
-            showNotification('Formulario limpiado');
-        });
+            delete document.getElementById('nombre_descarga').dataset.manual;
+            delete document.getElementById('quien_descarga').dataset.manual;
+            document.getElementById('maqMemoryChip').classList.add('hidden');
+            document.getElementById('maqHelper').textContent = '0 díg.';
+            try { localStorage.removeItem(STORAGE_DRAFT_M1); } catch (e) {}
+            generarEnVivo();
+            showNotification('Formulario reiniciado');
+        };
 
-        // ===== INICIALIZACIÓN =====
-        lucide.createIcons();
-        actualizarFecha();
-        cargarHistorial();
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            document.getElementById('notification-text').textContent = message;
+            notification.classList.remove('hidden', 'border-rose-500', 'border-slate-700');
+            notification.classList.add(type === 'error' ? 'border-rose-500' : 'border-slate-700');
+            clearTimeout(notifTimeout);
+            notifTimeout = setTimeout(() => notification.classList.add('hidden'), 2800);
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            inicializarM1();
+            document.addEventListener('keydown', (e) => {
+                if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                    e.preventDefault();
+                    copiarInforme();
+                }
+            });
+            lucide.createIcons();
+        });
     </script>
     <script src="js/global.js"></script>
-
 </body>
-
 </html>
