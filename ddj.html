@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Declaración Jurada - CCTV</title>
+    <title>Declaración Jurada (DDJJ) · CCTV</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -30,6 +30,31 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/global.css">
     <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .report-font {
+            font-family: 'JetBrains Mono', Consolas, monospace;
+        }
+        .history-item {
+            transition: all 0.16s ease;
+            border-left: 3px solid transparent;
+        }
+        .history-item:hover {
+            border-left-color: #6366f1;
+        }
+        @media print {
+            body {
+                background: #ffffff !important;
+                color: #0f172a !important;
+                padding: 0 !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+            #printSheet {
+                display: block !important;
+            }
+        }
+    </style>
 </head>
 <body class="bg-slate-100 dark:bg-slate-950 p-3 sm:p-5 md:p-8 text-slate-800 dark:text-slate-100 min-h-screen font-sans transition-colors duration-200">
 
@@ -42,16 +67,28 @@
                     <i data-lucide="file-check-2" class="w-6 h-6 text-white"></i>
                 </div>
                 <div>
-                    <h1 class="text-lg sm:text-xl font-bold leading-tight text-white">Declaración Jurada</h1>
-                    <p class="text-slate-400 text-xs uppercase tracking-wider">CCTV · Generador Cronológico DDJJ</p>
+                    <h1 class="text-lg sm:text-xl font-bold leading-tight text-white flex items-center gap-2 flex-wrap">
+                        Declaración Jurada (DDJJ)
+                        <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Autoguardado</span>
+                    </h1>
+                    <p class="text-slate-400 text-xs uppercase tracking-wider">CCTV · Seguimiento Cronológico de Confección y Cierre</p>
                 </div>
             </div>
 
             <div class="flex flex-wrap items-center gap-2">
-                <div class="flex items-center gap-2 bg-slate-800 border border-slate-700 px-3 py-1.5 rounded-xl">
-                    <span class="text-xs font-semibold text-indigo-400">Hora Inicio:</span>
-                    <input type="time" id="horaGlobal" oninput="sincronizarTodo()" class="bg-transparent text-white font-mono text-xs outline-none">
-                </div>
+                <a href="palvar.html" class="px-3 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-xl text-xs font-semibold text-white transition inline-flex items-center gap-1.5 shadow-sm" title="Ir a Pagos Altos (Pal Var)">
+                    <i data-lucide="ticket" class="w-4 h-4"></i>
+                    <span class="hidden sm:inline">Pagos Altos</span>
+                </a>
+
+                <a href="jackpot.html" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl text-xs font-semibold text-slate-200 transition inline-flex items-center gap-1.5" title="Ir a Modelos de Jackpot">
+                    <i data-lucide="trophy" class="w-4 h-4 text-amber-400"></i>
+                    <span class="hidden sm:inline">Jackpot</span>
+                </a>
+
+                <button type="button" onclick="limpiarSeccion()" class="p-2 bg-slate-800 hover:bg-rose-600 border border-slate-700 rounded-xl transition text-slate-200 hover:text-white cursor-pointer" title="Limpiar formulario">
+                    <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
+                </button>
 
                 <div class="hidden md:flex items-center gap-2 bg-slate-800/90 border border-slate-700 px-3 py-1.5 rounded-xl text-xs font-mono text-slate-200">
                     <i data-lucide="clock" class="w-3.5 h-3.5 text-indigo-400"></i>
@@ -73,143 +110,1010 @@
             </div>
         </header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 rounded-b-2xl overflow-hidden">
-
-            <!-- COLUMNA IZQUIERDA: FORMULARIO -->
-            <div class="lg:col-span-7 p-5 sm:p-6 space-y-5 bg-slate-50 dark:bg-slate-900/60">
-                <div class="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
-                    <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2.5">
-                        <span class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
-                            <i data-lucide="users" class="w-4 h-4"></i> 1. Datos de la Novedad
-                        </span>
-                    </div>
-
-                    <div class="space-y-4">
-                        <div>
-                            <label for="d-personal" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Personal Informante (Enc. / As. / Op.)</label>
-                            <input type="text" id="d-personal" placeholder="Ej: Enc. Gómez Juan" oninput="sincronizarTodo()"
-                                class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition">
-                        </div>
-                        <div>
-                            <label for="d-cliente" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Cliente (Sra. / Sr.)</label>
-                            <input type="text" id="d-cliente" placeholder="Ej: Sra. García María" oninput="sincronizarTodo()"
-                                class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="flex flex-wrap gap-2.5">
-                    <button type="button" onclick="volverAlInicio()" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2 shadow-sm cursor-pointer">
-                        <i data-lucide="refresh-cw" class="w-4 h-4"></i>
-                        <span>Hora Actual</span>
-                    </button>
-                    <button type="button" onclick="limpiarSeccion()" class="px-4 py-2.5 bg-rose-600 hover:bg-rose-500 text-white rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2 shadow-sm cursor-pointer">
-                        <i data-lucide="trash-2" class="w-4 h-4"></i>
-                        <span>Limpiar Campos</span>
-                    </button>
-                </div>
-
-                <div class="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/50 rounded-xl p-3.5 flex items-center gap-2.5">
-                    <i data-lucide="info" class="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0"></i>
-                    <p class="text-xs text-amber-800 dark:text-amber-300">El sistema calcula automáticamente <strong>+1 y +2 minutos</strong> para la confección y el cierre de la Declaración Jurada.</p>
-                </div>
-            </div>
-
-            <!-- COLUMNA DERECHA: RESULTADO -->
-            <div class="lg:col-span-5 bg-slate-100/80 dark:bg-slate-950/60 border-t lg:border-t-0 lg:border-l border-slate-200 dark:border-slate-800 p-5 sm:p-6 flex flex-col justify-between">
+        <!-- Hoja exclusiva de impresión -->
+        <div id="printSheet" class="hidden p-8 space-y-4">
+            <div class="border-b-2 border-slate-800 pb-3 flex justify-between items-start">
                 <div>
-                    <div class="flex items-center justify-between mb-3">
-                        <h2 class="text-sm font-bold uppercase tracking-wider text-slate-700 dark:text-slate-200 flex items-center gap-2">
-                            <i data-lucide="file-text" class="w-4 h-4 text-indigo-500"></i> Vista Previa del Acta
+                    <h2 class="text-lg font-bold uppercase">Acta Cronológica CCTV · Declaración Jurada</h2>
+                    <p class="text-xs text-slate-600">Registro Operativo de Monitoreo</p>
+                </div>
+                <span id="printFechaHora" class="text-xs font-mono text-slate-600"></span>
+            </div>
+            <pre id="printTexto" class="report-font whitespace-pre-wrap text-sm leading-relaxed p-4 border border-slate-300 rounded-lg bg-slate-50"></pre>
+        </div>
+
+        <!-- Contenido Principal -->
+        <main class="no-print grid grid-cols-1 lg:grid-cols-12 rounded-b-2xl overflow-hidden">
+
+            <!-- COLUMNA IZQUIERDA: FORMULARIO (7/12) -->
+            <div class="lg:col-span-7 p-4 sm:p-6 space-y-4 bg-slate-50 dark:bg-slate-900/60">
+
+                <!-- 1. Personal y Cliente -->
+                <div class="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+                    <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-2.5">
+                        <h2 class="text-sm font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+                            <i data-lucide="users" class="w-4 h-4 text-indigo-500"></i>
+                            1. Personal Informante y Cliente
                         </h2>
-                        <span class="text-[11px] bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/50 px-2 py-0.5 rounded-full font-semibold">Editable</span>
+                        <span class="text-[11px] text-slate-400 font-mono">Ctrl+Enter para copiar y registrar</span>
                     </div>
 
-                    <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-3 mb-4">
-                        <textarea id="out-dj" spellcheck="false"
-                            class="report-font w-full h-80 p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs sm:text-sm text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-indigo-500 transition resize-none"></textarea>
+                    <!-- Personal Informante -->
+                    <div class="relative">
+                        <div class="flex items-center justify-between mb-1">
+                            <label for="d-personal" class="block text-xs font-semibold text-slate-600 dark:text-slate-300">Personal que Informa (Cargo y Nombre)</label>
+                            <button type="button" onclick="limpiarCampo('d-personal')" class="text-[11px] text-slate-400 hover:text-rose-500 transition cursor-pointer">Borrar</button>
+                        </div>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i data-lucide="user-check" class="w-4 h-4 text-slate-400"></i>
+                            </div>
+                            <input type="text" id="d-personal" autocomplete="off" placeholder="Escribe 1 letra: ej. Denz, Moises, Lazarte, Gómez..."
+                                class="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 outline-none transition">
+                            <div id="dropdownPersonalDdj" class="hidden absolute left-0 right-0 top-full mt-1 z-50 max-h-52 overflow-y-auto rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-xl divide-y divide-slate-100 dark:divide-slate-800"></div>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-1 mt-1.5">
+                            <span class="text-[10px] font-semibold text-slate-400 mr-0.5">Cargo:</span>
+                            <button type="button" onclick="aplicarPrefijoCargo('Enc.')" class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 hover:bg-indigo-100 dark:hover:bg-indigo-950 text-[10px] font-semibold text-slate-600 dark:text-slate-300 transition cursor-pointer">Enc.</button>
+                            <button type="button" onclick="aplicarPrefijoCargo('Enc. de Turno')" class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 hover:bg-indigo-100 dark:hover:bg-indigo-950 text-[10px] font-semibold text-slate-600 dark:text-slate-300 transition cursor-pointer">Enc. Turno</button>
+                            <button type="button" onclick="aplicarPrefijoCargo('Asist. de Sala')" class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 hover:bg-indigo-100 dark:hover:bg-indigo-950 text-[10px] font-semibold text-slate-600 dark:text-slate-300 transition cursor-pointer">Asist. Sala</button>
+                            <button type="button" onclick="aplicarPrefijoCargo('Op. de Caja')" class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 hover:bg-indigo-100 dark:hover:bg-indigo-950 text-[10px] font-semibold text-slate-600 dark:text-slate-300 transition cursor-pointer">Op. Caja</button>
+                            <button type="button" onclick="aplicarPrefijoCargo('Jefe de Caja')" class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 hover:bg-indigo-100 dark:hover:bg-indigo-950 text-[10px] font-semibold text-slate-600 dark:text-slate-300 transition cursor-pointer">Jefe Caja</button>
+                            <button type="button" onclick="aplicarPrefijoCargo('Control Interno')" class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 hover:bg-indigo-100 dark:hover:bg-indigo-950 text-[10px] font-semibold text-slate-600 dark:text-slate-300 transition cursor-pointer">Control Interno</button>
+                        </div>
+                    </div>
+
+                    <!-- Cliente -->
+                    <div class="relative">
+                        <div class="flex items-center justify-between mb-1">
+                            <label for="d-cliente" class="block text-xs font-semibold text-slate-600 dark:text-slate-300">Cliente (Trato y Apellido / Nombre)</label>
+                            <button type="button" onclick="limpiarCampo('d-cliente')" class="text-[11px] text-slate-400 hover:text-rose-500 transition cursor-pointer">Borrar</button>
+                        </div>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i data-lucide="user" class="w-4 h-4 text-slate-400"></i>
+                            </div>
+                            <input type="text" id="d-cliente" autocomplete="off" placeholder="Ej: Sra. García María / Sr. López Carlos"
+                                class="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 outline-none transition">
+                            <div id="dropdownClienteDdj" class="hidden absolute left-0 right-0 top-full mt-1 z-50 max-h-48 overflow-y-auto rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-xl divide-y divide-slate-100 dark:divide-slate-800"></div>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-1 mt-1.5">
+                            <span class="text-[10px] font-semibold text-slate-400 mr-0.5">Trato rápido:</span>
+                            <button type="button" onclick="aplicarTratoCliente('Sra.')" class="px-2.5 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900 text-[11px] font-semibold text-indigo-700 dark:text-indigo-300 border border-indigo-200/70 dark:border-indigo-800 transition cursor-pointer">Sra.</button>
+                            <button type="button" onclick="aplicarTratoCliente('Sr.')" class="px-2.5 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900 text-[11px] font-semibold text-indigo-700 dark:text-indigo-300 border border-indigo-200/70 dark:border-indigo-800 transition cursor-pointer">Sr.</button>
+                            <button type="button" onclick="aplicarTratoCliente('Srta.')" class="px-2.5 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900 text-[11px] font-semibold text-indigo-700 dark:text-indigo-300 border border-indigo-200/70 dark:border-indigo-800 transition cursor-pointer">Srta.</button>
+                        </div>
                     </div>
                 </div>
 
-                <button type="button" onclick="copiarTexto()" class="w-full px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2 shadow-sm cursor-pointer">
-                    <i data-lucide="copy" class="w-4 h-4"></i>
-                    <span>Copiar al Portapapeles</span>
-                </button>
+                <!-- 2. Secuencia Cronológica (3 Pasos Editables + Encadenado) -->
+                <div class="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3.5">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="clock" class="w-4 h-4 text-indigo-500"></i>
+                            <h2 class="text-sm font-bold text-slate-800 dark:text-slate-100">2. Cronología de los 3 Pasos</h2>
+                            <span id="badgeDuracionTotal" class="text-[11px] font-mono font-bold px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">2 min</span>
+                        </div>
+
+                        <label class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 dark:text-slate-300 cursor-pointer select-none">
+                            <input type="checkbox" id="chkEncadenar" checked onchange="alCambiarEncadenado()" class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500">
+                            Encadenar desde Inicio
+                        </label>
+                    </div>
+
+                    <!-- Presets rápidos de intervalos -->
+                    <div class="flex flex-wrap items-center gap-1.5">
+                        <span class="text-[10px] font-semibold text-slate-400">Secuencia rápida:</span>
+                        <button type="button" onclick="aplicarIntervalo(1, 2)" id="btnInt1_2" class="px-2 py-1 rounded-lg bg-indigo-600 text-white text-[11px] font-mono font-semibold transition cursor-pointer" title="Confección +1 min · Cierre +2 min">+1m / +2m (Clásico)</button>
+                        <button type="button" onclick="aplicarIntervalo(1, 4)" id="btnInt1_4" class="px-2 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-indigo-100 dark:hover:bg-indigo-950 text-slate-700 dark:text-slate-300 text-[11px] font-mono font-semibold transition cursor-pointer">+1m / +4m</button>
+                        <button type="button" onclick="aplicarIntervalo(1, 6)" id="btnInt1_6" class="px-2 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-indigo-100 dark:hover:bg-indigo-950 text-slate-700 dark:text-slate-300 text-[11px] font-mono font-semibold transition cursor-pointer">+1m / +6m</button>
+                        <button type="button" onclick="aplicarIntervalo(2, 8)" id="btnInt2_8" class="px-2 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-indigo-100 dark:hover:bg-indigo-950 text-slate-700 dark:text-slate-300 text-[11px] font-mono font-semibold transition cursor-pointer">+2m / +8m</button>
+                    </div>
+
+                    <!-- Tres pasos con hora individual + botón Ahora + botón Copiar Paso -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <!-- Paso 1: Aviso -->
+                        <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800 space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[11px] font-bold text-indigo-600 dark:text-indigo-400">1° Llamada / Aviso</span>
+                                <button type="button" onclick="copiarPasoIndividual(1)" class="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:text-indigo-600 cursor-pointer" title="Copiar solo el párrafo 1">Copiar 1°</button>
+                            </div>
+                            <div class="flex items-stretch">
+                                <input type="time" id="horaGlobal" oninput="alCambiarHoraInicio()" class="w-full min-w-0 px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-r-0 border-slate-300 dark:border-slate-700 rounded-l-lg text-xs font-mono font-bold text-slate-900 dark:text-white outline-none">
+                                <button type="button" onclick="ponerHoraActualEn('horaGlobal')" class="px-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-r-lg text-[10px] font-semibold transition cursor-pointer" title="Poner hora actual sin borrar nombres">Ahora</button>
+                            </div>
+                        </div>
+
+                        <!-- Paso 2: Confección -->
+                        <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800 space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[11px] font-bold text-amber-600 dark:text-amber-400">2° Confección</span>
+                                <button type="button" onclick="copiarPasoIndividual(2)" class="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:text-amber-600 cursor-pointer" title="Copiar solo el párrafo 2">Copiar 2°</button>
+                            </div>
+                            <div class="flex items-stretch">
+                                <input type="time" id="horaConfeccion" oninput="alEditarHoraManual()" class="w-full min-w-0 px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-r-0 border-slate-300 dark:border-slate-700 rounded-l-lg text-xs font-mono font-bold text-slate-900 dark:text-white outline-none">
+                                <button type="button" onclick="ponerHoraActualEn('horaConfeccion')" class="px-2 bg-slate-200 dark:bg-slate-800 hover:bg-amber-600 hover:text-white rounded-r-lg text-[10px] font-semibold transition cursor-pointer" title="Poner hora actual en confección">Ahora</button>
+                            </div>
+                        </div>
+
+                        <!-- Paso 3: Finalización -->
+                        <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800 space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[11px] font-bold text-emerald-600 dark:text-emerald-400">3° Finalización</span>
+                                <button type="button" onclick="copiarPasoIndividual(3)" class="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:text-emerald-600 cursor-pointer" title="Copiar solo el párrafo 3">Copiar 3°</button>
+                            </div>
+                            <div class="flex items-stretch">
+                                <input type="time" id="horaCierre" oninput="alEditarHoraManual()" class="w-full min-w-0 px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-r-0 border-slate-300 dark:border-slate-700 rounded-l-lg text-xs font-mono font-bold text-slate-900 dark:text-white outline-none">
+                                <button type="button" onclick="ponerHoraActualEn('horaCierre')" class="px-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-r-lg text-[10px] font-semibold transition cursor-pointer" title="Marcar cierre con la hora actual">Ahora</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Datos Opcionales (Sector, Monto/Motivo, DNI, Cámara, Cierre distinto) -->
+                <details class="group bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                    <summary class="cursor-pointer list-none px-4 sm:px-5 py-3.5 flex items-center justify-between text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 select-none">
+                        <span class="flex items-center gap-2">
+                            <i data-lucide="sliders" class="w-4 h-4 text-indigo-500"></i>
+                            3. Datos Complementarios Opcionales (Sector, Monto, DNI o Cámara CCTV)
+                            <span id="badgeExtrasActivos" class="hidden text-[10px] font-mono px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300">Activos</span>
+                        </span>
+                        <span class="text-xs text-slate-400 group-open:rotate-180 transition-transform">▼</span>
+                    </summary>
+
+                    <div class="px-4 sm:px-5 pb-4 pt-2 border-t border-slate-100 dark:border-slate-800 grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                        <div>
+                            <label for="d-sector" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Lugar / Ventanilla (Opcional)</label>
+                            <select id="d-sector" onchange="sincronizarTodo()" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white outline-none focus:border-indigo-500">
+                                <option value="">No mencionar en el texto (Clásico)</option>
+                                <option value="en Ventanilla de Caja">en Ventanilla de Caja</option>
+                                <option value="en Caja Slots">en Caja Slots</option>
+                                <option value="en Caja Juegos Vivos">en Caja Juegos Vivos</option>
+                                <option value="en Sala">en Sala</option>
+                                <option value="en Recepción">en Recepción</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="d-motivo" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Motivo de la DDJJ (Opcional)</label>
+                            <select id="d-motivo" onchange="sincronizarTodo()" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white outline-none focus:border-indigo-500">
+                                <option value="">No mencionar motivo (Clásico)</option>
+                                <option value="por cobro de premio">por cobro de premio</option>
+                                <option value="por pago alto de tickets">por pago alto de tickets</option>
+                                <option value="por cambio de valores en caja">por cambio de valores en caja</option>
+                                <option value="por normativa UIF">por normativa UIF</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="d-monto" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Importe Asociado ($ · Opcional)</label>
+                            <input type="text" id="d-monto" inputmode="decimal" autocomplete="off" placeholder="Ej: 2.500.000,00"
+                                oninput="sincronizarTodo()" onblur="formatearMontoBlur(this)"
+                                class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-mono text-slate-900 dark:text-white outline-none focus:border-indigo-500">
+                        </div>
+
+                        <div>
+                            <label for="d-dni" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">DNI / Documento Cliente (Opcional)</label>
+                            <input type="text" id="d-dni" autocomplete="off" placeholder="Ej: 32.456.789"
+                                oninput="sincronizarTodo()"
+                                class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-mono text-slate-900 dark:text-white outline-none focus:border-indigo-500">
+                        </div>
+
+                        <div>
+                            <label for="d-camara" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Cámara CCTV (Ej: 106, 601, 715)</label>
+                            <input type="text" id="d-camara" autocomplete="off" placeholder="Opcional: escribe 3 dígitos p/ autocompletar"
+                                oninput="alEscribirCamaraDdj()"
+                                class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-mono text-slate-900 dark:text-white outline-none focus:border-indigo-500">
+                        </div>
+
+                        <div>
+                            <label for="d-personal-cierre" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Quién Informa el Cierre (si cambia)</label>
+                            <input type="text" id="d-personal-cierre" autocomplete="off" placeholder="Por defecto el mismo informante inicial"
+                                oninput="sincronizarTodo()"
+                                class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white outline-none focus:border-indigo-500">
+                        </div>
+                    </div>
+                </details>
             </div>
-        </div>
+
+            <!-- COLUMNA DERECHA: VISTA PREVIA E HISTORIAL (5/12) -->
+            <div class="lg:col-span-5 bg-slate-100/80 dark:bg-slate-950/60 border-t lg:border-t-0 lg:border-l border-slate-200 dark:border-slate-800 p-4 sm:p-6 flex flex-col justify-between space-y-4">
+
+                <div class="space-y-4">
+                    <!-- Vista Previa del Acta -->
+                    <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-4 space-y-3">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <h2 class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-200 flex items-center gap-2">
+                                <span class="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-pulse"></span>
+                                Vista Previa del Acta
+                            </h2>
+                            <div class="flex items-center gap-1.5">
+                                <button type="button" onclick="restaurarTextoAuto()" class="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition inline-flex items-center gap-1 cursor-pointer" title="Restaurar al texto automático">
+                                    <i data-lucide="refresh-cw" class="w-3 h-3"></i>
+                                    Restaurar
+                                </button>
+                                <button type="button" onclick="window.print()" class="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition inline-flex items-center gap-1 cursor-pointer" title="Imprimir acta">
+                                    <i data-lucide="printer" class="w-3 h-3"></i>
+                                    Imprimir
+                                </button>
+                            </div>
+                        </div>
+
+                        <textarea id="out-dj" rows="11" spellcheck="false" oninput="actualizarContadorTexto()"
+                            class="report-font w-full min-h-[255px] p-3.5 bg-slate-50 dark:bg-slate-950 border-2 border-indigo-200 dark:border-indigo-900/80 rounded-xl text-xs sm:text-sm text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-indigo-500 transition resize-y leading-relaxed"></textarea>
+
+                        <div class="flex items-center justify-between text-[11px]">
+                            <span id="contadorCaracteres" class="font-mono text-slate-400">0 caracteres</span>
+                            <span class="text-emerald-600 dark:text-emerald-400 font-semibold">Editable antes de copiar</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 pt-0.5">
+                            <button type="button" id="btnCopiarPrincipal" onclick="copiarTexto()" class="sm:col-span-8 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold text-xs sm:text-sm transition flex items-center justify-center gap-2 shadow-md cursor-pointer active:scale-[0.99]">
+                                <i data-lucide="copy" class="w-4 h-4"></i>
+                                <span>Copiar y Registrar</span>
+                            </button>
+                            <button type="button" onclick="copiarWhatsApp()" class="sm:col-span-4 px-3 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-sm cursor-pointer active:scale-[0.99]" title="Copiar con encabezado en negrita para WhatsApp">
+                                <i data-lucide="message-square" class="w-3.5 h-3.5"></i>
+                                <span>WhatsApp</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Historial de Declaraciones Juradas -->
+                    <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-4 space-y-3">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-200 flex items-center gap-1.5">
+                                <i data-lucide="history" class="w-4 h-4 text-indigo-500"></i>
+                                Historial DDJJ (<span id="contadorHistorial">0</span>)
+                            </h3>
+                            <div class="flex items-center gap-1.5">
+                                <button type="button" onclick="exportarHistorialCSV()" class="px-2 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900 text-emerald-700 dark:text-emerald-300 text-[11px] font-semibold transition inline-flex items-center gap-1 cursor-pointer" title="Exportar planilla CSV para Excel">
+                                    <i data-lucide="sheet" class="w-3 h-3"></i>
+                                    CSV
+                                </button>
+                                <button type="button" onclick="exportarHistorialTXT()" class="px-2 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900 text-indigo-700 dark:text-indigo-300 text-[11px] font-semibold transition inline-flex items-center gap-1 cursor-pointer" title="Descargar historial en TXT">
+                                    <i data-lucide="download" class="w-3 h-3"></i>
+                                    TXT
+                                </button>
+                                <button type="button" onclick="vaciarHistorial()" class="p-1 rounded-lg text-slate-400 hover:text-rose-500 transition cursor-pointer" title="Vaciar historial">
+                                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="relative">
+                            <input type="text" id="buscarHistorialDdj" oninput="renderizarHistorial()" placeholder="Filtrar por cliente, informante u hora..."
+                                class="w-full pl-8 pr-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-xs text-slate-800 dark:text-slate-200 outline-none focus:border-indigo-500">
+                            <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2"></i>
+                        </div>
+
+                        <div id="historialLista" class="space-y-1.5 max-h-56 overflow-y-auto pr-0.5 text-xs">
+                            <p class="text-slate-400 text-center py-4">Sin declaraciones registradas aún</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
     </div>
 
     <!-- TOAST NOTIFICACIONES -->
-    <div id="notification" class="hidden fixed bottom-5 right-5 bg-emerald-600 text-white px-4 py-3 rounded-xl shadow-xl flex items-center gap-2.5 fade-in z-50 text-sm font-medium">
-        <i data-lucide="check-circle" class="w-4 h-4"></i>
+    <div id="notification" class="no-print hidden fixed bottom-5 right-5 bg-slate-900 dark:bg-slate-800 text-white border border-slate-700 px-4 py-3 rounded-xl shadow-2xl flex items-center gap-2.5 z-50 text-xs font-semibold">
+        <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>
         <span id="notification-text">Texto copiado al portapapeles</span>
     </div>
 
     <script src="js/global.js"></script>
     <script>
+        const DDJJ_STORAGE = {
+            stateKey: 'cctv_ddjj_state_v2',
+            historyKey: 'cctv_ddjj_historial_v2',
+            staffExtraKey: 'cctv_ddjj_personal_frecuente',
+            clientExtraKey: 'cctv_ddjj_clientes_frecuentes',
+            maxHistory: 50
+        };
+
+        const PERSONAL_SUGERIDO = [
+            'Enc. de Turno DENZ GIMENEZ, DEBORA ADRIANA',
+            'Enc. de Turno MOISES, ARIEL JESUS',
+            'Enc. de Turno RODRIGUEZ, MONICA ELIANA',
+            'Enc. de Turno ZAMBRANA, CARINA DEL VALLE',
+            'Enc. de Turno MARTINEZ GUAYMAS, CAROLINA ALEJANDRA',
+            'Asist. de Sala LAZARTE, LAURA LORENA',
+            'Asist. de Sala ALONSO, JOSE ANTONIO SEBASTIAN',
+            'Asist. de Sala CAMINOS, CINTIA SOLEDAD',
+            'Asist. de Sala PARADA, JULIO ALBERTO',
+            'Jefe de Caja CARRIZO, NATALIA VALERIA',
+            'Op. de Caja CHOCOBAR, GISELA NOEMI',
+            'Op. de Caja FLORES, ROMINA PAOLA',
+            'Op. de Caja MAMANI, SILVANA SOLEDAD',
+            'Supervisor de Control Interno Padilla Jorge',
+            'Supervisora de Control Interno Rojas Dolly',
+            'Supervisor de Control Interno Urbano Daniel',
+            'Control Interno Yujra Fernando',
+            'Control Interno Rizzato Enzo',
+            'Control Interno Castaño Pablo'
+        ];
+
+        const CAMARAS_BOULEVARD = {
+            '101':'SALA SLOTS (DVR 1)','102':'SALA SLOTS (DVR 1)','103':'SALA SLOTS (DVR 1)','104':'SALA SLOTS (DVR 1)','105':'SALA SLOTS (DVR 1)',
+            '106':'CAJA SLOTS (DVR 1)','107':'CAJA SLOTS (DVR 1)','108':'CAJA SLOTS (DVR 1)','109':'CAJA SLOTS (DVR 1)',
+            '110':'TESORO SLOTS (DVR 1)','116':'ACCESO PERSONAL (DVR 1)',
+            '409':'OFICINAS (DVR 4)','416':'CCTV (DVR 4)',
+            '601':'CAJA JV (DVR 6)','602':'CAJA JV (DVR 6)','603':'CAJA JV (DVR 6)','604':'CAJA JV (DVR 6)',
+            '605':'CAJA JV (DVR 6)','606':'CAJA JV (DVR 6)','607':'CAJA JV (DVR 6)','608':'CAJA JV (DVR 6)',
+            '706':'ACCESO (DVR 7)','715':'RECEPCION (DVR 7)','716':'RECEPCION (DVR 7)',
+            '801':'SALA SLOTS (DVR 8)','805':'RECEPCION (DVR 8)'
+        };
+
+        const CARGOS_PREFIJO_REGEX = /^(Enc\.?\s+de\s+Turno|Encargado(?:a)?\s+de\s+Turno|Enc\.?|Asist\.?\s+de\s+Sala|Asistente\s+de\s+Sala|As\.?|Op\.?\s+de\s+Caja|Operador(?:a)?\s+de\s+Caja|Op\.?|Jefe(?:a)?\s+de\s+Caja|Supervisor(?:a)?\s+de\s+Control\s+Interno|Control\s+Interno)\s+/i;
+        const TRATO_CLIENTE_REGEX = /^(Sra\.?|Sr\.?|Srta\.?|Don|Doña)\s+/i;
+
+        let offsetConfeccion = 1;
+        let offsetCierre = 2;
+        let textoAutomaticoActual = '';
+        let parrafosActuales = ['', '', ''];
+        let historialDdj = [];
+        let personalExtra = [];
+        let clientesExtra = [];
+        let toastTimer = null;
+
+        function normStr(s) {
+            return String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+        }
+
+        function escHtml(s) {
+            return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        function getHoraActualStr() {
+            const now = new Date();
+            return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+        }
+
         function sumarMinutos(hora, minutos) {
             if (!hora || !hora.includes(':')) return '--:--';
             const [h, m] = hora.split(':').map(Number);
             if (isNaN(h) || isNaN(m)) return '--:--';
-            const d = new Date();
-            d.setHours(h, m + minutos, 0, 0);
-            return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+            const total = ((h * 60 + m + minutos) % 1440 + 1440) % 1440;
+            return `${String(Math.floor(total / 60)).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`;
         }
 
-        function sincronizarTodo() {
-            const hBase = document.getElementById('horaGlobal').value;
-            const h1 = hBase || '--:--';
-            const h2 = sumarMinutos(hBase, 1);
-            const h3 = sumarMinutos(hBase, 2);
-
-            const dPers = document.getElementById('d-personal').value || "[Personal]";
-            const dClie = document.getElementById('d-cliente').value || "[Cliente]";
-
-            const outDj =
-                `A las ${h1} Hs. CCTV recibe llamada de ${dPers}, informa que ${dClie} procederá a confeccionar Declaración Jurada.-\n\n` +
-                `A las ${h2} Hs. ${dClie} confecciona Declaración Jurada.-\n\n` +
-                `A las ${h3} Hs. ${dPers}, informa que finalizó llenado de declaración Jurada.-`;
-
-            document.getElementById('out-dj').value = outDj;
+        function calcularDiferenciaMinutos(inicio, fin) {
+            if (!inicio || !fin || !inicio.includes(':') || !fin.includes(':')) return 0;
+            const [h1, m1] = inicio.split(':').map(Number);
+            const [h2, m2] = fin.split(':').map(Number);
+            if (isNaN(h1) || isNaN(m1) || isNaN(h2) || isNaN(m2)) return 0;
+            let diff = (h2 * 60 + m2) - (h1 * 60 + m1);
+            if (diff < 0) diff += 1440;
+            return diff;
         }
 
-        function limpiarSeccion() {
-            ['d-personal', 'd-cliente'].forEach(id => document.getElementById(id).value = "");
+        function parsearMontoFlexible(rawStr) {
+            if (!rawStr) return NaN;
+            let s = String(rawStr).trim().replace(/[$\s]/g, '').replace(/[.,]+$/, '');
+            if (!s) return NaN;
+            if (s.includes(',') && s.includes('.')) {
+                return s.lastIndexOf(',') > s.lastIndexOf('.')
+                    ? parseFloat(s.replace(/\./g, '').replace(',', '.'))
+                    : parseFloat(s.replace(/,/g, ''));
+            }
+            if (s.includes(',')) return parseFloat(s.replace(',', '.'));
+            if (s.includes('.')) {
+                const p = s.split('.');
+                if (p.length === 2 && p[1].length !== 3) return parseFloat(s);
+                return parseFloat(s.replace(/\./g, ''));
+            }
+            return parseFloat(s);
+        }
+
+        function formatearMonedaAR(num) {
+            if (typeof num !== 'number' || isNaN(num) || !isFinite(num)) return '';
+            return num.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        window.formatearMontoBlur = function (inp) {
+            const n = parsearMontoFlexible(inp.value);
+            if (!isNaN(n) && n > 0) {
+                inp.value = formatearMonedaAR(n);
+                sincronizarTodo();
+            }
+        };
+
+        // Autocompletado de 1 letra para Personal y Clientes
+        function configurarAutocomplete(inputId, dropdownId, listGetterFn, isClient) {
+            const inp = document.getElementById(inputId);
+            const dd = document.getElementById(dropdownId);
+            if (!inp || !dd) return;
+
+            const mostrar = () => {
+                const q = normStr(inp.value);
+                if (!q) {
+                    dd.classList.add('hidden');
+                    return;
+                }
+                const matches = listGetterFn().filter(it => normStr(it.valor).includes(q) && normStr(it.valor) !== q).slice(0, 10);
+                if (!matches.length) {
+                    dd.classList.add('hidden');
+                    return;
+                }
+                dd._matches = matches;
+                dd.innerHTML = matches.map((m, idx) => `
+                    <div class="flex items-center justify-between hover:bg-indigo-50 dark:hover:bg-indigo-950/60 transition">
+                        <button type="button" onmousedown="event.preventDefault(); elegirSugerenciaDdj('${dropdownId}','${inputId}',${idx})"
+                            class="flex-1 text-left px-3 py-2 text-xs font-semibold text-slate-800 dark:text-slate-100 cursor-pointer truncate">
+                            ${escHtml(m.valor)}
+                            ${m.custom ? '<span class="ml-1.5 text-[10px] font-normal text-indigo-500">frecuente</span>' : ''}
+                        </button>
+                        ${m.custom ? `
+                            <button type="button" onmousedown="event.preventDefault(); borrarFrecuenteDdj(${isClient ? 'true' : 'false'}, '${escHtml(m.valor).replace(/'/g, "\\'")}')"
+                                class="px-2.5 py-2 text-slate-400 hover:text-rose-500 text-xs cursor-pointer" title="Quitar de frecuentes">✕</button>
+                        ` : ''}
+                    </div>
+                `).join('');
+                dd.classList.remove('hidden');
+            };
+
+            inp.addEventListener('input', () => {
+                mostrar();
+                sincronizarTodo();
+            });
+            inp.addEventListener('focus', mostrar);
+            inp.addEventListener('blur', () => setTimeout(() => dd.classList.add('hidden'), 150));
+        }
+
+        window.elegirSugerenciaDdj = function (dropdownId, inputId, idx) {
+            const dd = document.getElementById(dropdownId);
+            const inp = document.getElementById(inputId);
+            const item = dd?._matches?.[idx];
+            if (!inp || !item) return;
+            inp.value = item.valor;
+            dd.classList.add('hidden');
             sincronizarTodo();
+        };
+
+        window.borrarFrecuenteDdj = function (esCliente, valor) {
+            if (esCliente) {
+                clientesExtra = clientesExtra.filter(x => x !== valor);
+                localStorage.setItem(DDJJ_STORAGE.clientExtraKey, JSON.stringify(clientesExtra));
+                document.getElementById('d-cliente')?.dispatchEvent(new Event('focus'));
+            } else {
+                personalExtra = personalExtra.filter(x => x !== valor);
+                localStorage.setItem(DDJJ_STORAGE.staffExtraKey, JSON.stringify(personalExtra));
+                document.getElementById('d-personal')?.dispatchEvent(new Event('focus'));
+            }
+        };
+
+        function obtenerOpcionesPersonal() {
+            const vistos = new Set();
+            const out = [];
+            personalExtra.forEach(v => {
+                const k = normStr(v);
+                if (k && !vistos.has(k)) { vistos.add(k); out.push({ valor: v, custom: true }); }
+            });
+            PERSONAL_SUGERIDO.forEach(v => {
+                const k = normStr(v);
+                if (k && !vistos.has(k)) { vistos.add(k); out.push({ valor: v, custom: false }); }
+            });
+            return out;
         }
 
-        function volverAlInicio() {
-            const now = new Date();
-            const horas = String(now.getHours()).padStart(2, '0');
-            const minutos = String(now.getMinutes()).padStart(2, '0');
-            document.getElementById('horaGlobal').value = `${horas}:${minutos}`;
-            document.getElementById('d-personal').value = "";
-            document.getElementById('d-cliente').value = "";
+        function obtenerOpcionesClientes() {
+            return clientesExtra.map(v => ({ valor: v, custom: true }));
+        }
+
+        function recordarNombresFrecuentes() {
+            const pers = document.getElementById('d-personal').value.trim();
+            if (pers.length >= 4 && !PERSONAL_SUGERIDO.some(b => normStr(b) === normStr(pers))) {
+                personalExtra = [pers, ...personalExtra.filter(x => normStr(x) !== normStr(pers))].slice(0, 25);
+                localStorage.setItem(DDJJ_STORAGE.staffExtraKey, JSON.stringify(personalExtra));
+            }
+            const cli = document.getElementById('d-cliente').value.trim();
+            if (cli.length >= 5) {
+                clientesExtra = [cli, ...clientesExtra.filter(x => normStr(x) !== normStr(cli))].slice(0, 30);
+                localStorage.setItem(DDJJ_STORAGE.clientExtraKey, JSON.stringify(clientesExtra));
+            }
+        }
+
+        // Botones de prefijo de cargo y trato
+        window.aplicarPrefijoCargo = function (cargo) {
+            const inp = document.getElementById('d-personal');
+            const limpio = inp.value.trim().replace(CARGOS_PREFIJO_REGEX, '').trim();
+            inp.value = limpio ? `${cargo} ${limpio}` : `${cargo} `;
+            inp.focus();
+            const len = inp.value.length;
+            inp.setSelectionRange(len, len);
             sincronizarTodo();
-        }
+        };
 
-        function copiarTexto() {
-            const el = document.getElementById('out-dj');
-            const textoParaCopiar = el.value;
+        window.aplicarTratoCliente = function (trato) {
+            const inp = document.getElementById('d-cliente');
+            const limpio = inp.value.trim().replace(TRATO_CLIENTE_REGEX, '').trim();
+            inp.value = limpio ? `${trato} ${limpio}` : `${trato} `;
+            inp.focus();
+            const len = inp.value.length;
+            inp.setSelectionRange(len, len);
+            sincronizarTodo();
+        };
 
-            navigator.clipboard.writeText(textoParaCopiar).then(() => {
-                showNotification('¡Texto copiado al portapapeles!');
-            }).catch(() => {
-                el.select();
-                document.execCommand('copy');
-                showNotification('¡Texto copiado al portapapeles!');
+        window.limpiarCampo = function (id) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.value = '';
+            el.focus();
+            sincronizarTodo();
+        };
+
+        // Manejo de tiempos encadenados y manuales
+        window.aplicarIntervalo = function (minConf, minCierre) {
+            offsetConfeccion = minConf;
+            offsetCierre = minCierre;
+            document.getElementById('chkEncadenar').checked = true;
+            actualizarBotonesIntervaloUI();
+            recalcularTiemposEncadenados();
+            sincronizarTodo();
+        };
+
+        function actualizarBotonesIntervaloUI() {
+            const activeCls = 'px-2 py-1 rounded-lg bg-indigo-600 text-white text-[11px] font-mono font-semibold transition cursor-pointer';
+            const inactiveCls = 'px-2 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-indigo-100 dark:hover:bg-indigo-950 text-slate-700 dark:text-slate-300 text-[11px] font-mono font-semibold transition cursor-pointer';
+            const encadenado = document.getElementById('chkEncadenar').checked;
+
+            const pares = [
+                { id: 'btnInt1_2', c: 1, f: 2 },
+                { id: 'btnInt1_4', c: 1, f: 4 },
+                { id: 'btnInt1_6', c: 1, f: 6 },
+                { id: 'btnInt2_8', c: 2, f: 8 }
+            ];
+            pares.forEach(p => {
+                const btn = document.getElementById(p.id);
+                if (btn) btn.className = (encadenado && offsetConfeccion === p.c && offsetCierre === p.f) ? activeCls : inactiveCls;
             });
         }
+
+        function recalcularTiemposEncadenados() {
+            const hBase = document.getElementById('horaGlobal').value;
+            if (!hBase) return;
+            document.getElementById('horaConfeccion').value = sumarMinutos(hBase, offsetConfeccion);
+            document.getElementById('horaCierre').value = sumarMinutos(hBase, offsetCierre);
+        }
+
+        window.alCambiarHoraInicio = function () {
+            if (document.getElementById('chkEncadenar').checked) {
+                recalcularTiemposEncadenados();
+            }
+            sincronizarTodo();
+        };
+
+        window.alCambiarEncadenado = function () {
+            if (document.getElementById('chkEncadenar').checked) {
+                recalcularTiemposEncadenados();
+            }
+            actualizarBotonesIntervaloUI();
+            sincronizarTodo();
+        };
+
+        window.alEditarHoraManual = function () {
+            document.getElementById('chkEncadenar').checked = false;
+            actualizarBotonesIntervaloUI();
+            sincronizarTodo();
+        };
+
+        window.ponerHoraActualEn = function (id) {
+            const ahora = getHoraActualStr();
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.value = ahora;
+            if (id === 'horaGlobal' && document.getElementById('chkEncadenar').checked) {
+                recalcularTiemposEncadenados();
+            } else if (id !== 'horaGlobal') {
+                document.getElementById('chkEncadenar').checked = false;
+                actualizarBotonesIntervaloUI();
+            }
+            sincronizarTodo();
+            showNotification('Hora actualizada sin borrar los datos cargados');
+        };
+
+        window.alEscribirCamaraDdj = function () {
+            const inp = document.getElementById('d-camara');
+            const val = inp.value.trim();
+            if (/^\d{3}$/.test(val) && CAMARAS_BOULEVARD[val]) {
+                inp.value = `${val} - ${CAMARAS_BOULEVARD[val]}`;
+            }
+            sincronizarTodo();
+        };
+
+        // Generación del Acta Cronológica
+        window.sincronizarTodo = function () {
+            const h1 = document.getElementById('horaGlobal').value || '--:--';
+            const h2 = document.getElementById('horaConfeccion').value || sumarMinutos(h1, offsetConfeccion);
+            const h3 = document.getElementById('horaCierre').value || sumarMinutos(h1, offsetCierre);
+
+            const durMin = calcularDiferenciaMinutos(h1, h3);
+            document.getElementById('badgeDuracionTotal').textContent = `${durMin} min`;
+
+            const dPers = document.getElementById('d-personal').value.trim() || '[Personal]';
+            const dPersCierre = document.getElementById('d-personal-cierre').value.trim() || dPers;
+            const dClie = document.getElementById('d-cliente').value.trim() || '[Cliente]';
+
+            const sector = document.getElementById('d-sector').value;
+            const motivo = document.getElementById('d-motivo').value;
+            const dniRaw = document.getElementById('d-dni').value.trim();
+            const montoNum = parsearMontoFlexible(document.getElementById('d-monto').value);
+            const camara = document.getElementById('d-camara').value.trim();
+
+            const dniTxt = dniRaw ? ` (DNI ${dniRaw})` : '';
+            const sectorTxt = sector ? ` ${sector}` : '';
+            let motivoMontoTxt = '';
+            if (motivo && !isNaN(montoNum) && montoNum > 0) {
+                motivoMontoTxt = ` ${motivo} ($ ${formatearMonedaAR(montoNum)})`;
+            } else if (motivo) {
+                motivoMontoTxt = ` ${motivo}`;
+            } else if (!isNaN(montoNum) && montoNum > 0) {
+                motivoMontoTxt = ` por importe de $ ${formatearMonedaAR(montoNum)}`;
+            }
+            const camaraTxt = camara ? ` (visualizado por cámara ${camara})` : '';
+
+            const p1 = `A las ${h1} Hs. CCTV recibe llamada de ${dPers}, informa que ${dClie}${dniTxt} procederá a confeccionar Declaración Jurada${sectorTxt}${motivoMontoTxt}.-`;
+            const p2 = `A las ${h2} Hs. ${dClie} confecciona Declaración Jurada${camaraTxt}.-`;
+            const p3 = `A las ${h3} Hs. ${dPersCierre}, informa que finalizó llenado de Declaración Jurada.-`;
+
+            parrafosActuales = [p1, p2, p3];
+            textoAutomaticoActual = `${p1}\n\n${p2}\n\n${p3}`;
+
+            document.getElementById('out-dj').value = textoAutomaticoActual;
+            actualizarIndicadorExtras();
+            guardarEstadoActual();
+            actualizarContadorTexto();
+        };
+
+        function actualizarIndicadorExtras() {
+            const activos = Boolean(
+                document.getElementById('d-sector').value ||
+                document.getElementById('d-motivo').value ||
+                document.getElementById('d-monto').value.trim() ||
+                document.getElementById('d-dni').value.trim() ||
+                document.getElementById('d-camara').value.trim() ||
+                document.getElementById('d-personal-cierre').value.trim()
+            );
+            document.getElementById('badgeExtrasActivos').classList.toggle('hidden', !activos);
+        }
+
+        window.actualizarContadorTexto = function () {
+            const val = document.getElementById('out-dj').value;
+            document.getElementById('contadorCaracteres').textContent = `${val.length} caracteres`;
+            document.getElementById('printTexto').textContent = val;
+            document.getElementById('printFechaHora').textContent = new Date().toLocaleString('es-AR');
+        };
+
+        window.restaurarTextoAuto = function () {
+            document.getElementById('out-dj').value = textoAutomaticoActual;
+            actualizarContadorTexto();
+            showNotification('Texto automático restaurado');
+        };
+
+        // Autoguardado del formulario
+        function guardarEstadoActual() {
+            const data = {
+                horaGlobal: document.getElementById('horaGlobal').value,
+                horaConfeccion: document.getElementById('horaConfeccion').value,
+                horaCierre: document.getElementById('horaCierre').value,
+                encadenar: document.getElementById('chkEncadenar').checked,
+                offsetConfeccion,
+                offsetCierre,
+                personal: document.getElementById('d-personal').value,
+                cliente: document.getElementById('d-cliente').value,
+                sector: document.getElementById('d-sector').value,
+                motivo: document.getElementById('d-motivo').value,
+                monto: document.getElementById('d-monto').value,
+                dni: document.getElementById('d-dni').value,
+                camara: document.getElementById('d-camara').value,
+                personalCierre: document.getElementById('d-personal-cierre').value
+            };
+            try {
+                localStorage.setItem(DDJJ_STORAGE.stateKey, JSON.stringify(data));
+            } catch (e) {}
+        }
+
+        function cargarEstadoGuardado() {
+            try {
+                personalExtra = JSON.parse(localStorage.getItem(DDJJ_STORAGE.staffExtraKey) || '[]');
+                clientesExtra = JSON.parse(localStorage.getItem(DDJJ_STORAGE.clientExtraKey) || '[]');
+                historialDdj = JSON.parse(localStorage.getItem(DDJJ_STORAGE.historyKey) || '[]');
+            } catch (e) {
+                personalExtra = [];
+                clientesExtra = [];
+                historialDdj = [];
+            }
+
+            let saved = null;
+            try {
+                saved = JSON.parse(localStorage.getItem(DDJJ_STORAGE.stateKey) || 'null');
+            } catch (e) {}
+
+            const ahora = getHoraActualStr();
+            document.getElementById('horaGlobal').value = saved?.horaGlobal || ahora;
+            offsetConfeccion = saved?.offsetConfeccion || 1;
+            offsetCierre = saved?.offsetCierre || 2;
+            document.getElementById('chkEncadenar').checked = saved?.encadenar !== undefined ? Boolean(saved.encadenar) : true;
+
+            if (saved?.horaConfeccion && !document.getElementById('chkEncadenar').checked) {
+                document.getElementById('horaConfeccion').value = saved.horaConfeccion;
+            } else {
+                document.getElementById('horaConfeccion').value = sumarMinutos(document.getElementById('horaGlobal').value, offsetConfeccion);
+            }
+
+            if (saved?.horaCierre && !document.getElementById('chkEncadenar').checked) {
+                document.getElementById('horaCierre').value = saved.horaCierre;
+            } else {
+                document.getElementById('horaCierre').value = sumarMinutos(document.getElementById('horaGlobal').value, offsetCierre);
+            }
+
+            if (saved) {
+                document.getElementById('d-personal').value = saved.personal || '';
+                document.getElementById('d-cliente').value = saved.cliente || '';
+                document.getElementById('d-sector').value = saved.sector || '';
+                document.getElementById('d-motivo').value = saved.motivo || '';
+                document.getElementById('d-monto').value = saved.monto || '';
+                document.getElementById('d-dni').value = saved.dni || '';
+                document.getElementById('d-camara').value = saved.camara || '';
+                document.getElementById('d-personal-cierre').value = saved.personalCierre || '';
+            }
+
+            actualizarBotonesIntervaloUI();
+            renderizarHistorial();
+            sincronizarTodo();
+        }
+
+        // Copiado y Registro en Historial
+        async function escribirPortapapeles(texto) {
+            try {
+                if (navigator.clipboard && window.isSecureContext) {
+                    await navigator.clipboard.writeText(texto);
+                    return true;
+                }
+            } catch (e) {}
+            try {
+                const temp = document.createElement('textarea');
+                temp.value = texto;
+                temp.style.position = 'fixed';
+                temp.style.opacity = '0';
+                document.body.appendChild(temp);
+                temp.select();
+                const ok = document.execCommand('copy');
+                temp.remove();
+                return ok;
+            } catch (e) {
+                return false;
+            }
+        }
+
+        window.copiarPasoIndividual = async function (numPaso) {
+            const txt = parrafosActuales[numPaso - 1] || '';
+            if (!txt) return;
+            await escribirPortapapeles(txt);
+            showNotification(`Paso ${numPaso}° copiado al portapapeles`);
+        };
+
+        window.copiarTexto = async function () {
+            const texto = document.getElementById('out-dj').value.trim();
+            if (!texto) {
+                showNotification('No hay texto para copiar', 'error');
+                return;
+            }
+            const ok = await escribirPortapapeles(texto);
+            if (!ok) {
+                showNotification('No se pudo copiar automáticamente (use Ctrl+C)', 'error');
+                return;
+            }
+            recordarNombresFrecuentes();
+            registrarEnHistorial(texto);
+
+            const btn = document.getElementById('btnCopiarPrincipal');
+            const orig = btn.innerHTML;
+            btn.innerHTML = '<i data-lucide="check" class="w-4 h-4"></i><span>¡Copiado y Registrado!</span>';
+            btn.classList.replace('bg-indigo-600', 'bg-emerald-600');
+            lucide.createIcons({ nodes: [btn] });
+            setTimeout(() => {
+                btn.innerHTML = orig;
+                btn.classList.replace('bg-emerald-600', 'bg-indigo-600');
+                lucide.createIcons({ nodes: [btn] });
+            }, 1700);
+
+            showNotification('¡Acta DDJJ copiada y guardada en historial!');
+        };
+
+        window.copiarWhatsApp = async function () {
+            const texto = document.getElementById('out-dj').value.trim();
+            if (!texto) return;
+            const msg = `📋 *DECLARACIÓN JURADA (DDJJ) - CCTV*\n\n${texto}`;
+            const ok = await escribirPortapapeles(msg);
+            if (ok) {
+                recordarNombresFrecuentes();
+                registrarEnHistorial(texto);
+                showNotification('Copiado con formato WhatsApp');
+            }
+        };
+
+        function registrarEnHistorial(texto) {
+            if (historialDdj.length > 0 && historialDdj[0].texto === texto) return;
+            const reg = {
+                fechaISO: new Date().toISOString(),
+                horaInicio: document.getElementById('horaGlobal').value || '--:--',
+                horaCierre: document.getElementById('horaCierre').value || '--:--',
+                personal: document.getElementById('d-personal').value.trim() || 'Sin especificar',
+                cliente: document.getElementById('d-cliente').value.trim() || 'Sin especificar',
+                monto: document.getElementById('d-monto').value.trim() || '',
+                texto
+            };
+            historialDdj.unshift(reg);
+            historialDdj = historialDdj.slice(0, DDJJ_STORAGE.maxHistory);
+            try {
+                localStorage.setItem(DDJJ_STORAGE.historyKey, JSON.stringify(historialDdj));
+            } catch (e) {}
+            renderizarHistorial();
+        }
+
+        window.renderizarHistorial = function () {
+            document.getElementById('contadorHistorial').textContent = String(historialDdj.length);
+            const lista = document.getElementById('historialLista');
+            const q = normStr(document.getElementById('buscarHistorialDdj')?.value || '');
+
+            const filtrados = historialDdj
+                .map((item, index) => ({ item, index }))
+                .filter(({ item }) => !q || normStr(`${item.cliente} ${item.personal} ${item.horaInicio} ${item.monto} ${item.texto}`).includes(q));
+
+            if (!filtrados.length) {
+                lista.innerHTML = `<p class="text-slate-400 text-center py-4">${historialDdj.length ? 'Sin coincidencias' : 'Sin declaraciones registradas aún'}</p>`;
+                return;
+            }
+
+            lista.innerHTML = filtrados.map(({ item, index }) => {
+                const fechaCorta = new Date(item.fechaISO).toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit' });
+                return `
+                    <div class="history-item p-2.5 rounded-lg bg-slate-50 dark:bg-slate-950/70 hover:bg-indigo-50/70 dark:hover:bg-slate-800/80 border border-slate-200/70 dark:border-slate-800 flex items-center justify-between gap-2">
+                        <button type="button" onclick="cargarItemHistorial(${index})" class="flex-1 min-w-0 text-left cursor-pointer">
+                            <div class="flex items-center gap-1.5 flex-wrap">
+                                <span class="px-1.5 py-0.5 rounded bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 font-mono font-bold text-[10px]">${escHtml(item.horaInicio)}–${escHtml(item.horaCierre)}</span>
+                                <span class="text-[10px] font-mono text-slate-400">${escHtml(fechaCorta)}</span>
+                                ${item.monto ? `<span class="text-[10px] font-mono font-semibold text-emerald-600 dark:text-emerald-400">$${escHtml(item.monto)}</span>` : ''}
+                            </div>
+                            <p class="text-xs font-bold text-slate-800 dark:text-slate-100 truncate mt-0.5">${escHtml(item.cliente)}</p>
+                            <p class="text-[11px] text-slate-500 dark:text-slate-400 truncate">${escHtml(item.personal)}</p>
+                        </button>
+                        <div class="flex items-center gap-1 shrink-0">
+                            <button type="button" onclick="recopiarItemHistorial(${index})" class="p-1.5 rounded-md text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-white dark:hover:bg-slate-900 transition cursor-pointer" title="Copiar este registro">
+                                <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                            </button>
+                            <button type="button" onclick="eliminarItemHistorial(${index})" class="p-1.5 rounded-md text-slate-400 hover:text-rose-500 hover:bg-white dark:hover:bg-slate-900 transition cursor-pointer" title="Eliminar">
+                                <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            lucide.createIcons({ nodes: [lista] });
+        };
+
+        window.cargarItemHistorial = function (idx) {
+            const it = historialDdj[idx];
+            if (!it) return;
+            document.getElementById('out-dj').value = it.texto;
+            actualizarContadorTexto();
+            showNotification('Declaración cargada en la vista previa');
+        };
+
+        window.recopiarItemHistorial = async function (idx) {
+            const it = historialDdj[idx];
+            if (!it) return;
+            await escribirPortapapeles(it.texto);
+            showNotification('Registro del historial copiado');
+        };
+
+        window.eliminarItemHistorial = function (idx) {
+            historialDdj.splice(idx, 1);
+            localStorage.setItem(DDJJ_STORAGE.historyKey, JSON.stringify(historialDdj));
+            renderizarHistorial();
+        };
+
+        window.vaciarHistorial = function () {
+            if (!historialDdj.length) return;
+            if (!confirm('¿Vaciar el historial de Declaraciones Juradas?')) return;
+            historialDdj = [];
+            localStorage.removeItem(DDJJ_STORAGE.historyKey);
+            renderizarHistorial();
+            showNotification('Historial vaciado');
+        };
+
+        function descargarArchivo(contenido, nombre, mime) {
+            const blob = new Blob([contenido], { type: mime });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = nombre;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        window.exportarHistorialTXT = function () {
+            if (!historialDdj.length) {
+                showNotification('No hay registros para exportar', 'error');
+                return;
+            }
+            let txt = '=== HISTORIAL DE DECLARACIONES JURADAS (CCTV) ===\n\n';
+            historialDdj.forEach((it, i) => {
+                txt += `${i + 1}. ${new Date(it.fechaISO).toLocaleString('es-AR')} | Cliente: ${it.cliente}\n${it.texto}\n\n---\n\n`;
+            });
+            descargarArchivo(txt, `ddjj-cctv-${new Date().toISOString().split('T')[0]}.txt`, 'text/plain;charset=utf-8');
+            showNotification('Historial TXT descargado');
+        };
+
+        window.exportarHistorialCSV = function () {
+            if (!historialDdj.length) {
+                showNotification('No hay registros para exportar', 'error');
+                return;
+            }
+            const escCsv = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+            const rows = [['Fecha', 'Hora Inicio', 'Hora Cierre', 'Cliente', 'Personal Informante', 'Importe', 'Texto Acta']];
+            historialDdj.forEach(it => {
+                rows.push([
+                    new Date(it.fechaISO).toLocaleDateString('es-AR'),
+                    it.horaInicio,
+                    it.horaCierre,
+                    it.cliente,
+                    it.personal,
+                    it.monto,
+                    it.texto
+                ]);
+            });
+            const csv = '\uFEFF' + rows.map(r => r.map(escCsv).join(';')).join('\r\n');
+            descargarArchivo(csv, `ddjj-cctv-${new Date().toISOString().split('T')[0]}.csv`, 'text/csv;charset=utf-8');
+            showNotification('Planilla CSV descargada');
+        };
+
+        window.limpiarSeccion = function () {
+            const hayDatos = document.getElementById('d-personal').value.trim() || document.getElementById('d-cliente').value.trim();
+            if (hayDatos && !confirm('¿Limpiar los campos de la Declaración Jurada actual?')) return;
+
+            ['d-personal', 'd-cliente', 'd-monto', 'd-dni', 'd-camara', 'd-personal-cierre'].forEach(id => {
+                document.getElementById(id).value = '';
+            });
+            document.getElementById('d-sector').value = '';
+            document.getElementById('d-motivo').value = '';
+            offsetConfeccion = 1;
+            offsetCierre = 2;
+            document.getElementById('chkEncadenar').checked = true;
+            document.getElementById('horaGlobal').value = getHoraActualStr();
+            recalcularTiemposEncadenados();
+            actualizarBotonesIntervaloUI();
+            localStorage.removeItem(DDJJ_STORAGE.stateKey);
+            sincronizarTodo();
+            showNotification('Formulario restablecido con hora actual');
+        };
 
         function showNotification(message, type = 'success') {
             const notification = document.getElementById('notification');
             document.getElementById('notification-text').textContent = message;
-            notification.classList.remove('hidden', 'bg-rose-600', 'bg-emerald-600');
-            notification.classList.add(type === 'error' ? 'bg-rose-600' : 'bg-emerald-600');
-            setTimeout(() => notification.classList.add('hidden'), 3000);
+            notification.classList.remove('hidden', 'border-rose-500', 'border-slate-700');
+            notification.classList.add(type === 'error' ? 'border-rose-500' : 'border-slate-700');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => notification.classList.add('hidden'), 2600);
         }
 
-        window.addEventListener('DOMContentLoaded', volverAlInicio);
+        window.addEventListener('DOMContentLoaded', () => {
+            configurarAutocomplete('d-personal', 'dropdownPersonalDdj', obtenerOpcionesPersonal, false);
+            configurarAutocomplete('d-cliente', 'dropdownClienteDdj', obtenerOpcionesClientes, true);
+            cargarEstadoGuardado();
+
+            document.addEventListener('keydown', (e) => {
+                if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                    e.preventDefault();
+                    copiarTexto();
+                }
+            });
+
+            lucide.createIcons();
+        });
     </script>
 </body>
 </html>

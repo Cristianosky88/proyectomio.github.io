@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pal Cap - Operaciones de Caja</title>
+    <title>Pal Cap · Operaciones de Caja · CCTV</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -30,6 +30,31 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/global.css">
     <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .report-font {
+            font-family: 'JetBrains Mono', Consolas, monospace;
+        }
+        .history-item {
+            transition: all 0.16s ease;
+            border-left: 3px solid transparent;
+        }
+        .history-item:hover {
+            border-left-color: #6366f1;
+        }
+        @media print {
+            body {
+                background: #ffffff !important;
+                color: #0f172a !important;
+                padding: 0 !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+            #printSheet {
+                display: block !important;
+            }
+        }
+    </style>
 </head>
 <body class="bg-slate-100 dark:bg-slate-950 p-3 sm:p-5 md:p-8 text-slate-800 dark:text-slate-100 min-h-screen font-sans transition-colors duration-200">
 
@@ -42,13 +67,16 @@
                     <i data-lucide="wallet-cards" class="w-6 h-6 text-white"></i>
                 </div>
                 <div>
-                    <h1 class="text-lg sm:text-xl font-bold leading-tight text-white">Pal Cap · Operaciones de Caja</h1>
+                    <h1 class="text-lg sm:text-xl font-bold leading-tight text-white flex items-center gap-2 flex-wrap">
+                        Pal Cap · Operaciones de Caja
+                        <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Autoguardado</span>
+                    </h1>
                     <p class="text-slate-400 text-xs uppercase tracking-wider">CCTV · Cambio de Efectivo por Tickets (<span id="fechaActual">--/--/--</span>)</p>
                 </div>
             </div>
 
             <div class="flex flex-wrap items-center gap-2">
-                <a href="palvar.html" class="px-3 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-xl transition text-xs font-semibold text-white inline-flex items-center gap-1.5">
+                <a href="palvar.html" class="px-3 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-xl transition text-xs font-semibold text-white inline-flex items-center gap-1.5 shadow-sm">
                     <i data-lucide="ticket" class="w-4 h-4"></i>
                     <span class="hidden sm:inline">Pal Var</span>
                 </a>
@@ -56,6 +84,10 @@
                     <i data-lucide="building-2" class="w-4 h-4 text-indigo-400"></i>
                     <span class="hidden sm:inline">Luxor</span>
                 </a>
+
+                <button type="button" onclick="limpiarFormulario()" class="p-2 bg-slate-800 hover:bg-rose-600 border border-slate-700 rounded-xl transition text-slate-200 hover:text-white cursor-pointer" title="Limpiar formulario">
+                    <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
+                </button>
 
                 <div class="hidden md:flex items-center gap-2 bg-slate-800/90 border border-slate-700 px-3 py-1.5 rounded-xl text-xs font-mono text-slate-200">
                     <i data-lucide="clock" class="w-3.5 h-3.5 text-indigo-400"></i>
@@ -77,311 +109,969 @@
             </div>
         </header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 rounded-b-2xl overflow-hidden">
+        <!-- Hoja de Impresión -->
+        <div id="printSheet" class="hidden p-8 space-y-4">
+            <div class="border-b-2 border-slate-800 pb-3 flex justify-between items-start">
+                <div>
+                    <h2 class="text-lg font-bold uppercase">Acta CCTV · Cambio de Efectivo por Tickets en Caja</h2>
+                    <p class="text-xs text-slate-600">Registro Operativo de Monitoreo</p>
+                </div>
+                <span id="printFechaHora" class="text-xs font-mono text-slate-600"></span>
+            </div>
+            <pre id="printTexto" class="report-font whitespace-pre-wrap text-sm leading-relaxed p-4 border border-slate-300 rounded-lg bg-slate-50"></pre>
+        </div>
 
-            <!-- COLUMNA IZQUIERDA: INPUTS -->
-            <div class="lg:col-span-7 p-5 sm:p-6 space-y-5 bg-slate-50 dark:bg-slate-900/60">
+        <main class="no-print grid grid-cols-1 lg:grid-cols-12 rounded-b-2xl overflow-hidden">
 
-                <!-- 1. EMPLEADO -->
+            <!-- COLUMNA IZQUIERDA: FORMULARIO (7/12) -->
+            <div class="lg:col-span-7 p-4 sm:p-6 space-y-4 bg-slate-50 dark:bg-slate-900/60">
+
+                <!-- 1. EMPLEADO DE CAJA Y HORARIOS -->
                 <div class="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 space-y-4">
-                    <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2.5">
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
-                            <i data-lucide="user-check" class="w-4 h-4"></i> 1. Empleado/a de Caja
-                        </h3>
-                        <button type="button" onclick="setNow('horaLlamada')" class="text-xs bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800/60 hover:bg-indigo-100 px-2.5 py-1 rounded-lg flex items-center gap-1 transition cursor-pointer font-semibold">
-                            <i data-lucide="clock" class="w-3.5 h-3.5"></i> Ahora
-                        </button>
+                    <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-2.5">
+                        <h2 class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
+                            <i data-lucide="user-check" class="w-4 h-4"></i> 1. Personal de Caja y Tiempos
+                        </h2>
+                        <span class="text-[11px] text-slate-400 font-mono">Ctrl+Enter copia y registra</span>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-12 gap-3.5">
-                        <div class="sm:col-span-4">
-                            <label for="horaLlamada" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Hora Llamada</label>
-                            <input type="time" id="horaLlamada" oninput="generar()" class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm font-mono text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition">
+                        <!-- Hora Llamada -->
+                        <div class="sm:col-span-6">
+                            <label for="horaLlamada" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">⏰ Hora Llamada (Solicitud)</label>
+                            <div class="flex items-stretch">
+                                <input type="time" id="horaLlamada" oninput="alCambiarHoraLlamada()" class="w-full min-w-0 px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-r-0 border-slate-300 dark:border-slate-700 rounded-l-xl text-xs sm:text-sm font-mono text-slate-900 dark:text-white outline-none focus:border-indigo-500">
+                                <button type="button" onclick="setNow('horaLlamada')" class="px-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-r-xl text-[11px] font-semibold transition cursor-pointer shrink-0">Ahora</button>
+                            </div>
                         </div>
-                        <div class="sm:col-span-8">
-                            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Cargo y Nombre Completo</label>
-                            <div class="flex gap-2">
-                                <select id="rolSolicitante" onchange="generar()" class="w-2/5 p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition">
-                                    <option value="Jefe de Caja">Jefe Caja</option>
-                                    <option value="Asistente de Caja">Asistente</option>
-                                    <option value="Cajera">Cajera</option>
-                                    <option value="Cajero">Cajero</option>
-                                </select>
-                                <input type="text" id="nombreEmpleado" oninput="generar()" placeholder="Apellido y Nombre" class="w-3/5 p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition">
+
+                        <!-- Hora Entrega -->
+                        <div class="sm:col-span-6">
+                            <div class="flex items-center justify-between mb-1">
+                                <label for="horaEntrega" class="text-xs font-semibold text-slate-600 dark:text-slate-300">✅ Hora Entrega Ventanilla</label>
+                                <div class="flex items-center gap-1">
+                                    <button type="button" onclick="sumarMinEntrega(1)" class="text-[10px] font-mono font-semibold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer">+1m</button>
+                                    <button type="button" onclick="sumarMinEntrega(2)" class="text-[10px] font-mono font-semibold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer">+2m</button>
+                                    <button type="button" onclick="sumarMinEntrega(3)" class="text-[10px] font-mono font-semibold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer">+3m</button>
+                                </div>
+                            </div>
+                            <div class="flex items-stretch">
+                                <input type="time" id="horaEntrega" oninput="generar()" class="w-full min-w-0 px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-r-0 border-slate-300 dark:border-slate-700 rounded-l-xl text-xs sm:text-sm font-mono text-slate-900 dark:text-white outline-none focus:border-emerald-500">
+                                <button type="button" onclick="setNow('horaEntrega')" class="px-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-r-xl text-[11px] font-semibold transition cursor-pointer shrink-0">Ahora</button>
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <!-- 2. TRANSACCIÓN -->
-                <div class="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 space-y-4">
-                    <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2.5">
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
-                            <i data-lucide="banknote" class="w-4 h-4"></i> 2. Cliente y Valores
-                        </h3>
-                    </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-12 gap-3.5">
                         <div class="sm:col-span-4">
-                            <label for="generoCliente" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Género Cliente</label>
-                            <select id="generoCliente" onchange="generar()" class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition">
-                                <option value="M">Sr. (Masculino)</option>
-                                <option value="F">Sra. (Femenino)</option>
+                            <label for="rolSolicitante" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Cargo en Caja</label>
+                            <select id="rolSolicitante" onchange="generar()" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs sm:text-sm font-semibold text-slate-900 dark:text-white outline-none focus:border-indigo-500">
+                                <option value="Jefe de Caja">Jefe de Caja</option>
+                                <option value="Jefa de Caja">Jefa de Caja</option>
+                                <option value="Asistente de Caja">Asistente de Caja</option>
+                                <option value="Cajera">Cajera</option>
+                                <option value="Cajero">Cajero</option>
+                                <option value="Operadora de Caja">Operadora de Caja</option>
+                                <option value="Operador de Caja">Operador de Caja</option>
                             </select>
                         </div>
-                        <div class="sm:col-span-8">
-                            <label for="nombreCliente" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Apellido y Nombre</label>
-                            <input type="text" id="nombreCliente" oninput="generar()" placeholder="Ej: Gómez María" class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition">
+
+                        <div class="sm:col-span-8 relative">
+                            <div class="flex items-center justify-between mb-1">
+                                <label for="nombreEmpleado" class="block text-xs font-semibold text-slate-600 dark:text-slate-300">Apellido y Nombre (1 letra p/ buscar)</label>
+                                <button type="button" onclick="limpiarInput('nombreEmpleado')" class="text-[11px] text-slate-400 hover:text-rose-500 cursor-pointer">Borrar</button>
+                            </div>
+                            <input type="text" id="nombreEmpleado" autocomplete="off" placeholder="Ej: Carrizo Natalia / Chocobar Gisela / Flores Romina..."
+                                class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-white outline-none focus:border-indigo-500">
+                            <div id="dropEmpleadoCaja" class="hidden absolute left-0 right-0 top-full mt-1 z-50 max-h-48 overflow-y-auto rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-xl divide-y divide-slate-100 dark:divide-slate-800"></div>
                         </div>
                     </div>
-
-                    <div>
-                        <label for="montoEfectivo" class="block text-xs font-semibold text-emerald-700 dark:text-emerald-400 mb-1">Total Efectivo Recibido ($)</label>
-                        <input type="text" id="montoEfectivo" oninput="validarMatematica(); generar()" placeholder="0" class="w-full p-2.5 border border-emerald-300 dark:border-emerald-700/70 bg-emerald-50/70 dark:bg-emerald-950/30 rounded-xl text-sm font-mono font-semibold text-emerald-900 dark:text-emerald-300 focus:ring-2 focus:ring-emerald-500 outline-none transition">
-                    </div>
-
-                    <div class="space-y-2.5">
-                        <div class="grid grid-cols-2 gap-3 bg-slate-50 dark:bg-slate-950/60 p-3 rounded-xl border border-slate-200 dark:border-slate-800">
-                            <div>
-                                <label for="cantTickets" class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Cant. Tickets (1)</label>
-                                <input type="text" id="cantTickets" oninput="validarMatematica(); generar()" placeholder="0" class="w-full p-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-sm font-mono outline-none focus:ring-2 focus:ring-indigo-500">
-                            </div>
-                            <div>
-                                <label for="valorTicket" class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Valor Unitario ($)</label>
-                                <input type="text" id="valorTicket" oninput="validarMatematica(); generar()" placeholder="0" class="w-full p-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-sm font-mono outline-none focus:ring-2 focus:ring-indigo-500">
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-3 bg-slate-50 dark:bg-slate-950/60 p-3 rounded-xl border border-slate-200 dark:border-slate-800">
-                            <div>
-                                <label for="cantTickets2" class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Cant. Tickets (2)</label>
-                                <input type="text" id="cantTickets2" oninput="validarMatematica(); generar()" placeholder="Opcional" class="w-full p-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-sm font-mono outline-none focus:ring-2 focus:ring-indigo-500">
-                            </div>
-                            <div>
-                                <label for="valorTicket2" class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Valor Unitario ($)</label>
-                                <input type="text" id="valorTicket2" oninput="validarMatematica(); generar()" placeholder="Opcional" class="w-full p-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-sm font-mono outline-none focus:ring-2 focus:ring-indigo-500">
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-3 bg-slate-50 dark:bg-slate-950/60 p-3 rounded-xl border border-slate-200 dark:border-slate-800">
-                            <div>
-                                <label for="cantTickets3" class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Cant. Tickets (3)</label>
-                                <input type="text" id="cantTickets3" oninput="validarMatematica(); generar()" placeholder="Opcional" class="w-full p-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-sm font-mono outline-none focus:ring-2 focus:ring-indigo-500">
-                            </div>
-                            <div>
-                                <label for="valorTicket3" class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Valor Unitario ($)</label>
-                                <input type="text" id="valorTicket3" oninput="validarMatematica(); generar()" placeholder="Opcional" class="w-full p-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-sm font-mono outline-none focus:ring-2 focus:ring-indigo-500">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="alertaValidacion" class="hidden text-xs p-2.5 rounded-xl flex items-center gap-2"></div>
                 </div>
 
-                <!-- 3. CIERRE -->
-                <div class="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 space-y-3">
+                <!-- 2. CLIENTE, EFECTIVO Y TICKETS -->
+                <div class="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 space-y-4">
                     <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2.5">
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
-                            <i data-lucide="check-circle-2" class="w-4 h-4"></i> 3. Cierre de Operación
-                        </h3>
-                        <button type="button" onclick="setNow('horaEntrega')" class="text-xs bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800/60 hover:bg-indigo-100 px-2.5 py-1 rounded-lg flex items-center gap-1 transition cursor-pointer font-semibold">
-                            <i data-lucide="clock" class="w-3.5 h-3.5"></i> Ahora
-                        </button>
-                    </div>
-                    <div>
-                        <label for="horaEntrega" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Hora Entrega por Ventanilla</label>
-                        <input type="time" id="horaEntrega" oninput="generar()" class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm font-mono text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition">
-                    </div>
-                </div>
-
-                <div class="flex gap-3">
-                    <button type="button" onclick="limpiarFormulario()" class="px-4 py-2.5 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-sm font-semibold transition flex items-center gap-2 shadow-sm cursor-pointer">
-                        <i data-lucide="trash-2" class="w-4 h-4"></i> Limpiar Formulario
-                    </button>
-                </div>
-            </div>
-
-            <!-- COLUMNA DERECHA: RESULTADO -->
-            <div class="lg:col-span-5 bg-slate-100/80 dark:bg-slate-950/60 border-t lg:border-t-0 lg:border-l border-slate-200 dark:border-slate-800 p-5 sm:p-6 flex flex-col justify-between">
-                <div>
-                    <div class="flex items-center justify-between mb-3">
-                        <h2 class="text-sm font-bold uppercase tracking-wider text-slate-700 dark:text-slate-200 flex items-center gap-2">
-                            <i data-lucide="file-text" class="w-4 h-4 text-indigo-500"></i> Vista Previa
+                        <h2 class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
+                            <i data-lucide="banknote" class="w-4 h-4"></i> 2. Cliente, Efectivo y Desglose de Tickets
                         </h2>
                     </div>
 
-                    <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-3">
-                        <textarea id="resultadoTexto" class="report-font w-full h-64 p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs sm:text-sm leading-relaxed text-slate-800 dark:text-slate-100 resize-none outline-none" readonly spellcheck="false"></textarea>
+                    <div class="grid grid-cols-1 sm:grid-cols-12 gap-3.5">
+                        <div class="sm:col-span-4">
+                            <label for="generoCliente" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Trato Cliente</label>
+                            <select id="generoCliente" onchange="generar()" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs sm:text-sm font-semibold text-slate-900 dark:text-white outline-none focus:border-indigo-500">
+                                <option value="M">cliente Sr.</option>
+                                <option value="F">clienta Sra.</option>
+                            </select>
+                        </div>
+                        <div class="sm:col-span-8 relative">
+                            <div class="flex items-center justify-between mb-1">
+                                <label for="nombreCliente" class="block text-xs font-semibold text-slate-600 dark:text-slate-300">Apellido y Nombre del Cliente</label>
+                                <button type="button" onclick="limpiarInput('nombreCliente')" class="text-[11px] text-slate-400 hover:text-rose-500 cursor-pointer">Borrar</button>
+                            </div>
+                            <input type="text" id="nombreCliente" autocomplete="off" placeholder="Ej: Gómez Juan / García María"
+                                class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-white outline-none focus:border-indigo-500">
+                            <div id="dropClienteCaja" class="hidden absolute left-0 right-0 top-full mt-1 z-50 max-h-44 overflow-y-auto rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-xl divide-y divide-slate-100 dark:divide-slate-800"></div>
+                        </div>
                     </div>
 
-                    <button type="button" onclick="copiarTexto()" class="mt-4 w-full px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2 shadow-sm cursor-pointer">
-                        <i data-lucide="copy" class="w-4 h-4"></i>
-                        <span>Copiar al Portapapeles</span>
+                    <!-- Efectivo Total -->
+                    <div>
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-1">
+                            <label for="montoEfectivo" class="text-xs font-bold text-emerald-700 dark:text-emerald-400">💵 Total Efectivo Recibido ($)</label>
+                            <button type="button" onclick="igualarEfectivoATickets()" class="text-[11px] font-semibold text-emerald-700 dark:text-emerald-400 hover:underline cursor-pointer" title="Calcular automáticamente desde la suma de tickets cargados">
+                                ⬆ Tomar suma de tickets
+                            </button>
+                        </div>
+                        <input type="text" id="montoEfectivo" inputmode="decimal" autocomplete="off" placeholder="Ej: 1.000.000"
+                            oninput="validarMatematica(); generar()" onblur="formatearInputMoneda(this)"
+                            class="w-full px-3.5 py-2.5 border border-emerald-300 dark:border-emerald-700/70 bg-emerald-50/70 dark:bg-emerald-950/30 rounded-xl text-sm font-mono font-bold text-emerald-900 dark:text-emerald-300 focus:ring-2 focus:ring-emerald-500 outline-none transition">
+                    </div>
+
+                    <!-- Cortes rápidos de valor unitario -->
+                    <div class="flex flex-wrap items-center gap-1.5">
+                        <span class="text-[10px] font-semibold text-slate-400">Valor rápido en última fila:</span>
+                        <button type="button" onclick="aplicarValorRapidoTicket(50000)" class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 hover:bg-indigo-100 dark:hover:bg-indigo-950 text-[11px] font-mono font-semibold text-slate-700 dark:text-slate-300 cursor-pointer">$50.000</button>
+                        <button type="button" onclick="aplicarValorRapidoTicket(100000)" class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 hover:bg-indigo-100 dark:hover:bg-indigo-950 text-[11px] font-mono font-semibold text-slate-700 dark:text-slate-300 cursor-pointer">$100.000</button>
+                        <button type="button" onclick="aplicarValorRapidoTicket(200000)" class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 hover:bg-indigo-100 dark:hover:bg-indigo-950 text-[11px] font-mono font-semibold text-slate-700 dark:text-slate-300 cursor-pointer">$200.000</button>
+                        <button type="button" onclick="aplicarValorRapidoTicket(250000)" class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 hover:bg-indigo-100 dark:hover:bg-indigo-950 text-[11px] font-mono font-semibold text-slate-700 dark:text-slate-300 cursor-pointer">$250.000</button>
+                        <button type="button" onclick="aplicarValorRapidoTicket(500000)" class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 hover:bg-indigo-100 dark:hover:bg-indigo-950 text-[11px] font-mono font-semibold text-slate-700 dark:text-slate-300 cursor-pointer">$500.000</button>
+                    </div>
+
+                    <!-- Contenedor dinámico de cortes de tickets -->
+                    <div id="contenedorFilasTickets" class="space-y-2"></div>
+
+                    <button type="button" onclick="agregarFilaTicket()" class="w-full py-2 rounded-xl border border-dashed border-indigo-300 dark:border-indigo-800 text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50/60 dark:hover:bg-indigo-950/40 transition flex items-center justify-center gap-1.5 cursor-pointer">
+                        <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i>
+                        Agregar otro corte de tickets
                     </button>
 
-                    <div id="toast" class="hidden mt-3 bg-emerald-100 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2 fade-in">
-                        <i data-lucide="check-circle" class="w-4 h-4"></i>
-                        <span>Copiado al portapapeles.</span>
+                    <div id="alertaValidacion" class="hidden text-xs p-2.5 rounded-xl flex items-center justify-between gap-2"></div>
+                </div>
+
+                <!-- 3. Opcionales (Ventanilla y Cámara CCTV) -->
+                <details class="group bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                    <summary class="cursor-pointer list-none px-4 sm:px-5 py-3.5 flex items-center justify-between text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 select-none">
+                        <span class="flex items-center gap-2">
+                            <i data-lucide="sliders" class="w-4 h-4 text-indigo-500"></i>
+                            3. Opciones Adicionales (Ventanilla específica o Cámara CCTV)
+                            <span id="badgeOpcionalesPalCap" class="hidden text-[10px] font-mono px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300">Activas</span>
+                        </span>
+                        <span class="text-xs text-slate-400 group-open:rotate-180 transition-transform">▼</span>
+                    </summary>
+                    <div class="px-4 sm:px-5 pb-4 pt-2 border-t border-slate-100 dark:border-slate-800 grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                        <div>
+                            <label for="ventanillaLugar" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Lugar de Entrega</label>
+                            <select id="ventanillaLugar" onchange="generar()" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white outline-none focus:border-indigo-500">
+                                <option value="por ventanilla de caja">por ventanilla de caja (Clásico)</option>
+                                <option value="por ventanilla N° 1 de Caja">por ventanilla N° 1 de Caja</option>
+                                <option value="por ventanilla N° 2 de Caja">por ventanilla N° 2 de Caja</option>
+                                <option value="por ventanilla de Caja Slots">por ventanilla de Caja Slots</option>
+                                <option value="por ventanilla de Caja Juegos Vivos">por ventanilla de Caja Juegos Vivos</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="camaraCaja" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Cámara CCTV (Ej: 106, 107, 601)</label>
+                            <input type="text" id="camaraCaja" autocomplete="off" oninput="alEscribirCamaraCaja()" placeholder="Opcional: escribe 3 dígitos"
+                                class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-mono text-slate-900 dark:text-white outline-none focus:border-indigo-500">
+                        </div>
                     </div>
+                </details>
+            </div>
+
+            <!-- COLUMNA DERECHA: VISTA PREVIA, VALIDACIÓN E HISTORIAL (5/12) -->
+            <div class="lg:col-span-5 bg-slate-100/80 dark:bg-slate-950/60 border-t lg:border-t-0 lg:border-l border-slate-200 dark:border-slate-800 p-4 sm:p-6 flex flex-col justify-between space-y-4">
+                <div class="space-y-4">
 
                     <!-- Resumen Matemático -->
-                    <div class="mt-6 border-t border-slate-200 dark:border-slate-800 pt-4">
-                        <h4 class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2.5">Validación de Importes</h4>
-                        <div class="grid grid-cols-2 gap-3 text-sm">
-                            <div class="bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-800">
-                                <span class="block text-xs text-slate-500 dark:text-slate-400">Total Efectivo</span>
-                                <span class="font-mono font-bold text-emerald-600 dark:text-emerald-400" id="resumenEfectivo">$0,00</span>
+                    <div class="grid grid-cols-2 gap-3 text-sm">
+                        <div class="bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                            <span class="block text-[11px] font-semibold text-slate-500 dark:text-slate-400">Efectivo Recibido</span>
+                            <span class="font-mono font-bold text-base text-emerald-600 dark:text-emerald-400" id="resumenEfectivo">$ 0,00</span>
+                        </div>
+                        <div class="bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                            <span class="block text-[11px] font-semibold text-slate-500 dark:text-slate-400">Suma Tickets (<span id="resumenCantTotal">0</span> tk)</span>
+                            <span class="font-mono font-bold text-base text-indigo-600 dark:text-indigo-400" id="resumenTickets">$ 0,00</span>
+                        </div>
+                    </div>
+
+                    <!-- Vista Previa Editable -->
+                    <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-4 space-y-3">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <h2 class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-200 flex items-center gap-2">
+                                <span class="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-pulse"></span>
+                                Vista Previa Editable
+                            </h2>
+                            <div class="flex items-center gap-1.5">
+                                <button type="button" onclick="restaurarTextoAuto()" class="px-2 py-1 rounded-lg text-[11px] font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition inline-flex items-center gap-1 cursor-pointer">
+                                    <i data-lucide="refresh-cw" class="w-3 h-3"></i>
+                                    Restaurar
+                                </button>
+                                <button type="button" onclick="window.print()" class="px-2 py-1 rounded-lg text-[11px] font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition inline-flex items-center gap-1 cursor-pointer" title="Imprimir">
+                                    <i data-lucide="printer" class="w-3 h-3"></i>
+                                </button>
                             </div>
-                            <div class="bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-800">
-                                <span class="block text-xs text-slate-500 dark:text-slate-400">Valor Tickets</span>
-                                <span class="font-mono font-bold text-indigo-600 dark:text-indigo-400" id="resumenTickets">$0,00</span>
+                        </div>
+
+                        <textarea id="resultadoTexto" rows="11" spellcheck="false" oninput="actualizarImpresion()"
+                            class="report-font w-full min-h-[245px] p-3.5 bg-slate-50 dark:bg-slate-950 border-2 border-indigo-200 dark:border-indigo-900/80 rounded-xl text-xs sm:text-sm leading-relaxed text-slate-800 dark:text-slate-100 resize-y outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+
+                        <!-- Copiar paso 1 o paso 2 individualmente -->
+                        <div class="grid grid-cols-2 gap-2">
+                            <button type="button" onclick="copiarPasoPalCap(1)" class="py-1.5 px-2.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900 text-indigo-700 dark:text-indigo-300 border border-indigo-200/70 dark:border-indigo-800 text-[11px] font-semibold transition cursor-pointer">
+                                Copiar 1° (Solicitud)
+                            </button>
+                            <button type="button" onclick="copiarPasoPalCap(2)" class="py-1.5 px-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900 text-emerald-700 dark:text-emerald-300 border border-emerald-200/70 dark:border-emerald-800 text-[11px] font-semibold transition cursor-pointer">
+                                Copiar 2° (Entrega)
+                            </button>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-12 gap-2">
+                            <button type="button" id="btnCopiarPalCap" onclick="copiarTexto()" class="sm:col-span-8 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold text-xs sm:text-sm transition flex items-center justify-center gap-2 shadow-md cursor-pointer active:scale-[0.99]">
+                                <i data-lucide="copy" class="w-4 h-4"></i>
+                                <span>Copiar y Registrar</span>
+                            </button>
+                            <button type="button" onclick="copiarWhatsApp()" class="sm:col-span-4 px-3 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-sm cursor-pointer active:scale-[0.99]">
+                                <i data-lucide="message-square" class="w-3.5 h-3.5"></i>
+                                <span>WhatsApp</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Historial de Operaciones -->
+                    <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-4 space-y-3">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-200 flex items-center gap-1.5">
+                                <i data-lucide="history" class="w-4 h-4 text-indigo-500"></i>
+                                Historial Caja (<span id="countHistorialPalCap">0</span>)
+                            </h3>
+                            <div class="flex items-center gap-1.5">
+                                <button type="button" onclick="exportarCSV()" class="px-2 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900 text-emerald-700 dark:text-emerald-300 text-[11px] font-semibold transition inline-flex items-center gap-1 cursor-pointer">
+                                    <i data-lucide="sheet" class="w-3 h-3"></i> CSV
+                                </button>
+                                <button type="button" onclick="exportarTXT()" class="px-2 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900 text-indigo-700 dark:text-indigo-300 text-[11px] font-semibold transition inline-flex items-center gap-1 cursor-pointer">
+                                    <i data-lucide="download" class="w-3 h-3"></i> TXT
+                                </button>
+                                <button type="button" onclick="vaciarHistorialPalCap()" class="p-1 rounded-lg text-slate-400 hover:text-rose-500 transition cursor-pointer" title="Vaciar historial">
+                                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                </button>
                             </div>
+                        </div>
+
+                        <div class="relative">
+                            <input type="text" id="buscarHistorialPalCap" oninput="renderizarHistorialPalCap()" placeholder="Filtrar por cliente, cajero o monto..."
+                                class="w-full pl-8 pr-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-xs text-slate-800 dark:text-slate-200 outline-none focus:border-indigo-500">
+                            <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2"></i>
+                        </div>
+
+                        <div id="listaHistorialPalCap" class="space-y-1.5 max-h-52 overflow-y-auto pr-0.5 text-xs">
+                            <p class="text-slate-400 text-center py-3">Sin operaciones registradas</p>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </main>
+    </div>
+
+    <!-- TOAST -->
+    <div id="toast" class="no-print hidden fixed bottom-5 right-5 bg-slate-900 dark:bg-slate-800 text-white border border-slate-700 px-4 py-3 rounded-xl shadow-2xl text-xs font-semibold flex items-center gap-2 z-50">
+        <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>
+        <span id="toastText">Copiado al portapapeles</span>
     </div>
 
     <script src="js/global.js"></script>
     <script>
+        const PALCAP_STORAGE = {
+            draftKey: 'cctv_palcap_draft_v2',
+            historyKey: 'cctv_palcap_historial_v2',
+            staffExtraKey: 'cctv_palcap_staff_frecuentes',
+            clientExtraKey: 'cctv_palcap_clientes_frecuentes',
+            maxHistory: 50
+        };
+
+        const PERSONAL_CAJA_BASE = [
+            { nombre: 'CARRIZO, NATALIA VALERIA', rol: 'Jefa de Caja' },
+            { nombre: 'CHOCOBAR, GISELA NOEMI', rol: 'Cajera' },
+            { nombre: 'FLORES, ROMINA PAOLA', rol: 'Cajera' },
+            { nombre: 'MAMANI, SILVANA SOLEDAD', rol: 'Cajera' },
+            { nombre: 'DENZ GIMENEZ, DEBORA ADRIANA', rol: 'Jefa de Caja' },
+            { nombre: 'LAZARTE, LAURA LORENA', rol: 'Asistente de Caja' },
+            { nombre: 'CAMINOS, CINTIA SOLEDAD', rol: 'Asistente de Caja' },
+            { nombre: 'MOISES, ARIEL JESUS', rol: 'Jefe de Caja' },
+            { nombre: 'ALONSO, JOSE ANTONIO SEBASTIAN', rol: 'Asistente de Caja' },
+            { nombre: 'PARADA, JULIO ALBERTO', rol: 'Cajero' }
+        ];
+
+        const CAMARAS_CAJA = {
+            '106':'CAJA SLOTS (DVR 1)','107':'CAJA SLOTS (DVR 1)','108':'CAJA SLOTS (DVR 1)','109':'CAJA SLOTS (DVR 1)',
+            '110':'TESORO SLOTS (DVR 1)','111':'TESORO SLOTS (DVR 1)',
+            '601':'CAJA JV (DVR 6)','602':'CAJA JV (DVR 6)','603':'CAJA JV (DVR 6)','604':'CAJA JV (DVR 6)',
+            '605':'CAJA JV (DVR 6)','606':'CAJA JV (DVR 6)','607':'CAJA JV (DVR 6)','608':'CAJA JV (DVR 6)',
+            '609':'TESORO JV (DVR 6)','610':'TESORO JV (DVR 6)','715':'RECEPCION (DVR 7)'
+        };
+
+        let filasTickets = [{ cant: '', valor: '' }, { cant: '', valor: '' }];
+        let parrafosPalCap = ['', ''];
+        let textoAutoPalCap = '';
+        let historialPalCap = [];
+        let staffExtra = [];
+        let clientExtra = [];
+        let toastTimer = null;
+
         document.getElementById('fechaActual').innerText = new Date().toLocaleDateString('es-AR');
 
-        function setNow(id) {
+        function normStr(s) {
+            return String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+        }
+
+        function escHtml(s) {
+            return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        function getNowStr() {
             const now = new Date();
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            document.getElementById(id).value = `${hours}:${minutes}`;
+            return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+        }
+
+        function sumarMinutos(hora, mins) {
+            if (!hora || !hora.includes(':')) return '';
+            const [h, m] = hora.split(':').map(Number);
+            if (isNaN(h) || isNaN(m)) return '';
+            const t = ((h * 60 + m + mins) % 1440 + 1440) % 1440;
+            return `${String(Math.floor(t / 60)).padStart(2, '0')}:${String(t % 60).padStart(2, '0')}`;
+        }
+
+        window.setNow = function (id) {
+            const ahora = getNowStr();
+            document.getElementById(id).value = ahora;
+            if (id === 'horaLlamada') alCambiarHoraLlamada();
+            else generar();
+        };
+
+        window.alCambiarHoraLlamada = function () {
+            const h1 = document.getElementById('horaLlamada').value;
+            const h2El = document.getElementById('horaEntrega');
+            if (h1 && !h2El.value) {
+                h2El.value = sumarMinutos(h1, 2);
+            }
             generar();
+        };
+
+        window.sumarMinEntrega = function (mins) {
+            const base = document.getElementById('horaLlamada').value || getNowStr();
+            document.getElementById('horaLlamada').value = base;
+            document.getElementById('horaEntrega').value = sumarMinutos(base, mins);
+            generar();
+        };
+
+        // Parseo y formato monetario Argentino seguro (soporta coma y punto)
+        function parseLocalFloat(str) {
+            if (str === null || str === undefined) return 0;
+            let s = String(str).trim().replace(/[$\s]/g, '').replace(/[.,]+$/, '');
+            if (!s) return 0;
+            if (s.includes(',') && s.includes('.')) {
+                return s.lastIndexOf(',') > s.lastIndexOf('.')
+                    ? (parseFloat(s.replace(/\./g, '').replace(',', '.')) || 0)
+                    : (parseFloat(s.replace(/,/g, '')) || 0);
+            }
+            if (s.includes(',')) {
+                return parseFloat(s.replace(',', '.')) || 0;
+            }
+            if (s.includes('.')) {
+                const parts = s.split('.');
+                if (parts.length === 2 && parts[1].length !== 3) {
+                    return parseFloat(s) || 0;
+                }
+                return parseFloat(s.replace(/\./g, '')) || 0;
+            }
+            return parseFloat(s) || 0;
+        }
+
+        function formatMontoAR(num, forceDecimals = false) {
+            if (!num || isNaN(num)) return '0';
+            const hasCents = Math.abs(num - Math.round(num)) >= 0.005;
+            return num.toLocaleString('es-AR', {
+                minimumFractionDigits: (forceDecimals || hasCents) ? 2 : 0,
+                maximumFractionDigits: 2
+            });
         }
 
         const moneyFormat = (num) => {
-            if (!num) return "$ 0,00";
-            return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', minimumFractionDigits: 2 }).format(num);
+            if (!num || isNaN(num)) return '$ 0,00';
+            return `$ ${formatMontoAR(num, true)}`;
         };
 
-        function parseLocalFloat(str) {
-            if (!str) return 0;
-            const s = String(str).trim().replace(/[^\d.,]/g, '');
-            if (!s) return 0;
-            if (s.includes(',')) {
-                return parseFloat(s.replace(/\./g, '').replace(',', '.')) || 0;
+        window.formatearInputMoneda = function (inp) {
+            const v = parseLocalFloat(inp.value);
+            if (v > 0) {
+                inp.value = formatMontoAR(v, false);
+                validarMatematica();
+                generar();
             }
-            const dotParts = s.split('.');
-            if (dotParts.length === 2 && dotParts[1].length <= 2 && dotParts[0].length >= 4) {
-                return parseFloat(s) || 0;
-            }
-            return parseFloat(s.replace(/\./g, '')) || 0;
+        };
+
+        // Gestión dinámica de cortes de tickets
+        function renderizarFilasTickets() {
+            const cont = document.getElementById('contenedorFilasTickets');
+            cont.innerHTML = filasTickets.map((f, idx) => `
+                <div class="grid grid-cols-12 gap-2 items-end bg-slate-50 dark:bg-slate-950/60 p-2.5 rounded-xl border border-slate-200 dark:border-slate-800">
+                    <div class="col-span-4">
+                        <label class="block text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Cant. Tickets (${idx + 1})</label>
+                        <input type="number" min="0" step="1" value="${escHtml(f.cant)}" placeholder="0"
+                            oninput="actualizarFilaTicket(${idx}, 'cant', this.value)"
+                            class="w-full px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs sm:text-sm font-mono text-slate-900 dark:text-white outline-none focus:border-indigo-500">
+                    </div>
+                    <div class="col-span-7">
+                        <div class="flex items-center justify-between mb-1">
+                            <label class="text-[11px] font-semibold text-slate-500 dark:text-slate-400">Valor Unitario ($)</label>
+                            ${idx === 0 ? `<button type="button" onclick="calcularUnitarioDesdeEfectivo()" class="text-[10px] font-semibold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer" title="Dividir Efectivo ÷ Cantidad">÷ Auto</button>` : ''}
+                        </div>
+                        <input type="text" inputmode="decimal" value="${escHtml(f.valor)}" placeholder="Ej: 500.000"
+                            oninput="actualizarFilaTicket(${idx}, 'valor', this.value)"
+                            onblur="formatearValorFilaBlur(${idx}, this)"
+                            class="w-full px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs sm:text-sm font-mono text-slate-900 dark:text-white outline-none focus:border-indigo-500">
+                    </div>
+                    <div class="col-span-1 flex justify-center pb-1">
+                        ${filasTickets.length > 1 ? `
+                            <button type="button" onclick="quitarFilaTicket(${idx})" class="p-1 rounded-lg text-slate-400 hover:text-rose-500 cursor-pointer" title="Quitar fila">
+                                <i data-lucide="x" class="w-4 h-4"></i>
+                            </button>
+                        ` : ''}
+                    </div>
+                </div>
+            `).join('');
+            lucide.createIcons({ nodes: [cont] });
         }
 
-        function validarMatematica() {
+        window.actualizarFilaTicket = function (idx, campo, valor) {
+            if (!filasTickets[idx]) return;
+            filasTickets[idx][campo] = valor;
+            validarMatematica();
+            generar();
+        };
+
+        window.formatearValorFilaBlur = function (idx, inp) {
+            const v = parseLocalFloat(inp.value);
+            if (v > 0) {
+                const fmt = formatMontoAR(v, false);
+                inp.value = fmt;
+                filasTickets[idx].valor = fmt;
+                validarMatematica();
+                generar();
+            }
+        };
+
+        window.agregarFilaTicket = function () {
+            filasTickets.push({ cant: '', valor: '' });
+            renderizarFilasTickets();
+        };
+
+        window.quitarFilaTicket = function (idx) {
+            if (filasTickets.length <= 1) return;
+            filasTickets.splice(idx, 1);
+            renderizarFilasTickets();
+            validarMatematica();
+            generar();
+        };
+
+        window.aplicarValorRapidoTicket = function (monto) {
+            let targetIdx = filasTickets.findIndex(f => !parseLocalFloat(f.valor));
+            if (targetIdx === -1) targetIdx = filasTickets.length - 1;
+            if (!filasTickets[targetIdx].cant) filasTickets[targetIdx].cant = '1';
+            filasTickets[targetIdx].valor = formatMontoAR(monto, false);
+            renderizarFilasTickets();
+            validarMatematica();
+            generar();
+        };
+
+        window.igualarEfectivoATickets = function () {
+            const suma = filasTickets.reduce((acc, f) => acc + (parseLocalFloat(f.cant) * parseLocalFloat(f.valor)), 0);
+            if (suma <= 0) {
+                mostrarToast('Carga primero cantidad y valor de tickets');
+                return;
+            }
+            document.getElementById('montoEfectivo').value = formatMontoAR(suma, false);
+            validarMatematica();
+            generar();
+        };
+
+        window.calcularUnitarioDesdeEfectivo = function () {
+            const ef = parseLocalFloat(document.getElementById('montoEfectivo').value);
+            const cant = parseLocalFloat(filasTickets[0]?.cant || '1') || 1;
+            if (ef <= 0) {
+                mostrarToast('Ingresa primero el Total Efectivo Recibido');
+                return;
+            }
+            filasTickets[0].cant = String(cant);
+            filasTickets[0].valor = formatMontoAR(ef / cant, false);
+            renderizarFilasTickets();
+            validarMatematica();
+            generar();
+        };
+
+        window.validarMatematica = function () {
             const efectivo = parseLocalFloat(document.getElementById('montoEfectivo').value);
+            let totalTickets = 0;
+            let cantTotalTickets = 0;
 
-            const cant1 = parseLocalFloat(document.getElementById('cantTickets').value);
-            const val1 = parseLocalFloat(document.getElementById('valorTicket').value);
-
-            const cant2 = parseLocalFloat(document.getElementById('cantTickets2').value);
-            const val2 = parseLocalFloat(document.getElementById('valorTicket2').value);
-
-            const cant3 = parseLocalFloat(document.getElementById('cantTickets3').value);
-            const val3 = parseLocalFloat(document.getElementById('valorTicket3').value);
-
-            const totalTickets = (cant1 * val1) + (cant2 * val2) + (cant3 * val3);
+            filasTickets.forEach(f => {
+                const c = parseLocalFloat(f.cant);
+                const v = parseLocalFloat(f.valor);
+                if (c > 0 && v > 0) {
+                    totalTickets += c * v;
+                    cantTotalTickets += c;
+                }
+            });
 
             document.getElementById('resumenEfectivo').innerText = moneyFormat(efectivo);
             document.getElementById('resumenTickets').innerText = moneyFormat(totalTickets);
+            document.getElementById('resumenCantTotal').innerText = String(cantTotalTickets);
 
             const alerta = document.getElementById('alertaValidacion');
-
-            if (efectivo > 0 && (cant1 > 0 || cant2 > 0 || cant3 > 0)) {
+            if (efectivo > 0 && cantTotalTickets > 0) {
                 alerta.classList.remove('hidden');
-                if (Math.abs(efectivo - totalTickets) < 0.01) {
-                    alerta.className = "text-xs p-2.5 rounded-xl flex items-center gap-2 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 fade-in";
-                    alerta.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i> <span>Coincide perfectamente.</span>`;
+                const dif = efectivo - totalTickets;
+                if (Math.abs(dif) < 0.01) {
+                    alerta.className = 'text-xs p-2.5 rounded-xl flex items-center justify-between gap-2 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800';
+                    alerta.innerHTML = '<span class="flex items-center gap-1.5 font-semibold"><i data-lucide="check-circle" class="w-4 h-4"></i> Coincide exactamente ($ 0,00 de diferencia)</span>';
                 } else {
-                    const dif = Math.abs(efectivo - totalTickets);
-                    alerta.className = "text-xs p-2.5 rounded-xl flex items-center gap-2 bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 fade-in";
-                    alerta.innerHTML = `<i data-lucide="alert-triangle" class="w-4 h-4"></i> <span>Diferencia de ${moneyFormat(dif)}</span>`;
+                    const estado = dif > 0 ? `Faltan asignar ${moneyFormat(Math.abs(dif))} en tickets` : `Tickets superan efectivo por ${moneyFormat(Math.abs(dif))}`;
+                    alerta.className = 'text-xs p-2.5 rounded-xl flex items-center justify-between gap-2 bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800';
+                    alerta.innerHTML = `
+                        <span class="flex items-center gap-1.5 font-semibold"><i data-lucide="alert-triangle" class="w-4 h-4"></i> ${escHtml(estado)}</span>
+                        <button type="button" onclick="igualarEfectivoATickets()" class="underline font-bold cursor-pointer shrink-0">Ajustar efectivo</button>
+                    `;
                 }
-                if (window.lucide) lucide.createIcons();
+                lucide.createIcons({ nodes: [alerta] });
             } else {
                 alerta.classList.add('hidden');
             }
+        };
+
+        window.alEscribirCamaraCaja = function () {
+            const inp = document.getElementById('camaraCaja');
+            const v = inp.value.trim();
+            if (/^\d{3}$/.test(v) && CAMARAS_CAJA[v]) {
+                inp.value = `${v} - ${CAMARAS_CAJA[v]}`;
+            }
+            generar();
+        };
+
+        window.limpiarInput = function (id) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.value = '';
+            el.focus();
+            generar();
+        };
+
+        // Autocompletado de Personal de Caja y Clientes
+        function configurarAutocompleteCaja() {
+            const inpEmp = document.getElementById('nombreEmpleado');
+            const dropEmp = document.getElementById('dropEmpleadoCaja');
+
+            const mostrarEmp = () => {
+                const q = normStr(inpEmp.value);
+                if (!q) { dropEmp.classList.add('hidden'); return; }
+                const opciones = [
+                    ...staffExtra.map(n => ({ nombre: n, rol: '', custom: true })),
+                    ...PERSONAL_CAJA_BASE.map(p => ({ ...p, custom: false }))
+                ].filter((it, idx, arr) => arr.findIndex(a => normStr(a.nombre) === normStr(it.nombre)) === idx)
+                 .filter(it => normStr(it.nombre).includes(q) && normStr(it.nombre) !== q)
+                 .slice(0, 10);
+
+                if (!opciones.length) { dropEmp.classList.add('hidden'); return; }
+                dropEmp._matches = opciones;
+                dropEmp.innerHTML = opciones.map((op, i) => `
+                    <button type="button" onmousedown="event.preventDefault(); elegirEmpleadoCaja(${i})"
+                        class="w-full text-left px-3 py-2 text-xs font-semibold text-slate-800 dark:text-slate-100 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 flex items-center justify-between cursor-pointer">
+                        <span>${escHtml(op.nombre)}</span>
+                        ${op.rol ? `<span class="text-[10px] text-indigo-500 font-normal">${escHtml(op.rol)}</span>` : ''}
+                    </button>
+                `).join('');
+                dropEmp.classList.remove('hidden');
+            };
+
+            inpEmp.addEventListener('input', () => { mostrarEmp(); generar(); });
+            inpEmp.addEventListener('focus', mostrarEmp);
+            inpEmp.addEventListener('blur', () => setTimeout(() => dropEmp.classList.add('hidden'), 150));
+
+            const inpCli = document.getElementById('nombreCliente');
+            const dropCli = document.getElementById('dropClienteCaja');
+            const mostrarCli = () => {
+                const q = normStr(inpCli.value);
+                if (!q) { dropCli.classList.add('hidden'); return; }
+                const matches = clientExtra.filter(c => normStr(c).includes(q) && normStr(c) !== q).slice(0, 8);
+                if (!matches.length) { dropCli.classList.add('hidden'); return; }
+                dropCli._matches = matches;
+                dropCli.innerHTML = matches.map((c, i) => `
+                    <button type="button" onmousedown="event.preventDefault(); elegirClienteCaja(${i})"
+                        class="w-full text-left px-3 py-2 text-xs font-semibold text-slate-800 dark:text-slate-100 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 cursor-pointer">
+                        ${escHtml(c)}
+                    </button>
+                `).join('');
+                dropCli.classList.remove('hidden');
+            };
+            inpCli.addEventListener('input', () => { mostrarCli(); generar(); });
+            inpCli.addEventListener('focus', mostrarCli);
+            inpCli.addEventListener('blur', () => setTimeout(() => dropCli.classList.add('hidden'), 150));
         }
 
-        function generar() {
-            const h1 = document.getElementById('horaLlamada').value || "--:--";
+        window.elegirEmpleadoCaja = function (idx) {
+            const op = document.getElementById('dropEmpleadoCaja')?._matches?.[idx];
+            if (!op) return;
+            document.getElementById('nombreEmpleado').value = op.nombre;
+            if (op.rol) document.getElementById('rolSolicitante').value = op.rol;
+            document.getElementById('dropEmpleadoCaja').classList.add('hidden');
+            generar();
+        };
+
+        window.elegirClienteCaja = function (idx) {
+            const val = document.getElementById('dropClienteCaja')?._matches?.[idx];
+            if (!val) return;
+            document.getElementById('nombreCliente').value = val;
+            document.getElementById('dropClienteCaja').classList.add('hidden');
+            generar();
+        };
+
+        // Generador del Acta
+        window.generar = function () {
+            const h1 = document.getElementById('horaLlamada').value || '--:--';
+            const h2 = document.getElementById('horaEntrega').value || '--:--';
             const rol = document.getElementById('rolSolicitante').value;
-            const emp = document.getElementById('nombreEmpleado').value || "___";
+            const emp = document.getElementById('nombreEmpleado').value.trim() || '___';
 
-            const nombreCli = document.getElementById('nombreCliente').value || "___";
+            const nombreCli = document.getElementById('nombreCliente').value.trim() || '___';
             const genero = document.getElementById('generoCliente').value;
-
             const txtCliente = genero === 'F' ? `clienta Sra. ${nombreCli}` : `cliente Sr. ${nombreCli}`;
 
-            const monto = document.getElementById('montoEfectivo').value || "0";
-            const h2 = document.getElementById('horaEntrega').value || "--:--";
-
-            const cant1 = document.getElementById('cantTickets').value || "0";
-            const val1 = document.getElementById('valorTicket').value || "0";
-            const cant2 = document.getElementById('cantTickets2').value;
-            const val2 = document.getElementById('valorTicket2').value;
-            const cant3 = document.getElementById('cantTickets3').value;
-            const val3 = document.getElementById('valorTicket3').value;
+            const montoNum = parseLocalFloat(document.getElementById('montoEfectivo').value);
+            const montoStr = montoNum > 0 ? formatMontoAR(montoNum, false) : (document.getElementById('montoEfectivo').value.trim() || '0');
 
             const wordTk = n => Number(n) === 1 ? 'ticket' : 'tickets';
-            let txtTickets = `${cant1} ${wordTk(cant1)} de valor $${val1}`;
-            let txtEntrega = `${cant1} ${wordTk(cant1)}`;
+            const cortesValidos = filasTickets
+                .map(f => ({ c: parseLocalFloat(f.cant), v: parseLocalFloat(f.valor), rawC: f.cant, rawV: f.valor }))
+                .filter(x => x.c > 0 && x.v > 0);
 
-            if (cant2 && val2 && parseLocalFloat(cant2) > 0) {
-                txtTickets += `, ${cant2} ${wordTk(cant2)} de valor $${val2}`;
-                txtEntrega = `la totalidad de los tickets`;
+            let txtTickets = '0 tickets de valor $0';
+            let txtEntrega = '0 tickets';
+
+            if (cortesValidos.length === 1) {
+                const u = cortesValidos[0];
+                txtTickets = `${u.c} ${wordTk(u.c)} de valor $${formatMontoAR(u.v, false)}`;
+                txtEntrega = `${u.c} ${wordTk(u.c)}`;
+            } else if (cortesValidos.length > 1) {
+                const partes = cortesValidos.map(u => `${u.c} ${wordTk(u.c)} de valor $${formatMontoAR(u.v, false)}`);
+                const ult = partes.pop();
+                txtTickets = `${partes.join(', ')} y ${ult}`;
+                txtEntrega = 'la totalidad de los tickets';
             }
 
-            if (cant3 && val3 && parseLocalFloat(cant3) > 0) {
-                txtTickets += ` y ${cant3} ${wordTk(cant3)} de valor $${val3}`;
-                txtEntrega = `la totalidad de los tickets`;
-            }
+            const esRolFemenino = ['Cajera', 'Jefa de Caja', 'Operadora de Caja'].includes(rol);
+            const pronEmpleado = esRolFemenino ? 'la misma' : 'el mismo';
 
-            const pronEmpleado = rol === 'Cajera' ? 'la misma' : 'el mismo';
+            const ventanilla = document.getElementById('ventanillaLugar').value || 'por ventanilla de caja';
+            const cam = document.getElementById('camaraCaja').value.trim();
+            const camTxt = cam ? ` (visualizado por cámara ${cam})` : '';
 
-            const t = `A las ${h1} Hs. CCTV recibe llamada de ${rol} ${emp}, informa que ${txtCliente} le entrega $${monto} en efectivo y solicita que se lo cambie por tickets. A su vez ${pronEmpleado} también informa que procede a imprimir ${txtTickets}.-\n\nA las ${h2} Hs. ${rol} ${emp}, entrega ${txtEntrega} a ${txtCliente} por ventanilla de caja.-`;
+            const p1 = `A las ${h1} Hs. CCTV recibe llamada de ${rol} ${emp}, informa que ${txtCliente} le entrega $${montoStr} en efectivo y solicita que se lo cambie por tickets. A su vez ${pronEmpleado} también informa que procede a imprimir ${txtTickets}.-`;
+            const p2 = `A las ${h2} Hs. ${rol} ${emp}, entrega ${txtEntrega} a ${txtCliente} ${ventanilla}${camTxt}.-`;
 
-            document.getElementById('resultadoTexto').value = t;
+            parrafosPalCap = [p1, p2];
+            textoAutoPalCap = `${p1}\n\n${p2}`;
+
+            document.getElementById('resultadoTexto').value = textoAutoPalCap;
+            document.getElementById('badgeOpcionalesPalCap').classList.toggle('hidden', ventanilla === 'por ventanilla de caja' && !cam);
+            guardarBorradorPalCap();
+            actualizarImpresion();
+        };
+
+        window.actualizarImpresion = function () {
+            document.getElementById('printTexto').textContent = document.getElementById('resultadoTexto').value;
+            document.getElementById('printFechaHora').textContent = new Date().toLocaleString('es-AR');
+        };
+
+        window.restaurarTextoAuto = function () {
+            document.getElementById('resultadoTexto').value = textoAutoPalCap;
+            actualizarImpresion();
+            mostrarToast('Texto automático restaurado');
+        };
+
+        function guardarBorradorPalCap() {
+            const data = {
+                horaLlamada: document.getElementById('horaLlamada').value,
+                horaEntrega: document.getElementById('horaEntrega').value,
+                rolSolicitante: document.getElementById('rolSolicitante').value,
+                nombreEmpleado: document.getElementById('nombreEmpleado').value,
+                generoCliente: document.getElementById('generoCliente').value,
+                nombreCliente: document.getElementById('nombreCliente').value,
+                montoEfectivo: document.getElementById('montoEfectivo').value,
+                filasTickets,
+                ventanillaLugar: document.getElementById('ventanillaLugar').value,
+                camaraCaja: document.getElementById('camaraCaja').value
+            };
+            try {
+                localStorage.setItem(PALCAP_STORAGE.draftKey, JSON.stringify(data));
+            } catch (e) {}
         }
 
-        async function copiarTexto() {
-            const copyText = document.getElementById("resultadoTexto");
+        function cargarDatosIniciales() {
+            try {
+                staffExtra = JSON.parse(localStorage.getItem(PALCAP_STORAGE.staffExtraKey) || '[]');
+                clientExtra = JSON.parse(localStorage.getItem(PALCAP_STORAGE.clientExtraKey) || '[]');
+                historialPalCap = JSON.parse(localStorage.getItem(PALCAP_STORAGE.historyKey) || '[]');
+            } catch (e) {}
+
+            let saved = null;
+            try {
+                saved = JSON.parse(localStorage.getItem(PALCAP_STORAGE.draftKey) || 'null');
+            } catch (e) {}
+
+            if (saved) {
+                document.getElementById('horaLlamada').value = saved.horaLlamada || getNowStr();
+                document.getElementById('horaEntrega').value = saved.horaEntrega || '';
+                if (saved.rolSolicitante) document.getElementById('rolSolicitante').value = saved.rolSolicitante;
+                document.getElementById('nombreEmpleado').value = saved.nombreEmpleado || '';
+                if (saved.generoCliente) document.getElementById('generoCliente').value = saved.generoCliente;
+                document.getElementById('nombreCliente').value = saved.nombreCliente || '';
+                document.getElementById('montoEfectivo').value = saved.montoEfectivo || '';
+                if (Array.isArray(saved.filasTickets) && saved.filasTickets.length) {
+                    filasTickets = saved.filasTickets;
+                }
+                if (saved.ventanillaLugar) document.getElementById('ventanillaLugar').value = saved.ventanillaLugar;
+                document.getElementById('camaraCaja').value = saved.camaraCaja || '';
+            } else {
+                const ahora = getNowStr();
+                document.getElementById('horaLlamada').value = ahora;
+                document.getElementById('horaEntrega').value = sumarMinutos(ahora, 2);
+            }
+
+            renderizarFilasTickets();
+            validarMatematica();
+            renderizarHistorialPalCap();
+            generar();
+        }
+
+        async function escribirPortapapeles(txt) {
             try {
                 if (navigator.clipboard && window.isSecureContext) {
-                    await navigator.clipboard.writeText(copyText.value);
-                } else {
-                    copyText.select();
-                    copyText.setSelectionRange(0, 99999);
-                    document.execCommand('copy');
+                    await navigator.clipboard.writeText(txt);
+                    return true;
                 }
+            } catch (e) {}
+            try {
+                const t = document.createElement('textarea');
+                t.value = txt;
+                t.style.position = 'fixed';
+                t.style.opacity = '0';
+                document.body.appendChild(t);
+                t.select();
+                const ok = document.execCommand('copy');
+                t.remove();
+                return ok;
             } catch (e) {
-                copyText.select();
-                copyText.setSelectionRange(0, 99999);
-                document.execCommand('copy');
+                return false;
+            }
+        }
+
+        window.copiarPasoPalCap = async function (num) {
+            const txt = parrafosPalCap[num - 1] || '';
+            if (!txt) return;
+            await escribirPortapapeles(txt);
+            mostrarToast(`Paso ${num}° copiado al portapapeles`);
+        };
+
+        function recordarNombresUsados() {
+            const emp = document.getElementById('nombreEmpleado').value.trim();
+            if (emp.length >= 4 && !PERSONAL_CAJA_BASE.some(p => normStr(p.nombre) === normStr(emp))) {
+                staffExtra = [emp, ...staffExtra.filter(x => normStr(x) !== normStr(emp))].slice(0, 20);
+                localStorage.setItem(PALCAP_STORAGE.staffExtraKey, JSON.stringify(staffExtra));
+            }
+            const cli = document.getElementById('nombreCliente').value.trim();
+            if (cli.length >= 4) {
+                clientExtra = [cli, ...clientExtra.filter(x => normStr(x) !== normStr(cli))].slice(0, 25);
+                localStorage.setItem(PALCAP_STORAGE.clientExtraKey, JSON.stringify(clientExtra));
+            }
+        }
+
+        function guardarEnHistorial(texto) {
+            if (historialPalCap.length > 0 && historialPalCap[0].texto === texto) return;
+            const reg = {
+                fechaISO: new Date().toISOString(),
+                hora: document.getElementById('horaLlamada').value || '--:--',
+                empleado: `${document.getElementById('rolSolicitante').value} ${document.getElementById('nombreEmpleado').value.trim()}`.trim(),
+                cliente: document.getElementById('nombreCliente').value.trim() || 'Sin especificar',
+                monto: formatMontoAR(parseLocalFloat(document.getElementById('montoEfectivo').value), false),
+                texto
+            };
+            historialPalCap.unshift(reg);
+            historialPalCap = historialPalCap.slice(0, PALCAP_STORAGE.maxHistory);
+            localStorage.setItem(PALCAP_STORAGE.historyKey, JSON.stringify(historialPalCap));
+            renderizarHistorialPalCap();
+        }
+
+        window.copiarTexto = async function () {
+            const txt = document.getElementById('resultadoTexto').value.trim();
+            if (!txt) return;
+            const ok = await escribirPortapapeles(txt);
+            if (!ok) return;
+            recordarNombresUsados();
+            guardarEnHistorial(txt);
+            mostrarToast('Operación copiada y guardada en historial');
+        };
+
+        window.copiarWhatsApp = async function () {
+            const txt = document.getElementById('resultadoTexto').value.trim();
+            if (!txt) return;
+            const msg = `💳 *CAMBIO DE EFECTIVO POR TICKETS - CAJA*\n\n${txt}`;
+            const ok = await escribirPortapapeles(msg);
+            if (ok) {
+                recordarNombresUsados();
+                guardarEnHistorial(txt);
+                mostrarToast('Copiado con formato WhatsApp');
+            }
+        };
+
+        window.renderizarHistorialPalCap = function () {
+            document.getElementById('countHistorialPalCap').textContent = String(historialPalCap.length);
+            const lista = document.getElementById('listaHistorialPalCap');
+            const q = normStr(document.getElementById('buscarHistorialPalCap')?.value || '');
+
+            const items = historialPalCap
+                .map((it, idx) => ({ it, idx }))
+                .filter(({ it }) => !q || normStr(`${it.cliente} ${it.empleado} ${it.monto} ${it.hora} ${it.texto}`).includes(q));
+
+            if (!items.length) {
+                lista.innerHTML = `<p class="text-slate-400 text-center py-3">${historialPalCap.length ? 'Sin coincidencias' : 'Sin operaciones registradas'}</p>`;
+                return;
             }
 
+            lista.innerHTML = items.map(({ it, idx }) => {
+                const fechaCorta = new Date(it.fechaISO).toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit' });
+                return `
+                    <div class="history-item p-2.5 rounded-lg bg-slate-50 dark:bg-slate-950/70 hover:bg-indigo-50/70 dark:hover:bg-slate-800/80 border border-slate-200/70 dark:border-slate-800 flex items-center justify-between gap-2">
+                        <button type="button" onclick="cargarItemPalCap(${idx})" class="flex-1 min-w-0 text-left cursor-pointer">
+                            <div class="flex items-center gap-1.5 flex-wrap">
+                                <span class="px-1.5 py-0.5 rounded bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 font-mono font-bold text-[10px]">${escHtml(it.hora)} Hs.</span>
+                                <span class="font-mono font-bold text-emerald-600 dark:text-emerald-400 text-[11px]">$${escHtml(it.monto)}</span>
+                                <span class="text-[10px] font-mono text-slate-400">${escHtml(fechaCorta)}</span>
+                            </div>
+                            <p class="text-xs font-bold text-slate-800 dark:text-slate-100 truncate mt-0.5">${escHtml(it.cliente)}</p>
+                            <p class="text-[11px] text-slate-500 dark:text-slate-400 truncate">${escHtml(it.empleado)}</p>
+                        </button>
+                        <div class="flex items-center gap-1 shrink-0">
+                            <button type="button" onclick="recopiarItemPalCap(${idx})" class="p-1.5 rounded-md text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-white dark:hover:bg-slate-900 cursor-pointer" title="Copiar">
+                                <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                            </button>
+                            <button type="button" onclick="eliminarItemPalCap(${idx})" class="p-1.5 rounded-md text-slate-400 hover:text-rose-500 hover:bg-white dark:hover:bg-slate-900 cursor-pointer" title="Eliminar">
+                                <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            lucide.createIcons({ nodes: [lista] });
+        };
+
+        window.cargarItemPalCap = function (idx) {
+            const it = historialPalCap[idx];
+            if (!it) return;
+            document.getElementById('resultadoTexto').value = it.texto;
+            actualizarImpresion();
+            mostrarToast('Operación cargada en vista previa');
+        };
+
+        window.recopiarItemPalCap = async function (idx) {
+            const it = historialPalCap[idx];
+            if (!it) return;
+            await escribirPortapapeles(it.texto);
+            mostrarToast('Registro copiado del historial');
+        };
+
+        window.eliminarItemPalCap = function (idx) {
+            historialPalCap.splice(idx, 1);
+            localStorage.setItem(PALCAP_STORAGE.historyKey, JSON.stringify(historialPalCap));
+            renderizarHistorialPalCap();
+        };
+
+        window.vaciarHistorialPalCap = function () {
+            if (!historialPalCap.length || !confirm('¿Vaciar el historial de operaciones de Caja?')) return;
+            historialPalCap = [];
+            localStorage.removeItem(PALCAP_STORAGE.historyKey);
+            renderizarHistorialPalCap();
+        };
+
+        function descargarBlob(contenido, nombre, mime) {
+            const blob = new Blob([contenido], { type: mime });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = nombre;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        window.exportarTXT = function () {
+            if (!historialPalCap.length) return mostrarToast('No hay registros para exportar');
+            let txt = '=== HISTORIAL PAL CAP - OPERACIONES DE CAJA ===\n\n';
+            historialPalCap.forEach((it, i) => {
+                txt += `${i + 1}. ${new Date(it.fechaISO).toLocaleString('es-AR')} | Monto: $${it.monto}\n${it.texto}\n\n---\n\n`;
+            });
+            descargarBlob(txt, `palcap-caja-${new Date().toISOString().split('T')[0]}.txt`, 'text/plain;charset=utf-8');
+        };
+
+        window.exportarCSV = function () {
+            if (!historialPalCap.length) return mostrarToast('No hay registros para exportar');
+            const esc = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
+            const rows = [['Fecha', 'Hora', 'Cliente', 'Personal Caja', 'Monto Efectivo', 'Acta Completa']];
+            historialPalCap.forEach(it => {
+                rows.push([new Date(it.fechaISO).toLocaleDateString('es-AR'), it.hora, it.cliente, it.empleado, it.monto, it.texto]);
+            });
+            descargarBlob('\uFEFF' + rows.map(r => r.map(esc).join(';')).join('\r\n'), `palcap-caja-${new Date().toISOString().split('T')[0]}.csv`, 'text/csv;charset=utf-8');
+        };
+
+        window.limpiarFormulario = function () {
+            if ((document.getElementById('nombreCliente').value.trim() || document.getElementById('montoEfectivo').value.trim()) &&
+                !confirm('¿Limpiar los campos de la operación actual?')) {
+                return;
+            }
+            const ahora = getNowStr();
+            document.getElementById('horaLlamada').value = ahora;
+            document.getElementById('horaEntrega').value = sumarMinutos(ahora, 2);
+            document.getElementById('nombreEmpleado').value = '';
+            document.getElementById('generoCliente').value = 'M';
+            document.getElementById('nombreCliente').value = '';
+            document.getElementById('montoEfectivo').value = '';
+            document.getElementById('ventanillaLugar').value = 'por ventanilla de caja';
+            document.getElementById('camaraCaja').value = '';
+            filasTickets = [{ cant: '', valor: '' }, { cant: '', valor: '' }];
+            localStorage.removeItem(PALCAP_STORAGE.draftKey);
+            renderizarFilasTickets();
+            validarMatematica();
+            generar();
+            mostrarToast('Formulario restablecido');
+        };
+
+        function mostrarToast(msg) {
             const toast = document.getElementById('toast');
+            document.getElementById('toastText').textContent = msg;
             toast.classList.remove('hidden');
-            setTimeout(() => toast.classList.add('hidden'), 3000);
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => toast.classList.add('hidden'), 2600);
         }
 
-        function limpiarFormulario() {
-            if (confirm('¿Borrar formulario?')) {
-                document.querySelectorAll('input').forEach(i => i.value = '');
-                document.getElementById('generoCliente').value = 'M';
-                document.getElementById('alertaValidacion').classList.add('hidden');
-                generar();
-                validarMatematica();
-            }
-        }
+        window.addEventListener('DOMContentLoaded', () => {
+            configurarAutocompleteCaja();
+            cargarDatosIniciales();
 
-        generar();
+            document.addEventListener('keydown', (e) => {
+                if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                    e.preventDefault();
+                    copiarTexto();
+                }
+            });
+            lucide.createIcons();
+        });
     </script>
 </body>
 </html>

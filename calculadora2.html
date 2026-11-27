@@ -282,7 +282,7 @@
                         </button>
                         <button type="button" onclick="showCurrencyConverter()"
                             class="px-3.5 py-2.5 bg-white/20 hover:bg-white/30 rounded-xl text-xs font-semibold transition sm:col-span-2 text-center cursor-pointer">
-                            💱 Conversor Bidireccional de Divisas (USD / EUR ⇄ ARS)
+                            💱 Conversor Bidireccional de Divisas (USD / EUR / BRL ⇄ ARS)
                         </button>
                     </div>
                 </div>
@@ -314,27 +314,38 @@
                                     <i data-lucide="dollar-sign" class="w-4 h-4"></i>
                                     <h3 class="font-bold text-xs uppercase tracking-wider">Dólar (ARS por USD)</h3>
                                 </div>
-                                <button type="button" onclick="refreshAllRates()"
-                                    class="text-xs bg-white/20 hover:bg-white/30 px-2 py-1 rounded-lg transition cursor-pointer"
-                                    title="Actualizar cotizaciones">
-                                    <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
-                                </button>
+                                <div class="flex items-center gap-1.5">
+                                    <button type="button" onclick="showCurrencyConverter()"
+                                        class="text-[11px] font-semibold bg-white/20 hover:bg-white/30 px-2.5 py-1 rounded-lg transition cursor-pointer">
+                                        Convertir
+                                    </button>
+                                    <button type="button" id="btnRefreshRates" onclick="refreshAllRates(false)"
+                                        class="text-xs bg-white/20 hover:bg-white/30 px-2 py-1 rounded-lg transition cursor-pointer"
+                                        title="Actualizar cotizaciones en línea">
+                                        <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+                                    </button>
+                                </div>
                             </div>
-                            <div class="grid grid-cols-3 gap-1.5 text-center text-xs">
+                            <div class="grid grid-cols-4 gap-1.5 text-center text-xs">
                                 <div class="bg-black/20 rounded-lg p-1.5 cursor-pointer hover:bg-black/30 transition"
                                     onclick="openConverterWith('usd', 'official')">
-                                    <div class="opacity-80 text-[11px]">Oficial</div>
-                                    <div class="font-mono font-bold mt-0.5" id="officialRate">$1.000</div>
+                                    <div class="opacity-80 text-[10px]">Oficial</div>
+                                    <div class="font-mono font-bold mt-0.5 text-[11px]" id="officialRate">$1.000</div>
                                 </div>
                                 <div class="bg-black/20 rounded-lg p-1.5 cursor-pointer hover:bg-black/30 transition"
                                     onclick="openConverterWith('usd', 'blue')">
-                                    <div class="opacity-80 text-[11px]">Blue</div>
-                                    <div class="font-mono font-bold mt-0.5" id="blueRate">$1.200</div>
+                                    <div class="opacity-80 text-[10px]">Blue</div>
+                                    <div class="font-mono font-bold mt-0.5 text-[11px]" id="blueRate">$1.200</div>
+                                </div>
+                                <div class="bg-black/20 rounded-lg p-1.5 cursor-pointer hover:bg-black/30 transition"
+                                    onclick="openConverterWith('usd', 'mep')">
+                                    <div class="opacity-80 text-[10px]">MEP</div>
+                                    <div class="font-mono font-bold mt-0.5 text-[11px]" id="mepRate">$1.180</div>
                                 </div>
                                 <div class="bg-black/20 rounded-lg p-1.5 cursor-pointer hover:bg-black/30 transition"
                                     onclick="openConverterWith('usd', 'custom')">
-                                    <div class="opacity-80 text-[11px]">Personal</div>
-                                    <div class="font-mono font-bold mt-0.5" id="customDollarRateDisplay">Sin def.</div>
+                                    <div class="opacity-80 text-[10px]">Personal</div>
+                                    <div class="font-mono font-bold mt-0.5 text-[11px]" id="customDollarRateDisplay">Sin def.</div>
                                 </div>
                             </div>
                         </div>
@@ -344,32 +355,39 @@
                             <div class="flex items-center justify-between mb-2">
                                 <div class="flex items-center gap-1.5">
                                     <i data-lucide="euro" class="w-4 h-4"></i>
-                                    <h3 class="font-bold text-xs uppercase tracking-wider">Euro (ARS por EUR)</h3>
+                                    <h3 class="font-bold text-xs uppercase tracking-wider">Euro y Real (ARS)</h3>
                                 </div>
-                                <span class="text-[10px] bg-white/15 px-2 py-0.5 rounded-full">Clic para
-                                    convertir</span>
+                                <button type="button" onclick="openConverterWith('brl', 'official')"
+                                    class="text-[10px] font-mono font-semibold bg-white/20 hover:bg-white/30 px-2 py-0.5 rounded-full transition cursor-pointer"
+                                    title="Abrir conversor en Real Brasileño">
+                                    🇧🇷 BRL: <span id="officialBrlRate">$200</span>
+                                </button>
                             </div>
                             <div class="grid grid-cols-3 gap-1.5 text-center text-xs">
                                 <div class="bg-black/20 rounded-lg p-1.5 cursor-pointer hover:bg-black/30 transition"
                                     onclick="openConverterWith('eur', 'official')">
-                                    <div class="opacity-80 text-[11px]">Oficial</div>
+                                    <div class="opacity-80 text-[11px]">EUR Oficial</div>
                                     <div class="font-mono font-bold mt-0.5" id="officialEuroRate">$1.050</div>
                                 </div>
                                 <div class="bg-black/20 rounded-lg p-1.5 cursor-pointer hover:bg-black/30 transition"
                                     onclick="openConverterWith('eur', 'blue')">
-                                    <div class="opacity-80 text-[11px]">Ref. Blue</div>
+                                    <div class="opacity-80 text-[11px]">EUR Blue</div>
                                     <div class="font-mono font-bold mt-0.5" id="blueEuroRate">$1.250</div>
                                 </div>
                                 <div class="bg-black/20 rounded-lg p-1.5 cursor-pointer hover:bg-black/30 transition"
                                     onclick="openConverterWith('eur', 'custom')">
-                                    <div class="opacity-80 text-[11px]">Personal</div>
+                                    <div class="opacity-80 text-[11px]">EUR Personal</div>
                                     <div class="font-mono font-bold mt-0.5" id="customEuroRateDisplay">Sin def.</div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="text-center text-[11px] text-slate-500 dark:text-slate-400">
-                            Actualizado: <span id="lastUpdate" class="font-mono">-</span>
+                        <div class="flex items-center justify-between px-1 text-[11px] text-slate-500 dark:text-slate-400">
+                            <span id="ratesSourceStatus" class="inline-flex items-center gap-1">
+                                <span class="w-2 h-2 rounded-full bg-slate-400 inline-block"></span>
+                                Cotización local
+                            </span>
+                            <span>Actualizado: <span id="lastUpdate" class="font-mono">-</span></span>
                         </div>
                     </div>
 
@@ -673,16 +691,25 @@
                 class="sticky top-0 z-10 bg-gradient-to-r from-indigo-700 to-purple-700 text-white p-4 flex items-center justify-between">
                 <div class="flex items-center gap-2">
                     <i data-lucide="arrow-left-right" class="w-5 h-5"></i>
-                    <h3 class="font-bold text-sm sm:text-base">Conversor de Divisas</h3>
+                    <div>
+                        <h3 class="font-bold text-sm sm:text-base leading-tight">Conversor Bidireccional de Divisas</h3>
+                        <p class="text-[11px] text-indigo-100/80">Escribe en cualquiera de las dos monedas (acepta punto o coma)</p>
+                    </div>
                 </div>
-                <button type="button" onclick="closeModal('currencyModal')"
-                    class="hover:bg-white/20 p-1 rounded-lg cursor-pointer">
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </button>
+                <div class="flex items-center gap-1">
+                    <button type="button" onclick="refreshAllRates(false)"
+                        class="hover:bg-white/20 p-1.5 rounded-lg cursor-pointer" title="Actualizar cotizaciones ahora">
+                        <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                    </button>
+                    <button type="button" onclick="closeModal('currencyModal')"
+                        class="hover:bg-white/20 p-1.5 rounded-lg cursor-pointer">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
             </div>
 
-            <!-- Tabs USD / EUR -->
-            <div class="grid grid-cols-2 gap-2 p-4 border-b border-slate-200 dark:border-slate-800">
+            <!-- Tabs USD / EUR / BRL -->
+            <div class="grid grid-cols-3 gap-2 p-4 pb-3 border-b border-slate-200 dark:border-slate-800">
                 <button type="button" id="usdTab" onclick="selectCurrency('usd')"
                     class="py-2 rounded-xl text-xs sm:text-sm font-semibold transition cursor-pointer bg-indigo-600 text-white">
                     💵 Dólar (USD)
@@ -691,18 +718,26 @@
                     class="py-2 rounded-xl text-xs sm:text-sm font-semibold transition cursor-pointer bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
                     💶 Euro (EUR)
                 </button>
+                <button type="button" id="brlTab" onclick="selectCurrency('brl')"
+                    class="py-2 rounded-xl text-xs sm:text-sm font-semibold transition cursor-pointer bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                    🇧🇷 Real (BRL)
+                </button>
             </div>
 
-            <div class="p-5 space-y-4">
+            <div class="p-4 sm:p-5 space-y-3.5">
                 <!-- Selector de tipo de cambio -->
-                <div class="grid grid-cols-3 gap-2">
+                <div class="grid grid-cols-4 gap-1.5">
                     <button type="button" id="useOfficialCurrencyBtn" onclick="setCurrencyExchangeType('official')"
                         class="px-2 py-2 rounded-xl font-semibold transition text-xs cursor-pointer bg-indigo-600 text-white">
                         Oficial
                     </button>
                     <button type="button" id="useBlueCurrencyBtn" onclick="setCurrencyExchangeType('blue')"
                         class="px-2 py-2 rounded-xl font-semibold transition text-xs cursor-pointer bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
-                        Blue / Ref
+                        Blue
+                    </button>
+                    <button type="button" id="useMepCurrencyBtn" onclick="setCurrencyExchangeType('mep')"
+                        class="px-2 py-2 rounded-xl font-semibold transition text-xs cursor-pointer bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                        MEP
                     </button>
                     <button type="button" id="useCustomCurrencyBtn" onclick="setCurrencyExchangeType('custom')"
                         class="px-2 py-2 rounded-xl font-semibold transition text-xs cursor-pointer bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
@@ -710,69 +745,122 @@
                     </button>
                 </div>
 
-                <!-- Cotización activa -->
-                <div
-                    class="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-3 rounded-xl text-center">
-                    <div class="text-xs text-slate-500 dark:text-slate-400" id="selectedCurrencyType">Dólar Oficial
+                <!-- Punta Compra / Promedio / Venta + Cotización Editable Directa -->
+                <div class="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-3 rounded-xl space-y-2.5">
+                    <div id="rateQuoteSideRow" class="grid grid-cols-3 gap-1.5 text-[11px]">
+                        <button type="button" id="rateSideCompraBtn" onclick="setRateQuoteSide('compra')"
+                            class="py-1.5 px-2 rounded-lg font-semibold transition cursor-pointer bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300">
+                            Compra: <span id="rateSideCompraVal" class="font-mono font-bold">$0</span>
+                        </button>
+                        <button type="button" id="rateSidePromedioBtn" onclick="setRateQuoteSide('promedio')"
+                            class="py-1.5 px-2 rounded-lg font-semibold transition cursor-pointer bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300">
+                            Prom: <span id="rateSidePromedioVal" class="font-mono font-bold">$0</span>
+                        </button>
+                        <button type="button" id="rateSideVentaBtn" onclick="setRateQuoteSide('venta')"
+                            class="py-1.5 px-2 rounded-lg font-semibold transition cursor-pointer bg-indigo-600 text-white">
+                            Venta: <span id="rateSideVentaVal" class="font-mono font-bold">$0</span>
+                        </button>
                     </div>
-                    <div class="text-2xl font-mono font-bold text-indigo-600 dark:text-indigo-400 mt-0.5"
-                        id="selectedCurrencyRate">$1.000,00</div>
+
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-0.5">
+                        <div>
+                            <div class="text-xs font-bold text-slate-700 dark:text-slate-200" id="selectedCurrencyType">Dólar Oficial (Venta)</div>
+                            <div class="text-[11px] text-slate-400">Puedes editar la cotización directamente:</div>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-sm font-mono font-bold text-slate-400">$</span>
+                            <input type="text" id="activeRateInput" inputmode="decimal" placeholder="Ej: 1.200,50"
+                                oninput="onActiveRateTyping(this)"
+                                onblur="formatConverterInputOnBlur(this, 2)"
+                                class="w-36 px-3 py-1.5 border border-indigo-300 dark:border-indigo-700 rounded-xl text-right font-mono font-bold text-base bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 outline-none focus:ring-2 focus:ring-indigo-500">
+                            <span class="text-xs font-mono font-semibold text-slate-500">ARS</span>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Input para cotización personalizada (sin borrar centavos al escribir) -->
-                <div id="customCurrencyRateSection"
-                    class="hidden bg-indigo-50/50 dark:bg-slate-950 p-3.5 rounded-xl border border-indigo-200 dark:border-slate-800">
-                    <label for="customCurrencyRate"
-                        class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-                        Ingresa tu cotización personalizada (ARS por 1 unidad):
-                    </label>
-                    <div class="flex gap-2">
-                        <input type="text" id="customCurrencyRate" inputmode="decimal" placeholder="Ej: 1.250,50"
-                            oninput="handleLiveArInput(this)"
-                            class="flex-1 px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-xl text-center font-mono font-semibold bg-white dark:bg-slate-900 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500">
-                        <button type="button" onclick="setCustomCurrencyRate()"
-                            class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-semibold transition text-xs sm:text-sm cursor-pointer">
-                            Guardar
+                <!-- CAJA 1: MONEDA EXTRANJERA (USD / EUR / BRL) -->
+                <div class="bg-indigo-50/50 dark:bg-indigo-950/25 border border-indigo-200/80 dark:border-indigo-900/70 rounded-xl p-3.5 space-y-2">
+                    <div class="flex items-center justify-between gap-2">
+                        <label for="currencyForeignInput" id="currencyForeignLabel"
+                            class="text-xs font-bold text-indigo-900 dark:text-indigo-200 uppercase tracking-wide">
+                            💵 Monto en Dólares (USD)
+                        </label>
+                        <div class="flex flex-wrap gap-1">
+                            <button type="button" onclick="setQuickForeignAmount(50)" class="px-1.5 py-0.5 rounded bg-white dark:bg-slate-800 border border-indigo-200 dark:border-slate-700 text-[10px] font-mono font-semibold text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 cursor-pointer">50</button>
+                            <button type="button" onclick="setQuickForeignAmount(100)" class="px-1.5 py-0.5 rounded bg-white dark:bg-slate-800 border border-indigo-200 dark:border-slate-700 text-[10px] font-mono font-semibold text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 cursor-pointer">100</button>
+                            <button type="button" onclick="setQuickForeignAmount(500)" class="px-1.5 py-0.5 rounded bg-white dark:bg-slate-800 border border-indigo-200 dark:border-slate-700 text-[10px] font-mono font-semibold text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 cursor-pointer">500</button>
+                            <button type="button" onclick="setQuickForeignAmount(1000)" class="px-1.5 py-0.5 rounded bg-white dark:bg-slate-800 border border-indigo-200 dark:border-slate-700 text-[10px] font-mono font-semibold text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 cursor-pointer">1.000</button>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <input type="text" id="currencyForeignInput" inputmode="decimal" placeholder="0,00"
+                            oninput="onForeignAmountInput(this)"
+                            onblur="formatConverterInputOnBlur(this, 0)"
+                            class="w-full px-3.5 py-2.5 border border-indigo-300 dark:border-indigo-800 rounded-xl text-right font-mono font-bold text-xl bg-white dark:bg-slate-950 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500">
+                        <button type="button" onclick="copyConverterValue('foreign')" title="Copiar monto en divisa"
+                            class="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-indigo-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:text-indigo-600 cursor-pointer shrink-0">
+                            <i data-lucide="copy" class="w-4 h-4"></i>
                         </button>
                     </div>
                 </div>
 
-                <!-- Dirección de conversión -->
-                <div class="flex items-center justify-between">
-                    <label for="currencyAmount"
-                        class="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200"
-                        id="currencyAmountLabel">
-                        Monto en Dólares (USD):
-                    </label>
-                    <button type="button" onclick="toggleConversionDirection()"
-                        class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 transition flex items-center gap-1 cursor-pointer">
-                        <i data-lucide="repeat" class="w-3.5 h-3.5"></i> Invertir dirección
+                <!-- Indicador bidireccional central -->
+                <div class="flex items-center justify-center gap-2 -my-1">
+                    <div class="h-px flex-1 bg-slate-200 dark:bg-slate-800"></div>
+                    <button type="button" onclick="swapConverterAmounts()" title="Intercambiar número entre casillas"
+                        class="px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-indigo-100 dark:hover:bg-indigo-950 text-[11px] font-semibold text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 flex items-center gap-1 transition cursor-pointer">
+                        <i data-lucide="arrow-up-down" class="w-3.5 h-3.5 text-indigo-500"></i>
+                        Conversión simultánea ⇄
                     </button>
+                    <div class="h-px flex-1 bg-slate-200 dark:bg-slate-800"></div>
                 </div>
 
-                <input type="text" id="currencyAmount" inputmode="decimal" placeholder="Ej: 100 o 1.250,50"
-                    oninput="handleLiveArInput(this); convertCurrency();"
-                    class="w-full px-3.5 py-2.5 border border-slate-300 dark:border-slate-700 rounded-xl text-center font-mono font-semibold text-lg bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500">
-
-                <!-- Resultado -->
-                <div
-                    class="bg-gradient-to-r from-emerald-600 to-teal-600 rounded-xl p-4 text-white text-center shadow-sm">
-                    <div class="text-xs opacity-85 mb-1" id="currencyResultLabel">Equivalente en Pesos Argentinos (ARS)
+                <!-- CAJA 2: PESOS ARGENTINOS (ARS) -->
+                <div class="bg-emerald-50/60 dark:bg-emerald-950/25 border border-emerald-200/80 dark:border-emerald-900/70 rounded-xl p-3.5 space-y-2">
+                    <div class="flex items-center justify-between gap-2">
+                        <label for="currencyArsInput"
+                            class="text-xs font-bold text-emerald-900 dark:text-emerald-200 uppercase tracking-wide">
+                            🇦🇷 Monto en Pesos Argentinos (ARS $)
+                        </label>
+                        <button type="button" onclick="pullMainSumToConverter()"
+                            class="text-[11px] font-semibold text-emerald-700 dark:text-emerald-400 hover:underline cursor-pointer">
+                            Traer suma / arqueo
+                        </button>
                     </div>
-                    <div class="text-2xl sm:text-3xl font-mono font-bold" id="currencyPesosResult">$ 0,00</div>
+                    <div class="flex items-center gap-2">
+                        <input type="text" id="currencyArsInput" inputmode="decimal" placeholder="0,00"
+                            oninput="onArsAmountInput(this)"
+                            onblur="formatConverterInputOnBlur(this, 0)"
+                            class="w-full px-3.5 py-2.5 border border-emerald-300 dark:border-emerald-800 rounded-xl text-right font-mono font-bold text-xl bg-white dark:bg-slate-950 text-emerald-700 dark:text-emerald-300 outline-none focus:ring-2 focus:ring-emerald-500">
+                        <button type="button" onclick="copyConverterValue('ars')" title="Copiar monto en Pesos"
+                            class="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-emerald-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:text-emerald-600 cursor-pointer shrink-0">
+                            <i data-lucide="copy" class="w-4 h-4"></i>
+                        </button>
+                    </div>
                 </div>
 
-                <!-- Desglose sugerido de billetes (cuando el resultado es en ARS) -->
+                <!-- Resumen claro de la operación -->
+                <div id="currencySummaryBanner"
+                    class="bg-gradient-to-r from-emerald-600 to-teal-600 rounded-xl p-3.5 text-white text-center shadow-sm">
+                    <div class="text-[11px] opacity-90" id="currencyResultLabel">Ingresa un monto arriba en Divisa o en Pesos</div>
+                    <div class="text-lg sm:text-xl font-mono font-bold mt-0.5" id="currencyPesosResult">$ 0,00</div>
+                </div>
+
+                <!-- Desglose sugerido de billetes (cuando hay ARS) -->
                 <div id="currencyBillBreakdown" class="hidden"></div>
 
                 <!-- Acciones -->
-                <div class="flex gap-2">
+                <div class="flex flex-wrap gap-2">
+                    <button type="button" onclick="copyCurrencyFullSummary()"
+                        class="flex-1 px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-semibold text-xs sm:text-sm transition flex items-center justify-center gap-1.5 cursor-pointer">
+                        <i data-lucide="copy" class="w-4 h-4"></i> Copiar Detalle
+                    </button>
                     <button type="button" onclick="addCurrencyConversionToHistory()"
-                        class="flex-1 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold text-xs sm:text-sm transition flex items-center justify-center gap-1.5 cursor-pointer">
-                        <i data-lucide="save" class="w-4 h-4"></i> Guardar en Historial
+                        class="flex-1 px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold text-xs sm:text-sm transition flex items-center justify-center gap-1.5 cursor-pointer">
+                        <i data-lucide="save" class="w-4 h-4"></i> Al Historial
                     </button>
                     <button type="button" onclick="clearCurrencyForm()"
-                        class="px-4 py-2 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-xl font-semibold text-xs sm:text-sm transition cursor-pointer">
+                        class="px-3.5 py-2 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-xl font-semibold text-xs sm:text-sm transition cursor-pointer">
                         Limpiar
                     </button>
                 </div>
@@ -791,6 +879,8 @@
             MAX_BILLS_PER_DENOM: 9999,
             DOLLAR_API_URL: 'https://dolarapi.com/v1/dolares',
             EURO_API_URL: 'https://dolarapi.com/v1/cotizaciones/eur',
+            BRL_API_URL: 'https://dolarapi.com/v1/cotizaciones/brl',
+            BLUELYTICS_API_URL: 'https://api.bluelytics.com.ar/v2/latest',
             CACHE_DURATION: 5 * 60 * 1000
         };
 
@@ -799,22 +889,33 @@
         let lastOperation = null;
 
         let dollarRates = {
-            official: { value: 1000, compra: 980 },
-            blue: { value: 1200, compra: 1180 },
-            custom: { value: 0 }
+            official: { value: 1100, compra: 1060 },
+            blue: { value: 1220, compra: 1200 },
+            mep: { value: 1190, compra: 1185 },
+            custom: { value: 0, compra: 0 }
         };
 
         let euroRates = {
-            official: { value: 1050, compra: 1020 },
-            blue: { value: 1260, compra: 1230 },
-            custom: { value: 0 }
+            official: { value: 1180, compra: 1140 },
+            blue: { value: 1310, compra: 1285 },
+            mep: { value: 1280, compra: 1270 },
+            custom: { value: 0, compra: 0 }
+        };
+
+        let brlRates = {
+            official: { value: 200, compra: 190 },
+            blue: { value: 220, compra: 210 },
+            mep: { value: 215, compra: 210 },
+            custom: { value: 0, compra: 0 }
         };
 
         let currentCurrency = 'usd';
         let currentExchangeType = 'official';
+        let currentQuoteSide = 'venta'; // 'venta' | 'promedio' | 'compra'
         let conversionDirection = 'toArs'; // 'toArs' | 'fromArs'
         let customDollarRate = 0;
         let customEuroRate = 0;
+        let customBrlRate = 0;
         let toastTimer = null;
 
         // ==================== TEMA Y UTILIDADES ====================
@@ -886,7 +987,7 @@
 
         function parseArgentineNumber(rawStr) {
             if (rawStr === null || rawStr === undefined) return NaN;
-            let s = String(rawStr).trim().replace(/[$€\s]/g, '');
+            let s = String(rawStr).trim().replace(/[$€R\s]/g, '');
             if (!s) return NaN;
 
             let sign = 1;
@@ -896,26 +997,55 @@
             } else if (s.startsWith('+')) {
                 s = s.slice(1);
             }
+            // Permitir coma o punto final mientras el usuario está escribiendo decimales (ej: "100," o "100.")
+            s = s.replace(/[.,]+$/, '');
             if (!s) return NaN;
+
+            // Ambos separadores presentes: el último define el decimal (soporta 1.250,50 y 1,250.50)
+            if (s.includes(',') && s.includes('.')) {
+                if (s.lastIndexOf(',') > s.lastIndexOf('.')) {
+                    const parts = s.split(',');
+                    if (parts.length !== 2) return NaN;
+                    const intPart = parts[0].replace(/\./g, '');
+                    const decPart = parts[1];
+                    if ((intPart && !/^\d+$/.test(intPart)) || !/^\d{1,6}$/.test(decPart)) return NaN;
+                    return sign * parseFloat(`${intPart || '0'}.${decPart}`);
+                } else {
+                    const parts = s.split('.');
+                    if (parts.length !== 2) return NaN;
+                    const intPart = parts[0].replace(/,/g, '');
+                    const decPart = parts[1];
+                    if ((intPart && !/^\d+$/.test(intPart)) || !/^\d{1,6}$/.test(decPart)) return NaN;
+                    return sign * parseFloat(`${intPart || '0'}.${decPart}`);
+                }
+            }
 
             if (s.includes(',')) {
                 const parts = s.split(',');
                 if (parts.length !== 2) return NaN;
-                const intPart = parts[0].replace(/\./g, '');
+                const intPart = parts[0];
                 const decPart = parts[1];
-                if ((intPart && !/^\d+$/.test(intPart)) || !/^\d{1,4}$/.test(decPart)) return NaN;
+                if ((intPart && !/^\d+$/.test(intPart)) || !/^\d{1,6}$/.test(decPart)) return NaN;
                 return sign * parseFloat(`${intPart || '0'}.${decPart}`);
             }
 
-            // Si tiene un único punto seguido de 1 o 2 dígitos y la parte entera >= 4 dígitos (ej. 12500.50), tratar como decimal
-            const dotParts = s.split('.');
-            if (dotParts.length === 2 && dotParts[1].length <= 2 && dotParts[0].length >= 4 && /^\d+$/.test(dotParts[0]) && /^\d+$/.test(dotParts[1])) {
-                return sign * parseFloat(`${dotParts[0]}.${dotParts[1]}`);
+            if (s.includes('.')) {
+                const dotParts = s.split('.');
+                // Un único punto con 1 o 2 decimales (ej. 10.5, 1250.50, 0.25) o parte entera 0 (ej. 0.125) -> punto decimal
+                if (dotParts.length === 2 && /^\d*$/.test(dotParts[0]) && /^\d+$/.test(dotParts[1])) {
+                    if (dotParts[1].length !== 3 || dotParts[0] === '0' || dotParts[0] === '') {
+                        return sign * parseFloat(`${dotParts[0] || '0'}.${dotParts[1]}`);
+                    }
+                }
+                // Formato miles argentino (1.000, 25.000, 1.250.000)
+                if (/^\d{1,3}(\.\d{3})+$/.test(s)) {
+                    return sign * parseFloat(s.replace(/\./g, ''));
+                }
+                return NaN;
             }
 
-            // Formato miles argentino o entero puro
-            if (/^\d{1,3}(\.\d{3})*$/.test(s) || /^\d+$/.test(s)) {
-                return sign * parseFloat(s.replace(/\./g, ''));
+            if (/^\d+$/.test(s)) {
+                return sign * parseFloat(s);
             }
 
             return NaN;
@@ -1288,14 +1418,62 @@
         }
 
         // ==================== DIVISAS Y COTIZACIONES ====================
+        const CURRENCY_META = {
+            usd: { code: 'USD', name: 'Dólar', plural: 'Dólares (USD)', icon: '💵' },
+            eur: { code: 'EUR', name: 'Euro', plural: 'Euros (EUR)', icon: '💶' },
+            brl: { code: 'BRL', name: 'Real', plural: 'Reales (BRL)', icon: '🇧🇷' }
+        };
+
+        function getRatesObject(currency = currentCurrency) {
+            if (currency === 'eur') return euroRates;
+            if (currency === 'brl') return brlRates;
+            return dollarRates;
+        }
+
+        function getCustomRate(currency = currentCurrency) {
+            if (currency === 'eur') return customEuroRate;
+            if (currency === 'brl') return customBrlRate;
+            return customDollarRate;
+        }
+
+        function saveCustomRateValue(currency, val) {
+            if (currency === 'eur') {
+                customEuroRate = val;
+                euroRates.custom = { value: val, compra: val };
+                try { localStorage.setItem('customEuroRate', String(val)); } catch (e) { }
+            } else if (currency === 'brl') {
+                customBrlRate = val;
+                brlRates.custom = { value: val, compra: val };
+                try { localStorage.setItem('customBrlRate', String(val)); } catch (e) { }
+            } else {
+                customDollarRate = val;
+                dollarRates.custom = { value: val, compra: val };
+                try { localStorage.setItem('customDollarRate', String(val)); } catch (e) { }
+            }
+        }
+
         function renderExchangeCards() {
             document.getElementById('officialRate').innerHTML = `$${formatArgentineNumber(dollarRates.official.value)}<div class="text-[9px] opacity-75">C: $${formatArgentineNumber(dollarRates.official.compra || dollarRates.official.value)}</div>`;
             document.getElementById('blueRate').innerHTML = `$${formatArgentineNumber(dollarRates.blue.value)}<div class="text-[9px] opacity-75">C: $${formatArgentineNumber(dollarRates.blue.compra || dollarRates.blue.value)}</div>`;
+            const mepEl = document.getElementById('mepRate');
+            if (mepEl) {
+                mepEl.innerHTML = `$${formatArgentineNumber(dollarRates.mep.value)}<div class="text-[9px] opacity-75">C: $${formatArgentineNumber(dollarRates.mep.compra || dollarRates.mep.value)}</div>`;
+            }
             document.getElementById('customDollarRateDisplay').textContent = customDollarRate > 0 ? `$${formatArgentineNumber(customDollarRate)}` : 'Sin def.';
 
             document.getElementById('officialEuroRate').innerHTML = `$${formatArgentineNumber(euroRates.official.value)}<div class="text-[9px] opacity-75">C: $${formatArgentineNumber(euroRates.official.compra || euroRates.official.value)}</div>`;
-            document.getElementById('blueEuroRate').innerHTML = `$${formatArgentineNumber(euroRates.blue.value)}<div class="text-[9px] opacity-75">Brecha USD</div>`;
+            document.getElementById('blueEuroRate').innerHTML = `$${formatArgentineNumber(euroRates.blue.value)}<div class="text-[9px] opacity-75">C: $${formatArgentineNumber(euroRates.blue.compra || euroRates.blue.value)}</div>`;
             document.getElementById('customEuroRateDisplay').textContent = customEuroRate > 0 ? `$${formatArgentineNumber(customEuroRate)}` : 'Sin def.';
+
+            const brlEl = document.getElementById('officialBrlRate');
+            if (brlEl) brlEl.textContent = `$${formatArgentineNumber(brlRates.official.value, 0)}`;
+        }
+
+        function setRatesStatusUI(online, labelText) {
+            const el = document.getElementById('ratesSourceStatus');
+            if (!el) return;
+            const dotCls = online ? 'bg-emerald-500' : 'bg-amber-500';
+            el.innerHTML = `<span class="w-2 h-2 rounded-full ${dotCls} inline-block"></span> ${escapeHtml(labelText)}`;
         }
 
         function loadCachedRates() {
@@ -1303,79 +1481,174 @@
                 const cachedUsd = JSON.parse(localStorage.getItem('dollarRates') || 'null');
                 if (cachedUsd?.official?.value) dollarRates.official = cachedUsd.official;
                 if (cachedUsd?.blue?.value) dollarRates.blue = cachedUsd.blue;
+                if (cachedUsd?.mep?.value) dollarRates.mep = cachedUsd.mep;
 
                 const cachedEur = JSON.parse(localStorage.getItem('euroRates') || 'null');
                 if (cachedEur?.official?.value) euroRates.official = cachedEur.official;
                 if (cachedEur?.blue?.value) euroRates.blue = cachedEur.blue;
+                if (cachedEur?.mep?.value) euroRates.mep = cachedEur.mep;
+
+                const cachedBrl = JSON.parse(localStorage.getItem('brlRates') || 'null');
+                if (cachedBrl?.official?.value) brlRates.official = cachedBrl.official;
+                if (cachedBrl?.blue?.value) brlRates.blue = cachedBrl.blue;
 
                 const savedTime = localStorage.getItem('ratesLastUpdate');
-                if (savedTime) document.getElementById('lastUpdate').textContent = `${savedTime} (caché)`;
+                if (savedTime) {
+                    document.getElementById('lastUpdate').textContent = savedTime;
+                    setRatesStatusUI(false, 'Última cotización guardada');
+                }
 
                 const savedCustomUsd = parseFloat(localStorage.getItem('customDollarRate') || '0');
-                if (savedCustomUsd > 0) {
-                    customDollarRate = savedCustomUsd;
-                    dollarRates.custom.value = savedCustomUsd;
-                }
+                if (savedCustomUsd > 0) saveCustomRateValue('usd', savedCustomUsd);
 
                 const savedCustomEur = parseFloat(localStorage.getItem('customEuroRate') || '0');
-                if (savedCustomEur > 0) {
-                    customEuroRate = savedCustomEur;
-                    euroRates.custom.value = savedCustomEur;
-                }
+                if (savedCustomEur > 0) saveCustomRateValue('eur', savedCustomEur);
+
+                const savedCustomBrl = parseFloat(localStorage.getItem('customBrlRate') || '0');
+                if (savedCustomBrl > 0) saveCustomRateValue('brl', savedCustomBrl);
             } catch (e) { }
             renderExchangeCards();
         }
 
+        async function fetchJsonWithTimeout(url, ms = 6000) {
+            const ctrl = new AbortController();
+            const timer = setTimeout(() => ctrl.abort(), ms);
+            try {
+                const res = await fetch(url, { signal: ctrl.signal, cache: 'no-store' });
+                if (!res.ok) return null;
+                return await res.json();
+            } catch (e) {
+                return null;
+            } finally {
+                clearTimeout(timer);
+            }
+        }
+
         async function refreshAllRates(silent = false) {
-            let updated = false;
-            try {
-                const resUsd = await fetch(CONSTANTS.DOLLAR_API_URL);
-                if (resUsd.ok) {
-                    const data = await resUsd.json();
-                    const official = data.find(d => d.nombre === 'Oficial');
-                    const blue = data.find(d => d.nombre === 'Blue');
-                    if (official?.venta) {
-                        dollarRates.official = { value: official.venta, compra: official.compra || official.venta };
-                        updated = true;
-                    }
-                    if (blue?.venta) {
-                        dollarRates.blue = { value: blue.venta, compra: blue.compra || blue.venta };
-                        updated = true;
-                    }
-                }
-            } catch (e) { }
+            const refreshBtn = document.getElementById('btnRefreshRates');
+            if (refreshBtn) refreshBtn.classList.add('animate-spin');
 
-            try {
-                const resEur = await fetch(CONSTANTS.EURO_API_URL);
-                if (resEur.ok) {
-                    const data = await resEur.json();
-                    if (data?.venta) {
-                        euroRates.official = { value: data.venta, compra: data.compra || data.venta };
-                        const spread = (dollarRates.official.value > 0 && dollarRates.blue.value > 0)
-                            ? (dollarRates.blue.value / dollarRates.official.value)
-                            : 1.05;
-                        euroRates.blue = {
-                            value: Math.round(euroRates.official.value * spread * 100) / 100,
-                            compra: Math.round((data.compra || data.venta) * spread * 100) / 100
-                        };
-                        updated = true;
-                    }
-                }
-            } catch (e) { }
+            let updatedUsd = false;
+            let updatedEurBlueReal = false;
 
-            if (updated) {
+            const [dolarApiData, eurApiData, brlApiData, bluelyticsData] = await Promise.all([
+                fetchJsonWithTimeout(CONSTANTS.DOLLAR_API_URL),
+                fetchJsonWithTimeout(CONSTANTS.EURO_API_URL),
+                fetchJsonWithTimeout(CONSTANTS.BRL_API_URL),
+                fetchJsonWithTimeout(CONSTANTS.BLUELYTICS_API_URL)
+            ]);
+
+            // 1. Procesar DolarAPI (USD Oficial, Blue, MEP)
+            if (Array.isArray(dolarApiData)) {
+                const findCasa = (key) => dolarApiData.find(d =>
+                    String(d.casa || '').toLowerCase() === key ||
+                    String(d.nombre || '').toLowerCase().includes(key)
+                );
+                const off = findCasa('oficial');
+                const blu = findCasa('blue');
+                const mep = findCasa('bolsa') || findCasa('mep');
+
+                if (off?.venta > 0) {
+                    dollarRates.official = { value: Number(off.venta), compra: Number(off.compra || off.venta) };
+                    updatedUsd = true;
+                }
+                if (blu?.venta > 0) {
+                    dollarRates.blue = { value: Number(blu.venta), compra: Number(blu.compra || blu.venta) };
+                    updatedUsd = true;
+                }
+                if (mep?.venta > 0) {
+                    dollarRates.mep = { value: Number(mep.venta), compra: Number(mep.compra || mep.venta) };
+                    updatedUsd = true;
+                }
+            }
+
+            // 2. Respaldo y Euro Blue real desde Bluelytics
+            if (bluelyticsData) {
+                if (!updatedUsd && bluelyticsData.oficial?.value_sell > 0) {
+                    dollarRates.official = {
+                        value: Number(bluelyticsData.oficial.value_sell),
+                        compra: Number(bluelyticsData.oficial.value_buy || bluelyticsData.oficial.value_sell)
+                    };
+                    updatedUsd = true;
+                }
+                if (bluelyticsData.blue?.value_sell > 0 && (!Array.isArray(dolarApiData))) {
+                    dollarRates.blue = {
+                        value: Number(bluelyticsData.blue.value_sell),
+                        compra: Number(bluelyticsData.blue.value_buy || bluelyticsData.blue.value_sell)
+                    };
+                    updatedUsd = true;
+                }
+                if (bluelyticsData.oficial_euro?.value_sell > 0) {
+                    euroRates.official = {
+                        value: Number(bluelyticsData.oficial_euro.value_sell),
+                        compra: Number(bluelyticsData.oficial_euro.value_buy || bluelyticsData.oficial_euro.value_sell)
+                    };
+                }
+                if (bluelyticsData.blue_euro?.value_sell > 0) {
+                    euroRates.blue = {
+                        value: Number(bluelyticsData.blue_euro.value_sell),
+                        compra: Number(bluelyticsData.blue_euro.value_buy || bluelyticsData.blue_euro.value_sell)
+                    };
+                    updatedEurBlueReal = true;
+                }
+            }
+
+            // 3. Procesar Euro y Real desde DolarAPI
+            const spreadUsd = (dollarRates.official.value > 0 && dollarRates.blue.value > 0)
+                ? (dollarRates.blue.value / dollarRates.official.value)
+                : 1.08;
+            const spreadMep = (dollarRates.official.value > 0 && dollarRates.mep.value > 0)
+                ? (dollarRates.mep.value / dollarRates.official.value)
+                : 1.05;
+
+            if (eurApiData?.venta > 0) {
+                euroRates.official = { value: Number(eurApiData.venta), compra: Number(eurApiData.compra || eurApiData.venta) };
+                if (!updatedEurBlueReal) {
+                    euroRates.blue = {
+                        value: Math.round(euroRates.official.value * spreadUsd * 100) / 100,
+                        compra: Math.round(euroRates.official.compra * spreadUsd * 100) / 100
+                    };
+                }
+            }
+            euroRates.mep = {
+                value: Math.round(euroRates.official.value * spreadMep * 100) / 100,
+                compra: Math.round(euroRates.official.compra * spreadMep * 100) / 100
+            };
+
+            if (brlApiData?.venta > 0) {
+                brlRates.official = { value: Number(brlApiData.venta), compra: Number(brlApiData.compra || brlApiData.venta) };
+                brlRates.blue = {
+                    value: Math.round(brlRates.official.value * spreadUsd * 100) / 100,
+                    compra: Math.round(brlRates.official.compra * spreadUsd * 100) / 100
+                };
+                brlRates.mep = {
+                    value: Math.round(brlRates.official.value * spreadMep * 100) / 100,
+                    compra: Math.round(brlRates.official.compra * spreadMep * 100) / 100
+                };
+            }
+
+            if (refreshBtn) refreshBtn.classList.remove('animate-spin');
+
+            const anySuccess = Boolean(updatedUsd || updatedEurBlueReal || eurApiData?.venta || brlApiData?.venta);
+            if (anySuccess) {
                 const timeStr = new Date().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
                 document.getElementById('lastUpdate').textContent = timeStr;
+                setRatesStatusUI(true, 'Cotizaciones en línea');
                 try {
-                    localStorage.setItem('dollarRates', JSON.stringify({ official: dollarRates.official, blue: dollarRates.blue }));
-                    localStorage.setItem('euroRates', JSON.stringify({ official: euroRates.official, blue: euroRates.blue }));
+                    localStorage.setItem('dollarRates', JSON.stringify({ official: dollarRates.official, blue: dollarRates.blue, mep: dollarRates.mep }));
+                    localStorage.setItem('euroRates', JSON.stringify({ official: euroRates.official, blue: euroRates.blue, mep: euroRates.mep }));
+                    localStorage.setItem('brlRates', JSON.stringify({ official: brlRates.official, blue: brlRates.blue, mep: brlRates.mep }));
                     localStorage.setItem('ratesLastUpdate', timeStr);
                 } catch (e) { }
                 renderExchangeCards();
-                updateSelectedCurrencyRate();
-                if (!silent) showToast('Cotizaciones actualizadas', 'success');
-            } else if (!silent) {
-                showToast('Sin conexión: usando última cotización guardada', 'warning');
+                if (currentExchangeType !== 'custom') {
+                    syncActiveRateInputFromSelection();
+                    recalculateFromActiveSide();
+                }
+                if (!silent) showToast('Cotizaciones actualizadas en línea', 'success');
+            } else {
+                setRatesStatusUI(false, 'Modo sin conexión (editable)');
+                if (!silent) showToast('Sin conexión a API: puedes escribir la cotización manualmente', 'warning');
             }
         }
 
@@ -1383,21 +1656,29 @@
             currentCurrency = currency;
             currentExchangeType = type;
             showCurrencyConverter();
+            if (type === 'custom') {
+                setTimeout(() => {
+                    const rateInp = document.getElementById('activeRateInput');
+                    rateInp?.focus();
+                    rateInp?.select();
+                }, 60);
+            }
         }
 
         function selectCurrency(currency) {
             currentCurrency = currency;
-            const usdTab = document.getElementById('usdTab');
-            const eurTab = document.getElementById('eurTab');
-            const activeCls = 'py-2 rounded-xl text-xs sm:text-sm font-semibold transition cursor-pointer bg-indigo-600 text-white';
+            const activeCls = 'py-2 rounded-xl text-xs sm:text-sm font-semibold transition cursor-pointer bg-indigo-600 text-white shadow-sm';
             const inactiveCls = 'py-2 rounded-xl text-xs sm:text-sm font-semibold transition cursor-pointer bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300';
 
-            usdTab.className = currency === 'usd' ? activeCls : inactiveCls;
-            eurTab.className = currency === 'eur' ? activeCls : inactiveCls;
+            ['usd', 'eur', 'brl'].forEach(c => {
+                const tab = document.getElementById(`${c}Tab`);
+                if (tab) tab.className = c === currency ? activeCls : inactiveCls;
+            });
+
+            const meta = CURRENCY_META[currency] || CURRENCY_META.usd;
+            document.getElementById('currencyForeignLabel').textContent = `${meta.icon} Monto en ${meta.plural}`;
 
             setCurrencyExchangeType(currentExchangeType);
-            updateConversionLabels();
-            convertCurrency();
         }
 
         function setCurrencyExchangeType(type) {
@@ -1405,112 +1686,278 @@
             const map = {
                 official: document.getElementById('useOfficialCurrencyBtn'),
                 blue: document.getElementById('useBlueCurrencyBtn'),
+                mep: document.getElementById('useMepCurrencyBtn'),
                 custom: document.getElementById('useCustomCurrencyBtn')
             };
-            const activeCls = 'px-2 py-2 rounded-xl font-semibold transition text-xs cursor-pointer bg-indigo-600 text-white';
+            const activeCls = 'px-2 py-2 rounded-xl font-semibold transition text-xs cursor-pointer bg-indigo-600 text-white shadow-sm';
             const inactiveCls = 'px-2 py-2 rounded-xl font-semibold transition text-xs cursor-pointer bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300';
 
             Object.entries(map).forEach(([k, btn]) => {
-                btn.className = k === type ? activeCls : inactiveCls;
+                if (btn) btn.className = k === type ? activeCls : inactiveCls;
             });
 
-            const customSection = document.getElementById('customCurrencyRateSection');
-            if (type === 'custom') {
-                customSection.classList.remove('hidden');
-                const saved = currentCurrency === 'usd' ? customDollarRate : customEuroRate;
-                document.getElementById('customCurrencyRate').value = saved > 0 ? formatArgentineNumber(saved) : '';
-            } else {
-                customSection.classList.add('hidden');
-            }
+            const quoteRow = document.getElementById('rateQuoteSideRow');
+            if (quoteRow) quoteRow.classList.toggle('hidden', type === 'custom');
 
-            updateSelectedCurrencyRate();
-            convertCurrency();
+            updateQuoteSideButtonsUI();
+            syncActiveRateInputFromSelection();
+            recalculateFromActiveSide();
+            if (type === 'custom' && getCustomRate(currentCurrency) <= 0) {
+                setTimeout(() => document.getElementById('activeRateInput')?.focus(), 40);
+            }
+        }
+
+        function setRateQuoteSide(side) {
+            currentQuoteSide = side;
+            updateQuoteSideButtonsUI();
+            syncActiveRateInputFromSelection();
+            recalculateFromActiveSide();
+        }
+
+        function getQuoteBucket() {
+            const rates = getRatesObject(currentCurrency);
+            if (currentExchangeType === 'blue') return rates.blue;
+            if (currentExchangeType === 'mep') return rates.mep || rates.blue;
+            if (currentExchangeType === 'custom') {
+                const c = getCustomRate(currentCurrency);
+                return { value: c, compra: c };
+            }
+            return rates.official;
+        }
+
+        function updateQuoteSideButtonsUI() {
+            const bucket = getQuoteBucket();
+            const venta = Number(bucket?.value || 0);
+            const compra = Number(bucket?.compra || venta);
+            const prom = Math.round(((venta + compra) / 2) * 100) / 100;
+
+            const cEl = document.getElementById('rateSideCompraVal');
+            const pEl = document.getElementById('rateSidePromedioVal');
+            const vEl = document.getElementById('rateSideVentaVal');
+            if (cEl) cEl.textContent = `$${formatArgentineNumber(compra)}`;
+            if (pEl) pEl.textContent = `$${formatArgentineNumber(prom)}`;
+            if (vEl) vEl.textContent = `$${formatArgentineNumber(venta)}`;
+
+            const activeCls = 'py-1.5 px-2 rounded-lg font-semibold transition cursor-pointer bg-indigo-600 text-white shadow-sm';
+            const inactiveCls = 'py-1.5 px-2 rounded-lg font-semibold transition cursor-pointer bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300';
+
+            const btnMap = {
+                compra: document.getElementById('rateSideCompraBtn'),
+                promedio: document.getElementById('rateSidePromedioBtn'),
+                venta: document.getElementById('rateSideVentaBtn')
+            };
+            Object.entries(btnMap).forEach(([k, btn]) => {
+                if (btn) btn.className = k === currentQuoteSide ? activeCls : inactiveCls;
+            });
         }
 
         function getActiveRate() {
-            const rates = currentCurrency === 'usd' ? dollarRates : euroRates;
-            if (currentExchangeType === 'official') return rates.official.value;
-            if (currentExchangeType === 'blue') return rates.blue.value;
-            return currentCurrency === 'usd' ? customDollarRate : customEuroRate;
+            const typedRate = parseArgentineNumber(document.getElementById('activeRateInput')?.value || '');
+            if (currentExchangeType === 'custom') {
+                return (!isNaN(typedRate) && typedRate > 0) ? typedRate : getCustomRate(currentCurrency);
+            }
+            const bucket = getQuoteBucket();
+            const venta = Number(bucket?.value || 0);
+            const compra = Number(bucket?.compra || venta);
+            if (currentQuoteSide === 'compra') return compra;
+            if (currentQuoteSide === 'promedio') return Math.round(((venta + compra) / 2) * 100) / 100;
+            return venta;
         }
 
         function getActiveRateName() {
-            const currencyName = currentCurrency === 'usd' ? 'Dólar' : 'Euro';
-            if (currentExchangeType === 'official') return `${currencyName} Oficial`;
-            if (currentExchangeType === 'blue') return currentCurrency === 'usd' ? 'Dólar Blue' : 'Euro Referencia';
-            return `${currencyName} Personal`;
+            const meta = CURRENCY_META[currentCurrency] || CURRENCY_META.usd;
+            if (currentExchangeType === 'custom') return `${meta.name} Personalizado`;
+            const sideLabel = currentQuoteSide === 'compra' ? 'Compra' : currentQuoteSide === 'promedio' ? 'Promedio' : 'Venta';
+            if (currentExchangeType === 'official') return `${meta.name} Oficial (${sideLabel})`;
+            if (currentExchangeType === 'mep') return `${meta.name} MEP (${sideLabel})`;
+            return `${meta.name} Blue (${sideLabel})`;
         }
 
-        function updateSelectedCurrencyRate() {
-            const rate = getActiveRate();
+        function syncActiveRateInputFromSelection() {
             document.getElementById('selectedCurrencyType').textContent = getActiveRateName();
-            document.getElementById('selectedCurrencyRate').textContent = rate > 0 ? `$${formatArgentineNumber(rate, 2)} ARS` : 'Sin definir';
+            const inp = document.getElementById('activeRateInput');
+            if (!inp) return;
+            const rate = currentExchangeType === 'custom' ? getCustomRate(currentCurrency) : getActiveRate();
+            inp.value = rate > 0 ? formatArgentineNumber(rate, 2) : '';
         }
 
-        function setCustomCurrencyRate() {
-            const parsed = parseArgentineNumber(document.getElementById('customCurrencyRate').value);
-            if (isNaN(parsed) || parsed <= 0) {
-                showToast('Ingresa una cotización mayor a 0', 'error');
+        function sanitizeConverterTyping(input) {
+            const cleaned = input.value.replace(/[^\d.,]/g, '');
+            if (input.value !== cleaned) input.value = cleaned;
+        }
+
+        function formatConverterInputOnBlur(input, minDecimals = 0) {
+            const val = parseArgentineNumber(input.value);
+            if (!isNaN(val) && val > 0) {
+                input.value = formatArgentineNumber(val, minDecimals);
+            } else if (!input.value.trim()) {
+                input.value = '';
+            }
+        }
+
+        function onActiveRateTyping(input) {
+            sanitizeConverterTyping(input);
+            const parsed = parseArgentineNumber(input.value);
+            if (currentExchangeType !== 'custom') {
+                currentExchangeType = 'custom';
+                const map = {
+                    official: document.getElementById('useOfficialCurrencyBtn'),
+                    blue: document.getElementById('useBlueCurrencyBtn'),
+                    mep: document.getElementById('useMepCurrencyBtn'),
+                    custom: document.getElementById('useCustomCurrencyBtn')
+                };
+                const activeCls = 'px-2 py-2 rounded-xl font-semibold transition text-xs cursor-pointer bg-indigo-600 text-white shadow-sm';
+                const inactiveCls = 'px-2 py-2 rounded-xl font-semibold transition text-xs cursor-pointer bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300';
+                Object.entries(map).forEach(([k, btn]) => {
+                    if (btn) btn.className = k === 'custom' ? activeCls : inactiveCls;
+                });
+                document.getElementById('rateQuoteSideRow')?.classList.add('hidden');
+                document.getElementById('selectedCurrencyType').textContent = getActiveRateName();
+            }
+
+            if (!isNaN(parsed) && parsed > 0) {
+                saveCustomRateValue(currentCurrency, parsed);
+                renderExchangeCards();
+            }
+            recalculateFromActiveSide();
+        }
+
+        function onForeignAmountInput(input) {
+            sanitizeConverterTyping(input);
+            conversionDirection = 'toArs';
+            convertCurrency();
+        }
+
+        function onArsAmountInput(input) {
+            sanitizeConverterTyping(input);
+            conversionDirection = 'fromArs';
+            convertCurrency();
+        }
+
+        function setQuickForeignAmount(val) {
+            const foreignInp = document.getElementById('currencyForeignInput');
+            foreignInp.value = formatArgentineNumber(val);
+            conversionDirection = 'toArs';
+            convertCurrency();
+        }
+
+        function swapConverterAmounts() {
+            const foreignInp = document.getElementById('currencyForeignInput');
+            const arsInp = document.getElementById('currencyArsInput');
+            if (conversionDirection === 'toArs' && foreignInp.value.trim()) {
+                arsInp.value = foreignInp.value;
+                conversionDirection = 'fromArs';
+            } else if (arsInp.value.trim()) {
+                foreignInp.value = arsInp.value;
+                conversionDirection = 'toArs';
+            } else {
+                conversionDirection = conversionDirection === 'toArs' ? 'fromArs' : 'toArs';
+            }
+            convertCurrency();
+        }
+
+        function pullMainSumToConverter() {
+            let total = 0;
+            if (numbers.length > 0) {
+                total = numbers.reduce((a, b) => a + b, 0);
+            } else {
+                total = getBillCounterTotal();
+            }
+            if (total <= 0) {
+                showToast('No hay suma cargada en Calculadora ni en Arqueo', 'warning');
                 return;
             }
-
-            if (currentCurrency === 'usd') {
-                customDollarRate = parsed;
-                dollarRates.custom.value = parsed;
-                try { localStorage.setItem('customDollarRate', String(parsed)); } catch (e) { }
-            } else {
-                customEuroRate = parsed;
-                euroRates.custom.value = parsed;
-                try { localStorage.setItem('customEuroRate', String(parsed)); } catch (e) { }
-            }
-
-            renderExchangeCards();
-            updateSelectedCurrencyRate();
+            const arsInp = document.getElementById('currencyArsInput');
+            arsInp.value = formatArgentineNumber(total, 2);
+            conversionDirection = 'fromArs';
             convertCurrency();
-            showToast(`Cotización guardada: $${formatArgentineNumber(parsed, 2)}`, 'success');
+            showToast('Monto en Pesos cargado para convertir', 'success');
         }
 
-        function toggleConversionDirection() {
-            conversionDirection = conversionDirection === 'toArs' ? 'fromArs' : 'toArs';
-            updateConversionLabels();
-            convertCurrency();
-        }
-
-        function updateConversionLabels() {
-            const code = currentCurrency === 'usd' ? 'USD' : 'EUR';
-            const name = currentCurrency === 'usd' ? 'Dólares (USD)' : 'Euros (EUR)';
-            if (conversionDirection === 'toArs') {
-                document.getElementById('currencyAmountLabel').textContent = `Monto en ${name}:`;
-                document.getElementById('currencyResultLabel').textContent = 'Equivalente a entregar en Pesos (ARS)';
-            } else {
-                document.getElementById('currencyAmountLabel').textContent = 'Monto en Pesos Argentinos (ARS):';
-                document.getElementById('currencyResultLabel').textContent = `Equivalente en ${name}`;
+        function recalculateFromActiveSide() {
+            const foreignHas = Boolean(document.getElementById('currencyForeignInput')?.value.trim());
+            const arsHas = Boolean(document.getElementById('currencyArsInput')?.value.trim());
+            if (conversionDirection === 'toArs' && !foreignHas && arsHas) {
+                conversionDirection = 'fromArs';
+            } else if (conversionDirection === 'fromArs' && !arsHas && foreignHas) {
+                conversionDirection = 'toArs';
             }
-            lucide.createIcons();
+            convertCurrency();
         }
 
         function convertCurrency() {
-            const amount = parseArgentineNumber(document.getElementById('currencyAmount').value);
-            const rate = getActiveRate();
+            const foreignInp = document.getElementById('currencyForeignInput');
+            const arsInp = document.getElementById('currencyArsInput');
             const resEl = document.getElementById('currencyPesosResult');
+            const labelEl = document.getElementById('currencyResultLabel');
             const breakdownEl = document.getElementById('currencyBillBreakdown');
-            const sym = currentCurrency === 'usd' ? 'USD' : 'EUR';
+            const meta = CURRENCY_META[currentCurrency] || CURRENCY_META.usd;
+            const rate = getActiveRate();
 
-            if (isNaN(amount) || amount <= 0 || rate <= 0) {
-                resEl.textContent = conversionDirection === 'toArs' ? '$ 0,00' : `${sym} 0,00`;
+            if (!rate || rate <= 0) {
+                labelEl.textContent = `Define una cotización válida para ${meta.name}`;
+                resEl.textContent = 'Sin cotización';
                 breakdownEl.classList.add('hidden');
                 return;
             }
 
             if (conversionDirection === 'toArs') {
+                const rawForeign = foreignInp.value.trim();
+                const amount = parseArgentineNumber(rawForeign);
+                if (!rawForeign || isNaN(amount) || amount <= 0) {
+                    if (!rawForeign) arsInp.value = '';
+                    labelEl.textContent = `1 ${meta.code} = $${formatArgentineNumber(rate, 2)} ARS (${getActiveRateName()})`;
+                    resEl.textContent = '$ 0,00';
+                    breakdownEl.classList.add('hidden');
+                    return;
+                }
                 const pesos = amount * rate;
-                resEl.textContent = `$ ${formatArgentineNumber(pesos, 2)}`;
+                arsInp.value = formatArgentineNumber(pesos, 2);
+                labelEl.textContent = `${meta.code} ${formatArgentineNumber(amount, 2)} × $${formatArgentineNumber(rate, 2)} (${getActiveRateName()})`;
+                resEl.textContent = `$ ${formatArgentineNumber(pesos, 2)} ARS`;
                 renderBillBreakdownInto(pesos, breakdownEl);
             } else {
-                const foreign = amount / rate;
-                resEl.textContent = `${sym} ${formatArgentineNumber(foreign, 2)}`;
-                breakdownEl.classList.add('hidden');
+                const rawArs = arsInp.value.trim();
+                const pesos = parseArgentineNumber(rawArs);
+                if (!rawArs || isNaN(pesos) || pesos <= 0) {
+                    if (!rawArs) foreignInp.value = '';
+                    labelEl.textContent = `1 ${meta.code} = $${formatArgentineNumber(rate, 2)} ARS (${getActiveRateName()})`;
+                    resEl.textContent = `${meta.code} 0,00`;
+                    breakdownEl.classList.add('hidden');
+                    return;
+                }
+                const foreign = pesos / rate;
+                foreignInp.value = formatArgentineNumber(foreign, 2);
+                labelEl.textContent = `$${formatArgentineNumber(pesos, 2)} ARS ÷ $${formatArgentineNumber(rate, 2)} (${getActiveRateName()})`;
+                resEl.textContent = `${meta.code} ${formatArgentineNumber(foreign, 2)}`;
+                renderBillBreakdownInto(pesos, breakdownEl);
             }
+        }
+
+        async function copyConverterValue(which) {
+            const val = document.getElementById(which === 'foreign' ? 'currencyForeignInput' : 'currencyArsInput')?.value.trim();
+            if (!val) {
+                showToast('No hay monto para copiar', 'warning');
+                return;
+            }
+            await copyTextSafe(val);
+            showToast(`Copiado: ${val}`, 'success');
+        }
+
+        async function copyCurrencyFullSummary() {
+            const foreignVal = parseArgentineNumber(document.getElementById('currencyForeignInput')?.value);
+            const arsVal = parseArgentineNumber(document.getElementById('currencyArsInput')?.value);
+            const rate = getActiveRate();
+            const meta = CURRENCY_META[currentCurrency] || CURRENCY_META.usd;
+            if (isNaN(foreignVal) || foreignVal <= 0 || isNaN(arsVal) || arsVal <= 0 || rate <= 0) {
+                showToast('Ingresa un monto válido primero', 'warning');
+                return;
+            }
+            const summary = conversionDirection === 'toArs'
+                ? `${meta.code} ${formatArgentineNumber(foreignVal, 2)} = $${formatArgentineNumber(arsVal, 2)} ARS (${getActiveRateName()}: $${formatArgentineNumber(rate, 2)})`
+                : `$${formatArgentineNumber(arsVal, 2)} ARS = ${meta.code} ${formatArgentineNumber(foreignVal, 2)} (${getActiveRateName()}: $${formatArgentineNumber(rate, 2)})`;
+            await copyTextSafe(summary);
+            showToast('Conversión copiada al portapapeles', 'success');
         }
 
         function renderBillBreakdownInto(pesosAmount, container) {
@@ -1539,7 +1986,7 @@
             const resto = pesosAmount - Math.floor(pesosAmount) + remaining;
             container.innerHTML = `
                 <div class="bg-slate-50 dark:bg-slate-950 p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 space-y-1">
-                    <div class="text-xs font-semibold text-slate-700 dark:text-slate-200 mb-1">Sugerencia de billetes a entregar:</div>
+                    <div class="text-xs font-semibold text-slate-700 dark:text-slate-200 mb-1">Sugerencia de billetes en Pesos (ARS):</div>
                     ${rows}
                     ${resto >= 0.01 ? `<div class="text-[11px] text-amber-600 dark:text-amber-400 pt-1 border-t border-slate-200 dark:border-slate-800">Resto en cambio chico / centavos: $${formatArgentineNumber(resto, 2)}</div>` : ''}
                 </div>
@@ -1548,31 +1995,27 @@
         }
 
         function clearCurrencyForm() {
-            document.getElementById('currencyAmount').value = '';
+            document.getElementById('currencyForeignInput').value = '';
+            document.getElementById('currencyArsInput').value = '';
             convertCurrency();
         }
 
         function addCurrencyConversionToHistory() {
-            const amount = parseArgentineNumber(document.getElementById('currencyAmount').value);
+            const foreignVal = parseArgentineNumber(document.getElementById('currencyForeignInput').value);
+            const arsVal = parseArgentineNumber(document.getElementById('currencyArsInput').value);
             const rate = getActiveRate();
-            if (isNaN(amount) || amount <= 0 || rate <= 0) {
+            if (isNaN(foreignVal) || foreignVal <= 0 || isNaN(arsVal) || arsVal <= 0 || rate <= 0) {
                 showToast('Ingresa un monto y cotización válidos', 'error');
                 return;
             }
 
-            const sym = currentCurrency === 'usd' ? 'USD' : 'EUR';
-            let opTitle = '';
-            let valDesc = '';
-
-            if (conversionDirection === 'toArs') {
-                const pesos = amount * rate;
-                opTitle = `${sym} → ARS (${getActiveRateName()})`;
-                valDesc = `$${formatArgentineNumber(pesos, 2)}`;
-            } else {
-                const foreign = amount / rate;
-                opTitle = `ARS → ${sym} (${getActiveRateName()})`;
-                valDesc = `${sym} ${formatArgentineNumber(foreign, 2)}`;
-            }
+            const meta = CURRENCY_META[currentCurrency] || CURRENCY_META.usd;
+            const opTitle = conversionDirection === 'toArs'
+                ? `${meta.code} ${formatArgentineNumber(foreignVal, 2)} → ARS (${getActiveRateName()})`
+                : `ARS $${formatArgentineNumber(arsVal, 2)} → ${meta.code} (${getActiveRateName()})`;
+            const valDesc = conversionDirection === 'toArs'
+                ? `$${formatArgentineNumber(arsVal, 2)}`
+                : `${meta.code} ${formatArgentineNumber(foreignVal, 2)}`;
 
             history.unshift({
                 id: Date.now(),

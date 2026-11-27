@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reporte de Control de Auditoría de Máquinas</title>
+    <title>Auditoría de Máquinas · Bitácora CCTV</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -13,27 +13,10 @@
                     fontFamily: {
                         sans: ['Inter', 'Segoe UI', 'sans-serif'],
                         mono: ['JetBrains Mono', 'Consolas', 'monospace']
-                    },
-                    animation: {
-                        'fade-in': 'fadeIn 0.3s ease-out',
-                        'slide-up': 'slideUp 0.3s ease-out',
-                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                    },
-                    keyframes: {
-                        fadeIn: {
-                            '0%': { opacity: '0', transform: 'translateY(10px)' },
-                            '100%': { opacity: '1', transform: 'translateY(0)' },
-                        },
-                        slideUp: {
-                            '0%': { transform: 'translateY(100%)', opacity: '0' },
-                            '100%': { transform: 'translateY(0)', opacity: '1' },
-                        }
                     }
                 }
             }
-        }
-    </script>
-    <script>
+        };
         (function () {
             try {
                 if (localStorage.getItem('cctv_theme') === 'dark') {
@@ -48,51 +31,43 @@
     <link rel="stylesheet" href="css/global.css">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        body { 
-            background-color: #f8fafc; 
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+        .report-font {
+            font-family: 'JetBrains Mono', Consolas, monospace;
         }
-        .dark body { background-color: #0f172a; }
-        
         .log-entry:hover .action-btns { opacity: 1; }
-        
-        /* Custom scrollbar */
-        #log-scroll-area::-webkit-scrollbar { width: 6px; }
-        #log-scroll-area::-webkit-scrollbar-track { background: transparent; }
-        #log-scroll-area::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
-        .dark #log-scroll-area::-webkit-scrollbar-thumb { background: #334155; }
-
-        /* Editable style */
         .editable-text:focus {
             outline: none;
-            background-color: #fff;
+            background-color: #ffffff;
             box-shadow: 0 0 0 2px #6366f1;
             padding: 4px 8px;
-            border-radius: 4px;
-            transition: all 0.2s;
+            border-radius: 6px;
         }
         .dark .editable-text:focus {
-            background-color: #1e293b;
+            background-color: #0f172a;
             box-shadow: 0 0 0 2px #818cf8;
         }
-
-        /* Print styles */
-        @media print {
-            .no-print { display: none !important; }
-            body { background: white; }
-            #log-scroll-area { overflow: visible !important; max-height: none !important; }
-        }
-
-        /* Mobile optimizations */
         @media (max-width: 768px) {
             .log-entry .action-btns { opacity: 1; }
-            .editable-text { font-size: 0.875rem; padding-right: 3rem; }
+        }
+        @media print {
+            body {
+                background: #ffffff !important;
+                color: #0f172a !important;
+                padding: 0 !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+            #printSheet {
+                display: block !important;
+            }
         }
     </style>
 </head>
 <body class="bg-slate-100 dark:bg-slate-950 p-3 sm:p-5 md:p-8 text-slate-800 dark:text-slate-100 min-h-screen font-sans transition-colors duration-200">
 
     <div class="max-w-6xl mx-auto bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 transition-colors duration-200">
+
         <!-- Header Estándar -->
         <header class="no-print bg-slate-900 dark:bg-slate-950 border-b border-slate-800 px-4 sm:px-6 py-4 rounded-t-2xl text-white flex flex-wrap justify-between items-center gap-3">
             <div class="flex items-center gap-3">
@@ -100,303 +75,433 @@
                     <i data-lucide="clipboard-check" class="w-6 h-6 text-white"></i>
                 </div>
                 <div>
-                    <h1 class="text-lg sm:text-xl font-bold leading-tight text-white">Auditoría de Máquinas</h1>
-                    <p class="text-slate-400 text-xs uppercase tracking-wider">CCTV · Bitácora Cronológica de Eventos</p>
+                    <h1 class="text-lg sm:text-xl font-bold leading-tight text-white flex items-center gap-2 flex-wrap">
+                        Auditoría de Máquinas
+                        <span id="save-indicator" class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Autoguardado</span>
+                    </h1>
+                    <p class="text-slate-400 text-xs uppercase tracking-wider">CCTV · Bitácora Cronológica de Contadores, Aperturas y Control</p>
                 </div>
             </div>
+
             <div class="flex flex-wrap items-center gap-2">
-                <div id="current-clock" class="hidden md:flex items-center gap-2 bg-slate-800/90 px-3 py-1.5 rounded-xl border border-slate-700">
-                    <i data-lucide="clock" class="w-3.5 h-3.5 text-indigo-400"></i>
-                    <div class="text-xs font-mono font-medium text-slate-200 tabular-nums" data-cctv-clock>00:00:00 Hs.</div>
-                </div>
-                <div data-cctv-nav></div>
-                <button type="button" onclick="toggleDarkMode()" class="no-print p-2 bg-slate-800 border border-slate-700 rounded-xl hover:bg-slate-700 transition inline-flex items-center justify-center text-slate-200 cursor-pointer" title="Cambiar modo claro / oscuro">
-                    <i data-lucide="sun" class="w-5 h-5 text-amber-400 hidden dark:block"></i>
-                    <i data-lucide="moon" class="w-5 h-5 text-slate-200 block dark:hidden" id="dark-mode-icon"></i>
+                <a href="cerado.html" class="px-3 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-xl text-xs font-semibold text-white transition inline-flex items-center gap-1.5 shadow-sm" title="Ir a Cerado de Máquinas">
+                    <i data-lucide="wrench" class="w-4 h-4"></i>
+                    <span class="hidden sm:inline">Cerado</span>
+                </a>
+
+                <button type="button" onclick="exportarBitacoraCSV()" class="p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl transition text-emerald-400 cursor-pointer" title="Exportar bitácora a CSV (Excel)">
+                    <i data-lucide="sheet" class="w-5 h-5"></i>
                 </button>
-                <a href="index.html" class="no-print p-2 bg-slate-800 border border-slate-700 rounded-xl hover:bg-slate-700 transition text-slate-200 inline-flex items-center justify-center" title="Volver al Menú Principal">
+
+                <button type="button" onclick="descargarBitacoraTXT()" class="p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl transition text-indigo-400 cursor-pointer" title="Descargar bitácora en TXT">
+                    <i data-lucide="download" class="w-5 h-5"></i>
+                </button>
+
+                <button type="button" onclick="window.print()" class="p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl transition text-slate-200 cursor-pointer" title="Imprimir bitácora">
+                    <i data-lucide="printer" class="w-5 h-5"></i>
+                </button>
+
+                <div class="hidden md:flex items-center gap-2 bg-slate-800/90 px-3 py-1.5 rounded-xl border border-slate-700">
+                    <i data-lucide="clock" class="w-3.5 h-3.5 text-indigo-400"></i>
+                    <span class="text-xs font-mono font-medium text-slate-200 tabular-nums" data-cctv-clock>00:00:00 Hs.</span>
+                </div>
+
+                <div data-cctv-nav></div>
+
+                <button type="button" onclick="toggleDarkMode()" class="p-2 bg-slate-800 border border-slate-700 rounded-xl hover:bg-slate-700 transition inline-flex items-center justify-center text-slate-200 cursor-pointer" title="Cambiar modo claro / oscuro">
+                    <i data-lucide="sun" class="w-5 h-5 text-amber-400 hidden dark:block"></i>
+                    <i data-lucide="moon" class="w-5 h-5 text-slate-200 block dark:hidden"></i>
+                </button>
+
+                <a href="index.html" class="p-2 bg-slate-800 border border-slate-700 rounded-xl hover:bg-slate-700 transition text-slate-200 inline-flex items-center justify-center" title="Volver al Menú Principal">
                     <i data-lucide="home" class="w-5 h-5"></i>
                 </a>
             </div>
         </header>
 
-        <div class="p-5 sm:p-6 md:p-8 grid grid-cols-1 lg:grid-cols-3 gap-6 rounded-b-2xl bg-slate-50 dark:bg-slate-900/60">
-            <!-- Sidebar: Forms -->
-            <div class="lg:col-span-1 space-y-6 no-print">
-                
-                <!-- Quick Actions Card -->
-                <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700">
-                    <h2 class="text-lg font-semibold mb-4 flex items-center gap-2 text-slate-900 dark:text-white">
-                        <i data-lucide="plus-circle" class="w-5 h-5 text-blue-500"></i>
-                        Nueva Entrada
-                    </h2>
-                    
-                    <div class="space-y-3">
-                        <button onclick="openModal('ingreso')" class="w-full flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-700 hover:bg-blue-50 dark:hover:bg-blue-900/20 border border-slate-200 dark:border-slate-600 hover:border-blue-200 dark:hover:border-blue-800 rounded-xl transition-all group">
-                            <span class="font-medium text-slate-700 dark:text-slate-200">Registrar Ingreso</span>
-                            <i data-lucide="user-plus" class="w-4 h-4 text-slate-400 group-hover:text-blue-500"></i>
-                            <span class="text-xs text-slate-400 ml-2">Ctrl+N</span>
-                        </button>
-                        
-                        <button onclick="openModal('inicio')" class="w-full flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-700 hover:bg-blue-50 dark:hover:bg-blue-900/20 border border-slate-200 dark:border-slate-600 hover:border-blue-200 dark:hover:border-blue-800 rounded-xl transition-all group">
-                            <span class="font-medium text-slate-700 dark:text-slate-200">Inicio de Auditoría</span>
-                            <i data-lucide="play" class="w-4 h-4 text-slate-400 group-hover:text-blue-500"></i>
-                            <span class="text-xs text-slate-400 ml-2">Ctrl+I</span>
-                        </button>
-                        
-                        <button onclick="addLogEntry('finaliza')" class="w-full flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-700 hover:bg-blue-50 dark:hover:bg-blue-900/20 border border-slate-200 dark:border-slate-600 hover:border-blue-200 dark:hover:border-blue-800 rounded-xl transition-all group">
-                            <span class="font-medium text-slate-700 dark:text-slate-200">Finalizar Auditoría</span>
-                            <i data-lucide="square" class="w-4 h-4 text-slate-400 group-hover:text-blue-500"></i>
-                            <span class="text-xs text-slate-400 ml-2">Ctrl+F</span>
-                        </button>
+        <datalist id="salasAuditList">
+            <option value="Casino Boulevard"></option>
+            <option value="Sala Luxor"></option>
+            <option value="Slots Salvador Mazza"></option>
+            <option value="Slots Lajitas"></option>
+            <option value="Slots Mosconi"></option>
+            <option value="Slots Refinor"></option>
+            <option value="Sala VIP"></option>
+        </datalist>
 
-                        <button onclick="openModal('retiro')" class="w-full flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-700 hover:bg-blue-50 dark:hover:bg-blue-900/20 border border-slate-200 dark:border-slate-600 hover:border-blue-200 dark:hover:border-blue-800 rounded-xl transition-all group">
-                            <span class="font-medium text-slate-700 dark:text-slate-200">Registrar Retiro</span>
-                            <i data-lucide="log-out" class="w-4 h-4 text-slate-400 group-hover:text-blue-500"></i>
-                            <span class="text-xs text-slate-400 ml-2">Ctrl+R</span>
-                        </button>
+        <!-- Hoja exclusiva de Impresión -->
+        <div id="printSheet" class="hidden p-8 space-y-4">
+            <div class="border-b-2 border-slate-800 pb-3 flex justify-between items-start">
+                <div>
+                    <h2 class="text-lg font-bold uppercase">Acta Cronológica CCTV · Auditoría de Máquinas</h2>
+                    <p id="printSubtitulo" class="text-xs text-slate-600">Libro de Novedades de Monitoreo</p>
+                </div>
+                <span id="printFechaHora" class="text-xs font-mono text-slate-600"></span>
+            </div>
+            <pre id="printTexto" class="report-font whitespace-pre-wrap text-sm leading-relaxed p-4 border border-slate-300 rounded-lg bg-slate-50"></pre>
+        </div>
+
+        <main class="no-print p-4 sm:p-6 space-y-4 rounded-b-2xl bg-slate-50 dark:bg-slate-900/60">
+
+            <!-- Banner Superior de Estado de Auditoría y Equipo Activo -->
+            <div id="bannerEstadoAuditoria" class="hidden bg-white dark:bg-slate-900 border border-indigo-200 dark:border-indigo-800/80 rounded-2xl p-3.5 shadow-sm">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <div class="flex items-center gap-3 min-w-0">
+                        <span id="dotEstadoAudit" class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
+                        <div class="min-w-0">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <span id="badgeFaseAudit" class="text-[11px] font-bold uppercase tracking-wider text-indigo-700 dark:text-indigo-300">Equipo en Sala</span>
+                                <span id="badgeTiempoAudit" class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800"></span>
+                                <span id="badgeMaquinasAudit" class="hidden text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800"></span>
+                            </div>
+                            <p id="txtEquipoActivo" class="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100 truncate mt-0.5"></p>
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-1.5 shrink-0">
+                        <button type="button" onclick="seleccionarTipoComposer('inicio', true)" class="px-2.5 py-1 rounded-lg bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold transition cursor-pointer">▶ Iniciar</button>
+                        <button type="button" onclick="seleccionarTipoComposer('maquina', true)" class="px-2.5 py-1 rounded-lg bg-violet-600 hover:bg-violet-500 text-white text-xs font-semibold transition cursor-pointer">🎰 + Máquina</button>
+                        <button type="button" onclick="seleccionarTipoComposer('finaliza', true)" class="px-2.5 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition cursor-pointer">⏹ Finalizar</button>
+                        <button type="button" onclick="seleccionarTipoComposer('retiro', true)" class="px-2.5 py-1 rounded-lg bg-amber-600 hover:bg-amber-500 text-white text-xs font-semibold transition cursor-pointer">🚪 Retiro</button>
                     </div>
                 </div>
+            </div>
 
-                <!-- Config Card -->
-                <div class="bg-slate-900 text-white p-6 rounded-2xl shadow-lg shadow-blue-200/20 dark:shadow-none">
-                    <h3 class="text-sm font-bold uppercase tracking-widest text-blue-400 mb-4">Personal en Turno</h3>
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-xs text-slate-400 mb-1">Nombre de Personal (Control I/Operador)</label>
-                            <input type="text" id="reporter-name" placeholder="Ej: Nombre Apellido" class="bg-slate-800 border-none w-full rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+
+                <!-- COLUMNA IZQUIERDA: CONSOLA RÁPIDA EN LÍNEA + INFORMANTE (5/12) -->
+                <div class="lg:col-span-5 space-y-4">
+
+                    <!-- Consola de Carga Rápida sin Modales -->
+                    <div class="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 space-y-4">
+                        <div class="flex items-center justify-between">
+                            <h2 class="text-sm font-bold flex items-center gap-2 text-slate-900 dark:text-white">
+                                <i data-lucide="zap" class="w-4 h-4 text-indigo-500"></i>
+                                Consola de Carga Rápida
+                            </h2>
+                            <span class="text-[10px] font-mono text-slate-400">Alt+1..6 cambia tipo</span>
                         </div>
-                        <div>
-                            <label class="block text-xs text-slate-400 mb-1">Función</label>
-                            <input type="text" id="reporter-role" value="Control Interno" class="bg-slate-800 border-none w-full rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+
+                        <!-- Selector de los 6 Tipos de Evento -->
+                        <div class="grid grid-cols-3 gap-1.5">
+                            <button type="button" id="tabTipo-ingreso" onclick="seleccionarTipoComposer('ingreso')" class="py-2 px-2 rounded-xl text-xs font-bold transition cursor-pointer bg-emerald-600 text-white shadow-sm flex items-center justify-center gap-1">
+                                <span>🟢 Ingreso</span>
+                            </button>
+                            <button type="button" id="tabTipo-inicio" onclick="seleccionarTipoComposer('inicio')" class="py-2 px-2 rounded-xl text-xs font-bold transition cursor-pointer bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center gap-1">
+                                <span>▶️ Inicio</span>
+                            </button>
+                            <button type="button" id="tabTipo-maquina" onclick="seleccionarTipoComposer('maquina')" class="py-2 px-2 rounded-xl text-xs font-bold transition cursor-pointer bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center gap-1">
+                                <span>🎰 Máquina</span>
+                            </button>
+                            <button type="button" id="tabTipo-finaliza" onclick="seleccionarTipoComposer('finaliza')" class="py-2 px-2 rounded-xl text-xs font-bold transition cursor-pointer bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center gap-1">
+                                <span>⏹️ Cierre</span>
+                            </button>
+                            <button type="button" id="tabTipo-retiro" onclick="seleccionarTipoComposer('retiro')" class="py-2 px-2 rounded-xl text-xs font-bold transition cursor-pointer bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center gap-1">
+                                <span>🟠 Retiro</span>
+                            </button>
+                            <button type="button" id="tabTipo-novedad" onclick="seleccionarTipoComposer('novedad')" class="py-2 px-2 rounded-xl text-xs font-bold transition cursor-pointer bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center gap-1">
+                                <span>📝 Libre</span>
+                            </button>
                         </div>
-                        <div class="pt-2 border-t border-slate-700">
-                            <div class="flex items-center gap-2 text-xs">
-                                <span id="save-indicator" class="flex items-center gap-1 text-green-400">
-                                    <i data-lucide="check" class="w-3 h-3"></i>
-                                    <span>Datos guardados</span>
-                                </span>
+
+                        <!-- Hora del Evento + Cámara CCTV Opcional -->
+                        <div class="grid grid-cols-1 sm:grid-cols-12 gap-3">
+                            <div class="sm:col-span-6">
+                                <div class="flex items-center justify-between mb-1">
+                                    <label for="compHora" class="text-xs font-semibold text-slate-600 dark:text-slate-300">⏰ Hora Evento</label>
+                                    <div class="flex gap-1">
+                                        <button type="button" onclick="ajustarHoraComposer(1)" class="text-[10px] font-mono font-semibold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer">+1m</button>
+                                        <button type="button" onclick="ajustarHoraComposer(5)" class="text-[10px] font-mono font-semibold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer">+5m</button>
+                                    </div>
+                                </div>
+                                <div class="flex items-stretch">
+                                    <input type="time" id="compHora" oninput="actualizarPreviaComposer()" class="w-full min-w-0 px-2.5 py-2 bg-slate-50 dark:bg-slate-950 border border-r-0 border-slate-300 dark:border-slate-700 rounded-l-xl text-xs sm:text-sm font-mono font-bold text-slate-900 dark:text-white outline-none focus:border-indigo-500">
+                                    <button type="button" onclick="ponerHoraAhoraComposer()" class="px-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-r-xl text-[11px] font-semibold transition cursor-pointer shrink-0">Ahora</button>
+                                </div>
+                            </div>
+
+                            <div class="sm:col-span-6">
+                                <div class="flex items-center justify-between mb-1">
+                                    <label for="compCamara" class="text-xs font-semibold text-slate-600 dark:text-slate-300">📹 Cámara (Opcional)</label>
+                                    <button type="button" onclick="limpiarCampoComp('compCamara')" class="text-[10px] text-slate-400 hover:text-rose-500 cursor-pointer">Borrar</button>
+                                </div>
+                                <input type="text" id="compCamara" autocomplete="off" oninput="alEscribirCamaraAudit()" placeholder="3 dígitos: ej. 204, 103"
+                                    class="w-full px-2.5 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-mono text-slate-900 dark:text-white outline-none focus:border-indigo-500">
+                            </div>
+                        </div>
+
+                        <!-- Bloque Sujeto / Auditores / Técnicos (visible en Ingreso, Inicio, Máquina y Retiro) -->
+                        <div id="bloqueCompSujeto" class="relative space-y-1.5">
+                            <div class="flex items-center justify-between">
+                                <label id="lblCompSujeto" for="compSujeto" class="text-xs font-semibold text-slate-600 dark:text-slate-300">👥 Personal / Auditores que Ingresan</label>
+                                <button type="button" onclick="limpiarCampoComp('compSujeto')" class="text-[10px] text-slate-400 hover:text-rose-500 cursor-pointer">Borrar</button>
+                            </div>
+                            <input type="text" id="compSujeto" autocomplete="off" placeholder="Escribe 1 letra o encadena varios con 'y'..."
+                                class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-white outline-none focus:border-indigo-500">
+                            <div id="dropCompSujeto" class="hidden absolute left-0 right-0 top-14 z-50 max-h-48 overflow-y-auto rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-xl divide-y divide-slate-100 dark:divide-slate-800"></div>
+
+                            <div class="flex flex-wrap items-center gap-1 pt-0.5">
+                                <button type="button" onclick="insertarRolSujeto('Auditor')" class="px-2 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 text-[10px] font-semibold cursor-pointer">Auditor</button>
+                                <button type="button" onclick="insertarRolSujeto('Personal de Ente Regulador')" class="px-2 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 text-[10px] font-semibold cursor-pointer">Ente Regulador</button>
+                                <button type="button" onclick="insertarRolSujeto('Téc.')" class="px-2 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 text-[10px] font-semibold cursor-pointer">Téc.</button>
+                                <button type="button" onclick="encadenarOtroSujeto()" class="px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 text-[10px] font-semibold cursor-pointer">+ Sumar otro ("y ")</button>
+                            </div>
+                        </div>
+
+                        <!-- Bloque Tarea General (visible en Ingreso e Inicio) -->
+                        <div id="bloqueCompTarea" class="space-y-1.5">
+                            <label for="compTarea" class="block text-xs font-semibold text-slate-600 dark:text-slate-300">📋 Motivo / Tarea de Auditoría</label>
+                            <input type="text" id="compTarea" value="auditoría de contadores electrónicos de máquinas" oninput="actualizarPreviaComposer()"
+                                class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white outline-none focus:border-indigo-500">
+                            <div class="flex flex-wrap gap-1">
+                                <button type="button" onclick="setTareaRapida('auditoría de contadores electrónicos de máquinas')" class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950 text-[10px] font-medium text-slate-700 dark:text-slate-300 cursor-pointer">Contadores elect.</button>
+                                <button type="button" onclick="setTareaRapida('verificación de memorias, precintos y programas')" class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950 text-[10px] font-medium text-slate-700 dark:text-slate-300 cursor-pointer">Memorias y precintos</button>
+                                <button type="button" onclick="setTareaRapida('relevamiento y toma de contadores de máquinas')" class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950 text-[10px] font-medium text-slate-700 dark:text-slate-300 cursor-pointer">Toma contadores</button>
+                                <button type="button" onclick="setTareaRapida('control técnico de billeteros y pago de premios')" class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950 text-[10px] font-medium text-slate-700 dark:text-slate-300 cursor-pointer">Billeteros / Pagos</button>
+                            </div>
+                        </div>
+
+                        <!-- Bloque Intervención Puntual de Máquina(s) (visible en modo 'maquina') -->
+                        <div id="bloqueCompMaquina" class="hidden p-3 rounded-xl bg-violet-50/60 dark:bg-violet-950/25 border border-violet-200 dark:border-violet-800/70 space-y-3">
+                            <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
+                                <div class="sm:col-span-7">
+                                    <label for="compNumMaquina" class="block text-xs font-bold text-violet-900 dark:text-violet-300 mb-1">🎰 N° Máquina(s)</label>
+                                    <input type="text" id="compNumMaquina" autocomplete="off" oninput="actualizarPreviaComposer()" placeholder="Ej: 10420 o 10420, 10421"
+                                        class="w-full px-3 py-1.5 bg-white dark:bg-slate-950 border border-violet-300 dark:border-violet-700 rounded-lg text-xs sm:text-sm font-mono font-bold text-slate-900 dark:text-white outline-none focus:border-violet-500">
+                                </div>
+                                <div class="sm:col-span-5">
+                                    <label for="compPrecinto" class="block text-xs font-semibold text-violet-900 dark:text-violet-300 mb-1">🔒 Precinto / Isla (Opc.)</label>
+                                    <input type="text" id="compPrecinto" autocomplete="off" oninput="actualizarPreviaComposer()" placeholder="Ej: Precinto 45812"
+                                        class="w-full px-2.5 py-1.5 bg-white dark:bg-slate-950 border border-violet-300 dark:border-violet-700 rounded-lg text-xs font-mono text-slate-900 dark:text-white outline-none focus:border-violet-500">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label for="compAccionMaq" class="block text-xs font-semibold text-violet-900 dark:text-violet-300 mb-1">Acción Realizada en Máquina</label>
+                                <select id="compAccionMaq" onchange="actualizarPreviaComposer()" class="w-full px-2.5 py-2 bg-white dark:bg-slate-950 border border-violet-300 dark:border-violet-700 rounded-lg text-xs font-semibold text-slate-900 dark:text-white outline-none">
+                                    <option value="procede a apertura y control de contadores en">🔓 Apertura y control de contadores</option>
+                                    <option value="procede a apertura de puerta lógica / CPU y verificación en">🧠 Apertura de puerta lógica / CPU</option>
+                                    <option value="realiza prueba de aceptador de billetes e impresión de ticket en">💵 Prueba de billetero y ticket</option>
+                                    <option value="finaliza control, cierra y deja operativa">✅ Cierra, precinta y deja operativa</option>
+                                    <option value="deja fuera de servicio por observación técnica a">⚠️ Queda fuera de servicio / observada</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Bloque Detalle de Cierre u Observación Libre (visible en 'finaliza' o 'novedad') -->
+                        <div id="bloqueCompDetalleLibre" class="hidden space-y-1.5">
+                            <label id="lblCompDetalleLibre" for="compDetalleLibre" class="block text-xs font-semibold text-slate-600 dark:text-slate-300">Detalle</label>
+                            <textarea id="compDetalleLibre" rows="2" oninput="actualizarPreviaComposer()" placeholder="Escribe el detalle aquí..."
+                                class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-white outline-none focus:border-indigo-500 resize-y"></textarea>
+                            <div id="chipsCierreRapido" class="flex flex-wrap gap-1">
+                                <button type="button" onclick="setDetalleLibre('sin novedades')" class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-[10px] font-semibold text-slate-700 dark:text-slate-300 cursor-pointer">sin novedades</button>
+                                <button type="button" onclick="setDetalleLibre('quedando la totalidad de máquinas operativas')" class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-[10px] font-semibold text-slate-700 dark:text-slate-300 cursor-pointer">todas operativas</button>
+                                <button type="button" onclick="setDetalleLibre('firmando acta de conformidad')" class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-[10px] font-semibold text-slate-700 dark:text-slate-300 cursor-pointer">acta firmada</button>
+                            </div>
+                        </div>
+
+                        <!-- Vista previa instantánea del renglón a insertar -->
+                        <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 space-y-1">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">Vista previa del renglón:</span>
+                            <p id="compPreviewText" class="report-font text-xs text-slate-700 dark:text-slate-200 leading-relaxed"></p>
+                        </div>
+
+                        <button type="button" onclick="agregarDesdeComposer()" class="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md transition flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99]">
+                            <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                            <span>Agregar al Libro de Novedades</span>
+                        </button>
+                    </div>
+
+                    <!-- Personal Informante en Turno -->
+                    <div class="bg-slate-900 dark:bg-slate-950 text-white p-4 sm:p-5 rounded-2xl border border-slate-800 space-y-3">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-indigo-400 flex items-center gap-1.5">
+                            <i data-lucide="shield" class="w-4 h-4"></i>
+                            Personal Informante en Turno (Sala / CI)
+                        </h3>
+
+                        <div class="space-y-3">
+                            <div class="relative">
+                                <label for="reporter-name" class="block text-xs text-slate-400 mb-1">Nombre de quien informa a CCTV (1 letra)</label>
+                                <input type="text" id="reporter-name" autocomplete="off" placeholder="Ej: Padilla Jorge, Rojas Dolly, Denz..."
+                                    oninput="onReporterInput()" onfocus="onReporterInput()" onblur="hideReporterDropdown()"
+                                    class="bg-slate-800 border border-slate-700 w-full rounded-xl px-3 py-2 text-xs text-white focus:border-indigo-500 outline-none">
+                                <div id="dropdownReporter" class="hidden absolute left-0 right-0 top-full mt-1 z-50 max-h-48 overflow-y-auto rounded-xl bg-slate-800 border border-slate-700 shadow-2xl divide-y divide-slate-700"></div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-2.5">
+                                <div>
+                                    <label for="reporter-role" class="block text-xs text-slate-400 mb-1">Función / Cargo</label>
+                                    <input type="text" id="reporter-role" value="Control Interno" oninput="saveConfig(); actualizarPreviaComposer()"
+                                        class="bg-slate-800 border border-slate-700 w-full rounded-xl px-3 py-2 text-xs text-white focus:border-indigo-500 outline-none">
+                                </div>
+                                <div>
+                                    <label for="reporter-sala" class="block text-xs text-slate-400 mb-1">Sala (Opcional)</label>
+                                    <input type="text" id="reporter-sala" list="salasAuditList" placeholder="Sin especificar" oninput="saveConfig(); actualizarPreviaComposer()"
+                                        class="bg-slate-800 border border-slate-700 w-full rounded-xl px-3 py-2 text-xs text-white focus:border-indigo-500 outline-none">
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Clear All -->
-                <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700">
-                    <button onclick="clearAllLogs()" class="w-full p-2.5 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40 border border-red-200 dark:border-red-800 rounded-lg text-sm transition-all font-medium text-red-600 dark:text-red-400 flex items-center justify-center gap-2">
-                        <i data-lucide="trash-2" class="w-4 h-4"></i>
-                        Limpiar Todo
-                    </button>
+                <!-- COLUMNA DERECHA: LIBRO DE NOVEDADES + HISTORIAL DE SESIONES (7/12) -->
+                <div class="lg:col-span-7 flex flex-col space-y-4">
+
+                    <!-- Barra de Búsqueda, Filtro y Orden -->
+                    <div class="flex flex-wrap items-center gap-2">
+                        <div class="relative flex-1 min-w-[180px]">
+                            <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+                            <input type="search" id="search-logs" placeholder="Buscar máquina, persona, cámara u hora..."
+                                class="w-full pl-9 pr-3 py-2 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-xs text-slate-900 dark:text-white focus:border-indigo-500 outline-none">
+                        </div>
+
+                        <select id="filter-type" class="border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 bg-white dark:bg-slate-900 text-xs font-semibold text-slate-700 dark:text-slate-200 outline-none">
+                            <option value="all">Todos los eventos</option>
+                            <option value="ingreso">🟢 Ingresos</option>
+                            <option value="inicio">▶️ Inicios</option>
+                            <option value="maquina">🎰 Máquinas</option>
+                            <option value="finaliza">⏹️ Cierres</option>
+                            <option value="retiro">🟠 Retiros</option>
+                            <option value="novedad">📝 Libres</option>
+                        </select>
+
+                        <label class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-200 cursor-pointer select-none">
+                            <input type="checkbox" id="chkOrdenCronologico" checked onchange="alCambiarOrdenCronologico()" class="rounded border-slate-300 text-indigo-600">
+                            Ordenar hora
+                        </label>
+                    </div>
+
+                    <!-- Contenedor Bitácora -->
+                    <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col min-h-[520px] max-h-[680px] overflow-hidden">
+                        <div class="px-4 sm:px-5 py-3.5 border-b border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2 bg-slate-50/70 dark:bg-slate-950/50">
+                            <div>
+                                <h2 class="font-bold text-slate-800 dark:text-white text-sm flex items-center gap-2">
+                                    <i data-lucide="book-open" class="w-4 h-4 text-indigo-500"></i>
+                                    Libro de Novedades Digital
+                                </h2>
+                                <span class="text-[11px] text-slate-400">Hora y texto editables directamente en cada fila</span>
+                            </div>
+
+                            <div class="flex flex-wrap items-center gap-1.5">
+                                <button type="button" onclick="undo()" class="p-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition cursor-pointer" title="Deshacer (Ctrl+Z)">
+                                    <i data-lucide="undo-2" class="w-3.5 h-3.5"></i>
+                                </button>
+                                <button type="button" onclick="redo()" class="p-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition cursor-pointer" title="Rehacer (Ctrl+Y)">
+                                    <i data-lucide="redo-2" class="w-3.5 h-3.5"></i>
+                                </button>
+                                <button type="button" onclick="copyAllLogs()" class="text-xs bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-xl font-bold flex items-center gap-1.5 shadow-sm transition cursor-pointer">
+                                    <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                                    Copiar Todo
+                                </button>
+                                <button type="button" onclick="copiarWhatsAppAudit()" class="text-xs bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-xl font-bold flex items-center gap-1.5 shadow-sm transition cursor-pointer" title="Copiar con encabezado y resumen para WhatsApp">
+                                    <i data-lucide="message-square" class="w-3.5 h-3.5"></i>
+                                    WhatsApp
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="log-scroll-area" class="flex-1 overflow-y-auto relative p-4">
+                            <div id="empty-state" class="h-full flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 py-16 text-center">
+                                <i data-lucide="clipboard-list" class="w-10 h-10 mb-2 opacity-60"></i>
+                                <p class="text-sm font-semibold">Sin eventos registrados en la auditoría actual</p>
+                                <p class="text-xs mt-1 max-w-xs">Completa la Consola Rápida a la izquierda y presiona "Agregar al Libro" (o Enter)</p>
+                            </div>
+                            <div id="log-container" class="space-y-2.5"></div>
+                        </div>
+
+                        <div class="px-4 sm:px-5 py-3 border-t border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-950/50 flex flex-wrap justify-between items-center gap-2 text-xs">
+                            <span id="log-count" class="font-semibold text-slate-600 dark:text-slate-300">0 registros</span>
+                            <div class="flex items-center gap-2">
+                                <button type="button" onclick="archivarYNuevaAuditoria()" class="px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/70 hover:bg-indigo-100 dark:hover:bg-indigo-900 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 font-semibold transition cursor-pointer" title="Guardar esta bitácora completa en el archivo y empezar una nueva">
+                                    🗂️ Archivar y Nueva
+                                </button>
+                                <button type="button" onclick="clearAllLogs()" class="px-2.5 py-1 rounded-lg bg-rose-50 dark:bg-rose-950/50 hover:bg-rose-100 dark:hover:bg-rose-900/60 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 font-semibold transition cursor-pointer">
+                                    Vaciar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Historial de Sesiones / Auditorías Archivadas -->
+                    <details class="group bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                        <summary class="cursor-pointer list-none px-4 sm:px-5 py-3.5 flex items-center justify-between text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-200 select-none">
+                            <span class="flex items-center gap-2">
+                                <i data-lucide="archive" class="w-4 h-4 text-indigo-500"></i>
+                                Auditorías Archivadas (<span id="countSesionesArchivadas">0</span>)
+                            </span>
+                            <span class="text-slate-400 group-open:rotate-180 transition-transform">▼</span>
+                        </summary>
+                        <div class="px-4 sm:px-5 pb-4 pt-1 border-t border-slate-100 dark:border-slate-800">
+                            <div id="listaSesionesArchivadas" class="space-y-2 max-h-56 overflow-y-auto pt-2 text-xs">
+                                <p class="text-slate-400 text-center py-3">Sin sesiones archivadas</p>
+                            </div>
+                        </div>
+                    </details>
                 </div>
             </div>
-
-            <!-- Main Panel: Log List -->
-            <div class="lg:col-span-2">
-                <!-- Search & Filter -->
-                <div class="flex flex-col sm:flex-row gap-2 mb-4 no-print">
-                    <div class="relative flex-1">
-                        <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
-                        <input type="text" id="search-logs" placeholder="Buscar en registros..." 
-                               class="w-full pl-10 pr-4 py-2.5 border border-slate-200 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-sm focus:ring-2 focus:ring-blue-500 outline-none dark:text-white">
-                    </div>
-                    <select id="filter-type" class="border border-slate-200 dark:border-slate-600 rounded-xl px-4 py-2.5 bg-white dark:bg-slate-800 text-sm dark:text-white">
-                        <option value="all">Todos los tipos</option>
-                        <option value="ingreso">Ingresos</option>
-                        <option value="inicio">Inicios</option>
-                        <option value="finaliza">Finalizaciones</option>
-                        <option value="retiro">Retiros</option>
-                    </select>
-                </div>
-
-                <!-- Log Panel -->
-                <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col h-[600px] overflow-hidden">
-                    <div class="p-6 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between bg-slate-50/50 dark:bg-slate-900/50">
-                        <div class="flex flex-col">
-                            <h2 class="font-bold text-slate-800 dark:text-white flex items-center gap-2">
-                                <i data-lucide="book-open" class="w-5 h-5"></i>
-                                Libro de Novedades Digital
-                            </h2>
-                            <span class="text-[10px] text-slate-400 dark:text-slate-500 font-semibold uppercase tracking-tighter">Orden Cronológico</span>
-                        </div>
-                        <div class="flex gap-2">
-                            <button onclick="undo()" class="text-xs bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 px-3 py-1.5 rounded-lg font-semibold flex items-center gap-2 hover:bg-slate-50 dark:hover:bg-slate-600 active:scale-95 transition-all" title="Deshacer (Ctrl+Z)">
-                                <i data-lucide="undo" class="w-3 h-3"></i>
-                            </button>
-                            <button onclick="redo()" class="text-xs bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 px-3 py-1.5 rounded-lg font-semibold flex items-center gap-2 hover:bg-slate-50 dark:hover:bg-slate-600 active:scale-95 transition-all" title="Rehacer (Ctrl+Y)">
-                                <i data-lucide="redo" class="w-3 h-3"></i>
-                            </button>
-                            <button onclick="copyAllLogs()" class="text-xs bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 px-3 py-1.5 rounded-lg font-semibold flex items-center gap-2 hover:bg-slate-50 dark:hover:bg-slate-600 active:scale-95 transition-all">
-                                <i data-lucide="copy" class="w-3 h-3"></i>
-                                Copiar Todo
-                            </button>
-                        </div>
-                    </div>
-
-                    <div id="log-scroll-area" class="flex-1 overflow-y-auto relative bg-white dark:bg-slate-800">
-                        <!-- Empty State -->
-                        <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center text-slate-400 dark:text-slate-600 opacity-60 pointer-events-none">
-                            <i data-lucide="clipboard-list" class="w-12 h-12 mb-2"></i>
-                            <p>Sin eventos registrados</p>
-                            <p class="text-xs mt-1">Presiona Ctrl+N para comenzar</p>
-                        </div>
-                        
-                        <!-- Log Container -->
-                        <div id="log-container" class="p-6 space-y-3 min-h-full">
-                            <!-- Logs will appear here in chronological order -->
-                        </div>
-                    </div>
-                    
-                    <!-- Status Bar -->
-                    <div class="px-6 py-2 border-t border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 flex justify-between items-center text-xs text-slate-400">
-                        <span id="log-count">0 registros</span>
-                    </div>
-                </div>
-                
-                <!-- Tips -->
-                <p class="mt-3 text-xs text-slate-400 dark:text-slate-500 flex items-center gap-1 italic no-print">
-                    <i data-lucide="info" class="w-3 h-3"></i>
-                    Consejo: Puedes editar el texto directamente haciendo clic sobre él. Usa Ctrl+Z/Y para deshacer/rehacer.
-                </p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modals -->
-    <div id="modal-overlay" class="fixed inset-0 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-slate-800 w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-fade-in">
-            <div class="p-6 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center">
-                <h3 id="modal-title" class="text-xl font-bold text-slate-800 dark:text-white">Acción</h3>
-                <button onclick="closeModal()" class="p-1 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full transition-colors">
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </button>
-            </div>
-            <div class="p-6 space-y-4" id="modal-body">
-                <!-- Content injected via JS -->
-            </div>
-            <div class="p-6 bg-slate-50 dark:bg-slate-900/50 border-t border-slate-100 dark:border-slate-700 flex justify-end gap-3">
-                <button onclick="closeModal()" class="px-4 py-2 text-sm font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl transition-colors">Cancelar</button>
-                <button id="modal-submit" class="px-6 py-2 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-lg shadow-blue-600/20 transition-all">Confirmar</button>
-            </div>
-        </div>
+        </main>
     </div>
 
     <!-- Toast Notification -->
-    <div id="toast" class="fixed bottom-8 left-1/2 -translate-x-1/2 bg-slate-900 dark:bg-slate-700 text-white px-6 py-3 rounded-full text-sm font-medium shadow-2xl transition-all duration-300 translate-y-24 opacity-0 flex items-center gap-2 z-50">
-        <i data-lucide="check-circle" class="w-4 h-4 text-green-400"></i>
-        <span>Operación exitosa</span>
+    <div id="toast" class="no-print fixed bottom-6 right-6 bg-slate-900 dark:bg-slate-800 border border-slate-700 text-white px-4 py-3 rounded-xl text-xs font-semibold shadow-2xl transition-all duration-300 translate-y-24 opacity-0 flex items-center gap-2 z-50">
+        <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>
+        <span id="toast-text">Operación exitosa</span>
     </div>
 
     <script>
-        // ==================== STATE MANAGEMENT ====================
+        const PERSONAL_AUDIT_LIST = [
+            { nombre: 'PADILLA, JORGE DAVID', rol: 'Supervisor Control Interno' },
+            { nombre: 'ROJAS, DOLLY DEL CARMEN', rol: 'Supervisora Control Interno' },
+            { nombre: 'URBANO, FELIX DANIEL', rol: 'Supervisor Control Interno' },
+            { nombre: 'CASTAÑO, PABLO HORACIO', rol: 'Control Interno' },
+            { nombre: 'YUJRA, FERNANDO', rol: 'Control Interno' },
+            { nombre: 'RIZZATO, ENZO', rol: 'Control Interno' },
+            { nombre: 'ZAMBONI, RODRIGO', rol: 'Control Interno' },
+            { nombre: 'ALTAMIRANO, FRANCISCO ROBERTO', rol: 'Encargado Técnico' },
+            { nombre: 'BENACCHIO, ANGEL ISMAEL', rol: 'Técnico Slots' },
+            { nombre: 'PORCEL, FRANCO', rol: 'Técnico Slots' },
+            { nombre: 'TEJERINA, SERGIO MAURICIO', rol: 'Técnico Slots' },
+            { nombre: 'DENZ GIMENEZ, DEBORA ADRIANA', rol: 'Encargada de Turno' },
+            { nombre: 'MOISES, ARIEL JESUS', rol: 'Encargado de Turno' },
+            { nombre: 'RODRIGUEZ, MONICA ELIANA', rol: 'Encargada de Turno' },
+            { nombre: 'ZAMBRANA, CARINA DEL VALLE', rol: 'Encargada de Turno' },
+            { nombre: 'MARTINEZ GUAYMAS, CAROLINA ALEJANDRA', rol: 'Encargada de Turno' },
+            { nombre: 'LAZARTE, LAURA LORENA', rol: 'Asistente de Sala' },
+            { nombre: 'ALONSO, JOSE ANTONIO SEBASTIAN', rol: 'Asistente de Sala' }
+        ];
+
+        const CAMARAS_BOULEVARD = {
+            '101':'SALA SLOTS (DVR 1)','102':'SALA SLOTS (DVR 1)','103':'SALA SLOTS (DVR 1)','104':'SALA SLOTS (DVR 1)','105':'SALA SLOTS (DVR 1)',
+            '106':'CAJA SLOTS (DVR 1)','107':'CAJA SLOTS (DVR 1)','108':'CAJA SLOTS (DVR 1)','109':'CAJA SLOTS (DVR 1)','110':'TESORO SLOTS (DVR 1)','116':'ACCESO PERSONAL (DVR 1)',
+            '201':'SALA SLOTS (DVR 2)','202':'SALA SLOTS (DVR 2)','203':'SALA SLOTS (DVR 2)','204':'SALA SLOTS (DVR 2)','205':'SALA SLOTS (DVR 2)','206':'SALA SLOTS (DVR 2)','207':'SALA SLOTS (DVR 2)','208':'SALA SLOTS (DVR 2)','209':'SALA SLOTS (DVR 2)','210':'SALA SLOTS (DVR 2)','211':'SALA SLOTS (DVR 2)','212':'SALA SLOTS (DVR 2)','213':'SALA SLOTS (DVR 2)','214':'SALA SLOTS (DVR 2)','215':'SALA SLOTS (DVR 2)','216':'SALA SLOTS (DVR 2)',
+            '301':'SALA SLOTS (DVR 3)','302':'SALA SLOTS (DVR 3)','303':'SALA SLOTS (DVR 3)','304':'SALA SLOTS (DVR 3)','305':'SALA SLOTS (DVR 3)','306':'SALA SLOTS (DVR 3)','307':'SALA SLOTS (DVR 3)','308':'SALA SLOTS (DVR 3)','309':'SALA SLOTS (DVR 3)','310':'SALA SLOTS (DVR 3)','311':'SALA SLOTS (DVR 3)','312':'SALA SLOTS (DVR 3)','313':'SALA SLOTS (DVR 3)','314':'SALA SLOTS (DVR 3)','315':'SALA SLOTS (DVR 3)','316':'SALA SLOTS (DVR 3)',
+            '401':'SALA SLOTS (DVR 4)','402':'SALA SLOTS (DVR 4)','403':'SALA SLOTS (DVR 4)','404':'SALA SLOTS (DVR 4)','405':'SALA SLOTS (DVR 4)','406':'TABLERO (DVR 4)','407':'SALA SLOTS (DVR 4)','408':'DEPOSITO (DVR 4)','409':'OFICINAS (DVR 4)','410':'RACK (DVR 4)','411':'DPTO. TECNICO (DVR 4)','416':'CCTV (DVR 4)',
+            '706':'ACCESO (DVR 7)','715':'RECEPCION (DVR 7)',
+            '801':'SALA SLOTS (DVR 8)','802':'SALA SLOTS (DVR 8)','803':'SALA SLOTS (DVR 8)','805':'RECEPCION (DVR 8)'
+        };
+
+        const AUDIT_STORAGE = {
+            logsKey: 'auditLogs',
+            configKey: 'auditConfig',
+            archivesKey: 'auditArchivedSessions_v1',
+            frequentSubjectsKey: 'auditFrequentSubjects_v1',
+            MAX_HISTORY: 50
+        };
+
         let logs = [];
         let history = [];
         let historyIndex = -1;
-        const MAX_HISTORY = 50;
+        let sesionesArchivadas = [];
+        let sujetosFrecuentes = [];
+        let tipoComposerActual = 'ingreso'; // 'ingreso' | 'inicio' | 'maquina' | 'finaliza' | 'retiro' | 'novedad'
+        let equipoActivoMemoria = '';
+        let ordenCronologico = true;
 
-        // ==================== INITIALIZATION ====================
-        function init() {
-            loadLogs();
-            loadDarkMode();
-            loadConfig();
-            setupEventListeners();
-            updateClock();
-            setInterval(updateClock, 1000);
-            lucide.createIcons();
-            updateSaveIndicator('guardado');
+        function normAudit(s) {
+            return String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
         }
 
-        function setupEventListeners() {
-            // Search functionality
-            document.getElementById('search-logs')?.addEventListener('input', renderLogs);
-            document.getElementById('filter-type')?.addEventListener('change', renderLogs);
-            
-            // Auto-save config
-            document.getElementById('reporter-name')?.addEventListener('input', saveConfig);
-            document.getElementById('reporter-role')?.addEventListener('input', saveConfig);
-            
-            // Keyboard shortcuts
-            document.addEventListener('keydown', handleKeyboardShortcuts);
-            
-            // Close modal on overlay click
-            document.getElementById('modal-overlay')?.addEventListener('click', (e) => {
-                if (e.target === e.currentTarget) closeModal();
-            });
-        }
-
-        // ==================== PERSISTENCE ====================
-        function saveLogs() {
-            try {
-                localStorage.setItem('auditLogs', JSON.stringify(logs));
-                updateSaveIndicator('guardado');
-            } catch (e) {
-                updateSaveIndicator('error');
-                console.error('Error saving logs:', e);
-            }
-        }
-
-        function loadLogs() {
-            try {
-                const saved = localStorage.getItem('auditLogs');
-                if (saved) {
-                    logs = JSON.parse(saved);
-                    logs.forEach(log => log.timestamp = new Date(log.timestamp));
-                }
-                addToHistory();
-                renderLogs();
-            } catch (e) {
-                console.error('Error loading logs:', e);
-                showToast('Error al cargar registros', true);
-            }
-        }
-
-        function saveConfig() {
-            const config = {
-                reporterName: document.getElementById('reporter-name')?.value || '',
-                reporterRole: document.getElementById('reporter-role')?.value || ''
-            };
-            localStorage.setItem('auditConfig', JSON.stringify(config));
-        }
-
-        function loadConfig() {
-            try {
-                const saved = localStorage.getItem('auditConfig');
-                if (saved) {
-                    const config = JSON.parse(saved);
-                    if (document.getElementById('reporter-name')) 
-                        document.getElementById('reporter-name').value = config.reporterName;
-                    if (document.getElementById('reporter-role'))
-                        document.getElementById('reporter-role').value = config.reporterRole;
-                }
-            } catch (e) {
-                console.error('Error loading config:', e);
-            }
-        }
-
-        // ==================== DARK MODE ====================
-        function toggleDarkMode() {
-            if (window.CCTVTheme) {
-                window.CCTVTheme.toggle();
-                return;
-            }
-            const isDark = document.documentElement.classList.toggle('dark');
-            try {
-                localStorage.setItem('cctv_theme', isDark ? 'dark' : 'light');
-            } catch (e) {}
-        }
-
-        function loadDarkMode() {
-            try {
-                if (localStorage.getItem('cctv_theme') === 'dark') {
-                    document.documentElement.classList.add('dark');
-                }
-            } catch (e) {}
-        }
-
-        function updateDarkModeIcon() {}
-
-        // ==================== CLOCK ====================
         function escapeHtml(str) {
-            return String(str)
+            return String(str ?? '')
                 .replace(/&/g, '&amp;')
                 .replace(/</g, '&lt;')
                 .replace(/>/g, '&gt;')
@@ -404,219 +509,675 @@
                 .replace(/'/g, '&#39;');
         }
 
-        function updateClock() {
-            const clockEl = document.querySelector('#current-clock .font-mono');
-            if (!clockEl) return;
+        function getHoraActualHHMM() {
             const now = new Date();
-            clockEl.textContent = now.toLocaleTimeString('es-AR', { hour12: false });
+            return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
         }
 
-        // ==================== MODAL LOGIC ====================
-        function openModal(type) {
-            const overlay = document.getElementById('modal-overlay');
-            const title = document.getElementById('modal-title');
-            const body = document.getElementById('modal-body');
-            const submitBtn = document.getElementById('modal-submit');
-            
-            overlay.classList.remove('hidden');
-            body.innerHTML = '';
+        function sumarMinutosHHMM(hora, mins) {
+            if (!hora || !hora.includes(':')) return getHoraActualHHMM();
+            const [h, m] = hora.split(':').map(Number);
+            if (isNaN(h) || isNaN(m)) return getHoraActualHHMM();
+            const tot = ((h * 60 + m + mins) % 1440 + 1440) % 1440;
+            return `${String(Math.floor(tot / 60)).padStart(2, '0')}:${String(tot % 60).padStart(2, '0')}`;
+        }
 
-            const inputClass = "w-full border border-slate-200 dark:border-slate-600 rounded-xl p-3 outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 dark:text-white transition-all";
+        function horaAMinutosOrden(hora) {
+            if (!hora || !hora.includes(':')) return 0;
+            const [h, m] = hora.split(':').map(Number);
+            return (h * 60) + m;
+        }
 
-            if (type === 'ingreso') {
-                title.innerText = 'Registrar Ingreso';
-                body.innerHTML = `
-                    <div class="space-y-3">
-                        <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300">Nombre del Auditado *</label>
-                        <input type="text" id="input-subject" placeholder="Ej: Nombre Apellido" class="${inputClass}" required>
-                        <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300">Tarea</label>
-                        <input type="text" id="input-task" value="auditoría de contadores electrónicos de máquinas" class="${inputClass}">
-                    </div>
-                `;
-                setTimeout(() => document.getElementById('input-subject')?.focus(), 100);
-            } else if (type === 'inicio') {
-                title.innerText = 'Inicio de Auditoría';
-                body.innerHTML = `
-                    <div class="space-y-3">
-                        <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300">Responsable que inicia *</label>
-                        <input type="text" id="input-subject" placeholder="Ej: Nombre Apellido" class="${inputClass}" required>
-                    </div>
-                `;
-                setTimeout(() => document.getElementById('input-subject')?.focus(), 100);
-            } else if (type === 'retiro') {
-                title.innerText = 'Registrar Retiro';
-                body.innerHTML = `
-                    <div class="space-y-3">
-                        <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300">Personal que egresa *</label>
-                        <textarea id="input-subject" rows="3" placeholder="Ej: Nombre Apellido, Otro Nombre..." class="${inputClass}" required></textarea>
-                    </div>
-                `;
-                setTimeout(() => document.getElementById('input-subject')?.focus(), 100);
+        // Inicialización
+        function init() {
+            loadConfig();
+            loadExtrasAndArchives();
+            loadLogs();
+            setupEventListeners();
+            document.getElementById('compHora').value = getHoraActualHHMM();
+            seleccionarTipoComposer('ingreso');
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function setupEventListeners() {
+            document.getElementById('search-logs')?.addEventListener('input', renderLogs);
+            document.getElementById('filter-type')?.addEventListener('change', renderLogs);
+            document.addEventListener('keydown', handleKeyboardShortcuts);
+
+            configurarAutocompleteSujeto();
+
+            // Enter rápido en inputs de una línea dentro de la Consola Rápida
+            ['compSujeto', 'compTarea', 'compNumMaquina', 'compPrecinto', 'compCamara'].forEach(id => {
+                document.getElementById(id)?.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        agregarDesdeComposer();
+                    }
+                });
+            });
+        }
+
+        // Autocompletado de Personal Informante
+        window.onReporterInput = function () {
+            saveConfig();
+            actualizarPreviaComposer();
+            const inp = document.getElementById('reporter-name');
+            const menu = document.getElementById('dropdownReporter');
+            if (!inp || !menu) return;
+            const q = normAudit(inp.value);
+            if (!q) {
+                menu.classList.add('hidden');
+                return;
+            }
+            const matches = PERSONAL_AUDIT_LIST.filter(p => normAudit(p.nombre + ' ' + p.rol).includes(q) && normAudit(p.nombre) !== q);
+            if (!matches.length) {
+                menu.classList.add('hidden');
+                return;
+            }
+            menu._matches = matches;
+            menu.innerHTML = matches.map((p, idx) => `
+                <button type="button" onmousedown="event.preventDefault(); selectReporter(${idx})"
+                    class="w-full text-left px-3 py-2 text-xs hover:bg-slate-700 transition flex items-center justify-between cursor-pointer">
+                    <span class="font-semibold text-white">${escapeHtml(p.nombre)}</span>
+                    <span class="text-[10px] text-indigo-300">${escapeHtml(p.rol)}</span>
+                </button>
+            `).join('');
+            menu.classList.remove('hidden');
+        };
+
+        window.selectReporter = function (idx) {
+            const menu = document.getElementById('dropdownReporter');
+            const p = menu?._matches?.[idx];
+            if (!p) return;
+            document.getElementById('reporter-name').value = p.nombre;
+            document.getElementById('reporter-role').value = p.rol;
+            menu.classList.add('hidden');
+            saveConfig();
+            actualizarPreviaComposer();
+        };
+
+        window.hideReporterDropdown = function () {
+            setTimeout(() => document.getElementById('dropdownReporter')?.classList.add('hidden'), 150);
+        };
+
+        // Autocompletado múltiple para Auditores / Técnicos en Consola
+        function configurarAutocompleteSujeto() {
+            const inp = document.getElementById('compSujeto');
+            const dd = document.getElementById('dropCompSujeto');
+            if (!inp || !dd) return;
+
+            const obtenerTramo = (val) => {
+                const m = val.match(/^(.*?(?:\s+y\s+|\s*\/\s*))([^\/]*)$/i);
+                if (m) return { prefijo: m[1], termino: m[2] };
+                return { prefijo: '', termino: val };
+            };
+
+            const mostrar = () => {
+                const { prefijo, termino } = obtenerTramo(inp.value);
+                const q = normAudit(termino);
+                if (!q) { dd.classList.add('hidden'); return; }
+
+                const baseFormateada = PERSONAL_AUDIT_LIST.map(p => ({
+                    valor: `${p.rol.includes('Técnico') ? 'Téc.' : p.rol} ${p.nombre}`,
+                    sub: p.rol
+                }));
+                const extras = sujetosFrecuentes.map(s => ({ valor: s, sub: 'frecuente' }));
+                const todos = [...extras, ...baseFormateada]
+                    .filter((it, i, arr) => arr.findIndex(x => normAudit(x.valor) === normAudit(it.valor)) === i)
+                    .filter(it => normAudit(it.valor).includes(q) && normAudit(it.valor) !== q && !normAudit(prefijo).includes(normAudit(it.valor)))
+                    .slice(0, 10);
+
+                if (!todos.length) { dd.classList.add('hidden'); return; }
+                dd._matches = todos;
+                dd._prefijo = prefijo;
+                dd.innerHTML = todos.map((m, i) => `
+                    <button type="button" onmousedown="event.preventDefault(); window._elegirSujetoAudit(${i})"
+                        class="w-full text-left px-3 py-2 text-xs font-semibold text-slate-800 dark:text-slate-100 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 flex items-center justify-between cursor-pointer">
+                        <span class="truncate">${escapeHtml(m.valor)}</span>
+                        <span class="text-[10px] text-indigo-500 font-normal ml-2 shrink-0">${escapeHtml(m.sub)}</span>
+                    </button>
+                `).join('');
+                dd.classList.remove('hidden');
+            };
+
+            inp.addEventListener('input', () => { mostrar(); actualizarPreviaComposer(); });
+            inp.addEventListener('focus', mostrar);
+            inp.addEventListener('blur', () => setTimeout(() => dd.classList.add('hidden'), 150));
+        }
+
+        window._elegirSujetoAudit = function (idx) {
+            const dd = document.getElementById('dropCompSujeto');
+            const inp = document.getElementById('compSujeto');
+            const item = dd?._matches?.[idx];
+            if (!inp || !item) return;
+            inp.value = `${dd._prefijo || ''}${item.valor}`;
+            dd.classList.add('hidden');
+            actualizarPreviaComposer();
+        };
+
+        // Controles de la Consola Rápida
+        window.seleccionarTipoComposer = function (tipo, usarHoraActual = false) {
+            tipoComposerActual = tipo;
+            if (usarHoraActual) {
+                document.getElementById('compHora').value = getHoraActualHHMM();
             }
 
-            submitBtn.onclick = () => {
-                const subject = document.getElementById('input-subject')?.value.trim();
-                const task = document.getElementById('input-task')?.value.trim();
-                
-                // Validation
-                if (!subject && type !== 'finaliza') {
-                    showToast('⚠️ Complete los campos requeridos', true);
-                    document.getElementById('input-subject')?.focus();
-                    return;
-                }
-                
-                addLogEntry(type, subject, task || 'auditoría de contadores electrónicos de máquinas');
-                closeModal();
+            const coloresActivos = {
+                ingreso: 'bg-emerald-600 text-white shadow-sm',
+                inicio: 'bg-sky-600 text-white shadow-sm',
+                maquina: 'bg-violet-600 text-white shadow-sm',
+                finaliza: 'bg-indigo-600 text-white shadow-sm',
+                retiro: 'bg-amber-600 text-white shadow-sm',
+                novedad: 'bg-slate-700 text-white shadow-sm'
             };
+            const baseCls = 'py-2 px-2 rounded-xl text-xs font-bold transition cursor-pointer flex items-center justify-center gap-1';
+            const inactivoCls = 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300';
 
-            // Submit on Enter (sin duplicar listeners en aperturas sucesivas)
-            body.onkeydown = (e) => {
-                if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
-                    e.preventDefault();
-                    submitBtn.click();
-                }
+            ['ingreso', 'inicio', 'maquina', 'finaliza', 'retiro', 'novedad'].forEach(t => {
+                const btn = document.getElementById(`tabTipo-${t}`);
+                if (btn) btn.className = `${baseCls} ${t === tipo ? coloresActivos[t] : inactivoCls}`;
+            });
+
+            const bSujeto = document.getElementById('bloqueCompSujeto');
+            const bTarea = document.getElementById('bloqueCompTarea');
+            const bMaq = document.getElementById('bloqueCompMaquina');
+            const bLibre = document.getElementById('bloqueCompDetalleLibre');
+            const chipsCierre = document.getElementById('chipsCierreRapido');
+
+            bSujeto.classList.toggle('hidden', tipo === 'finaliza' || tipo === 'novedad');
+            bTarea.classList.toggle('hidden', tipo !== 'ingreso' && tipo !== 'inicio');
+            bMaq.classList.toggle('hidden', tipo !== 'maquina');
+            bLibre.classList.toggle('hidden', tipo !== 'finaliza' && tipo !== 'novedad');
+            chipsCierre.classList.toggle('hidden', tipo !== 'finaliza');
+
+            const lblSujeto = document.getElementById('lblCompSujeto');
+            const inpSujeto = document.getElementById('compSujeto');
+            const inpLibre = document.getElementById('compDetalleLibre');
+
+            // Autocompletar el equipo activo en sala si el campo está vacío
+            if (!inpSujeto.value.trim() && equipoActivoMemoria && ['inicio', 'maquina', 'retiro'].includes(tipo)) {
+                inpSujeto.value = equipoActivoMemoria;
+            }
+
+            if (tipo === 'ingreso') {
+                lblSujeto.textContent = '👥 Personal / Auditores que Ingresan *';
+                inpSujeto.focus();
+            } else if (tipo === 'inicio') {
+                lblSujeto.textContent = '▶️ Responsable(s) que Inician *';
+                inpSujeto.focus();
+            } else if (tipo === 'maquina') {
+                lblSujeto.textContent = '🔧 Técnico / Auditor Interviniente';
+                document.getElementById('compNumMaquina').focus();
+            } else if (tipo === 'finaliza') {
+                document.getElementById('lblCompDetalleLibre').textContent = '⏹️ Detalle de Cierre (Opcional)';
+                if (!inpLibre.value.trim()) inpLibre.value = 'sin novedades';
+                inpLibre.focus();
+            } else if (tipo === 'retiro') {
+                lblSujeto.textContent = '🚪 Personal que se Retira *';
+                inpSujeto.focus();
+            } else {
+                document.getElementById('lblCompDetalleLibre').textContent = '📝 Observación o Novedad Puntual *';
+                if (inpLibre.value.trim() === 'sin novedades') inpLibre.value = '';
+                inpLibre.focus();
+            }
+
+            actualizarPreviaComposer();
+        };
+
+        window.ponerHoraAhoraComposer = function () {
+            document.getElementById('compHora').value = getHoraActualHHMM();
+            actualizarPreviaComposer();
+        };
+
+        window.ajustarHoraComposer = function (mins) {
+            const actual = document.getElementById('compHora').value || getHoraActualHHMM();
+            document.getElementById('compHora').value = sumarMinutosHHMM(actual, mins);
+            actualizarPreviaComposer();
+        };
+
+        window.alEscribirCamaraAudit = function () {
+            const inp = document.getElementById('compCamara');
+            const v = inp.value.trim();
+            if (/^\d{3}$/.test(v) && CAMARAS_BOULEVARD[v]) {
+                inp.value = `${v} - ${CAMARAS_BOULEVARD[v]}`;
+            }
+            actualizarPreviaComposer();
+        };
+
+        window.limpiarCampoComp = function (id) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.value = '';
+            el.focus();
+            actualizarPreviaComposer();
+        };
+
+        window.insertarRolSujeto = function (rol) {
+            const inp = document.getElementById('compSujeto');
+            const m = inp.value.match(/^(.*?(?:\s+y\s+|\s*\/\s*))(.*)$/i);
+            const pref = m ? m[1] : '';
+            const rest = (m ? m[2] : inp.value).trim().replace(/^(Auditor(?:a)?|Personal\s+de\s+Ente\s+Regulador|Téc\.?|Técnico)\s+/i, '');
+            inp.value = `${pref}${rol} ${rest}`;
+            inp.focus();
+            const len = inp.value.length;
+            inp.setSelectionRange(len, len);
+            actualizarPreviaComposer();
+        };
+
+        window.encadenarOtroSujeto = function () {
+            const inp = document.getElementById('compSujeto');
+            const v = inp.value.trim();
+            if (!v) { inp.focus(); return; }
+            inp.value = /\s+y$/i.test(v) ? `${v} ` : `${v} y `;
+            inp.focus();
+            const len = inp.value.length;
+            inp.setSelectionRange(len, len);
+            actualizarPreviaComposer();
+        };
+
+        window.setTareaRapida = function (txt) {
+            document.getElementById('compTarea').value = txt;
+            actualizarPreviaComposer();
+        };
+
+        window.setDetalleLibre = function (txt) {
+            document.getElementById('compDetalleLibre').value = txt;
+            actualizarPreviaComposer();
+        };
+
+        function construirTextoEvento(tipo, params) {
+            const time = params.hora || getHoraActualHHMM();
+            const reporter = document.getElementById('reporter-name')?.value.trim() || 'Personal';
+            const role = document.getElementById('reporter-role')?.value.trim() || 'Control Interno';
+            const sala = document.getElementById('reporter-sala')?.value.trim() || '';
+            const enSala = sala ? ` en ${sala}` : '';
+            const camTxt = params.camara ? ` (Cám. ${params.camara})` : '';
+
+            if (tipo === 'ingreso') {
+                const subj = params.sujeto || '[Personal que ingresa]';
+                const task = params.tarea || 'auditoría de contadores electrónicos de máquinas';
+                return `A las ${time} Hs. CCTV recibe llamada de ${role} ${reporter}, informando el ingreso${enSala} de ${subj} para realizar ${task}${camTxt}.-`;
+            }
+            if (tipo === 'inicio') {
+                const subj = params.sujeto || '[Responsable]';
+                const task = params.tarea || 'auditoría de contadores electrónicos de máquinas';
+                return `A las ${time} Hs. ${subj} informa que inicia ${task}${enSala}${camTxt}.-`;
+            }
+            if (tipo === 'maquina') {
+                const nums = params.maquina || '[N° Máquina]';
+                const plural = /[,y\-]/.test(nums);
+                const etiqMaq = plural ? `Máquinas N° ${nums}` : `Máquina N° ${nums}`;
+                const quien = params.sujeto ? `${params.sujeto} ` : 'Se ';
+                const accion = params.accionMaq || 'procede a apertura y control de contadores en';
+                const precinto = params.precinto ? ` (${params.precinto})` : '';
+                return `A las ${time} Hs. ${quien}${accion} ${etiqMaq}${precinto}${enSala}${camTxt}.-`;
+            }
+            if (tipo === 'finaliza') {
+                const det = params.detalleLibre ? ` (${params.detalleLibre.replace(/\.+-?$/, '')})` : '';
+                return `A las ${time} Hs. Finaliza auditoría de máquinas${enSala}${det}${camTxt}.-`;
+            }
+            if (tipo === 'retiro') {
+                const subj = params.sujeto || '[Personal que se retira]';
+                return `A las ${time} Hs. Personal de ${role} ${reporter}, informa el retiro de ${subj}${camTxt}.-`;
+            }
+            const libre = (params.detalleLibre || '[Observación]').replace(/\.+-?$/, '');
+            return `A las ${time} Hs. ${libre}${camTxt}.-`;
+        }
+
+        function leerParamsComposer() {
+            return {
+                hora: document.getElementById('compHora')?.value || getHoraActualHHMM(),
+                camara: document.getElementById('compCamara')?.value.trim() || '',
+                sujeto: document.getElementById('compSujeto')?.value.trim() || '',
+                tarea: document.getElementById('compTarea')?.value.trim() || 'auditoría de contadores electrónicos de máquinas',
+                maquina: document.getElementById('compNumMaquina')?.value.trim() || '',
+                precinto: document.getElementById('compPrecinto')?.value.trim() || '',
+                accionMaq: document.getElementById('compAccionMaq')?.value || '',
+                detalleLibre: document.getElementById('compDetalleLibre')?.value.trim() || ''
             };
         }
 
-        function closeModal() {
-            document.getElementById('modal-overlay').classList.add('hidden');
+        window.actualizarPreviaComposer = function () {
+            const p = leerParamsComposer();
+            document.getElementById('compPreviewText').textContent = construirTextoEvento(tipoComposerActual, p);
+        };
+
+        window.agregarDesdeComposer = function () {
+            const p = leerParamsComposer();
+            if (['ingreso', 'inicio', 'retiro'].includes(tipoComposerActual) && !p.sujeto) {
+                showToast('⚠️ Indica el personal / auditor interviniente', true);
+                document.getElementById('compSujeto').focus();
+                return;
+            }
+            if (tipoComposerActual === 'maquina' && !p.maquina) {
+                showToast('⚠️ Indica el N° de Máquina', true);
+                document.getElementById('compNumMaquina').focus();
+                return;
+            }
+            if (tipoComposerActual === 'novedad' && !p.detalleLibre) {
+                showToast('⚠️ Escribe el detalle de la observación', true);
+                document.getElementById('compDetalleLibre').focus();
+                return;
+            }
+
+            const texto = construirTextoEvento(tipoComposerActual, p);
+
+            // Memorizar equipo activo y sujetos frecuentes
+            if (p.sujeto) {
+                equipoActivoMemoria = p.sujeto;
+                p.sujeto.split(/\s+y\s+|\s*\/\s*/i).map(s => s.trim()).filter(s => s.length >= 4).forEach(s => {
+                    sujetosFrecuentes = [s, ...sujetosFrecuentes.filter(x => normAudit(x) !== normAudit(s))].slice(0, 25);
+                });
+                try {
+                    localStorage.setItem(AUDIT_STORAGE.frequentSubjectsKey, JSON.stringify(sujetosFrecuentes));
+                } catch (e) {}
+            }
+
+            const now = new Date();
+            const eventDate = new Date(now);
+            if (p.hora.includes(':')) {
+                const [hh, mm] = p.hora.split(':').map(Number);
+                eventDate.setHours(hh, mm, 0, 0);
+            }
+
+            addToHistory();
+            logs.push({
+                id: Date.now() + Math.floor(Math.random() * 1000),
+                text: texto,
+                hora: p.hora,
+                maquina: tipoComposerActual === 'maquina' ? p.maquina : '',
+                sujeto: p.sujeto || '',
+                timestamp: eventDate,
+                type: tipoComposerActual
+            });
+
+            if (ordenCronologico) ordenarLogsPorHora();
+
+            // Preparar el siguiente paso lógico automáticamente
+            if (tipoComposerActual === 'ingreso') {
+                seleccionarTipoComposer('inicio');
+            } else if (tipoComposerActual === 'inicio') {
+                seleccionarTipoComposer('maquina');
+            } else if (tipoComposerActual === 'maquina') {
+                document.getElementById('compNumMaquina').value = '';
+                document.getElementById('compPrecinto').value = '';
+                document.getElementById('compNumMaquina').focus();
+                actualizarPreviaComposer();
+            } else if (tipoComposerActual === 'finaliza') {
+                seleccionarTipoComposer('retiro');
+            } else if (tipoComposerActual === 'novedad') {
+                document.getElementById('compDetalleLibre').value = '';
+                actualizarPreviaComposer();
+            }
+
+            renderLogs();
+            saveLogs();
+
+            setTimeout(() => {
+                const scrollArea = document.getElementById('log-scroll-area');
+                if (scrollArea) scrollArea.scrollTo({ top: scrollArea.scrollHeight, behavior: 'smooth' });
+            }, 60);
+
+            showToast('✓ Evento agregado al Libro de Novedades');
+        };
+
+        // Ordenamiento y Estado de Auditoría
+        function ordenarLogsPorHora() {
+            logs.sort((a, b) => horaAMinutosOrden(a.hora || extraerHoraDeTexto(a.text)) - horaAMinutosOrden(b.hora || extraerHoraDeTexto(b.text)));
         }
 
-        // ==================== HISTORY MANAGEMENT ====================
+        function extraerHoraDeTexto(txt) {
+            const m = String(txt || '').match(/A las\s+(\d{1,2}:\d{2})/i);
+            return m ? m[1] : '00:00';
+        }
+
+        window.alCambiarOrdenCronologico = function () {
+            ordenCronologico = document.getElementById('chkOrdenCronologico').checked;
+            if (ordenCronologico) ordenarLogsPorHora();
+            renderLogs();
+            saveLogs();
+        };
+
+        window.cambiarHoraDeRegistro = function (id, nuevaHora) {
+            const idx = logs.findIndex(l => l.id === id);
+            if (idx === -1 || !nuevaHora) return;
+            addToHistory();
+            logs[idx].hora = nuevaHora;
+            logs[idx].text = logs[idx].text.replace(/^A las\s+\d{1,2}:\d{2}\s*Hs\./i, `A las ${nuevaHora} Hs.`);
+            if (ordenCronologico) ordenarLogsPorHora();
+            renderLogs();
+            saveLogs();
+        };
+
+        function actualizarBannerEstado() {
+            const banner = document.getElementById('bannerEstadoAuditoria');
+            if (!logs.length) {
+                banner.classList.add('hidden');
+                return;
+            }
+
+            const ultIngreso = [...logs].reverse().find(l => l.type === 'ingreso' || l.type === 'inicio');
+            const evInicio = logs.find(l => l.type === 'inicio') || logs.find(l => l.type === 'ingreso');
+            const evFin = [...logs].reverse().find(l => l.type === 'finaliza');
+            const evRetiro = [...logs].reverse().find(l => l.type === 'retiro');
+
+            if (ultIngreso?.sujeto && !equipoActivoMemoria) {
+                equipoActivoMemoria = ultIngreso.sujeto;
+            }
+
+            const maquinasSet = new Set();
+            logs.forEach(l => {
+                if (l.maquina) {
+                    l.maquina.split(/[,y\s]+/).map(x => x.trim()).filter(Boolean).forEach(m => maquinasSet.add(m));
+                } else {
+                    const m = String(l.text || '').match(/Máquinas?\s+N°\s+([\d,\s]+)/i);
+                    if (m) m[1].split(/[,\s]+/).filter(Boolean).forEach(x => maquinasSet.add(x));
+                }
+            });
+
+            banner.classList.remove('hidden');
+            document.getElementById('txtEquipoActivo').textContent = equipoActivoMemoria || 'Auditoría activa en seguimiento';
+
+            const dot = document.getElementById('dotEstadoAudit');
+            const fase = document.getElementById('badgeFaseAudit');
+            const tiempoChip = document.getElementById('badgeTiempoAudit');
+            const maqChip = document.getElementById('badgeMaquinasAudit');
+
+            if (evRetiro) {
+                dot.className = 'w-3 h-3 rounded-full bg-slate-400 shrink-0';
+                fase.textContent = 'Auditoría Concluida (Retirados)';
+            } else if (evFin) {
+                dot.className = 'w-3 h-3 rounded-full bg-indigo-500 shrink-0';
+                fase.textContent = 'Auditoría Finalizada · Pendiente Retiro';
+            } else {
+                dot.className = 'w-3 h-3 rounded-full bg-emerald-500 animate-pulse shrink-0';
+                fase.textContent = 'Auditoría en Curso';
+            }
+
+            if (evInicio) {
+                const hIni = evInicio.hora || extraerHoraDeTexto(evInicio.text);
+                const hRefFin = evFin ? (evFin.hora || extraerHoraDeTexto(evFin.text)) : getHoraActualHHMM();
+                let minDiff = horaAMinutosOrden(hRefFin) - horaAMinutosOrden(hIni);
+                if (minDiff < 0) minDiff += 1440;
+                const dh = Math.floor(minDiff / 60);
+                const dm = minDiff % 60;
+                tiempoChip.textContent = dh > 0 ? `Inicio ${hIni} · ${dh}h ${String(dm).padStart(2, '0')}m` : `Inicio ${hIni} · ${dm} min`;
+            } else {
+                tiempoChip.textContent = `${logs.length} eventos`;
+            }
+
+            if (maquinasSet.size > 0) {
+                maqChip.textContent = `${maquinasSet.size} máq. intervenida${maquinasSet.size === 1 ? '' : 's'}`;
+                maqChip.classList.remove('hidden');
+            } else {
+                maqChip.classList.add('hidden');
+            }
+        }
+
+        // Undo / Redo y Persistencia
         function addToHistory() {
             history.push(JSON.stringify(logs));
-            if (history.length > MAX_HISTORY) {
-                history.shift();
-            }
+            if (history.length > AUDIT_STORAGE.MAX_HISTORY) history.shift();
             historyIndex = history.length - 1;
         }
 
-        function undo() {
+        window.undo = function () {
             if (historyIndex > 0) {
                 historyIndex--;
                 logs = JSON.parse(history[historyIndex]);
                 logs.forEach(log => log.timestamp = new Date(log.timestamp));
                 renderLogs();
                 saveLogs();
-                showToast('↩️ Deshacer');
+                showToast('↩️ Acción deshecha');
             }
-        }
+        };
 
-        function redo() {
+        window.redo = function () {
             if (historyIndex < history.length - 1) {
                 historyIndex++;
                 logs = JSON.parse(history[historyIndex]);
                 logs.forEach(log => log.timestamp = new Date(log.timestamp));
                 renderLogs();
                 saveLogs();
-                showToast('↪️ Rehacer');
+                showToast('↪️ Acción rehecha');
             }
+        };
+
+        function saveLogs() {
+            try {
+                localStorage.setItem(AUDIT_STORAGE.logsKey, JSON.stringify(logs));
+                const ind = document.getElementById('save-indicator');
+                if (ind) ind.textContent = 'Autoguardado';
+            } catch (e) {}
+            sincronizarHojaImpresion();
         }
 
-        // ==================== LOG MANAGEMENT ====================
-        function addLogEntry(type, subject = '', task = 'auditoría de contadores electrónicos de máquinas') {
-            const now = new Date();
-            const time = now.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', hour12: false });
-            const reporter = document.getElementById('reporter-name')?.value || 'Personal';
-            const role = document.getElementById('reporter-role')?.value || 'Control Interno';
-            
-            let text = '';
-
-            switch(type) {
-                case 'ingreso':
-                    text = `A las ${time} Hs. CCTV Recibe Llamada de ${role} ${reporter}, informando el ingreso de ${subject} para realizar ${task}.-`;
-                    break;
-                case 'inicio':
-                    text = `A las ${time} Hs. ${subject} informa que inicia ${task}.-`;
-                    break;
-                case 'finaliza':
-                    text = `A las ${time} Hs. Finaliza auditoría de máquinas.-`;
-                    break;
-                case 'retiro':
-                    text = `A las ${time} Hs. Personal de ${role} ${reporter}, informa el retiro de ${subject}.-`;
-                    break;
+        function loadLogs() {
+            try {
+                const saved = localStorage.getItem(AUDIT_STORAGE.logsKey);
+                if (saved) {
+                    logs = JSON.parse(saved);
+                    logs.forEach(log => {
+                        log.timestamp = log.timestamp ? new Date(log.timestamp) : new Date();
+                        if (!log.hora) log.hora = extraerHoraDeTexto(log.text);
+                    });
+                }
+                addToHistory();
+                renderLogs();
+            } catch (e) {
+                logs = [];
+                renderLogs();
             }
+            sincronizarHojaImpresion();
+        }
 
+        function loadExtrasAndArchives() {
+            try {
+                sesionesArchivadas = JSON.parse(localStorage.getItem(AUDIT_STORAGE.archivesKey) || '[]');
+                sujetosFrecuentes = JSON.parse(localStorage.getItem(AUDIT_STORAGE.frequentSubjectsKey) || '[]');
+            } catch (e) {
+                sesionesArchivadas = [];
+                sujetosFrecuentes = [];
+            }
+            renderizarSesionesArchivadas();
+        }
+
+        window.saveConfig = function () {
+            const config = {
+                reporterName: document.getElementById('reporter-name')?.value || '',
+                reporterRole: document.getElementById('reporter-role')?.value || 'Control Interno',
+                reporterSala: document.getElementById('reporter-sala')?.value || ''
+            };
+            try {
+                localStorage.setItem(AUDIT_STORAGE.configKey, JSON.stringify(config));
+            } catch (e) {}
+        };
+
+        function loadConfig() {
+            try {
+                const saved = localStorage.getItem(AUDIT_STORAGE.configKey);
+                if (saved) {
+                    const config = JSON.parse(saved);
+                    document.getElementById('reporter-name').value = config.reporterName || '';
+                    document.getElementById('reporter-role').value = config.reporterRole || 'Control Interno';
+                    document.getElementById('reporter-sala').value = config.reporterSala || '';
+                }
+            } catch (e) {}
+        }
+
+        window.updateLogText = function (id, newText) {
+            const limpio = String(newText || '').trim();
+            const index = logs.findIndex(l => l.id === id);
+            if (index !== -1 && logs[index].text !== limpio) {
+                addToHistory();
+                logs[index].text = limpio;
+                logs[index].hora = extraerHoraDeTexto(limpio) || logs[index].hora;
+                saveLogs();
+                actualizarBannerEstado();
+            }
+        };
+
+        window.reutilizarMaquina = function (maq) {
+            seleccionarTipoComposer('maquina', true);
+            document.getElementById('compNumMaquina').value = maq;
+            document.getElementById('compAccionMaq').value = 'finaliza control, cierra y deja operativa';
+            actualizarPreviaComposer();
+            showToast(`Máquina ${maq} cargada para cierre / seguimiento`);
+        };
+
+        window.deleteLog = function (id) {
             addToHistory();
-            logs.push({ 
-                id: now.getTime(), 
-                text: text, 
-                timestamp: now,
-                type: type 
-            });
-            
+            logs = logs.filter(l => l.id !== id);
             renderLogs();
             saveLogs();
-            
-            // Auto-scroll to bottom
-            setTimeout(() => {
-                const scrollArea = document.getElementById('log-scroll-area');
-                if (scrollArea) {
-                    scrollArea.scrollTo({ top: scrollArea.scrollHeight, behavior: 'smooth' });
-                }
-            }, 100);
+            showToast('🗑️ Registro eliminado (Ctrl+Z deshacer)');
+        };
 
-            showToast('✅ Registro agregado');
-        }
-
-        function updateLogText(id, newText) {
-            const index = logs.findIndex(l => l.id === id);
-            if (index !== -1 && logs[index].text !== newText) {
-                addToHistory();
-                logs[index].text = newText;
-                saveLogs();
-                updateSaveIndicator('guardado');
-            }
-        }
-
-        function deleteLog(id) {
-            if (confirm('¿Está seguro de eliminar este registro? Esta acción no se puede deshacer.')) {
-                addToHistory();
-                logs = logs.filter(l => l.id !== id);
-                renderLogs();
-                saveLogs();
-                showToast('🗑️ Registro eliminado');
-            }
-        }
-
-        function clearAllLogs() {
-            if (logs.length === 0) {
+        window.clearAllLogs = function () {
+            if (!logs.length) {
                 showToast('No hay registros para eliminar');
                 return;
             }
-            if (confirm(`¿Está seguro de eliminar TODOS los registros (${logs.length} en total)?\n\nEsta acción no se puede deshacer.`)) {
-                addToHistory();
-                logs = [];
-                renderLogs();
-                saveLogs();
-                showToast('🗑️ Todos los registros eliminados');
-            }
+            if (!confirm(`¿Vaciar los ${logs.length} registros del Libro de Novedades?`)) return;
+            addToHistory();
+            logs = [];
+            equipoActivoMemoria = '';
+            renderLogs();
+            saveLogs();
+            showToast('🗑️ Bitácora vaciada (Ctrl+Z para deshacer)');
+        };
+
+        function obtenerBadgeTipo(type) {
+            const map = {
+                ingreso: { label: 'Ingreso', cls: 'bg-emerald-100 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800' },
+                inicio: { label: 'Inicio', cls: 'bg-sky-100 dark:bg-sky-950/70 text-sky-800 dark:text-sky-300 border-sky-200 dark:border-sky-800' },
+                maquina: { label: 'Máquina', cls: 'bg-violet-100 dark:bg-violet-950/70 text-violet-800 dark:text-violet-300 border-violet-200 dark:border-violet-800' },
+                finaliza: { label: 'Cierre', cls: 'bg-indigo-100 dark:bg-indigo-950/70 text-indigo-800 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800' },
+                retiro: { label: 'Retiro', cls: 'bg-amber-100 dark:bg-amber-950/70 text-amber-800 dark:text-amber-300 border-amber-200 dark:border-amber-800' },
+                novedad: { label: 'Libre', cls: 'bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-700' }
+            };
+            return map[type] || map.novedad;
         }
 
         function renderLogs() {
             const container = document.getElementById('log-container');
             const emptyState = document.getElementById('empty-state');
             const logCount = document.getElementById('log-count');
-            const searchTerm = document.getElementById('search-logs')?.value.toLowerCase() || '';
+            const searchTerm = normAudit(document.getElementById('search-logs')?.value || '');
             const filterType = document.getElementById('filter-type')?.value || 'all';
-            
-            if (!container || !emptyState) return;
 
-            // Filter logs
-            let filteredLogs = logs;
+            actualizarBannerEstado();
+
+            let filteredLogs = logs.slice();
             if (filterType !== 'all') {
                 filteredLogs = filteredLogs.filter(log => log.type === filterType);
             }
             if (searchTerm) {
-                filteredLogs = filteredLogs.filter(log => 
-                    log.text.toLowerCase().includes(searchTerm) ||
-                    log.timestamp.toLocaleDateString('es-AR').includes(searchTerm)
-                );
+                filteredLogs = filteredLogs.filter(log => normAudit(log.text).includes(searchTerm));
             }
 
-            // Update count
             if (logCount) {
-                logCount.textContent = `${filteredLogs.length} registro${filteredLogs.length !== 1 ? 's' : ''}`;
+                logCount.textContent = `${filteredLogs.length} registro${filteredLogs.length !== 1 ? 's' : ''}${filteredLogs.length !== logs.length ? ` (de ${logs.length})` : ''}`;
             }
 
             if (filteredLogs.length === 0) {
@@ -626,94 +1187,173 @@
             }
 
             emptyState.classList.add('hidden');
-            
-            container.innerHTML = filteredLogs.map(log => `
-                <div class="log-entry relative bg-white dark:bg-slate-700 p-4 rounded-xl border border-slate-200 dark:border-slate-600 group transition-all hover:border-blue-200 dark:hover:border-blue-800 hover:shadow-md animate-fade-in">
-                    <div class="flex items-start gap-2">
-                        <span class="text-xs text-slate-400 dark:text-slate-500 mt-0.5 whitespace-nowrap">
-                            ${log.timestamp.toLocaleDateString('es-AR', { day: '2-digit', month: 'short' })}
-                        </span>
-                        <p 
-                            class="editable-text text-sm leading-relaxed pr-12 text-slate-700 dark:text-slate-200 focus:text-slate-900 dark:focus:text-white transition-colors flex-1" 
-                            contenteditable="true" 
-                            onblur="updateLogText(${Number(log.id)}, this.innerText)"
-                            spellcheck="false"
-                        >${escapeHtml(log.text)}</p>
+
+            container.innerHTML = filteredLogs.map(log => {
+                const b = obtenerBadgeTipo(log.type);
+                const horaVal = log.hora || extraerHoraDeTexto(log.text) || '00:00';
+                const maqDetectada = log.maquina || (String(log.text || '').match(/Máquina\s+N°\s+(\d+)/i)?.[1] || '');
+                return `
+                    <div class="log-entry relative bg-slate-50/90 dark:bg-slate-950/70 p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-indigo-400 transition">
+                        <div class="flex items-start gap-2.5">
+                            <div class="flex flex-col items-center gap-1 shrink-0 mt-0.5">
+                                <span class="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase border ${b.cls}">${b.label}</span>
+                                <input type="time" value="${escapeHtml(horaVal)}" onchange="cambiarHoraDeRegistro(${Number(log.id)}, this.value)"
+                                    title="Cambiar hora de este evento"
+                                    class="w-[68px] px-1 py-0.5 text-[10px] font-mono font-bold text-center rounded bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 outline-none focus:border-indigo-500">
+                            </div>
+                            <p class="editable-text report-font text-xs sm:text-sm leading-relaxed pr-20 text-slate-800 dark:text-slate-200 flex-1"
+                               contenteditable="true"
+                               onblur="updateLogText(${Number(log.id)}, this.innerText)"
+                               spellcheck="false">${escapeHtml(log.text)}</p>
+                        </div>
+                        <div class="action-btns opacity-0 absolute top-2.5 right-2.5 flex gap-1 transition-opacity">
+                            ${maqDetectada ? `
+                                <button type="button" onclick="reutilizarMaquina('${escapeHtml(maqDetectada)}')" title="Cerrar / Seguir Máq. ${escapeHtml(maqDetectada)}" class="px-2 py-1 bg-violet-50 dark:bg-violet-950 border border-violet-200 dark:border-violet-800 rounded-lg text-[10px] font-mono font-bold text-violet-700 dark:text-violet-300 hover:bg-violet-100 cursor-pointer">
+                                    ✓ ${escapeHtml(maqDetectada)}
+                                </button>
+                            ` : ''}
+                            <button type="button" onclick="copyLogById(${Number(log.id)})" title="Copiar renglón" class="p-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-500 hover:text-indigo-600 cursor-pointer">
+                                <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                            </button>
+                            <button type="button" onclick="deleteLog(${Number(log.id)})" title="Eliminar" class="p-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-500 hover:text-rose-600 cursor-pointer">
+                                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
                     </div>
-                    
-                    <div class="action-btns opacity-0 absolute top-2 right-2 flex gap-1 transition-opacity">
-                        <button type="button" onclick="copyLogById(${Number(log.id)})" title="Copiar" class="p-2 bg-slate-50 dark:bg-slate-600 border border-slate-200 dark:border-slate-500 rounded-lg text-slate-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-all">
-                            <i data-lucide="copy" class="w-3.5 h-3.5"></i>
-                        </button>
-                        <button type="button" onclick="deleteLog(${Number(log.id)})" title="Eliminar" class="p-2 bg-slate-50 dark:bg-slate-600 border border-slate-200 dark:border-slate-500 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 transition-all">
-                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-                        </button>
+                `;
+            }).join('');
+
+            if (window.lucide) lucide.createIcons({ nodes: [container] });
+        }
+
+        function sincronizarHojaImpresion() {
+            const sala = document.getElementById('reporter-sala')?.value.trim();
+            document.getElementById('printSubtitulo').textContent = sala ? `Sala: ${sala}` : 'Libro de Novedades de Monitoreo';
+            document.getElementById('printFechaHora').textContent = new Date().toLocaleString('es-AR');
+            document.getElementById('printTexto').textContent = logs.length
+                ? logs.map(l => l.text).join('\n\n')
+                : 'Sin registros cargados.';
+        }
+
+        // Archivar Sesiones Completas
+        window.archivarYNuevaAuditoria = function () {
+            if (!logs.length) {
+                showToast('No hay eventos en la bitácora actual para archivar', true);
+                return;
+            }
+            const sala = document.getElementById('reporter-sala')?.value.trim() || 'Sala General';
+            const sesion = {
+                id: Date.now(),
+                fecha: new Date().toLocaleString('es-AR'),
+                sala,
+                equipo: equipoActivoMemoria || 'Auditoría de Máquinas',
+                cantidad: logs.length,
+                logs: JSON.parse(JSON.stringify(logs))
+            };
+            sesionesArchivadas.unshift(sesion);
+            sesionesArchivadas = sesionesArchivadas.slice(0, 30);
+            localStorage.setItem(AUDIT_STORAGE.archivesKey, JSON.stringify(sesionesArchivadas));
+            renderizarSesionesArchivadas();
+
+            addToHistory();
+            logs = [];
+            equipoActivoMemoria = '';
+            document.getElementById('compSujeto').value = '';
+            document.getElementById('compNumMaquina').value = '';
+            renderLogs();
+            saveLogs();
+            seleccionarTipoComposer('ingreso', true);
+            showToast('🗂️ Auditoría archivada y bitácora lista para nueva jornada');
+        };
+
+        function renderizarSesionesArchivadas() {
+            document.getElementById('countSesionesArchivadas').textContent = String(sesionesArchivadas.length);
+            const cont = document.getElementById('listaSesionesArchivadas');
+            if (!sesionesArchivadas.length) {
+                cont.innerHTML = '<p class="text-slate-400 text-center py-3">Sin sesiones archivadas</p>';
+                return;
+            }
+            cont.innerHTML = sesionesArchivadas.map((s, idx) => `
+                <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800 flex items-center justify-between gap-2">
+                    <div class="min-w-0">
+                        <div class="flex items-center gap-2">
+                            <span class="font-mono font-bold text-[11px] text-indigo-600 dark:text-indigo-400">${escapeHtml(s.fecha)}</span>
+                            <span class="px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-800 text-[10px] font-bold">${s.cantidad} ev.</span>
+                        </div>
+                        <p class="text-xs font-bold text-slate-800 dark:text-slate-200 truncate mt-0.5">${escapeHtml(s.equipo)} · ${escapeHtml(s.sala)}</p>
+                    </div>
+                    <div class="flex items-center gap-1 shrink-0">
+                        <button type="button" onclick="copiarSesionArchivada(${idx})" class="px-2 py-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] font-semibold hover:text-indigo-600 cursor-pointer">Copiar</button>
+                        <button type="button" onclick="restaurarSesionArchivada(${idx})" class="px-2 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-[11px] font-semibold cursor-pointer">Cargar</button>
+                        <button type="button" onclick="eliminarSesionArchivada(${idx})" class="p-1 text-slate-400 hover:text-rose-500 cursor-pointer" title="Eliminar">✕</button>
                     </div>
                 </div>
             `).join('');
-            
-            lucide.createIcons();
         }
 
-        function updateSaveIndicator(status) {
-            const indicator = document.getElementById('save-indicator');
-            if (!indicator) return;
-            
-            const states = {
-                guardado: { icon: 'check', class: 'text-green-400', text: 'Datos guardados' },
-                pendiente: { icon: 'refresh-cw', class: 'text-yellow-400', text: 'Guardando...' },
-                error: { icon: 'alert-triangle', class: 'text-red-400', text: 'Error al guardar' }
-            };
-            
-            const state = states[status] || states.guardado;
-            indicator.innerHTML = `
-                <i data-lucide="${state.icon}" class="w-3 h-3 ${state.class}"></i>
-                <span>${state.text}</span>
-            `;
-            lucide.createIcons();
-        }
+        window.copiarSesionArchivada = function (idx) {
+            const s = sesionesArchivadas[idx];
+            if (!s?.logs?.length) return;
+            copyText(s.logs.map(l => l.text).join('\n\n'), '📋 Sesión archivada copiada');
+        };
 
-        // ==================== KEYBOARD SHORTCUTS ====================
+        window.restaurarSesionArchivada = function (idx) {
+            const s = sesionesArchivadas[idx];
+            if (!s) return;
+            if (logs.length && !confirm('¿Reemplazar la bitácora actual con esta auditoría archivada?')) return;
+            addToHistory();
+            logs = s.logs.map(l => ({ ...l, timestamp: new Date(l.timestamp || Date.now()) }));
+            equipoActivoMemoria = s.equipo || '';
+            renderLogs();
+            saveLogs();
+            showToast('✓ Auditoría archivada restaurada');
+        };
+
+        window.eliminarSesionArchivada = function (idx) {
+            sesionesArchivadas.splice(idx, 1);
+            localStorage.setItem(AUDIT_STORAGE.archivesKey, JSON.stringify(sesionesArchivadas));
+            renderizarSesionesArchivadas();
+        };
+
+        // Atajos de teclado
         function handleKeyboardShortcuts(e) {
-            // Don't trigger shortcuts when editing text
-            if (e.target.isContentEditable || e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-                // Only allow Ctrl+Z/Y for undo/redo in edit mode
-                if ((e.ctrlKey || e.metaKey) && (e.key === 'z' || e.key === 'y')) {
-                    return;
-                }
+            const tiposAlt = { '1': 'ingreso', '2': 'inicio', '3': 'maquina', '4': 'finaliza', '5': 'retiro', '6': 'novedad' };
+            if (e.altKey && tiposAlt[e.key]) {
+                e.preventDefault();
+                seleccionarTipoComposer(tiposAlt[e.key], true);
                 return;
             }
-            
+            if (e.target.isContentEditable || e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
+                return;
+            }
             if (e.ctrlKey || e.metaKey) {
-                switch(e.key.toLowerCase()) {
-                    case 'n': e.preventDefault(); openModal('ingreso'); break;
-                    case 'i': e.preventDefault(); openModal('inicio'); break;
-                    case 'f': e.preventDefault(); addLogEntry('finaliza'); break;
-                    case 'r': e.preventDefault(); openModal('retiro'); break;
+                switch (e.key.toLowerCase()) {
+                    case 'n': e.preventDefault(); seleccionarTipoComposer('ingreso', true); break;
+                    case 'i': e.preventDefault(); seleccionarTipoComposer('inicio', true); break;
+                    case 'f': e.preventDefault(); seleccionarTipoComposer('finaliza', true); break;
+                    case 'r': e.preventDefault(); seleccionarTipoComposer('retiro', true); break;
+                    case 'o': e.preventDefault(); seleccionarTipoComposer('novedad', true); break;
                     case 'l': e.preventDefault(); copyAllLogs(); break;
                     case 'z': e.preventDefault(); undo(); break;
                     case 'y': e.preventDefault(); redo(); break;
                 }
             }
-            
-            // Escape to close modal
-            if (e.key === 'Escape') {
-                closeModal();
-            }
         }
 
-        // ==================== CLIPBOARD ====================
-        function copyLogById(id) {
+        // Copiado y Exportaciones
+        window.copyLogById = function (id) {
             const entry = logs.find(l => l.id === id);
             if (entry) copyText(entry.text);
-        }
+        };
 
-        function copyText(text, customMsg = '📋 Texto copiado') {
+        function copyText(text, customMsg = '📋 Renglón copiado') {
             navigator.clipboard.writeText(text).then(() => {
                 showToast(customMsg);
             }).catch(() => {
-                const textArea = document.createElement("textarea");
+                const textArea = document.createElement('textarea');
                 textArea.value = text;
+                textArea.style.position = 'fixed';
+                textArea.style.opacity = '0';
                 document.body.appendChild(textArea);
                 textArea.select();
                 document.execCommand('copy');
@@ -722,43 +1362,88 @@
             });
         }
 
-        function copyAllLogs() {
-            if (logs.length === 0) {
-                showToast('No hay registros para copiar');
+        window.copyAllLogs = function () {
+            if (!logs.length) {
+                showToast('No hay registros para copiar', true);
                 return;
             }
             const fullText = logs.map(l => l.text).join('\n\n');
-            copyText(fullText, "📄 Reporte completo copiado");
+            copyText(fullText, '📋 Bitácora completa copiada');
+        };
+
+        window.copiarWhatsAppAudit = function () {
+            if (!logs.length) {
+                showToast('No hay registros para copiar', true);
+                return;
+            }
+            const sala = document.getElementById('reporter-sala')?.value.trim();
+            const encabezado = `🎰 *AUDITORÍA DE MÁQUINAS - CCTV${sala ? ` (${sala.toUpperCase()})` : ''}*`;
+            const cuerpo = logs.map(l => l.text).join('\n\n');
+            copyText(`${encabezado}\n\n${cuerpo}`, '💬 Bitácora copiada para WhatsApp');
+        };
+
+        function descargarBlob(contenido, nombre, mime) {
+            const blob = new Blob([contenido], { type: mime });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = nombre;
+            a.click();
+            URL.revokeObjectURL(url);
         }
 
-        // ==================== TOAST ====================
+        window.descargarBitacoraTXT = function () {
+            if (!logs.length) {
+                showToast('No hay registros para descargar', true);
+                return;
+            }
+            const fullText = logs.map(l => l.text).join('\n\n');
+            descargarBlob(fullText, `bitacora_auditoria_${new Date().toISOString().split('T')[0]}.txt`, 'text/plain;charset=utf-8');
+            showToast('📥 Bitácora TXT descargada');
+        };
+
+        window.exportarBitacoraCSV = function () {
+            if (!logs.length) {
+                showToast('No hay registros para exportar', true);
+                return;
+            }
+            const esc = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
+            const rows = [['Fecha', 'Hora', 'Tipo Evento', 'Máquina', 'Detalle Completo']];
+            logs.forEach(l => {
+                rows.push([
+                    new Date(l.timestamp || Date.now()).toLocaleDateString('es-AR'),
+                    l.hora || extraerHoraDeTexto(l.text),
+                    (l.type || '').toUpperCase(),
+                    l.maquina || '',
+                    l.text || ''
+                ]);
+            });
+            descargarBlob('\uFEFF' + rows.map(r => r.map(esc).join(';')).join('\r\n'), `bitacora_auditoria_${new Date().toISOString().split('T')[0]}.csv`, 'text/csv;charset=utf-8');
+            showToast('📊 Planilla CSV descargada');
+        };
+
+        window.toggleDarkMode = function () {
+            if (window.CCTVTheme) {
+                window.CCTVTheme.toggle();
+                return;
+            }
+            document.documentElement.classList.toggle('dark');
+        };
+
         function showToast(msg, isError = false) {
             const toast = document.getElementById('toast');
-            if (!toast) return;
-            
-            const icon = toast.querySelector('i');
-            const span = toast.querySelector('span');
-            
-            if (isError) {
-                icon.setAttribute('data-lucide', 'alert-triangle');
-                icon.className = 'w-4 h-4 text-red-400';
-            } else {
-                icon.setAttribute('data-lucide', 'check-circle');
-                icon.className = 'w-4 h-4 text-green-400';
-            }
-            lucide.createIcons();
-            
+            const span = document.getElementById('toast-text');
+            if (!toast || !span) return;
             span.innerText = msg;
+            toast.classList.toggle('bg-rose-700', isError);
             toast.classList.remove('translate-y-24', 'opacity-0');
-            
             clearTimeout(toast._timeout);
             toast._timeout = setTimeout(() => {
                 toast.classList.add('translate-y-24', 'opacity-0');
-            }, 3000);
+            }, 2800);
         }
 
-        // ==================== INITIALIZE ====================
-        init();
+        window.addEventListener('DOMContentLoaded', init);
     </script>
     <script src="js/global.js"></script>
 </body>

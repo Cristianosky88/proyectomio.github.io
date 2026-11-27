@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ingreso Personal Externo</title>
+    <title>Ingreso Personal Externo · CCTV</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -31,48 +31,35 @@
     <link rel="stylesheet" href="css/global.css">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        :root {
-            --primary: #4f46e5;
-            --primary-hover: #4338ca;
-            --success: #059669;
-            --danger: #dc2626;
-            --warning: #d97706;
+        .report-font {
+            font-family: 'JetBrains Mono', Consolas, monospace;
         }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+        .history-item {
+            transition: all 0.16s ease;
+            border-left: 3px solid transparent;
         }
-        
-        .saving { animation: pulse 1.5s ease-in-out infinite; }
-        
-        @media (prefers-reduced-motion: reduce) {
-            * { animation-duration: 0.01ms !important; }
+        .history-item:hover {
+            border-left-color: #6366f1;
         }
-        
-        [data-tooltip] {
-            position: relative;
-        }
-        
-        [data-tooltip]:hover::after {
-            content: attr(data-tooltip);
-            position: absolute;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #1e293b;
-            color: white;
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 11px;
-            white-space: nowrap;
-            z-index: 50;
+        @media print {
+            body {
+                background: #ffffff !important;
+                color: #0f172a !important;
+                padding: 0 !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+            #printSheet {
+                display: block !important;
+            }
         }
     </style>
 </head>
 <body class="bg-slate-100 dark:bg-slate-950 p-3 sm:p-5 md:p-8 text-slate-800 dark:text-slate-100 min-h-screen font-sans transition-colors duration-200">
+
     <div class="max-w-6xl mx-auto bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 transition-colors duration-200">
-        
+
         <!-- Header Estándar -->
         <header class="no-print bg-slate-900 dark:bg-slate-950 border-b border-slate-800 px-4 sm:px-6 py-4 rounded-t-2xl text-white flex flex-wrap justify-between items-center gap-3">
             <div class="flex items-center gap-3">
@@ -80,1052 +67,1321 @@
                     <i data-lucide="user-plus" class="w-6 h-6 text-white"></i>
                 </div>
                 <div>
-                    <h1 class="text-lg sm:text-xl font-bold leading-tight text-white">Ingreso Personal Externo</h1>
-                    <p class="text-slate-400 text-xs uppercase tracking-wider">CCTV · Técnicos, Proveedores y Visitas</p>
+                    <h1 class="text-lg sm:text-xl font-bold leading-tight text-white flex items-center gap-2 flex-wrap">
+                        Ingreso Personal Externo
+                        <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Autoguardado</span>
+                    </h1>
+                    <p class="text-slate-400 text-xs uppercase tracking-wider">CCTV · Técnicos, Limpieza, Proveedores y Contratistas</p>
                 </div>
             </div>
-            
+
             <nav class="flex flex-wrap items-center gap-2">
                 <a href="Inpol.html" class="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-500 px-3 py-2 rounded-xl transition text-xs font-semibold text-white shadow-sm" title="Ir a Adicional Policial">
                     <i data-lucide="shield-check" class="w-4 h-4"></i>
                     <span class="hidden sm:inline">Policial</span>
                 </a>
+
+                <button type="button" onclick="limpiarTodoFormulario()" class="p-2 bg-slate-800 hover:bg-rose-600 border border-slate-700 rounded-xl transition text-slate-200 hover:text-white cursor-pointer" title="Restablecer formulario">
+                    <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
+                </button>
+
                 <div class="hidden md:flex items-center gap-2 bg-slate-800/90 border border-slate-700 px-3 py-1.5 rounded-xl text-xs font-mono text-slate-200">
                     <i data-lucide="clock" class="w-3.5 h-3.5 text-indigo-400"></i>
                     <span data-cctv-clock class="tabular-nums">00:00:00 Hs.</span>
                 </div>
+
                 <div data-cctv-nav></div>
+
                 <button type="button" onclick="toggleTheme()" title="Cambiar modo claro / oscuro" class="p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl transition inline-flex items-center justify-center text-slate-200 cursor-pointer">
                     <i data-lucide="sun" class="w-5 h-5 text-amber-400 hidden dark:block"></i>
                     <i data-lucide="moon" class="w-5 h-5 text-slate-200 block dark:hidden"></i>
                 </button>
+
                 <a href="index.html" class="p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl transition inline-flex items-center justify-center text-slate-200" title="Volver al Menú Principal">
                     <i data-lucide="home" class="w-5 h-5"></i>
                 </a>
             </nav>
         </header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 rounded-b-2xl overflow-hidden">
-            
-            <!-- COLUMNA IZQUIERDA: FORMULARIO -->
-            <div class="lg:col-span-7 p-5 sm:p-6 space-y-6 bg-slate-50 dark:bg-slate-900/60">
-                
-                <!-- Indicador de progreso -->
-                <div class="flex items-center gap-2 mb-4">
-                    <div class="flex-1 h-1 bg-slate-200 rounded">
-                        <div id="progress-bar" class="h-1 bg-indigo-600 rounded transition-all duration-300" style="width: 0%"></div>
-                    </div>
-                    <span id="progress-text" class="text-xs text-slate-500">0% completado</span>
+        <!-- Hoja exclusiva de Impresión -->
+        <div id="printSheet" class="hidden p-8 space-y-4">
+            <div class="border-b-2 border-slate-800 pb-3 flex justify-between items-start">
+                <div>
+                    <h2 class="text-lg font-bold uppercase">Acta CCTV · Ingreso y Egreso de Personal Externo</h2>
+                    <p class="text-xs text-slate-600">Registro Operativo de Monitoreo y Control Interno</p>
                 </div>
-                
-                <form id="report-form" novalidate>
-                    <!-- SECCIÓN 1: INGRESO -->
-                    <div class="bg-white p-4 rounded-lg shadow-sm border border-slate-200 hover:border-indigo-300 transition-colors">
-                        <h3 class="font-bold text-slate-700 text-sm flex items-center gap-2 mb-4">
-                            <span class="bg-indigo-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs shadow">1</span>
-                            Datos de Ingreso
-                            <i data-lucide="clock" class="w-4 h-4 text-slate-400 ml-auto"></i>
-                        </h3>
-
-                        <div class="space-y-4">
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-xs font-semibold text-slate-500 mb-1">
-                                        ⏰ Hora de Ingreso
-                                        <span class="text-red-500">*</span>
-                                    </label>
-                                    <input type="time" 
-                                           id="time1" 
-                                           required 
-                                           class="w-full p-2 bg-slate-50 border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none transition-all invalid:border-red-500"
-                                           aria-describedby="time1-error">
-                                    <span id="time1-error" class="text-xs text-red-500 hidden">Campo requerido</span>
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-semibold text-slate-500 mb-1">
-                                        👤 Control Interno
-                                        <span class="text-red-500">*</span>
-                                    </label>
-                                    <select id="supervisor1" 
-                                            required 
-                                            class="w-full p-2 bg-slate-50 border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
-                                        <option value="">Seleccionar personal...</option>
-                                        <optgroup label="Supervisores">
-                                            <option value="Supervisor de Control Interno Padilla Jorge">Padilla Jorge</option>
-                                            <option value="Supervisora de Control Interno Rojas Dolly">Rojas Dolly</option>
-                                            <option value="Supervisor de Control Interno Urbano Daniel">Urbano Daniel</option>
-                                        </optgroup>
-                                        <optgroup label="Control Interno">
-                                            <option value="Control Interno Yujra Fernando">Yujra Fernando</option>
-                                            <option value="Control Interno Rizzato Enzo">Rizzato Enzo</option>
-                                            <option value="Control Interno Castaño Pablo">Castaño Pablo</option>
-                                        </optgroup>
-                                        <option value="custom">✏️ Personalizado...</option>
-                                    </select>
-                                </div>
-                                
-                                <!-- Campo personalizado oculto -->
-                                <div id="custom-supervisor1" class="hidden col-span-2">
-                                    <label class="block text-xs font-semibold text-slate-500 mb-1">Nombre Personalizado</label>
-                                    <div class="flex gap-2">
-                                        <input type="text" 
-                                               id="supervisor1-custom" 
-                                               required
-                                               placeholder="Ingresar nombre completo" 
-                                               class="flex-1 p-2 bg-yellow-50 border border-yellow-300 rounded text-sm focus:ring-2 focus:ring-yellow-500 outline-none">
-                                        <button type="button" 
-                                                onclick="cancelarPersonalizado('supervisor1')" 
-                                                class="px-3 py-1 bg-slate-200 hover:bg-slate-300 rounded text-sm transition-colors">
-                                            Cancelar
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-xs font-semibold text-slate-500 mb-1">
-                                        🏢 Empresa
-                                        <span class="text-red-500">*</span>
-                                    </label>
-                                    <input type="text" 
-                                           id="company1" 
-                                           required 
-                                           value="Bazurco Facility" 
-                                           placeholder="Nombre empresa" 
-                                           class="w-full p-2 bg-slate-50 border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
-                                           list="companies-list">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-semibold text-slate-500 mb-1">
-                                        👷 Personal Externo
-                                        <span class="text-red-500">*</span>
-                                    </label>
-                                    <input type="text" 
-                                           id="worker1" 
-                                           required 
-                                           list="workers-list" 
-                                           placeholder="Nombre Personal Externo" 
-                                           class="w-full p-2 bg-slate-50 border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
-                                           autocomplete="off">
-                                </div>
-                            </div>
-
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-500 mb-1">
-                                    📋 Descripción de la Tarea
-                                    <span class="text-red-500">*</span>
-                                </label>
-                                <textarea id="task" 
-                                          required 
-                                          placeholder="Describe la tarea, horario y ubicación..." 
-                                          class="w-full p-2 bg-slate-50 border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none resize-none h-20 transition-all"
-                                          maxlength="500"
-                                          aria-describedby="task-counter">para realizar tareas de limpieza en el Casino desde las 00:00 Hs. hasta las 00:00 Hs.</textarea>
-                                <div class="flex justify-between">
-                                    <span id="task-error" class="text-xs text-red-500 hidden">Campo requerido</span>
-                                    <span id="task-counter" class="text-xs text-slate-400">0/500</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- SECCIÓN 2: SALIDA -->
-                    <div class="bg-white p-4 rounded-lg shadow-sm border border-slate-200 hover:border-green-300 transition-colors mt-4">
-                        <h3 class="font-bold text-slate-700 text-sm flex items-center gap-2 mb-4">
-                            <span class="bg-green-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs shadow">2</span>
-                            Finalización del Servicio
-                            <button type="button" 
-                                    onclick="copiarDatosIngreso()" 
-                                    class="ml-auto text-xs text-indigo-600 hover:text-indigo-800 underline"
-                                    data-tooltip="Copiar datos de ingreso">
-                                Copiar datos ↑
-                            </button>
-                        </h3>
-
-                        <div class="space-y-4">
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-xs font-semibold text-slate-500 mb-1">
-                                        ⏰ Hora de Salida
-                                        <span class="text-red-500">*</span>
-                                    </label>
-                                    <input type="time" 
-                                           id="time2" 
-                                           required 
-                                           class="w-full p-2 bg-slate-50 border border-slate-300 rounded text-sm focus:ring-2 focus:ring-green-500 outline-none transition-all">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-semibold text-slate-500 mb-1">
-                                        👤 Control Interno
-                                        <span class="text-red-500">*</span>
-                                    </label>
-                                    <select id="supervisor2" 
-                                            required 
-                                            class="w-full p-2 bg-slate-50 border border-slate-300 rounded text-sm focus:ring-2 focus:ring-green-500 outline-none transition-all">
-                                        <option value="">Seleccionar personal...</option>
-                                        <optgroup label="Supervisores">
-                                            <option value="Supervisor de Control Interno Padilla Jorge">Padilla Jorge </option>
-                                            <option value="Supervisora de Control Interno Rojas Dolly">Rojas Dolly</option>
-                                            <option value="Supervisor de Control Interno Urbano Daniel">Urbano Daniel</option>
-                                        </optgroup>
-                                        <optgroup label="Control Interno">
-                                            <option value="Control Interno Yujra Fernando">Yujra Fernando</option>
-                                            <option value="Control Interno Rizzato Enzo">Rizzato Enzo</option>
-                                            <option value="Control Interno Castaño Pablo">Castaño Pablo</option> 
-                                        </optgroup>
-                                        <option value="custom">✏️ Personalizado...</option>
-                                    </select>
-                                </div>
-                                
-                                <!-- Campo personalizado oculto -->
-                                <div id="custom-supervisor2" class="hidden col-span-2">
-                                    <label class="block text-xs font-semibold text-slate-500 mb-1">Nombre Personalizado</label>
-                                    <div class="flex gap-2">
-                                        <input type="text" 
-                                               id="supervisor2-custom" 
-                                               required
-                                               placeholder="Ingresar nombre completo" 
-                                               class="flex-1 p-2 bg-yellow-50 border border-yellow-300 rounded text-sm focus:ring-2 focus:ring-yellow-500 outline-none">
-                                        <button type="button" 
-                                                onclick="cancelarPersonalizado('supervisor2')" 
-                                                class="px-3 py-1 bg-slate-200 hover:bg-slate-300 rounded text-sm transition-colors">
-                                            Cancelar
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-xs font-semibold text-slate-500 mb-1">
-                                        🏢 Empresa
-                                        <span class="text-red-500">*</span>
-                                    </label>
-                                    <input type="text" 
-                                           id="company2" 
-                                           required 
-                                           value="Bazurco Facility" 
-                                           placeholder="Nombre empresa" 
-                                           class="w-full p-2 bg-slate-50 border border-slate-300 rounded text-sm focus:ring-2 focus:ring-green-500 outline-none transition-all">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-semibold text-slate-500 mb-1">
-                                        👷 Personal Externo
-                                        <span class="text-red-500">*</span>
-                                    </label>
-                                    <input type="text" 
-                                           id="worker2" 
-                                           required 
-                                           list="workers-list" 
-                                           placeholder="Nombre Personal Externo" 
-                                           class="w-full p-2 bg-slate-50 border border-slate-300 rounded text-sm focus:ring-2 focus:ring-green-500 outline-none transition-all">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- BOTONES DE ACCIÓN -->
-                    <div class="flex flex-col sm:flex-row gap-2 mt-6">
-                        <button type="button" 
-                                id="generateBtn" 
-                                class="flex-1 px-4 py-3 bg-indigo-600 text-white hover:bg-indigo-700 rounded-lg font-semibold text-sm transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg active:scale-95"
-                                data-tooltip="Ctrl + Enter">
-                            <i data-lucide="file-text" class="w-4 h-4"></i>
-                            <span>Generar Informe</span>
-                            <kbd class="hidden sm:inline text-xs bg-indigo-800 px-1.5 py-0.5 rounded">Ctrl+Enter</kbd>
-                        </button>
-                        <button type="button" 
-                                id="resetBtn" 
-                                class="flex-1 px-4 py-3 bg-slate-200 text-slate-700 hover:bg-slate-300 rounded-lg font-semibold text-sm transition-all duration-200 flex items-center justify-center gap-2">
-                            <i data-lucide="refresh-cw" class="w-4 h-4"></i>
-                            <span>Valores por Defecto</span>
-                        </button>
-                        <button type="button" 
-                                id="clearBtn" 
-                                class="flex-1 px-4 py-3 bg-red-50 text-red-700 hover:bg-red-100 rounded-lg font-semibold text-sm transition-all duration-200 flex items-center justify-center gap-2 border border-red-200">
-                            <i data-lucide="trash-2" class="w-4 h-4"></i>
-                            <span>Limpiar Todo</span>
-                        </button>
-                    </div>
-
-                    <!-- INDICADOR DE ESTADO -->
-                    <div id="form-status" class="mt-4 space-y-2">
-                        <div id="missing-fields" class="p-3 bg-yellow-50 border border-yellow-300 rounded-lg text-xs text-yellow-700 hidden flex items-center gap-2">
-                            <i data-lucide="alert-circle" class="w-4 h-4"></i>
-                            <span id="missing-count">0 campos vacíos</span>
-                        </div>
-                        <div id="auto-save-status" class="text-xs text-slate-400 text-center hidden saving">
-                            <i data-lucide="save" class="w-3 h-3 inline"></i>
-                            Guardando...
-                        </div>
-                    </div>
-                </form>
+                <span id="printFechaHora" class="text-xs font-mono text-slate-600"></span>
             </div>
-
-            <!-- COLUMNA DERECHA: RESULTADO -->
-            <div class="lg:col-span-5 bg-gradient-to-b from-slate-100 to-slate-50 border-l border-slate-200 flex flex-col">
-                <div class="p-6 sticky top-0 max-h-screen overflow-y-auto">
-                    <div class="flex items-center justify-between mb-4">
-                        <h2 class="font-bold text-slate-800 flex items-center gap-2">
-                            <i data-lucide="file-text" class="w-4 h-4"></i>
-                            Vista Previa
-                        </h2>
-                        <span class="text-xs px-2 py-1 bg-indigo-100 text-indigo-700 rounded-full font-medium">
-                            <span id="history-count">0</span> registros
-                        </span>
-                    </div>
-                    
-                    <!-- HISTORIAL DE INFORMES -->
-                    <div class="mb-4 p-3 bg-white rounded-lg border border-slate-200 shadow-sm">
-                        <label class="text-xs font-semibold text-slate-500 mb-2 block">Historial de Informes</label>
-                        <select id="historicoSelect" 
-                                class="w-full p-2 bg-slate-50 border border-slate-300 rounded text-xs focus:ring-2 focus:ring-indigo-500 outline-none hover:border-indigo-400 transition-colors">
-                            <option value="">📜 Seleccionar informe anterior...</option>
-                        </select>
-                        <div class="flex justify-between mt-2">
-                            <small class="text-slate-400">Últimos 10 registros</small>
-                            <button onclick="exportarHistorial()" class="text-xs text-indigo-600 hover:text-indigo-800 underline">
-                                Exportar todo
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <!-- CONTENEDOR DEL INFORME -->
-                    <div id="report-container" class="hidden animate__animated animate__fadeIn">
-                        <div class="bg-white rounded-lg shadow-md border border-slate-300 p-4 mb-4">
-                            <div id="report-content" class="text-sm font-mono whitespace-pre-wrap leading-relaxed text-slate-700"></div>
-                        </div>
-
-                        <div class="flex gap-2 mb-4">
-                            <button id="copy-btn" 
-                                    class="flex-1 px-3 py-2 bg-indigo-600 text-white hover:bg-indigo-700 rounded-lg text-xs font-semibold transition-all duration-200 flex items-center justify-center gap-1 shadow hover:shadow-md"
-                                    data-tooltip="Copiar al portapapeles">
-                                <i data-lucide="copy" class="w-3 h-3"></i>
-                                Copiar
-                            </button>
-                            <button id="save-btn" 
-                                    class="flex-1 px-3 py-2 bg-green-600 text-white hover:bg-green-700 rounded-lg text-xs font-semibold transition-all duration-200 flex items-center justify-center gap-1 shadow hover:shadow-md"
-                                    data-tooltip="Descargar como TXT">
-                                <i data-lucide="download" class="w-3 h-3"></i>
-                                Descargar
-                            </button>
-                            <button id="print-btn" 
-                                    class="px-3 py-2 bg-slate-600 text-white hover:bg-slate-700 rounded-lg text-xs font-semibold transition-all duration-200 flex items-center justify-center gap-1 shadow hover:shadow-md">
-                                <i data-lucide="printer" class="w-3 h-3"></i>
-                            </button>
-                        </div>
-
-                        <div id="timestamp" class="text-xs text-slate-500 text-center italic"></div>
-                    </div>
-
-                    <div id="no-report" class="bg-gradient-to-br from-slate-100 to-slate-200 rounded-lg p-8 text-center text-slate-600 text-sm border border-slate-300">
-                        <i data-lucide="clipboard" class="w-12 h-12 mx-auto mb-3 text-slate-400"></i>
-                        <p class="font-medium">Sin informe generado</p>
-                        <p class="text-xs text-slate-500 mt-1">Complete el formulario y presione "Generar Informe"</p>
-                    </div>
-                </div>
-            </div>
+            <pre id="printTexto" class="report-font whitespace-pre-wrap text-sm leading-relaxed p-4 border border-slate-300 rounded-lg bg-slate-50"></pre>
         </div>
+
+        <!-- Contenido Principal -->
+        <main class="no-print grid grid-cols-1 lg:grid-cols-12 rounded-b-2xl overflow-hidden">
+
+            <!-- COLUMNA IZQUIERDA: FORMULARIO (7/12) -->
+            <div class="lg:col-span-7 p-4 sm:p-6 space-y-4 bg-slate-50 dark:bg-slate-900/60">
+
+                <!-- Panel de Personal Externo Actualmente en Sala -->
+                <div id="panelExternosActivos" class="hidden bg-emerald-50 dark:bg-emerald-950/35 border border-emerald-200 dark:border-emerald-800/80 rounded-xl p-3.5 space-y-2.5 shadow-sm">
+                    <div class="flex items-center justify-between gap-2">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                            <h2 class="text-xs font-bold uppercase tracking-wider text-emerald-800 dark:text-emerald-300">
+                                Personal Externo Actualmente en Sala (<span id="countExternosActivos">0</span>)
+                            </h2>
+                        </div>
+                        <button type="button" onclick="limpiarTodosActivos()" class="text-[11px] text-slate-400 hover:text-rose-500 cursor-pointer">Limpiar lista</button>
+                    </div>
+                    <div id="listaExternosActivos" class="space-y-1.5"></div>
+                </div>
+
+                <!-- Selector de Modo Operativo -->
+                <div class="bg-white dark:bg-slate-900 p-3.5 sm:p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-2.5">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <span class="text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider">Modo de Novedad</span>
+                        <label class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 dark:text-slate-300 cursor-pointer select-none">
+                            <input type="checkbox" id="chkIncluirTitulo" checked onchange="sincronizarTodo()" class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500">
+                            Incluir título "Ingreso Personal Externo"
+                        </label>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-2">
+                        <button type="button" id="modoBtnCompleto" onclick="cambiarModo('completo')" class="py-2 px-2.5 rounded-xl text-xs font-bold transition cursor-pointer bg-indigo-600 text-white shadow-sm flex items-center justify-center gap-1.5">
+                            <i data-lucide="file-check" class="w-4 h-4"></i>
+                            <span>Ingreso + Salida</span>
+                        </button>
+                        <button type="button" id="modoBtnIngreso" onclick="cambiarModo('ingreso')" class="py-2 px-2.5 rounded-xl text-xs font-bold transition cursor-pointer bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center gap-1.5">
+                            <i data-lucide="log-in" class="w-4 h-4"></i>
+                            <span>Solo Ingreso</span>
+                        </button>
+                        <button type="button" id="modoBtnSalida" onclick="cambiarModo('salida')" class="py-2 px-2.5 rounded-xl text-xs font-bold transition cursor-pointer bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center gap-1.5">
+                            <i data-lucide="log-out" class="w-4 h-4"></i>
+                            <span>Solo Salida</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- SECCIÓN 1: DATOS DE INGRESO -->
+                <div id="bloqueIngreso" class="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 space-y-4">
+                    <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-2.5">
+                        <h3 class="font-bold text-slate-800 dark:text-slate-100 text-sm flex items-center gap-2">
+                            <span class="bg-indigo-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">1</span>
+                            Datos de Ingreso y Tarea
+                        </h3>
+                        <button type="button" onclick="dejarEnSalaActivo()" class="px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 text-[11px] font-semibold transition inline-flex items-center gap-1 cursor-pointer" title="Guardar en el panel superior como actualmente trabajando en sala">
+                            <i data-lucide="pin" class="w-3 h-3"></i>
+                            Marcar en Sala Ahora
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-12 gap-3.5">
+                        <!-- Hora de Ingreso -->
+                        <div class="sm:col-span-4">
+                            <label for="time1" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">⏰ Hora de Ingreso</label>
+                            <div class="flex items-stretch">
+                                <input type="time" id="time1" oninput="alCambiarHoraIngreso()" class="w-full min-w-0 px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-r-0 border-slate-300 dark:border-slate-700 rounded-l-xl text-xs sm:text-sm font-mono text-slate-900 dark:text-white outline-none focus:border-indigo-500">
+                                <button type="button" onclick="ponerHoraCampo('time1')" class="px-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-r-xl text-[11px] font-semibold transition cursor-pointer shrink-0">Ahora</button>
+                            </div>
+                        </div>
+
+                        <!-- Control Interno / Quién Informa Ingreso -->
+                        <div class="sm:col-span-8 relative">
+                            <div class="flex items-center justify-between mb-1">
+                                <label for="supervisor1" class="block text-xs font-semibold text-slate-600 dark:text-slate-300">👤 Quién Informa Ingreso (Control Interno / Sala)</label>
+                                <button type="button" onclick="limpiarCampo('supervisor1')" class="text-[11px] text-slate-400 hover:text-rose-500 cursor-pointer">Borrar</button>
+                            </div>
+                            <input type="text" id="supervisor1" autocomplete="off" placeholder="Escribe 1 letra: ej. Yujra, Padilla, Rojas, Urbano..."
+                                class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-white outline-none focus:border-indigo-500">
+                            <div id="dropSupervisor1" class="hidden absolute left-0 right-0 top-full mt-1 z-50 max-h-52 overflow-y-auto rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-xl divide-y divide-slate-100 dark:divide-slate-800"></div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-12 gap-3.5">
+                        <!-- Empresa -->
+                        <div class="sm:col-span-5 relative">
+                            <div class="flex items-center justify-between mb-1">
+                                <label for="company1" class="block text-xs font-semibold text-slate-600 dark:text-slate-300">🏢 Empresa / Contratista</label>
+                                <button type="button" onclick="limpiarCampo('company1')" class="text-[11px] text-slate-400 hover:text-rose-500 cursor-pointer">Borrar</button>
+                            </div>
+                            <input type="text" id="company1" value="Bazurco Facility" autocomplete="off" placeholder="Ej: Bazurco Facility"
+                                class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-white outline-none focus:border-indigo-500">
+                            <div id="dropCompany1" class="hidden absolute left-0 right-0 top-full mt-1 z-50 max-h-48 overflow-y-auto rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-xl divide-y divide-slate-100 dark:divide-slate-800"></div>
+                            <div class="flex flex-wrap gap-1 mt-1.5">
+                                <button type="button" onclick="seleccionarEmpresaRapida('Bazurco Facility')" class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 hover:bg-indigo-100 dark:hover:bg-indigo-950 text-[10px] font-semibold text-slate-600 dark:text-slate-300 cursor-pointer">Bazurco</button>
+                                <button type="button" onclick="seleccionarEmpresaRapida('Servicio Técnico')" class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 hover:bg-indigo-100 dark:hover:bg-indigo-950 text-[10px] font-semibold text-slate-600 dark:text-slate-300 cursor-pointer">Serv. Técnico</button>
+                                <button type="button" onclick="seleccionarEmpresaRapida('Mantenimiento Integral')" class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 hover:bg-indigo-100 dark:hover:bg-indigo-950 text-[10px] font-semibold text-slate-600 dark:text-slate-300 cursor-pointer">Mantenimiento</button>
+                            </div>
+                        </div>
+
+                        <!-- Personal Externo (admite 1 o varios encadenados con 'y' o ',') -->
+                        <div class="sm:col-span-7 relative">
+                            <div class="flex items-center justify-between mb-1">
+                                <label for="worker1" class="block text-xs font-semibold text-slate-600 dark:text-slate-300">👷 Personal Externo (1 o varios con "y")</label>
+                                <button type="button" onclick="limpiarCampo('worker1')" class="text-[11px] text-slate-400 hover:text-rose-500 cursor-pointer">Borrar</button>
+                            </div>
+                            <input type="text" id="worker1" autocomplete="off" placeholder="Ej: Sr. Sosa Lucas y Sra. Reyes Rosana..."
+                                class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-white outline-none focus:border-indigo-500">
+                            <div id="dropWorker1" class="hidden absolute left-0 right-0 top-full mt-1 z-50 max-h-52 overflow-y-auto rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-xl divide-y divide-slate-100 dark:divide-slate-800"></div>
+                            <div class="flex flex-wrap items-center gap-1 mt-1.5">
+                                <span class="text-[10px] font-semibold text-slate-400">Trato:</span>
+                                <button type="button" onclick="insertarTratoExterno('Sr.')" class="px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 text-[10px] font-semibold cursor-pointer">Sr.</button>
+                                <button type="button" onclick="insertarTratoExterno('Sra.')" class="px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 text-[10px] font-semibold cursor-pointer">Sra.</button>
+                                <button type="button" onclick="insertarTratoExterno('Téc.')" class="px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 text-[10px] font-semibold cursor-pointer">Téc.</button>
+                                <button type="button" onclick="encadenarOtroExterno()" class="px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 text-[10px] font-semibold cursor-pointer" title="Agregar otra persona en la misma entrada">+ Sumar otro ("y ")</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Plantillas de Tarea + Rango Horario de Tarea -->
+                    <div class="space-y-2.5 pt-1 border-t border-slate-100 dark:border-slate-800">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <label for="task" class="text-xs font-semibold text-slate-600 dark:text-slate-300">📋 Descripción de la Tarea</label>
+                            <div class="flex flex-wrap items-center gap-1.5">
+                                <label class="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-600 dark:text-slate-300 cursor-pointer">
+                                    <input type="checkbox" id="chkRangoTarea" checked onchange="actualizarRangoEnTarea()" class="rounded border-slate-300 text-indigo-600">
+                                    Horario pactado:
+                                </label>
+                                <input type="time" id="taskFrom" oninput="actualizarRangoEnTarea()" class="px-2 py-0.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-[11px] font-mono text-slate-800 dark:text-slate-200 outline-none">
+                                <span class="text-[11px] text-slate-400">a</span>
+                                <input type="time" id="taskTo" oninput="actualizarRangoEnTarea()" class="px-2 py-0.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-[11px] font-mono text-slate-800 dark:text-slate-200 outline-none">
+                                <button type="button" onclick="sumarHorasTarea(2)" class="px-1.5 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 text-[10px] font-mono font-semibold cursor-pointer">+2h</button>
+                                <button type="button" onclick="sumarHorasTarea(4)" class="px-1.5 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 text-[10px] font-mono font-semibold cursor-pointer">+4h</button>
+                            </div>
+                        </div>
+
+                        <!-- Chips de Tareas Frecuentes -->
+                        <div class="flex flex-wrap gap-1.5">
+                            <button type="button" onclick="aplicarPlantillaTarea('para realizar tareas de limpieza en el Casino')" class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950 text-[11px] font-medium text-slate-700 dark:text-slate-300 transition cursor-pointer">🧹 Limpieza</button>
+                            <button type="button" onclick="aplicarPlantillaTarea('para realizar mantenimiento de aires acondicionados')" class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950 text-[11px] font-medium text-slate-700 dark:text-slate-300 transition cursor-pointer">❄️ Aire Acond.</button>
+                            <button type="button" onclick="aplicarPlantillaTarea('para realizar revisión técnica en máquinas tragamonedas')" class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950 text-[11px] font-medium text-slate-700 dark:text-slate-300 transition cursor-pointer">🎰 Máquinas</button>
+                            <button type="button" onclick="aplicarPlantillaTarea('para realizar tareas técnicas en el rack / enlace de internet')" class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950 text-[11px] font-medium text-slate-700 dark:text-slate-300 transition cursor-pointer">🌐 Redes / ISP</button>
+                            <button type="button" onclick="aplicarPlantillaTarea('para realizar tareas de mantenimiento eléctrico')" class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950 text-[11px] font-medium text-slate-700 dark:text-slate-300 transition cursor-pointer">⚡ Eléctrico</button>
+                            <button type="button" onclick="aplicarPlantillaTarea('para realizar control de higiene, seguridad y matafuegos')" class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950 text-[11px] font-medium text-slate-700 dark:text-slate-300 transition cursor-pointer">🧯 Seg. e Higiene</button>
+                            <button type="button" onclick="aplicarPlantillaTarea('para realizar entrega de insumos / mercadería')" class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950 text-[11px] font-medium text-slate-700 dark:text-slate-300 transition cursor-pointer">📦 Proveedor</button>
+                        </div>
+
+                        <textarea id="task" rows="2" maxlength="500" oninput="sincronizarTodo()"
+                            placeholder="Describe la tarea, sector y horario..."
+                            class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-white outline-none focus:border-indigo-500 resize-y">para realizar tareas de limpieza en el Casino desde las 02:00 Hs. hasta las 04:00 Hs.</textarea>
+                    </div>
+                </div>
+
+                <!-- SECCIÓN 2: FINALIZACIÓN / SALIDA -->
+                <div id="bloqueSalida" class="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 space-y-4">
+                    <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-2.5">
+                        <h3 class="font-bold text-slate-800 dark:text-slate-100 text-sm flex items-center gap-2">
+                            <span class="bg-emerald-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">2</span>
+                            Finalización del Servicio (Salida)
+                            <span id="badgeDuracionReal" class="hidden text-[11px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800"></span>
+                        </h3>
+
+                        <label class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 dark:text-slate-300 cursor-pointer select-none">
+                            <input type="checkbox" id="chkSincronizarSalida" checked onchange="alCambiarSyncSalida()" class="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500">
+                            Copiar Empresa/Personal de Ingreso
+                        </label>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-12 gap-3.5">
+                        <!-- Hora de Salida -->
+                        <div class="sm:col-span-4">
+                            <label for="time2" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">⏰ Hora de Salida</label>
+                            <div class="flex items-stretch">
+                                <input type="time" id="time2" oninput="sincronizarTodo()" class="w-full min-w-0 px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-r-0 border-slate-300 dark:border-slate-700 rounded-l-xl text-xs sm:text-sm font-mono text-slate-900 dark:text-white outline-none focus:border-emerald-500">
+                                <button type="button" onclick="ponerHoraCampo('time2')" class="px-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-r-xl text-[11px] font-semibold transition cursor-pointer shrink-0">Ahora</button>
+                            </div>
+                        </div>
+
+                        <!-- Control Interno Salida -->
+                        <div class="sm:col-span-8 relative">
+                            <div class="flex items-center justify-between mb-1">
+                                <label for="supervisor2" class="block text-xs font-semibold text-slate-600 dark:text-slate-300">👤 Quién Informa Salida</label>
+                                <button type="button" onclick="igualarSupervisorSalida()" class="text-[11px] text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer">= Igual a Ingreso</button>
+                            </div>
+                            <input type="text" id="supervisor2" autocomplete="off" placeholder="Puede ser el mismo u otro Control Interno si hubo relevo..."
+                                class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-white outline-none focus:border-emerald-500">
+                            <div id="dropSupervisor2" class="hidden absolute left-0 right-0 top-full mt-1 z-50 max-h-52 overflow-y-auto rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-xl divide-y divide-slate-100 dark:divide-slate-800"></div>
+                        </div>
+                    </div>
+
+                    <div id="camposEmpresaWorkerSalida" class="grid grid-cols-1 sm:grid-cols-12 gap-3.5">
+                        <div class="sm:col-span-5">
+                            <label for="company2" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">🏢 Empresa (Salida)</label>
+                            <input type="text" id="company2" value="Bazurco Facility" oninput="sincronizarTodo()"
+                                class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-white outline-none focus:border-emerald-500">
+                        </div>
+                        <div class="sm:col-span-7">
+                            <label for="worker2" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">👷 Personal Externo (Salida)</label>
+                            <input type="text" id="worker2" oninput="sincronizarTodo()" placeholder="Nombre Personal Externo"
+                                class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-white outline-none focus:border-emerald-500">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Opcionales (Sala / Cámara CCTV) -->
+                <details class="group bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                    <summary class="cursor-pointer list-none px-4 sm:px-5 py-3.5 flex items-center justify-between text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 select-none">
+                        <span class="flex items-center gap-2">
+                            <i data-lucide="sliders" class="w-4 h-4 text-indigo-500"></i>
+                            3. Datos Complementarios Opcionales (Establecimiento o Cámara CCTV)
+                            <span id="badgeOpcionalesActivos" class="hidden text-[10px] font-mono px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300">Activos</span>
+                        </span>
+                        <span class="text-xs text-slate-400 group-open:rotate-180 transition-transform">▼</span>
+                    </summary>
+                    <div class="px-4 sm:px-5 pb-4 pt-2 border-t border-slate-100 dark:border-slate-800 grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                        <div>
+                            <label for="lugarEstablecimiento" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Establecimiento en Cierre</label>
+                            <select id="lugarEstablecimiento" onchange="sincronizarTodo()" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white outline-none focus:border-indigo-500">
+                                <option value="del Casino">del Casino (Clásico)</option>
+                                <option value="de Casino Boulevard">de Casino Boulevard</option>
+                                <option value="de Sala Luxor">de Sala Luxor</option>
+                                <option value="de la Sala">de la Sala</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="camaraAcceso" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Cámara de Acceso (Ej: 116, 706, 715)</label>
+                            <input type="text" id="camaraAcceso" autocomplete="off" oninput="alEscribirCamaraAcceso()" placeholder="Opcional: escribe 3 dígitos"
+                                class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-mono text-slate-900 dark:text-white outline-none focus:border-indigo-500">
+                        </div>
+                    </div>
+                </details>
+            </div>
+
+            <!-- COLUMNA DERECHA: VISTA PREVIA EN VIVO E HISTORIAL (5/12) -->
+            <div class="lg:col-span-5 p-4 sm:p-6 bg-slate-100/80 dark:bg-slate-950/60 border-t lg:border-t-0 lg:border-l border-slate-200 dark:border-slate-800 flex flex-col justify-between space-y-4">
+
+                <div class="space-y-4">
+                    <!-- Vista Previa en Vivo -->
+                    <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-4 space-y-3">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <h2 class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-200 flex items-center gap-2">
+                                <span class="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-pulse"></span>
+                                Informe en Vivo
+                            </h2>
+                            <div class="flex items-center gap-1.5">
+                                <button type="button" onclick="restaurarInformeAuto()" class="px-2 py-1 rounded-lg text-[11px] font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition inline-flex items-center gap-1 cursor-pointer" title="Restaurar texto automático">
+                                    <i data-lucide="refresh-cw" class="w-3 h-3"></i>
+                                    Restaurar
+                                </button>
+                                <button type="button" onclick="descargarInformeActual()" class="px-2 py-1 rounded-lg text-[11px] font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition inline-flex items-center gap-1 cursor-pointer" title="Descargar TXT">
+                                    <i data-lucide="download" class="w-3 h-3"></i>
+                                    TXT
+                                </button>
+                                <button type="button" onclick="window.print()" class="px-2 py-1 rounded-lg text-[11px] font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition inline-flex items-center gap-1 cursor-pointer" title="Imprimir acta">
+                                    <i data-lucide="printer" class="w-3 h-3"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <textarea id="reportOutput" rows="12" spellcheck="false" oninput="actualizarContadorSalida()"
+                            class="report-font w-full min-h-[265px] p-3.5 bg-slate-50 dark:bg-slate-950 border-2 border-indigo-200 dark:border-indigo-900/80 rounded-xl text-xs sm:text-sm text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-indigo-500 resize-y leading-relaxed"></textarea>
+
+                        <!-- Botones rápidos para copiar solo Ingreso o solo Salida cuando está en modo Completo -->
+                        <div id="botonesParrafosIndividuales" class="grid grid-cols-2 gap-2">
+                            <button type="button" onclick="copiarParrafo('ingreso')" class="py-1.5 px-2.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900 text-indigo-700 dark:text-indigo-300 border border-indigo-200/70 dark:border-indigo-800 text-[11px] font-semibold transition cursor-pointer">
+                                ⬆ Copiar solo Ingreso
+                            </button>
+                            <button type="button" onclick="copiarParrafo('salida')" class="py-1.5 px-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900 text-emerald-700 dark:text-emerald-300 border border-emerald-200/70 dark:border-emerald-800 text-[11px] font-semibold transition cursor-pointer">
+                                ⬇ Copiar solo Salida
+                            </button>
+                        </div>
+
+                        <div class="flex items-center justify-between text-[11px]">
+                            <span id="contadorCaracteres" class="font-mono text-slate-400">0 caracteres</span>
+                            <span class="text-slate-400 font-mono">Ctrl+Enter copia y guarda</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-12 gap-2">
+                            <button type="button" id="btnCopiarPrincipal" onclick="copiarYRegistrar()" class="sm:col-span-8 py-2.5 px-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99]">
+                                <i data-lucide="copy" class="w-4 h-4"></i>
+                                <span>Copiar y Registrar</span>
+                            </button>
+                            <button type="button" onclick="copiarWhatsApp()" class="sm:col-span-4 py-2.5 px-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold text-xs shadow-sm transition flex items-center justify-center gap-1.5 cursor-pointer active:scale-[0.99]">
+                                <i data-lucide="message-square" class="w-3.5 h-3.5"></i>
+                                <span>WhatsApp</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Historial de Informes -->
+                    <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-4 space-y-3">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-200 flex items-center gap-1.5">
+                                <i data-lucide="history" class="w-4 h-4 text-indigo-500"></i>
+                                Historial (<span id="history-count">0</span>)
+                            </h3>
+                            <div class="flex items-center gap-1.5">
+                                <button type="button" onclick="exportarHistorialCSV()" class="px-2 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900 text-emerald-700 dark:text-emerald-300 text-[11px] font-semibold transition inline-flex items-center gap-1 cursor-pointer" title="Descargar planilla CSV para Excel">
+                                    <i data-lucide="sheet" class="w-3 h-3"></i>
+                                    CSV
+                                </button>
+                                <button type="button" onclick="exportarHistorial()" class="px-2 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900 text-indigo-700 dark:text-indigo-300 text-[11px] font-semibold transition inline-flex items-center gap-1 cursor-pointer" title="Descargar historial TXT">
+                                    <i data-lucide="download" class="w-3 h-3"></i>
+                                    TXT
+                                </button>
+                                <button type="button" onclick="vaciarHistorial()" class="p-1 rounded-lg text-slate-400 hover:text-rose-500 transition cursor-pointer" title="Vaciar historial">
+                                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="relative">
+                            <input type="text" id="buscarHistorial" oninput="renderizarHistorial()" placeholder="Filtrar por empresa, personal, tarea u hora..."
+                                class="w-full pl-8 pr-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-xs text-slate-800 dark:text-slate-200 outline-none focus:border-indigo-500">
+                            <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2"></i>
+                        </div>
+
+                        <div id="historialLista" class="space-y-1.5 max-h-56 overflow-y-auto pr-0.5 text-xs">
+                            <p class="text-slate-400 text-center py-4">Sin registros anteriores</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
     </div>
 
-    <!-- TOAST NOTIFICACIONES MEJORADO -->
-    <div id="notification-container" class="fixed bottom-4 right-4 space-y-2 z-50"></div>
+    <!-- TOAST NOTIFICACIONES -->
+    <div id="notification-container" class="no-print fixed bottom-4 right-4 space-y-2 z-50"></div>
 
-    <!-- DATALISTS -->
-    <datalist id="workers-list">
-        <option value="Sr. Sosa Lucas"></option>
-        <option value="Sr. Vilte Nicolas"></option>
-        <option value="Sra. Reyes Rosana"></option>
-        <option value="Sra. Calapeña Lorena"></option>
-        <option value="Sra. Chungara Leonor"></option>
-        <option value="Sr. Yapura Sergio"></option>
-        <option value="Sra. Bais Ivana"></option>
-        <option value="Sra. Mendieta Anahi"></option>
-        <option value="Sra. Solange Barboza"></option>
-    </datalist>
+    <script>
+    (() => {
+        'use strict';
 
-    <datalist id="companies-list">
-        <option value="Bazurco Facility">
-        <option value="Limpieza Total SA">
-        <option value="Servicios Generales SRL">
-        <option value="Mantenimiento Integral">
-    </datalist>
+        const STORAGE = {
+            draftKey: 'ingreso_draft_v2',
+            legacyDraftKey: 'ingreso_draft',
+            historyKey: 'ingresoHistorial',
+            activosKey: 'cctv_externos_activos_v1',
+            workersExtraKey: 'cctv_externos_workers_frecuentes',
+            companiesExtraKey: 'cctv_externos_empresas_frecuentes',
+            supervisorsExtraKey: 'cctv_externos_supervisores_frecuentes',
+            maxHistory: 50
+        };
 
-<script>
-// ==================== SCRIPT PRINCIPAL MEJORADO ====================
-(() => {
-    'use strict';
-    
-    // Configuración
-    const CONFIG = {
-        maxHistoryItems: 10,
-        autoSaveInterval: 5000, // 5 segundos
-        formPrefix: 'ingreso_',
-        maxTaskLength: 500,
-        dateLocale: 'es-AR'
-    };
-    
-    // Estado de la aplicación
-    const state = {
-        formModified: false,
-        currentReport: null,
-        isGenerating: false,
-        lastAutoSave: null
-    };
-    
-    // Valores por defecto
-    const defaultValues = {
-        time1: '',
-        supervisor1: '',
-        company1: 'Bazurco Facility',
-        worker1: '',
-        task: 'para realizar tareas de limpieza en el Casino desde las 02:00 Hs. hasta las 04:00 Hs.',
-        time2: '',
-        supervisor2: '',
-        company2: 'Bazurco Facility',
-        worker2: ''
-    };
-    
-    // Inicializar íconos
-    lucide.createIcons();
-    
-    // ==================== FUNCIONES UTILITARIAS ====================
-    
-    const $ = (selector) => document.querySelector(selector);
-    const $$ = (selector) => document.querySelectorAll(selector);
-    
-    // Obtener datos del formulario
-    function getFormData() {
-        let supervisor1 = $('#supervisor1').value;
-        let supervisor2 = $('#supervisor2').value;
-        
-        if (supervisor1 === 'custom') {
-            supervisor1 = $('#supervisor1-custom').value.trim();
-        }
-        if (supervisor2 === 'custom') {
-            supervisor2 = $('#supervisor2-custom').value.trim();
-        }
-        
-        return {
-            time1: $('#time1').value,
-            supervisor1: supervisor1,
-            company1: $('#company1').value.trim(),
-            worker1: $('#worker1').value.trim(),
-            task: $('#task').value.trim(),
-            time2: $('#time2').value,
-            supervisor2: supervisor2,
-            company2: $('#company2').value.trim(),
-            worker2: $('#worker2').value.trim()
-        };
-    }
-    
-    // Validar formulario
-    function validateForm() {
-        let isValid = true;
-        const requiredFields = $$('#report-form [required]');
-        
-        requiredFields.forEach(field => {
-            // Saltar campos personalizados ocultos
-            if (field.id === 'supervisor1-custom' && $('#custom-supervisor1').classList.contains('hidden')) return;
-            if (field.id === 'supervisor2-custom' && $('#custom-supervisor2').classList.contains('hidden')) return;
-            
-            const value = field.value.trim();
-            const isValidField = value.length > 0;
-            
-            if (!isValidField) {
-                field.classList.add('border-red-500', 'bg-red-50');
-                isValid = false;
-                
-                // Mostrar mensaje de error específico
-                const errorEl = document.getElementById(field.id + '-error');
-                if (errorEl) errorEl.classList.remove('hidden');
-            } else {
-                field.classList.remove('border-red-500', 'bg-red-50');
-                const errorEl = document.getElementById(field.id + '-error');
-                if (errorEl) errorEl.classList.add('hidden');
-            }
-        });
-        
-        return isValid;
-    }
-    
-    // Validar tiempos
-    function validateTimes() {
-        const time1 = $('#time1').value;
-        const time2 = $('#time2').value;
-        
-        if (!time1 || !time2) {
-            showNotification('⚠️ Complete ambas horas (ingreso y salida)', 'warning');
-            return false;
-        }
-        
-        const [h1, m1] = time1.split(':').map(Number);
-        const [h2, m2] = time2.split(':').map(Number);
-        const minutos1 = h1 * 60 + m1;
-        const minutos2 = h2 * 60 + m2;
-        
-        let esValido = false;
-        
-        if (minutos2 > minutos1) {
-            esValido = true;
-        } else if (h1 >= 12 && minutos2 < minutos1) {
-            esValido = true; // Caso de cambio de día
-        }
-        
-        if (!esValido) {
-            showNotification('⚠️ La hora de salida debe ser posterior a la de ingreso', 'warning');
-            $('#time2').classList.add('border-red-500');
-            return false;
-        }
-        
-        $('#time2').classList.remove('border-red-500');
-        return true;
-    }
-    
-    // Generar informe
-    function generateReport() {
-        if (state.isGenerating) return;
-        
-        if (!validateForm()) {
-            showNotification('❌ Complete todos los campos obligatorios', 'error');
-            return false;
-        }
-        
-        if (!validateTimes()) {
-            return false;
-        }
-        
-        state.isGenerating = true;
-        $('#generateBtn').disabled = true;
-        $('#generateBtn').classList.add('opacity-50');
-        
-        try {
-            const data = getFormData();
-            const report = `Ingreso Personal Externo\n\nA las ${data.time1} Hs. CCTV recibe llamada de ${data.supervisor1}, informa que ingresa personal de ${data.company1} ${data.worker1} ${data.task}.\n\nA las ${data.time2} Hs. CCTV recibe llamada de ${data.supervisor2}, informa que personal de ${data.company2} ${data.worker2} finaliza servicio y se retira del Casino.-`;
-            
-            state.currentReport = report;
-            
-            // Actualizar UI
-            $('#report-content').textContent = report;
-            $('#timestamp').textContent = 'Generado: ' + new Date().toLocaleString(CONFIG.dateLocale);
-            $('#report-container').classList.remove('hidden');
-            $('#no-report').classList.add('hidden');
-            
-            // Guardar en historial
-            saveRecord(data, report);
-            
-            showNotification('✅ Informe generado exitosamente', 'success');
-            
-            // Scroll al informe
-            $('#report-container').scrollIntoView({ behavior: 'smooth', block: 'start' });
-            
-        } catch (error) {
-            console.error('Error al generar informe:', error);
-            showNotification('❌ Error al generar el informe', 'error');
-        } finally {
-            state.isGenerating = false;
-            $('#generateBtn').disabled = false;
-            $('#generateBtn').classList.remove('opacity-50');
-            state.formModified = false;
-        }
-    }
-    
-    // Guardar en historial
-    function saveRecord(data, contenido) {
-        let records = JSON.parse(localStorage.getItem('ingresoHistorial') || '[]');
-        
-        const record = {
-            ...data,
-            contenido: contenido,
-            fecha: new Date().toLocaleString(CONFIG.dateLocale),
-            timestamp: new Date().toISOString(),
-            id: Date.now()
-        };
-        
-        records.unshift(record);
-        records = records.slice(0, CONFIG.maxHistoryItems);
-        
-        localStorage.setItem('ingresoHistorial', JSON.stringify(records));
-        actualizarHistorial();
-    }
-    
-    // Actualizar select de historial
-    function actualizarHistorial() {
-        const historial = JSON.parse(localStorage.getItem('ingresoHistorial') || '[]');
-        const historicoSelect = $('#historicoSelect');
-        
-        // Actualizar contador
-        $('#history-count').textContent = historial.length;
-        
-        // Reconstruir opciones
-        historicoSelect.innerHTML = '<option value="">📜 Seleccionar informe anterior...</option>';
-        
-        historial.forEach((item, idx) => {
-            const option = document.createElement('option');
-            option.value = idx;
-            const timeRange = item.time1 && item.time2 ? `${item.time1}-${item.time2}` : 'Sin horario';
-            option.textContent = `${new Date(item.timestamp).toLocaleDateString(CONFIG.dateLocale)} - ${timeRange} (${item.supervisor1 || 'Sin supervisor'})`;
-            historicoSelect.appendChild(option);
-        });
-    }
-    
-    // Cargar del historial
-    function cargarDelHistorial(idx) {
-        const historial = JSON.parse(localStorage.getItem('ingresoHistorial') || '[]');
-        if (!historial[idx]) return;
-        
-        const item = historial[idx];
-        
-        // Mostrar reporte
-        $('#report-content').textContent = item.contenido;
-        $('#timestamp').textContent = `Generado: ${item.fecha}`;
-        $('#report-container').classList.remove('hidden');
-        $('#no-report').classList.add('hidden');
-        
-        showNotification('📋 Informe cargado del historial', 'info');
-    }
-    
-    // Copiar al portapapeles
-    async function copyToClipboard() {
-        if (!state.currentReport) {
-            showNotification('⚠️ Genere un informe primero', 'warning');
-            return;
-        }
-        
-        try {
-            await navigator.clipboard.writeText(state.currentReport);
-            showNotification('📋 Copiado al portapapeles', 'success');
-        } catch (err) {
-            // Fallback para navegadores antiguos
-            const textArea = document.createElement('textarea');
-            textArea.value = state.currentReport;
-            textArea.style.position = 'fixed';
-            textArea.style.opacity = '0';
-            document.body.appendChild(textArea);
-            textArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textArea);
-            showNotification('📋 Copiado al portapapeles', 'success');
-        }
-    }
-    
-    // Descargar informe
-    function downloadReport() {
-        if (!state.currentReport) {
-            showNotification('⚠️ Genere un informe primero', 'warning');
-            return;
-        }
-        
-        const timestamp = $('#timestamp').textContent;
-        const content = `${state.currentReport}\n\n---\n${timestamp}`;
-        
-        const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `informe-ingreso-${new Date().toISOString().split('T')[0]}.txt`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        
-        showNotification('💾 Informe descargado', 'success');
-    }
-    
-    // Imprimir informe (compatible con Live Server y escapando HTML)
-    function printReport() {
-        if (!state.currentReport) {
-            showNotification('⚠️ Genere un informe primero', 'warning');
-            return;
-        }
-        const safeReport = String(state.currentReport)
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;');
+        const SUPERVISORES_BASE = [
+            'Supervisor de Control Interno Padilla Jorge',
+            'Supervisora de Control Interno Rojas Dolly',
+            'Supervisor de Control Interno Urbano Daniel',
+            'Control Interno Yujra Fernando',
+            'Control Interno Rizzato Enzo',
+            'Control Interno Castaño Pablo',
+            'Control Interno Robinson Gonzalo',
+            'Enc. de Turno DENZ GIMENEZ, DEBORA ADRIANA',
+            'Enc. de Turno MOISES, ARIEL JESUS',
+            'Enc. de Turno RODRIGUEZ, MONICA ELIANA',
+            'Enc. de Turno ZAMBRANA, CARINA DEL VALLE',
+            'Enc. de Turno MARTINEZ GUAYMAS, CAROLINA ALEJANDRA',
+            'Asist. de Sala LAZARTE, LAURA LORENA',
+            'Asist. de Sala ALONSO, JOSE ANTONIO SEBASTIAN',
+            'Asist. de Sala CAMINOS, CINTIA SOLEDAD',
+            'Asist. de Sala PARADA, JULIO ALBERTO'
+        ];
 
-        const printWindow = window.open('', '_blank');
-        if (!printWindow) {
-            showNotification('⚠️ Habilite las ventanas emergentes para imprimir', 'warning');
-            return;
-        }
-        printWindow.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Informe de Ingreso - CCTV<\/title><style>body { font-family: monospace; padding: 40px; } pre { white-space: pre-wrap; font-size: 14px; }<\/style><\/head><body><pre>${safeReport}<\/pre><\/body><\/html>`);
-        printWindow.document.close();
-        printWindow.focus();
-        printWindow.print();
-    }
-    
-    // Notificaciones mejoradas
-    function showNotification(message, type = 'success') {
-        const container = $('#notification-container');
-        
-        const colors = {
-            success: 'bg-green-100 text-green-800 border-green-300',
-            error: 'bg-red-100 text-red-800 border-red-300',
-            warning: 'bg-yellow-100 text-yellow-800 border-yellow-300',
-            info: 'bg-blue-100 text-blue-800 border-blue-300'
-        };
-        
-        const icons = {
-            success: 'check-circle',
-            error: 'x-circle',
-            warning: 'alert-triangle',
-            info: 'info'
-        };
-        
-        const notification = document.createElement('div');
-        notification.className = `fade-in ${colors[type]} px-4 py-3 rounded-lg shadow-lg flex items-center gap-2 border`;
-        notification.innerHTML = `
-            <i data-lucide="${icons[type]}" class="w-4 h-4"></i>
-            <span>${message}</span>
-        `;
-        
-        container.appendChild(notification);
-        lucide.createIcons({ elements: [notification] });
-        
-        setTimeout(() => {
-            notification.style.opacity = '0';
-            notification.style.transition = 'opacity 0.3s';
-            setTimeout(() => notification.remove(), 300);
-        }, 3000);
-    }
-    
-    // Actualizar indicador de progreso
-    function updateProgress() {
-        const requiredFields = $$('#report-form [required]');
-        let filledFields = 0;
-        
-        requiredFields.forEach(field => {
-            const isCustom1 = field.id === 'supervisor1-custom';
-            const isCustom2 = field.id === 'supervisor2-custom';
-            
-            if (isCustom1 && $('#custom-supervisor1').classList.contains('hidden')) {
-                filledFields++;
-                return;
-            }
-            if (isCustom2 && $('#custom-supervisor2').classList.contains('hidden')) {
-                filledFields++;
-                return;
-            }
-            if (field.classList.contains('hidden')) {
-                filledFields++;
-                return;
-            }
-            if (field.value.trim()) filledFields++;
-        });
-        
-        const progress = Math.round((filledFields / requiredFields.length) * 100);
-        $('#progress-bar').style.width = progress + '%';
-        $('#progress-text').textContent = progress + '% completado';
-    }
-    
-    // Auto-guardado del formulario
-    function autoSave() {
-        const rawData = {
-           time1: $('#time1').value,
-           supervisor1: $('#supervisor1').value,
-           supervisor1Custom: $('#supervisor1-custom').value,
-           company1: $('#company1').value,
-           worker1: $('#worker1').value,
-           task: $('#task').value,
-           time2: $('#time2').value,
-           supervisor2: $('#supervisor2').value,
-           supervisor2Custom: $('#supervisor2-custom').value,
-           company2: $('#company2').value,
-           worker2: $('#worker2').value
-        };
-        localStorage.setItem(CONFIG.formPrefix + 'draft', JSON.stringify(rawData));
-        state.lastAutoSave = new Date();
-        
-        const status = $('#auto-save-status');
-        status.classList.remove('hidden');
-        setTimeout(() => status.classList.add('hidden'), 2000);
-    }
-    
-    // Cargar borrador
-    function loadDraft() {
-        const draft = localStorage.getItem(CONFIG.formPrefix + 'draft');
-        if (!draft) return;
-        
-        try {
-            const data = JSON.parse(draft);
-            if (data.time1 !== undefined) $('#time1').value = data.time1;
-            if (data.supervisor1 !== undefined) {
-                $('#supervisor1').value = data.supervisor1;
-                // Dispatch change para mostrar el campo si es custom
-                $('#supervisor1').dispatchEvent(new Event('change'));
-            }
-            if (data.supervisor1Custom !== undefined || data['supervisor1-custom'] !== undefined) {
-                $('#supervisor1-custom').value = data.supervisor1Custom || data['supervisor1-custom'] || '';
-            }
-            if (data.company1 !== undefined) $('#company1').value = data.company1;
-            if (data.worker1 !== undefined) $('#worker1').value = data.worker1;
-            if (data.task !== undefined) $('#task').value = data.task;
-            
-            if (data.time2 !== undefined) $('#time2').value = data.time2;
-            if (data.supervisor2 !== undefined) {
-                $('#supervisor2').value = data.supervisor2;
-                $('#supervisor2').dispatchEvent(new Event('change'));
-            }
-            if (data.supervisor2Custom !== undefined || data['supervisor2-custom'] !== undefined) {
-                $('#supervisor2-custom').value = data.supervisor2Custom || data['supervisor2-custom'] || '';
-            }
-            if (data.company2 !== undefined) $('#company2').value = data.company2;
-            if (data.worker2 !== undefined) $('#worker2').value = data.worker2;
+        const EMPRESAS_BASE = [
+            'Bazurco Facility',
+            'Mantenimiento Integral',
+            'Servicios Generales SRL',
+            'Limpieza Total SA',
+            'Servicio Técnico',
+            'Telecom / Proveedor ISP',
+            'EDESA'
+        ];
 
-            showNotification('📝 Borrador cargado', 'info');
-        } catch (e) {
-            console.error('Error al cargar borrador:', e);
+        const WORKERS_BASE = [
+            'Sr. Sosa Lucas',
+            'Sr. Vilte Nicolas',
+            'Sra. Reyes Rosana',
+            'Sra. Calapeña Lorena',
+            'Sra. Chungara Leonor',
+            'Sr. Yapura Sergio',
+            'Sra. Bais Ivana',
+            'Sra. Mendieta Anahi',
+            'Sra. Solange Barboza'
+        ];
+
+        const CAMARAS_BOULEVARD = {
+            '101':'SALA SLOTS (DVR 1)','106':'CAJA SLOTS (DVR 1)','110':'TESORO SLOTS (DVR 1)','116':'ACCESO PERSONAL (DVR 1)',
+            '406':'TABLERO (DVR 4)','408':'DEPOSITO (DVR 4)','409':'OFICINAS (DVR 4)','410':'RACK (DVR 4)','411':'DPTO. TECNICO (DVR 4)','416':'CCTV (DVR 4)',
+            '601':'CAJA JV (DVR 6)','609':'TESORO JV (DVR 6)',
+            '701':'SALA JV (DVR 7)','706':'ACCESO (DVR 7)','709':'RELOJ (DVR 7)','712':'DEPOSITO JV (DVR 7)','715':'RECEPCION (DVR 7)','716':'RECEPCION (DVR 7)',
+            '801':'SALA SLOTS (DVR 8)','804':'DEPOSITO JV (DVR 8)','805':'RECEPCION (DVR 8)','806':'CCTV (DVR 8)'
+        };
+
+        const RANGO_HORARIO_REGEX = /\s*desde\s+las\s+\d{1,2}:\d{2}\s*Hs\.?\s+hasta\s+las\s+\d{1,2}:\d{2}\s*Hs\.?$/i;
+
+        let modoActual = 'completo'; // 'completo' | 'ingreso' | 'salida'
+        let textoAutoActual = '';
+        let parrafoIngresoActual = '';
+        let parrafoSalidaActual = '';
+        let historial = [];
+        let externosActivos = [];
+        let workersExtra = [];
+        let companiesExtra = [];
+        let supervisorsExtra = [];
+
+        function normStr(s) {
+            return String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
         }
-    }
-    
-    // Cancelar campo personalizado
-    window.cancelarPersonalizado = function(supervisorType) {
-        const select = $(`#${supervisorType}`);
-        const customDiv = $(`#custom-${supervisorType}`);
-        
-        select.value = '';
-        customDiv.classList.add('hidden');
-        updateProgress();
-    };
-    
-    // Copiar datos de ingreso a salida
-    window.copiarDatosIngreso = function() {
-        $('#supervisor2').value = $('#supervisor1').value;
-        $('#company2').value = $('#company1').value;
-        $('#worker2').value = $('#worker1').value;
-        
-        if ($('#supervisor1').value === 'custom') {
-            $('#supervisor2').value = 'custom';
-            $('#custom-supervisor2').classList.remove('hidden');
-            $('#supervisor2-custom').value = $('#supervisor1-custom').value;
+
+        function escHtml(s) {
+            return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
         }
-        
-        showNotification('📋 Datos de ingreso copiados', 'info');
-        updateProgress();
-    };
-    
-    // Exportar historial completo
-    window.exportarHistorial = function() {
-        const historial = JSON.parse(localStorage.getItem('ingresoHistorial') || '[]');
-        if (historial.length === 0) {
-            showNotification('⚠️ No hay historial para exportar', 'warning');
-            return;
+
+        function getHoraActualStr() {
+            const now = new Date();
+            return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
         }
-        
-        let content = '=== HISTORIAL DE INGRESOS CCTV ===\n\n';
-        historial.forEach((item, idx) => {
-            content += `${idx + 1}. ${item.fecha}\n`;
-            content += `${item.contenido}\n`;
-            content += '---\n\n';
-        });
-        
-        const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `historial-completo-${new Date().toISOString().split('T')[0]}.txt`;
-        a.click();
-        URL.revokeObjectURL(url);
-        
-        showNotification('📦 Historial exportado', 'success');
-    };
-    
-    // Limpiar formulario completo (incluyendo selects y campos personalizados)
-    function clearForm() {
-        if (state.formModified) {
-            if (!confirm('¿Está seguro de limpiar todos los campos? Se perderán los datos no guardados.')) {
-                return;
+
+        function sumarHorasStr(hora, horas) {
+            if (!hora || !hora.includes(':')) return '';
+            const [h, m] = hora.split(':').map(Number);
+            if (isNaN(h) || isNaN(m)) return '';
+            const tot = ((h * 60 + m + horas * 60) % 1440 + 1440) % 1440;
+            return `${String(Math.floor(tot / 60)).padStart(2, '0')}:${String(tot % 60).padStart(2, '0')}`;
+        }
+
+        function calcularDuracionMin(h1, h2) {
+            if (!h1 || !h2 || !h1.includes(':') || !h2.includes(':')) return null;
+            const [a1, b1] = h1.split(':').map(Number);
+            const [a2, b2] = h2.split(':').map(Number);
+            if (isNaN(a1) || isNaN(b1) || isNaN(a2) || isNaN(b2)) return null;
+            let diff = (a2 * 60 + b2) - (a1 * 60 + b1);
+            if (diff < 0) diff += 1440;
+            return diff;
+        }
+
+        // Autocompletado inteligente (soporta múltiples personas separadas por "y" o "," en worker1)
+        function configurarAutocomplete(inputId, dropId, listFn, multiPerson = false, tipoLista = '') {
+            const inp = document.getElementById(inputId);
+            const dd = document.getElementById(dropId);
+            if (!inp || !dd) return;
+
+            const obtenerSegmentoActual = (val) => {
+                if (!multiPerson) return { prefijo: '', termino: val };
+                const m = val.match(/^(.*?(?:\s+y\s+|,\s*|\s*\/\s*))([^,\/]*)$/i);
+                if (m) return { prefijo: m[1], termino: m[2] };
+                return { prefijo: '', termino: val };
+            };
+
+            const render = () => {
+                const { prefijo, termino } = obtenerSegmentoActual(inp.value);
+                const q = normStr(termino);
+                if (!q) {
+                    dd.classList.add('hidden');
+                    return;
+                }
+                const yaElegidos = normStr(prefijo);
+                const matches = listFn()
+                    .filter(it => normStr(it.valor).includes(q) && normStr(it.valor) !== q && (!multiPerson || !yaElegidos.includes(normStr(it.valor))))
+                    .slice(0, 10);
+
+                if (!matches.length) {
+                    dd.classList.add('hidden');
+                    return;
+                }
+                dd._matches = matches;
+                dd._prefijo = prefijo;
+                dd.innerHTML = matches.map((m, i) => `
+                    <div class="flex items-center justify-between hover:bg-indigo-50 dark:hover:bg-indigo-950/60 transition">
+                        <button type="button" onmousedown="event.preventDefault(); window._pickIngresoAuto('${dropId}','${inputId}',${i})"
+                            class="flex-1 text-left px-3 py-2 text-xs font-semibold text-slate-800 dark:text-slate-100 cursor-pointer truncate">
+                            ${escHtml(m.valor)}
+                            ${m.custom ? '<span class="ml-1.5 text-[10px] font-normal text-indigo-500">frecuente</span>' : ''}
+                        </button>
+                        ${m.custom ? `
+                            <button type="button" onmousedown="event.preventDefault(); window._delIngresoAuto('${tipoLista}','${escHtml(m.valor).replace(/'/g, "\\'")}', '${inputId}')"
+                                class="px-2.5 py-2 text-slate-400 hover:text-rose-500 text-xs cursor-pointer" title="Olvidar">✕</button>
+                        ` : ''}
+                    </div>
+                `).join('');
+                dd.classList.remove('hidden');
+            };
+
+            inp.addEventListener('input', () => {
+                render();
+                alEditarCamposIngreso(inputId);
+            });
+            inp.addEventListener('focus', render);
+            inp.addEventListener('blur', () => setTimeout(() => dd.classList.add('hidden'), 150));
+        }
+
+        window._pickIngresoAuto = function (dropId, inputId, idx) {
+            const dd = document.getElementById(dropId);
+            const inp = document.getElementById(inputId);
+            const item = dd?._matches?.[idx];
+            if (!inp || !item) return;
+            inp.value = `${dd._prefijo || ''}${item.valor}`;
+            dd.classList.add('hidden');
+            alEditarCamposIngreso(inputId);
+        };
+
+        window._delIngresoAuto = function (tipoLista, valor, inputId) {
+            if (tipoLista === 'worker') {
+                workersExtra = workersExtra.filter(x => x !== valor);
+                localStorage.setItem(STORAGE.workersExtraKey, JSON.stringify(workersExtra));
+            } else if (tipoLista === 'company') {
+                companiesExtra = companiesExtra.filter(x => x !== valor);
+                localStorage.setItem(STORAGE.companiesExtraKey, JSON.stringify(companiesExtra));
+            } else if (tipoLista === 'supervisor') {
+                supervisorsExtra = supervisorsExtra.filter(x => x !== valor);
+                localStorage.setItem(STORAGE.supervisorsExtraKey, JSON.stringify(supervisorsExtra));
             }
+            document.getElementById(inputId)?.dispatchEvent(new Event('focus'));
+        };
+
+        function armarListaConExtras(extras, base) {
+            const vistos = new Set();
+            const out = [];
+            extras.forEach(v => {
+                const k = normStr(v);
+                if (k && !vistos.has(k)) { vistos.add(k); out.push({ valor: v, custom: true }); }
+            });
+            base.forEach(v => {
+                const k = normStr(v);
+                if (k && !vistos.has(k)) { vistos.add(k); out.push({ valor: v, custom: false }); }
+            });
+            return out;
         }
-        
-        $$('#report-form input, #report-form textarea').forEach(input => {
-            input.value = '';
-            input.classList.remove('border-red-500', 'bg-red-50');
-        });
-        $$('#report-form select').forEach(sel => {
-            sel.value = '';
-            sel.classList.remove('border-red-500', 'bg-red-50');
-        });
-        $('#custom-supervisor1').classList.add('hidden');
-        $('#custom-supervisor2').classList.add('hidden');
-        $('#task-counter').textContent = `0/${CONFIG.maxTaskLength}`;
-        
-        $('#report-container').classList.add('hidden');
-        $('#no-report').classList.remove('hidden');
-        state.currentReport = null;
-        state.formModified = false;
-        updateProgress();
-        
-        showNotification('🧹 Formulario limpiado', 'info');
-    }
-    
-    // Restablecer valores por defecto
-    function resetToDefaults() {
-        if (state.formModified) {
-            if (!confirm('¿Restablecer valores por defecto? Se perderán los cambios actuales.')) {
-                return;
+
+        function recordarFrecuentes() {
+            const s1 = document.getElementById('supervisor1').value.trim();
+            const s2 = document.getElementById('supervisor2').value.trim();
+            [s1, s2].forEach(s => {
+                if (s.length >= 5 && !SUPERVISORES_BASE.some(b => normStr(b) === normStr(s))) {
+                    supervisorsExtra = [s, ...supervisorsExtra.filter(x => normStr(x) !== normStr(s))].slice(0, 25);
+                }
+            });
+            localStorage.setItem(STORAGE.supervisorsExtraKey, JSON.stringify(supervisorsExtra));
+
+            const c1 = document.getElementById('company1').value.trim();
+            if (c1.length >= 3 && !EMPRESAS_BASE.some(b => normStr(b) === normStr(c1))) {
+                companiesExtra = [c1, ...companiesExtra.filter(x => normStr(x) !== normStr(c1))].slice(0, 20);
+                localStorage.setItem(STORAGE.companiesExtraKey, JSON.stringify(companiesExtra));
             }
+
+            const w1 = document.getElementById('worker1').value.trim();
+            w1.split(/\s+y\s+|,\s*/i).map(x => x.trim()).filter(Boolean).forEach(w => {
+                if (w.length >= 4 && !WORKERS_BASE.some(b => normStr(b) === normStr(w))) {
+                    workersExtra = [w, ...workersExtra.filter(x => normStr(x) !== normStr(w))].slice(0, 30);
+                }
+            });
+            localStorage.setItem(STORAGE.workersExtraKey, JSON.stringify(workersExtra));
         }
-        
-        Object.keys(defaultValues).forEach(key => {
-            const element = document.getElementById(key);
-            if (element) {
-                element.value = defaultValues[key];
-                element.classList.remove('border-red-500', 'bg-red-50');
-                if (element.tagName === 'SELECT') {
-                    element.dispatchEvent(new Event('change'));
+
+        function alEditarCamposIngreso(id) {
+            if (document.getElementById('chkSincronizarSalida').checked) {
+                if (id === 'company1') document.getElementById('company2').value = document.getElementById('company1').value;
+                if (id === 'worker1') document.getElementById('worker2').value = document.getElementById('worker1').value;
+                if (id === 'supervisor1' && !document.getElementById('supervisor2').dataset.manualEdit) {
+                    document.getElementById('supervisor2').value = document.getElementById('supervisor1').value;
                 }
             }
-        });
-        
-        $('#report-container').classList.add('hidden');
-        $('#no-report').classList.remove('hidden');
-        state.formModified = false;
-        
-        showNotification('🔄 Valores por defecto restablecidos', 'info');
-        updateProgress();
-    }
-    
-    // ==================== EVENT LISTENERS ====================
-    
-    document.addEventListener('DOMContentLoaded', () => {
-        // Generar informe
-        $('#generateBtn').addEventListener('click', generateReport);
-        
-        // Limpiar
-        $('#clearBtn').addEventListener('click', clearForm);
-        
-        // Resetear
-        $('#resetBtn').addEventListener('click', resetToDefaults);
-        
-        // Copiar
-        $('#copy-btn').addEventListener('click', copyToClipboard);
-        
-        // Descargar
-        $('#save-btn').addEventListener('click', downloadReport);
-        
-        // Imprimir
-        $('#print-btn').addEventListener('click', printReport);
-        
-        // Historial
-        $('#historicoSelect').addEventListener('change', function() {
-            if (this.value !== '') {
-                cargarDelHistorial(parseInt(this.value));
+            if (id === 'supervisor2') {
+                document.getElementById('supervisor2').dataset.manualEdit = '1';
             }
-        });
-        
-        // Supervisores personalizados
-        $('#supervisor1').addEventListener('change', function() {
-            const customDiv = $('#custom-supervisor1');
-            if (this.value === 'custom') {
-                customDiv.classList.remove('hidden');
-                $('#supervisor1-custom').focus();
-            } else {
-                customDiv.classList.add('hidden');
-            }
-            updateProgress();
-        });
-        
-        $('#supervisor2').addEventListener('change', function() {
-            const customDiv = $('#custom-supervisor2');
-            if (this.value === 'custom') {
-                customDiv.classList.remove('hidden');
-                $('#supervisor2-custom').focus();
-            } else {
-                customDiv.classList.add('hidden');
-            }
-            updateProgress();
-        });
-        
-        // Sincronización automática (input y change para incluir <select>)
-        ['supervisor1', 'company1', 'worker1'].forEach(id => {
-            const element = document.getElementById(id);
-            if (element) {
-                const syncFn = function() {
-                    const targetMap = {
-                        'supervisor1': 'supervisor2',
-                        'company1': 'company2',
-                        'worker1': 'worker2'
-                    };
-                    const targetId = targetMap[id];
-                    if (targetId) {
-                        const targetElement = document.getElementById(targetId);
-                        targetElement.value = this.value;
-                        if (id === 'supervisor1') {
-                            targetElement.dispatchEvent(new Event('change'));
-                        }
-                    }
-                };
-                element.addEventListener('input', syncFn);
-                element.addEventListener('change', syncFn);
-            }
-        });
-        
-        // Sincronización de supervisores personalizados
-        $('#supervisor1-custom').addEventListener('input', function() {
-            $('#supervisor2-custom').value = this.value;
-        });
-        
-        // Contador de caracteres para la tarea
-        $('#task').addEventListener('input', function() {
-            const length = this.value.length;
-            $('#task-counter').textContent = `${length}/${CONFIG.maxTaskLength}`;
-            
-            if (length > CONFIG.maxTaskLength) {
-                this.value = this.value.substring(0, CONFIG.maxTaskLength);
-                $('#task-counter').classList.add('text-red-500');
-            } else {
-                $('#task-counter').classList.remove('text-red-500');
-            }
-            
-            state.formModified = true;
-            updateProgress();
-        });
-        
-        // Monitorear cambios en todos los campos
-        $$('#report-form input, #report-form textarea, #report-form select').forEach(input => {
-            input.addEventListener('input', () => {
-                state.formModified = true;
-                updateProgress();
-            });
-            input.addEventListener('change', updateProgress);
-        });
-        
-        // Validación de tiempos
-        $('#time2').addEventListener('change', validateTimes);
-        
-        // Atajos de teclado
-        document.addEventListener('keydown', (e) => {
-            // Ctrl+Enter para generar
-            if (e.ctrlKey && e.key === 'Enter') {
-                e.preventDefault();
-                generateReport();
-            }
-            
-            // Ctrl+S para descargar
-            if (e.ctrlKey && e.key === 's') {
-                e.preventDefault();
-                downloadReport();
-            }
-        });
-        
-        // Auto-guardado
-        setInterval(autoSave, CONFIG.autoSaveInterval);
-        
-        // Cargar datos iniciales
-        loadDraft();
-        actualizarHistorial();
-        updateProgress();
-        
-        // Contador inicial de tarea
-        const taskLength = $('#task').value.length;
-        $('#task-counter').textContent = `${taskLength}/${CONFIG.maxTaskLength}`;
-    });
-    
-})();
-</script>
-<script src="js/global.js"></script>
+            sincronizarTodo();
+        }
 
+        // Acciones rápidas de UI
+        window.cambiarModo = function (nuevoModo) {
+            modoActual = nuevoModo;
+            const activeCls = 'py-2 px-2.5 rounded-xl text-xs font-bold transition cursor-pointer bg-indigo-600 text-white shadow-sm flex items-center justify-center gap-1.5';
+            const inactiveCls = 'py-2 px-2.5 rounded-xl text-xs font-bold transition cursor-pointer bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center gap-1.5';
+
+            document.getElementById('modoBtnCompleto').className = nuevoModo === 'completo' ? activeCls : inactiveCls;
+            document.getElementById('modoBtnIngreso').className = nuevoModo === 'ingreso' ? activeCls : inactiveCls;
+            document.getElementById('modoBtnSalida').className = nuevoModo === 'salida' ? activeCls : inactiveCls;
+
+            document.getElementById('bloqueIngreso').classList.toggle('hidden', nuevoModo === 'salida');
+            document.getElementById('bloqueSalida').classList.toggle('hidden', nuevoModo === 'ingreso');
+            document.getElementById('botonesParrafosIndividuales').classList.toggle('hidden', nuevoModo !== 'completo');
+
+            if (nuevoModo === 'salida') {
+                document.getElementById('camposEmpresaWorkerSalida').classList.remove('hidden');
+            }
+            sincronizarTodo();
+        };
+
+        window.ponerHoraCampo = function (id) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.value = getHoraActualStr();
+            if (id === 'time1') alCambiarHoraIngreso();
+            else sincronizarTodo();
+        };
+
+        window.alCambiarHoraIngreso = function () {
+            const t1 = document.getElementById('time1').value;
+            if (t1 && document.getElementById('chkRangoTarea').checked) {
+                document.getElementById('taskFrom').value = t1;
+                document.getElementById('taskTo').value = sumarHorasStr(t1, 2);
+                actualizarRangoEnTarea();
+                return;
+            }
+            sincronizarTodo();
+        };
+
+        window.limpiarCampo = function (id) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.value = '';
+            if (id === 'supervisor2') delete el.dataset.manualEdit;
+            el.focus();
+            alEditarCamposIngreso(id);
+        };
+
+        window.seleccionarEmpresaRapida = function (nombre) {
+            document.getElementById('company1').value = nombre;
+            alEditarCamposIngreso('company1');
+        };
+
+        window.insertarTratoExterno = function (trato) {
+            const inp = document.getElementById('worker1');
+            const val = inp.value;
+            const m = val.match(/^(.*?(?:\s+y\s+|,\s*))(.*)$/i);
+            const pref = m ? m[1] : '';
+            const rest = (m ? m[2] : val).trim().replace(/^(Sr\.?|Sra\.?|Srta\.?|Téc\.?)\s+/i, '');
+            inp.value = `${pref}${trato} ${rest}`;
+            inp.focus();
+            const len = inp.value.length;
+            inp.setSelectionRange(len, len);
+            alEditarCamposIngreso('worker1');
+        };
+
+        window.encadenarOtroExterno = function () {
+            const inp = document.getElementById('worker1');
+            const v = inp.value.trim();
+            if (!v) {
+                inp.focus();
+                return;
+            }
+            if (!/\s+y$/i.test(v)) {
+                inp.value = `${v} y `;
+            } else {
+                inp.value = `${v} `;
+            }
+            inp.focus();
+            const len = inp.value.length;
+            inp.setSelectionRange(len, len);
+            alEditarCamposIngreso('worker1');
+        };
+
+        window.aplicarPlantillaTarea = function (baseTexto) {
+            const usarRango = document.getElementById('chkRangoTarea').checked;
+            const d = document.getElementById('taskFrom').value || document.getElementById('time1').value || '00:00';
+            const h = document.getElementById('taskTo').value || sumarHorasStr(d, 2) || '00:00';
+            document.getElementById('task').value = usarRango
+                ? `${baseTexto} desde las ${d} Hs. hasta las ${h} Hs.`
+                : baseTexto;
+            sincronizarTodo();
+        };
+
+        window.sumarHorasTarea = function (horas) {
+            const base = document.getElementById('taskFrom').value || document.getElementById('time1').value || getHoraActualStr();
+            document.getElementById('taskFrom').value = base;
+            document.getElementById('taskTo').value = sumarHorasStr(base, horas);
+            document.getElementById('chkRangoTarea').checked = true;
+            actualizarRangoEnTarea();
+        };
+
+        window.actualizarRangoEnTarea = function () {
+            const taskEl = document.getElementById('task');
+            const baseLimpia = taskEl.value.trim().replace(/\.+-?$/, '').replace(RANGO_HORARIO_REGEX, '').trim();
+            if (document.getElementById('chkRangoTarea').checked) {
+                const d = document.getElementById('taskFrom').value || document.getElementById('time1').value || '00:00';
+                const h = document.getElementById('taskTo').value || '00:00';
+                taskEl.value = `${baseLimpia || 'para realizar tareas en el Casino'} desde las ${d} Hs. hasta las ${h} Hs.`;
+            } else {
+                taskEl.value = baseLimpia;
+            }
+            sincronizarTodo();
+        };
+
+        window.alCambiarSyncSalida = function () {
+            if (document.getElementById('chkSincronizarSalida').checked) {
+                document.getElementById('company2').value = document.getElementById('company1').value;
+                document.getElementById('worker2').value = document.getElementById('worker1').value;
+                if (!document.getElementById('supervisor2').value.trim()) {
+                    document.getElementById('supervisor2').value = document.getElementById('supervisor1').value;
+                }
+            }
+            sincronizarTodo();
+        };
+
+        window.igualarSupervisorSalida = function () {
+            const s2 = document.getElementById('supervisor2');
+            s2.value = document.getElementById('supervisor1').value;
+            delete s2.dataset.manualEdit;
+            sincronizarTodo();
+        };
+
+        window.alEscribirCamaraAcceso = function () {
+            const inp = document.getElementById('camaraAcceso');
+            const val = inp.value.trim();
+            if (/^\d{3}$/.test(val) && CAMARAS_BOULEVARD[val]) {
+                inp.value = `${val} - ${CAMARAS_BOULEVARD[val]}`;
+            }
+            sincronizarTodo();
+        };
+
+        // Panel de Personal Externo Activo en Sala
+        function cargarExternosActivos() {
+            try {
+                externosActivos = JSON.parse(localStorage.getItem(STORAGE.activosKey) || '[]');
+            } catch (e) {
+                externosActivos = [];
+            }
+            renderizarExternosActivos();
+        }
+
+        window.dejarEnSalaActivo = function () {
+            const worker = document.getElementById('worker1').value.trim();
+            const company = document.getElementById('company1').value.trim();
+            if (!worker && !company) {
+                showNotification('Complete al menos Empresa o Personal antes de marcar en sala', 'warning');
+                return;
+            }
+            const item = {
+                id: Date.now(),
+                time1: document.getElementById('time1').value || getHoraActualStr(),
+                supervisor1: document.getElementById('supervisor1').value.trim(),
+                company1: company || 'Empresa Externa',
+                worker1: worker || 'Personal Externo',
+                task: document.getElementById('task').value.trim()
+            };
+            externosActivos.unshift(item);
+            localStorage.setItem(STORAGE.activosKey, JSON.stringify(externosActivos));
+            renderizarExternosActivos();
+            showNotification('Registrado como Personal Externo actualmente en Sala', 'success');
+        };
+
+        window.darSalidaExternoActivo = function (id) {
+            const idx = externosActivos.findIndex(x => x.id === id);
+            if (idx === -1) return;
+            const it = externosActivos[idx];
+
+            document.getElementById('time1').value = it.time1;
+            document.getElementById('supervisor1').value = it.supervisor1 || '';
+            document.getElementById('company1').value = it.company1 || '';
+            document.getElementById('worker1').value = it.worker1 || '';
+            if (it.task) document.getElementById('task').value = it.task;
+
+            document.getElementById('time2').value = getHoraActualStr();
+            document.getElementById('company2').value = it.company1 || '';
+            document.getElementById('worker2').value = it.worker1 || '';
+            if (!document.getElementById('supervisor2').value.trim()) {
+                document.getElementById('supervisor2').value = it.supervisor1 || '';
+            }
+
+            externosActivos.splice(idx, 1);
+            localStorage.setItem(STORAGE.activosKey, JSON.stringify(externosActivos));
+            renderizarExternosActivos();
+
+            cambiarModo('completo');
+            showNotification('Datos cargados con hora de salida actual. Listo para copiar', 'success');
+        };
+
+        window.quitarExternoActivo = function (id) {
+            externosActivos = externosActivos.filter(x => x.id !== id);
+            localStorage.setItem(STORAGE.activosKey, JSON.stringify(externosActivos));
+            renderizarExternosActivos();
+        };
+
+        window.limpiarTodosActivos = function () {
+            externosActivos = [];
+            localStorage.removeItem(STORAGE.activosKey);
+            renderizarExternosActivos();
+        };
+
+        function renderizarExternosActivos() {
+            const panel = document.getElementById('panelExternosActivos');
+            const lista = document.getElementById('listaExternosActivos');
+            document.getElementById('countExternosActivos').textContent = String(externosActivos.length);
+
+            if (!externosActivos.length) {
+                panel.classList.add('hidden');
+                return;
+            }
+            panel.classList.remove('hidden');
+            lista.innerHTML = externosActivos.map(it => `
+                <div class="p-2.5 rounded-lg bg-white dark:bg-slate-900 border border-emerald-200 dark:border-emerald-900/70 flex flex-wrap items-center justify-between gap-2">
+                    <div class="min-w-0">
+                        <div class="flex items-center gap-2">
+                            <span class="font-mono font-bold text-xs text-emerald-700 dark:text-emerald-400">Ingresó ${escHtml(it.time1)} Hs.</span>
+                            <span class="text-xs font-bold text-slate-800 dark:text-slate-100 truncate">${escHtml(it.company1)}</span>
+                        </div>
+                        <p class="text-xs text-slate-600 dark:text-slate-300 truncate">${escHtml(it.worker1)}</p>
+                    </div>
+                    <div class="flex items-center gap-1.5 shrink-0">
+                        <button type="button" onclick="darSalidaExternoActivo(${it.id})" class="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold transition cursor-pointer">
+                            ⬇ Dar Salida Ahora
+                        </button>
+                        <button type="button" onclick="quitarExternoActivo(${it.id})" class="p-1 rounded-lg text-slate-400 hover:text-rose-500 cursor-pointer" title="Quitar">
+                            <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+            lucide.createIcons({ nodes: [lista] });
+        }
+
+        // Generador en Vivo del Informe
+        window.sincronizarTodo = function () {
+            if (document.getElementById('chkSincronizarSalida').checked && modoActual !== 'salida') {
+                document.getElementById('company2').value = document.getElementById('company1').value;
+                document.getElementById('worker2').value = document.getElementById('worker1').value;
+            }
+
+            const t1 = document.getElementById('time1').value || '--:--';
+            const sup1 = document.getElementById('supervisor1').value.trim() || '[Control Interno]';
+            const comp1 = document.getElementById('company1').value.trim() || '[Empresa]';
+            const work1 = document.getElementById('worker1').value.trim() || '[Personal Externo]';
+            const rawTask = document.getElementById('task').value.trim().replace(/\.+-?$/, '') || 'para realizar tareas asignadas';
+
+            const t2 = document.getElementById('time2').value || '--:--';
+            const sup2 = document.getElementById('supervisor2').value.trim() || sup1;
+            const comp2 = document.getElementById('company2').value.trim() || comp1;
+            const work2 = document.getElementById('worker2').value.trim() || work1;
+
+            const establecimiento = document.getElementById('lugarEstablecimiento').value || 'del Casino';
+            const cam = document.getElementById('camaraAcceso').value.trim();
+            const camTxt = cam ? ` (verificado por cámara ${cam})` : '';
+
+            // Duración real entre ingreso y salida
+            const badgeDur = document.getElementById('badgeDuracionReal');
+            const minReal = calcularDuracionMin(document.getElementById('time1').value, document.getElementById('time2').value);
+            if (minReal !== null && minReal > 0 && modoActual === 'completo') {
+                const dh = Math.floor(minReal / 60);
+                const dm = minReal % 60;
+                badgeDur.textContent = dh > 0 ? `${dh}h ${String(dm).padStart(2, '0')}m en sala` : `${dm} min en sala`;
+                badgeDur.classList.remove('hidden');
+            } else {
+                badgeDur.classList.add('hidden');
+            }
+
+            parrafoIngresoActual = `A las ${t1} Hs. CCTV recibe llamada de ${sup1}, informa que ingresa personal de ${comp1} ${work1} ${rawTask}${camTxt}.-`;
+            parrafoSalidaActual = `A las ${t2} Hs. CCTV recibe llamada de ${sup2}, informa que personal de ${comp2} ${work2} finaliza servicio y se retira ${establecimiento}${camTxt}.-`;
+
+            const incluirTitulo = document.getElementById('chkIncluirTitulo').checked;
+            const encabezado = incluirTitulo ? 'Ingreso Personal Externo\n\n' : '';
+
+            if (modoActual === 'ingreso') {
+                textoAutoActual = `${encabezado}${parrafoIngresoActual}`;
+            } else if (modoActual === 'salida') {
+                textoAutoActual = `${encabezado}${parrafoSalidaActual}`;
+            } else {
+                textoAutoActual = `${encabezado}${parrafoIngresoActual}\n\n${parrafoSalidaActual}`;
+            }
+
+            document.getElementById('reportOutput').value = textoAutoActual;
+            document.getElementById('badgeOpcionalesActivos').classList.toggle('hidden', establecimiento === 'del Casino' && !cam);
+            guardarBorrador();
+            actualizarContadorSalida();
+        };
+
+        window.actualizarContadorSalida = function () {
+            const val = document.getElementById('reportOutput').value;
+            document.getElementById('contadorCaracteres').textContent = `${val.length} caracteres`;
+            document.getElementById('printTexto').textContent = val;
+            document.getElementById('printFechaHora').textContent = new Date().toLocaleString('es-AR');
+        };
+
+        window.restaurarInformeAuto = function () {
+            document.getElementById('reportOutput').value = textoAutoActual;
+            actualizarContadorSalida();
+            showNotification('Texto automático restaurado', 'info');
+        };
+
+        // Persistencia Borrador
+        function guardarBorrador() {
+            const data = {
+                modoActual,
+                incluirTitulo: document.getElementById('chkIncluirTitulo').checked,
+                time1: document.getElementById('time1').value,
+                supervisor1: document.getElementById('supervisor1').value,
+                company1: document.getElementById('company1').value,
+                worker1: document.getElementById('worker1').value,
+                chkRangoTarea: document.getElementById('chkRangoTarea').checked,
+                taskFrom: document.getElementById('taskFrom').value,
+                taskTo: document.getElementById('taskTo').value,
+                task: document.getElementById('task').value,
+                chkSincronizarSalida: document.getElementById('chkSincronizarSalida').checked,
+                time2: document.getElementById('time2').value,
+                supervisor2: document.getElementById('supervisor2').value,
+                company2: document.getElementById('company2').value,
+                worker2: document.getElementById('worker2').value,
+                lugarEstablecimiento: document.getElementById('lugarEstablecimiento').value,
+                camaraAcceso: document.getElementById('camaraAcceso').value
+            };
+            try {
+                localStorage.setItem(STORAGE.draftKey, JSON.stringify(data));
+            } catch (e) {}
+        }
+
+        function cargarDatosIniciales() {
+            try {
+                workersExtra = JSON.parse(localStorage.getItem(STORAGE.workersExtraKey) || '[]');
+                companiesExtra = JSON.parse(localStorage.getItem(STORAGE.companiesExtraKey) || '[]');
+                supervisorsExtra = JSON.parse(localStorage.getItem(STORAGE.supervisorsExtraKey) || '[]');
+                historial = JSON.parse(localStorage.getItem(STORAGE.historyKey) || '[]');
+            } catch (e) {
+                workersExtra = [];
+                companiesExtra = [];
+                supervisorsExtra = [];
+                historial = [];
+            }
+
+            let draft = null;
+            try {
+                draft = JSON.parse(localStorage.getItem(STORAGE.draftKey) || localStorage.getItem(STORAGE.legacyDraftKey) || 'null');
+            } catch (e) {}
+
+            const ahora = getHoraActualStr();
+            const mas2h = sumarHorasStr(ahora, 2);
+
+            if (draft) {
+                if (draft.incluirTitulo !== undefined) document.getElementById('chkIncluirTitulo').checked = Boolean(draft.incluirTitulo);
+                document.getElementById('time1').value = draft.time1 || ahora;
+                const supLegacy1 = draft.supervisor1 === 'custom' ? (draft.supervisor1Custom || '') : (draft.supervisor1 || '');
+                const supLegacy2 = draft.supervisor2 === 'custom' ? (draft.supervisor2Custom || '') : (draft.supervisor2 || '');
+                document.getElementById('supervisor1').value = supLegacy1;
+                document.getElementById('company1').value = draft.company1 || 'Bazurco Facility';
+                document.getElementById('worker1').value = draft.worker1 || '';
+                if (draft.chkRangoTarea !== undefined) document.getElementById('chkRangoTarea').checked = Boolean(draft.chkRangoTarea);
+                document.getElementById('taskFrom').value = draft.taskFrom || document.getElementById('time1').value;
+                document.getElementById('taskTo').value = draft.taskTo || sumarHorasStr(document.getElementById('time1').value, 2);
+                if (draft.task) document.getElementById('task').value = draft.task;
+                if (draft.chkSincronizarSalida !== undefined) document.getElementById('chkSincronizarSalida').checked = Boolean(draft.chkSincronizarSalida);
+                document.getElementById('time2').value = draft.time2 || mas2h;
+                document.getElementById('supervisor2').value = supLegacy2 || supLegacy1;
+                document.getElementById('company2').value = draft.company2 || draft.company1 || 'Bazurco Facility';
+                document.getElementById('worker2').value = draft.worker2 || draft.worker1 || '';
+                if (draft.lugarEstablecimiento) document.getElementById('lugarEstablecimiento').value = draft.lugarEstablecimiento;
+                if (draft.camaraAcceso) document.getElementById('camaraAcceso').value = draft.camaraAcceso;
+                if (draft.modoActual) cambiarModo(draft.modoActual);
+            } else {
+                document.getElementById('time1').value = ahora;
+                document.getElementById('time2').value = mas2h;
+                document.getElementById('taskFrom').value = ahora;
+                document.getElementById('taskTo').value = mas2h;
+                actualizarRangoEnTarea();
+            }
+
+            cargarExternosActivos();
+            renderizarHistorial();
+            sincronizarTodo();
+        }
+
+        // Copiado, Descarga e Historial
+        async function escribirPortapapeles(texto) {
+            try {
+                if (navigator.clipboard && window.isSecureContext) {
+                    await navigator.clipboard.writeText(texto);
+                    return true;
+                }
+            } catch (e) {}
+            try {
+                const t = document.createElement('textarea');
+                t.value = texto;
+                t.style.position = 'fixed';
+                t.style.opacity = '0';
+                document.body.appendChild(t);
+                t.select();
+                const ok = document.execCommand('copy');
+                t.remove();
+                return ok;
+            } catch (e) {
+                return false;
+            }
+        }
+
+        window.copiarParrafo = async function (cual) {
+            const txt = cual === 'ingreso' ? parrafoIngresoActual : parrafoSalidaActual;
+            if (!txt) return;
+            await escribirPortapapeles(txt);
+            if (cual === 'ingreso') {
+                showNotification('Párrafo de Ingreso copiado', 'success');
+            } else {
+                showNotification('Párrafo de Salida copiado', 'success');
+            }
+        };
+
+        window.copiarYRegistrar = async function () {
+            const texto = document.getElementById('reportOutput').value.trim();
+            if (!texto) {
+                showNotification('No hay texto para copiar', 'warning');
+                return;
+            }
+            const ok = await escribirPortapapeles(texto);
+            if (!ok) {
+                showNotification('Error al copiar. Use Ctrl+C', 'error');
+                return;
+            }
+
+            recordarFrecuentes();
+            guardarRegistroHistorial(texto);
+
+            if (modoActual === 'ingreso') {
+                const w = document.getElementById('worker1').value.trim();
+                if (w && !externosActivos.some(x => normStr(x.worker1) === normStr(w))) {
+                    dejarEnSalaActivo();
+                }
+            }
+
+            const btn = document.getElementById('btnCopiarPrincipal');
+            const orig = btn.innerHTML;
+            btn.innerHTML = '<i data-lucide="check" class="w-4 h-4"></i><span>¡Copiado y Registrado!</span>';
+            btn.classList.replace('bg-indigo-600', 'bg-emerald-600');
+            lucide.createIcons({ nodes: [btn] });
+            setTimeout(() => {
+                btn.innerHTML = orig;
+                btn.classList.replace('bg-emerald-600', 'bg-indigo-600');
+                lucide.createIcons({ nodes: [btn] });
+            }, 1700);
+
+            showNotification('Informe copiado al portapapeles', 'success');
+        };
+
+        window.copiarWhatsApp = async function () {
+            const textoSinTitulo = document.getElementById('reportOutput').value.trim().replace(/^Ingreso Personal Externo\s*/i, '');
+            if (!textoSinTitulo) return;
+            const msg = `👷 *INGRESO PERSONAL EXTERNO - CCTV*\n\n${textoSinTitulo}`;
+            const ok = await escribirPortapapeles(msg);
+            if (ok) {
+                recordarFrecuentes();
+                guardarRegistroHistorial(document.getElementById('reportOutput').value.trim());
+                showNotification('Copiado con formato WhatsApp', 'success');
+            }
+        };
+
+        function guardarRegistroHistorial(contenido) {
+            if (historial.length > 0 && historial[0].contenido === contenido) return;
+            const record = {
+                id: Date.now(),
+                timestamp: new Date().toISOString(),
+                fecha: new Date().toLocaleString('es-AR'),
+                modo: modoActual,
+                time1: document.getElementById('time1').value,
+                time2: document.getElementById('time2').value,
+                supervisor1: document.getElementById('supervisor1').value.trim(),
+                supervisor2: document.getElementById('supervisor2').value.trim(),
+                company1: document.getElementById('company1').value.trim(),
+                worker1: document.getElementById('worker1').value.trim(),
+                task: document.getElementById('task').value.trim(),
+                contenido
+            };
+            historial.unshift(record);
+            historial = historial.slice(0, STORAGE.maxHistory);
+            try {
+                localStorage.setItem(STORAGE.historyKey, JSON.stringify(historial));
+            } catch (e) {}
+            renderizarHistorial();
+        }
+
+        window.renderizarHistorial = function () {
+            document.getElementById('history-count').textContent = String(historial.length);
+            const lista = document.getElementById('historialLista');
+            const q = normStr(document.getElementById('buscarHistorial')?.value || '');
+
+            const filtrados = historial
+                .map((item, idx) => ({ item, idx }))
+                .filter(({ item }) => !q || normStr(`${item.company1 || ''} ${item.worker1 || ''} ${item.supervisor1 || ''} ${item.time1 || ''} ${item.contenido || ''}`).includes(q));
+
+            if (!filtrados.length) {
+                lista.innerHTML = `<p class="text-slate-400 text-center py-4">${historial.length ? 'Sin coincidencias' : 'Sin registros anteriores'}</p>`;
+                return;
+            }
+
+            lista.innerHTML = filtrados.map(({ item, idx }) => {
+                const fechaCorta = item.timestamp ? new Date(item.timestamp).toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit' }) : '';
+                const horario = item.modo === 'ingreso'
+                    ? `⬆ ${item.time1 || '--:--'}`
+                    : item.modo === 'salida'
+                        ? `⬇ ${item.time2 || '--:--'}`
+                        : `${item.time1 || '--:--'}–${item.time2 || '--:--'}`;
+                const titulo = `${item.company1 || 'Externo'} · ${item.worker1 || ''}`.replace(/·\s*$/, '').trim();
+                return `
+                    <div class="history-item p-2.5 rounded-lg bg-slate-50 dark:bg-slate-950/70 hover:bg-indigo-50/70 dark:hover:bg-slate-800/80 border border-slate-200/70 dark:border-slate-800 flex items-center justify-between gap-2">
+                        <button type="button" onclick="cargarItemHistorial(${idx})" class="flex-1 min-w-0 text-left cursor-pointer">
+                            <div class="flex items-center gap-1.5 flex-wrap">
+                                <span class="px-1.5 py-0.5 rounded bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 font-mono font-bold text-[10px]">${escHtml(horario)}</span>
+                                <span class="text-[10px] font-mono text-slate-400">${escHtml(fechaCorta)}</span>
+                            </div>
+                            <p class="text-xs font-bold text-slate-800 dark:text-slate-100 truncate mt-0.5">${escHtml(titulo)}</p>
+                        </button>
+                        <div class="flex items-center gap-1 shrink-0">
+                            <button type="button" onclick="recopiarHistorial(${idx})" class="p-1.5 rounded-md text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-white dark:hover:bg-slate-900 transition cursor-pointer" title="Copiar">
+                                <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                            </button>
+                            <button type="button" onclick="eliminarItemHistorial(${idx})" class="p-1.5 rounded-md text-slate-400 hover:text-rose-500 hover:bg-white dark:hover:bg-slate-900 transition cursor-pointer" title="Eliminar">
+                                <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            lucide.createIcons({ nodes: [lista] });
+        };
+
+        window.cargarItemHistorial = function (idx) {
+            const item = historial[idx];
+            if (!item) return;
+            document.getElementById('reportOutput').value = item.contenido || '';
+            actualizarContadorSalida();
+            showNotification('Informe cargado en vista previa', 'info');
+        };
+
+        window.recopiarHistorial = async function (idx) {
+            const item = historial[idx];
+            if (!item?.contenido) return;
+            await escribirPortapapeles(item.contenido);
+            showNotification('Registro copiado del historial', 'success');
+        };
+
+        window.eliminarItemHistorial = function (idx) {
+            historial.splice(idx, 1);
+            localStorage.setItem(STORAGE.historyKey, JSON.stringify(historial));
+            renderizarHistorial();
+        };
+
+        window.vaciarHistorial = function () {
+            if (!historial.length) return;
+            if (!confirm('¿Vaciar todo el historial de ingresos externos?')) return;
+            historial = [];
+            localStorage.removeItem(STORAGE.historyKey);
+            renderizarHistorial();
+            showNotification('Historial vaciado', 'info');
+        };
+
+        function descargarArchivo(contenido, nombre, mime) {
+            const blob = new Blob([contenido], { type: mime });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = nombre;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        window.descargarInformeActual = function () {
+            const txt = document.getElementById('reportOutput').value.trim();
+            if (!txt) return;
+            descargarArchivo(`${txt}\n\n---\nGenerado: ${new Date().toLocaleString('es-AR')}`, `informe-externos-${new Date().toISOString().split('T')[0]}.txt`, 'text/plain;charset=utf-8');
+            showNotification('Informe TXT descargado', 'success');
+        };
+
+        window.exportarHistorial = function () {
+            if (!historial.length) {
+                showNotification('No hay registros para exportar', 'warning');
+                return;
+            }
+            let content = '=== HISTORIAL DE INGRESO PERSONAL EXTERNO (CCTV) ===\n\n';
+            historial.forEach((item, idx) => {
+                content += `${idx + 1}. ${item.fecha || ''}\n${item.contenido || ''}\n\n---\n\n`;
+            });
+            descargarArchivo(content, `historial-externos-${new Date().toISOString().split('T')[0]}.txt`, 'text/plain;charset=utf-8');
+            showNotification('Historial TXT exportado', 'success');
+        };
+
+        window.exportarHistorialCSV = function () {
+            if (!historial.length) {
+                showNotification('No hay registros para exportar', 'warning');
+                return;
+            }
+            const escCsv = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+            const rows = [['Fecha', 'Hora Ingreso', 'Hora Salida', 'Empresa', 'Personal Externo', 'Informante Ingreso', 'Informante Salida', 'Informe Completo']];
+            historial.forEach(it => {
+                rows.push([
+                    it.timestamp ? new Date(it.timestamp).toLocaleDateString('es-AR') : (it.fecha || ''),
+                    it.time1 || '',
+                    it.time2 || '',
+                    it.company1 || '',
+                    it.worker1 || '',
+                    it.supervisor1 || '',
+                    it.supervisor2 || '',
+                    it.contenido || ''
+                ]);
+            });
+            const csv = '\uFEFF' + rows.map(r => r.map(escCsv).join(';')).join('\r\n');
+            descargarArchivo(csv, `historial-externos-${new Date().toISOString().split('T')[0]}.csv`, 'text/csv;charset=utf-8');
+            showNotification('Planilla CSV descargada', 'success');
+        };
+
+        window.limpiarTodoFormulario = function () {
+            if ((document.getElementById('worker1').value.trim() || document.getElementById('supervisor1').value.trim()) &&
+                !confirm('¿Restablecer los campos del formulario actual?')) {
+                return;
+            }
+            const ahora = getHoraActualStr();
+            const mas2h = sumarHorasStr(ahora, 2);
+
+            document.getElementById('time1').value = ahora;
+            document.getElementById('time2').value = mas2h;
+            document.getElementById('supervisor1').value = '';
+            document.getElementById('supervisor2').value = '';
+            delete document.getElementById('supervisor2').dataset.manualEdit;
+            document.getElementById('company1').value = 'Bazurco Facility';
+            document.getElementById('company2').value = 'Bazurco Facility';
+            document.getElementById('worker1').value = '';
+            document.getElementById('worker2').value = '';
+            document.getElementById('chkRangoTarea').checked = true;
+            document.getElementById('taskFrom').value = ahora;
+            document.getElementById('taskTo').value = mas2h;
+            document.getElementById('task').value = `para realizar tareas de limpieza en el Casino desde las ${ahora} Hs. hasta las ${mas2h} Hs.`;
+            document.getElementById('lugarEstablecimiento').value = 'del Casino';
+            document.getElementById('camaraAcceso').value = '';
+            localStorage.removeItem(STORAGE.draftKey);
+            localStorage.removeItem(STORAGE.legacyDraftKey);
+            cambiarModo('completo');
+            showNotification('Formulario restablecido', 'info');
+        };
+
+        function showNotification(message, type = 'success') {
+            const container = document.getElementById('notification-container');
+            const styles = {
+                success: 'bg-slate-900 dark:bg-slate-800 text-white border-emerald-500/50',
+                error: 'bg-rose-950 text-rose-100 border-rose-500/60',
+                warning: 'bg-amber-950 text-amber-100 border-amber-500/60',
+                info: 'bg-slate-900 dark:bg-slate-800 text-slate-100 border-indigo-500/50'
+            };
+            const icons = {
+                success: 'check-circle',
+                error: 'x-circle',
+                warning: 'alert-triangle',
+                info: 'info'
+            };
+            const el = document.createElement('div');
+            el.className = `${styles[type] || styles.info} px-4 py-2.5 rounded-xl shadow-xl flex items-center gap-2 border text-xs font-semibold transition-opacity duration-300`;
+            el.innerHTML = `<i data-lucide="${icons[type] || 'info'}" class="w-4 h-4 shrink-0 text-indigo-400"></i><span>${escHtml(message)}</span>`;
+            container.appendChild(el);
+            lucide.createIcons({ nodes: [el] });
+            setTimeout(() => {
+                el.style.opacity = '0';
+                setTimeout(() => el.remove(), 300);
+            }, 2600);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            configurarAutocomplete('supervisor1', 'dropSupervisor1', () => armarListaConExtras(supervisorsExtra, SUPERVISORES_BASE), false, 'supervisor');
+            configurarAutocomplete('supervisor2', 'dropSupervisor2', () => armarListaConExtras(supervisorsExtra, SUPERVISORES_BASE), false, 'supervisor');
+            configurarAutocomplete('company1', 'dropCompany1', () => armarListaConExtras(companiesExtra, EMPRESAS_BASE), false, 'company');
+            configurarAutocomplete('worker1', 'dropWorker1', () => armarListaConExtras(workersExtra, WORKERS_BASE), true, 'worker');
+
+            cargarDatosIniciales();
+
+            document.addEventListener('keydown', (e) => {
+                if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                    e.preventDefault();
+                    copiarYRegistrar();
+                } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+                    e.preventDefault();
+                    descargarInformeActual();
+                }
+            });
+
+            lucide.createIcons();
+        });
+    })();
+    </script>
+    <script src="js/global.js"></script>
 </body>
 </html>

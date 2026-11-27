@@ -1,0 +1,12 @@
+# Scripts SQL internos de configuración de base de datos (respaldo local)
+supabase_setup.sql
+*.sql
+
+# Variables de entorno o secretos locales (nunca subir)
+.env
+.env.*
+
+# Archivos temporales del sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini

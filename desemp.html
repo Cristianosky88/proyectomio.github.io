@@ -510,113 +510,125 @@
           </div>
         </div>
 
-        <form id="formRegistro" onsubmit="agregarRegistro(event)"
-          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3.5 items-end">
-          <!-- Fila 1: Clasificación, DVR (si aplica), Cámara e Inicio / Fin amplios -->
-          <div id="contenedorCampoCategoria" class="lg:col-span-3">
-            <label for="inputCategoria"
-              class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">Categoría</label>
-            <select id="inputCategoria" onchange="sincronizarEstadoPorCategoria()"
-              class="w-full rounded-xl border border-slate-300 dark:border-slate-700 px-3 py-2.5 text-xs bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white focus:border-indigo-500 outline-none">
-              <option value="Operativo">Operativo / Sala</option>
-              <option value="Traslado">Transición / Traslado</option>
-              <option value="Celular Trabajo">Celular de Trabajo</option>
-              <option value="Descanso">Descanso Legal / Comida</option>
-              <option value="Baño">Baño / Sanitario</option>
-              <option value="Refrigerio">Cocina / Café / Gaseosa</option>
-              <option value="Charla">Habla / Conversación</option>
-              <option value="Permanencia">Permanece (Barra / Pitt)</option>
-              <option value="Celular">Celular Personal</option>
-              <option value="TV">Mira TV / Distracción</option>
-              <option value="Ausencia">Ausencia de Sector</option>
-            </select>
-          </div>
-
-          <div class="lg:col-span-2">
-            <label for="inputTipo" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">Estado
-              Cómputo</label>
-            <select id="inputTipo"
-              class="w-full rounded-xl border border-slate-300 dark:border-slate-700 px-2.5 py-2.5 text-xs font-semibold bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white focus:border-indigo-500 outline-none">
-              <option value="ASISTE">🟢 ASISTE (Trabaja)</option>
-              <option value="NO_ASISTE">🟠 NO ASISTE (Inactivo)</option>
-            </select>
-          </div>
-
-          <div id="contenedorCampoDvr" class="hidden lg:col-span-2">
-            <label for="inputDvr" class="block text-xs font-semibold text-indigo-700 dark:text-indigo-300 mb-1.5">Equipo
-              DVR</label>
-            <select id="inputDvr"
-              class="w-full rounded-xl border border-indigo-300 dark:border-indigo-700 px-3 py-2.5 text-xs font-bold bg-indigo-50/70 dark:bg-indigo-950/60 text-indigo-900 dark:text-indigo-200 focus:border-indigo-500 outline-none">
-              <option value="DVR 1">DVR 1</option>
-              <option value="DVR 2">DVR 2</option>
-              <option value="DVR 3">DVR 3</option>
-              <option value="DVR 4">DVR 4</option>
-              <option value="DVR 5">DVR 5</option>
-              <option value="DVR 6">DVR 6</option>
-              <option value="DVR 7">DVR 7</option>
-              <option value="DVR 8">DVR 8</option>
-            </select>
-          </div>
-
-          <div id="contenedorCampoCamara" class="lg:col-span-3">
-            <label for="inputCamara"
-              class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">Cámara
-              (CCTV)</label>
-            <div class="relative">
-              <input type="text" id="inputCamara" list="camarasDatalist" placeholder="Ej: CAM-01 (Sala Gral)" required
-                class="w-full rounded-xl border border-slate-300 dark:border-slate-700 pl-3 pr-[76px] py-2.5 text-xs bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white focus:border-indigo-500 outline-none" />
-              <button type="button" onclick="abrirSelectorCamaras()"
-                class="absolute right-1.5 top-1/2 -translate-y-1/2 px-2 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-[11px] font-semibold shadow-sm transition cursor-pointer"
-                title="Elegir Casino → DVR → Cámara">
-                📹 Elegir
-              </button>
+        <form id="formRegistro" onsubmit="agregarRegistro(event)" class="space-y-3.5">
+          <!-- Fila 1: Proporciones exactas para que Cámara, DVR e Inicio/Fin nunca se corten -->
+          <div id="fila1FormRegistro"
+            class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1.35fr_1.2fr_2.15fr_0.95fr_0.95fr] gap-3 items-end">
+            <div id="contenedorCampoCategoria">
+              <label for="inputCategoria"
+                class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">Categoría</label>
+              <select id="inputCategoria" onchange="sincronizarEstadoPorCategoria()"
+                class="w-full rounded-xl border border-slate-300 dark:border-slate-700 px-3 py-2.5 text-xs bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white focus:border-indigo-500 outline-none">
+                <option value="Operativo">Operativo / Sala</option>
+                <option value="Traslado">Transición / Traslado</option>
+                <option value="Celular Trabajo">Celular de Trabajo</option>
+                <option value="Descanso">Descanso Legal / Comida</option>
+                <option value="Baño">Baño / Sanitario</option>
+                <option value="Refrigerio">Cocina / Café / Gaseosa</option>
+                <option value="Charla">Habla / Conversación</option>
+                <option value="Permanencia">Permanece (Barra / Pitt)</option>
+                <option value="Celular">Celular Personal</option>
+                <option value="TV">Mira TV / Distracción</option>
+                <option value="Ausencia">Ausencia de Sector</option>
+              </select>
             </div>
-          </div>
 
-          <div class="lg:col-span-2">
-            <label for="inputInicio" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">Hora
-              Inicio</label>
-            <input type="time" id="inputInicio" required
-              class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-3 py-2.5 text-xs font-mono-nums text-slate-900 dark:text-white focus:border-indigo-500 outline-none" />
-          </div>
+            <div>
+              <label for="inputTipo" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">Estado
+                Cómputo</label>
+              <select id="inputTipo"
+                class="w-full rounded-xl border border-slate-300 dark:border-slate-700 px-2.5 py-2.5 text-xs font-semibold bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white focus:border-indigo-500 outline-none">
+                <option value="ASISTE">🟢 ASISTE (Trabaja)</option>
+                <option value="NO_ASISTE">🟠 NO ASISTE (Inactivo)</option>
+              </select>
+            </div>
 
-          <div class="lg:col-span-2">
-            <label for="inputFin" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">Hora
-              Fin</label>
-            <input type="time" id="inputFin" required
-              class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-3 py-2.5 text-xs font-mono-nums text-slate-900 dark:text-white focus:border-indigo-500 outline-none" />
+            <div id="contenedorCampoDvr" class="hidden">
+              <label for="inputDvr"
+                class="block text-xs font-semibold text-indigo-700 dark:text-indigo-300 mb-1.5">Equipo DVR</label>
+              <select id="inputDvr" onchange="alCambiarInputDvr()"
+                class="w-full rounded-xl border border-indigo-300 dark:border-indigo-700 px-2.5 py-2.5 text-xs font-bold bg-indigo-50/70 dark:bg-indigo-950/60 text-indigo-900 dark:text-indigo-200 focus:border-indigo-500 outline-none">
+                <option value="DVR 1">DVR 1</option>
+                <option value="DVR 2">DVR 2</option>
+                <option value="DVR 3">DVR 3</option>
+                <option value="DVR 4">DVR 4</option>
+                <option value="DVR 5">DVR 5</option>
+                <option value="DVR 6">DVR 6</option>
+                <option value="DVR 7">DVR 7</option>
+                <option value="DVR 8">DVR 8</option>
+              </select>
+            </div>
+
+            <div id="contenedorCampoCamara" class="relative">
+              <label for="inputCamara"
+                class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">Cámara (CCTV)</label>
+              <div class="flex items-stretch">
+                <input type="text" id="inputCamara" autocomplete="off"
+                  onfocus="this.select()"
+                  oninput="alEscribirInputCamara(false, event)"
+                  onchange="alEscribirInputCamara(true, event)"
+                  onblur="alSalirInputCamara()"
+                  onkeydown="teclaInputCamara(event)"
+                  placeholder="Escribe N° (ej: 412) y se elige sola" required
+                  class="w-full min-w-0 rounded-l-xl border border-r-0 border-slate-300 dark:border-slate-700 px-3 py-2.5 text-xs bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white focus:border-indigo-500 outline-none" />
+                <button type="button" onclick="abrirSelectorCamaras()"
+                  class="shrink-0 px-3 py-2.5 rounded-r-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer whitespace-nowrap"
+                  title="Elegir Casino → DVR → Cámara">
+                  📹 Elegir
+                </button>
+              </div>
+              <div id="dropdownSugerenciasCamara"
+                class="hidden absolute left-0 right-0 top-full mt-1 z-50 max-h-60 overflow-y-auto rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-xl divide-y divide-slate-100 dark:divide-slate-800">
+              </div>
+            </div>
+
+            <div>
+              <label for="inputInicio"
+                class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">Hora Inicio</label>
+              <input type="time" id="inputInicio" required
+                class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-2.5 py-2.5 text-xs font-mono-nums text-slate-900 dark:text-white focus:border-indigo-500 outline-none" />
+            </div>
+
+            <div>
+              <label for="inputFin"
+                class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">Hora Fin</label>
+              <input type="time" id="inputFin" required
+                class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-2.5 py-2.5 text-xs font-mono-nums text-slate-900 dark:text-white focus:border-indigo-500 outline-none" />
+            </div>
           </div>
 
           <!-- Fila 2: Sector / Observación amplia + Botón Extraer DVR + Botón Añadir -->
-          <div id="contenedorCampoDetalle" class="sm:col-span-2 lg:col-span-8 relative">
-            <div class="flex items-center justify-between gap-2 mb-1.5">
-              <label for="inputDetalle" class="block text-xs font-semibold text-slate-600 dark:text-slate-300">Sector
-                / Observación Detallada</label>
-              <button type="button" onclick="abrirArmadorDesdeInputActual()"
-                class="px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950/60 text-[11px] font-semibold text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 hover:bg-indigo-100 transition cursor-pointer"
-                title="Elegir uno o varios empleados del padrón y el sector">
-                👥 Armar con 1 o + Personal / Sector
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 items-end">
+            <div id="contenedorCampoDetalle" class="lg:col-span-8 relative">
+              <div class="flex items-center justify-between gap-2 mb-1.5">
+                <label for="inputDetalle" class="block text-xs font-semibold text-slate-600 dark:text-slate-300">Sector
+                  / Observación Detallada</label>
+                <button type="button" onclick="abrirArmadorDesdeInputActual()"
+                  class="px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950/60 text-[11px] font-semibold text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 hover:bg-indigo-100 transition cursor-pointer"
+                  title="Elegir uno o varios empleados del padrón y el sector">
+                  👥 Armar con 1 o + Personal / Sector
+                </button>
+              </div>
+              <input type="text" id="inputDetalle" autocomplete="off" required
+                placeholder="Ej: Habla en Sala con... (puedes encadenar varios con 'y' o ',')..."
+                class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-3.5 py-2.5 text-xs text-slate-900 dark:text-white focus:border-indigo-500 outline-none" />
+              <div id="dropdownSugerenciasDetalle"
+                class="hidden absolute left-0 right-0 top-full mt-1 z-50 max-h-64 overflow-y-auto rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-xl divide-y divide-slate-100 dark:divide-slate-800">
+              </div>
+            </div>
+
+            <div class="lg:col-span-4 flex items-center gap-2.5">
+              <label for="inputBajarVideo"
+                class="flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 hover:border-rose-400 has-[:checked]:bg-rose-50 dark:has-[:checked]:bg-rose-950/50 has-[:checked]:border-rose-400 has-[:checked]:text-rose-700 dark:has-[:checked]:text-rose-300 text-xs font-semibold text-slate-700 dark:text-slate-200 transition cursor-pointer select-none shrink-0"
+                title="Marcar este tramo para extraer video del DVR">
+                <input type="checkbox" id="inputBajarVideo" class="rounded text-rose-600 focus:ring-rose-500" />
+                <span>🎥 Extraer DVR</span>
+              </label>
+              <button type="submit" id="btnSubmitRegistro"
+                class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2.5 px-4 rounded-xl text-xs transition shadow-sm cursor-pointer whitespace-nowrap">
+                + Añadir Tramo
               </button>
             </div>
-            <input type="text" id="inputDetalle" autocomplete="off" required
-              placeholder="Ej: Habla en Sala con... (puedes encadenar varios con 'y' o ',')..."
-              class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-3.5 py-2.5 text-xs text-slate-900 dark:text-white focus:border-indigo-500 outline-none" />
-            <div id="dropdownSugerenciasDetalle"
-              class="hidden absolute left-0 right-0 top-full mt-1 z-50 max-h-64 overflow-y-auto rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-xl divide-y divide-slate-100 dark:divide-slate-800">
-            </div>
-          </div>
-
-          <div class="sm:col-span-2 lg:col-span-4 flex items-center gap-2.5">
-            <label for="inputBajarVideo"
-              class="flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 hover:border-rose-400 has-[:checked]:bg-rose-50 dark:has-[:checked]:bg-rose-950/50 has-[:checked]:border-rose-400 has-[:checked]:text-rose-700 dark:has-[:checked]:text-rose-300 text-xs font-semibold text-slate-700 dark:text-slate-200 transition cursor-pointer select-none shrink-0"
-              title="Marcar este tramo para extraer video del DVR">
-              <input type="checkbox" id="inputBajarVideo" class="rounded text-rose-600 focus:ring-rose-500" />
-              <span>🎥 Extraer DVR</span>
-            </label>
-            <button type="submit" id="btnSubmitRegistro"
-              class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2.5 px-4 rounded-xl text-xs transition shadow-sm cursor-pointer whitespace-nowrap">
-              + Añadir Tramo
-            </button>
           </div>
         </form>
 
@@ -1547,21 +1559,26 @@
 
     function actualizarVisibilidadDvrBoulevard(ficha) {
       const esBoulevard = esSalaBoulevard(ficha?.sala);
+      const fila1 = document.getElementById('fila1FormRegistro');
       const contDvr = document.getElementById('contenedorCampoDvr');
-      const contCat = document.getElementById('contenedorCampoCategoria');
-      const contCam = document.getElementById('contenedorCampoCamara');
+      const inpCam = document.getElementById('inputCamara');
       const badgeBoulevard = document.getElementById('badgeModoBoulevard');
       const filtroDvrEl = document.getElementById('filtroDvr');
 
       if (contDvr) contDvr.classList.toggle('hidden', !esBoulevard);
       if (badgeBoulevard) badgeBoulevard.classList.toggle('hidden', !esBoulevard);
-      if (contCat) {
-        contCat.classList.toggle('lg:col-span-3', !esBoulevard);
-        contCat.classList.toggle('lg:col-span-2', esBoulevard);
+      if (fila1) {
+        fila1.className = esBoulevard
+          ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1.2fr_1.15fr_0.75fr_2.15fr_0.95fr_0.95fr] gap-3 items-end'
+          : 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1.35fr_1.2fr_2.15fr_0.95fr_0.95fr] gap-3 items-end';
       }
-      if (contCam) {
-        contCam.classList.toggle('lg:col-span-3', !esBoulevard);
-        contCam.classList.toggle('lg:col-span-2', esBoulevard);
+
+      if (inpCam && editandoIndex === null) {
+        if (esBoulevard && inpCam.value === 'CAM-01 (Sala Gral)') {
+          inpCam.value = '101 - SALA SLOTS';
+        } else if (!esBoulevard && inpCam.value === '101 - SALA SLOTS') {
+          inpCam.value = 'CAM-01 (Sala Gral)';
+        }
       }
 
       const hayRegistrosConDvr = registros.some(r => Boolean(r.dvr));
@@ -1882,8 +1899,28 @@
 
     function actualizarDatalistCamaras() {
       const dl = document.getElementById('camarasDatalist');
+      if (!dl) return;
+      const ficha = obtenerFichaActual();
       const extras = registros.map(r => r.camara).filter(Boolean);
-      const unicas = Array.from(new Set([...CAMARAS_BASE, ...extras]));
+
+      if (esSalaBoulevard(ficha.sala)) {
+        const cat = obtenerCatalogoCctv();
+        const salaKey = resolverSalaCatalogo(ficha.sala) || 'Casino Boulevard';
+        const dvrsObj = cat[salaKey] || {};
+        const dvrSel = document.getElementById('inputDvr')?.value || 'DVR 1';
+        const camsDvrActual = dvrsObj[dvrSel] || [];
+        const todasBoulevard = [];
+        ordenarDvrs(Object.keys(dvrsObj)).forEach(d => {
+          (dvrsObj[d] || []).forEach(c => todasBoulevard.push(c));
+        });
+        const unicas = Array.from(new Set([...camsDvrActual, ...todasBoulevard, ...extras]));
+        dl.innerHTML = unicas.map(c => `<option value="${escapeHTML(c)}"></option>`).join('');
+        return;
+      }
+
+      const salaKey = resolverSalaCatalogo(ficha.sala);
+      const camsSala = salaKey ? Object.values(obtenerCatalogoCctv()[salaKey] || {}).flat() : CAMARAS_BASE;
+      const unicas = Array.from(new Set([...camsSala, ...CAMARAS_BASE, ...extras]));
       dl.innerHTML = unicas.map(c => `<option value="${escapeHTML(c)}"></option>`).join('');
     }
 
@@ -2407,26 +2444,384 @@
     };
 
     // ==================== SELECTOR DE CÁMARA: CASINO → DVR → CÁMARA ====================
-    const STORAGE_CATALOGO_CCTV_KEY = 'auditoria_cctv_catalogo_camaras_v1';
+    const STORAGE_CATALOGO_CCTV_KEY = 'auditoria_cctv_catalogo_camaras_v2';
     const SALAS_CCTV = ['Casino Boulevard', 'Sala Luxor', 'Slots Salvador Mazza', 'Slots Lajitas', 'Slots Mosconi', 'Slots Refinor', 'Sala VIP'];
-    let catalogoCctv = null;
-    const selectorCctv = { paso: 1, sala: '', dvr: '', filtro: '', editando: false, listaSalas: [], listaDvrs: [], listaCams: [] };
 
-    function generarCamarasGenericas(n) {
-      return Array.from({ length: n }, (_, i) => `CAM ${String(i + 1).padStart(2, '0')}`);
-    }
+    const CAMARAS_CASINO_BOULEVARD = {
+      'DVR 1': [
+        '101 - SALA SLOTS',
+        '102 - SALA SLOTS',
+        '103 - SALA SLOTS',
+        '104 - SALA SLOTS',
+        '105 - SALA SLOTS',
+        '106 - CAJA SLOTS',
+        '107 - CAJA SLOTS',
+        '108 - CAJA SLOTS',
+        '109 - CAJA SLOTS',
+        '110 - TESORO SLOTS',
+        '111 - TESORO SLOTS',
+        '112 - TESORO SLOTS',
+        '113 - TESORO SLOTS',
+        '114 - TESORO SLOTS',
+        '115 - TESORO SLOTS',
+        '116 - ACCESO PERSONAL'
+      ],
+      'DVR 2': [
+        '201 - SALA SLOTS',
+        '202 - SALA SLOTS',
+        '203 - SALA SLOTS',
+        '204 - SALA SLOTS',
+        '205 - SALA SLOTS',
+        '206 - SALA SLOTS',
+        '207 - SALA SLOTS',
+        '208 - SALA SLOTS',
+        '209 - SALA SLOTS',
+        '210 - SALA SLOTS',
+        '211 - SALA SLOTS',
+        '212 - SALA SLOTS',
+        '213 - SALA SLOTS',
+        '214 - SALA SLOTS',
+        '215 - SALA SLOTS',
+        '216 - SALA SLOTS'
+      ],
+      'DVR 3': [
+        '301 - SALA SLOTS',
+        '302 - SALA SLOTS',
+        '303 - SALA SLOTS',
+        '304 - SALA SLOTS',
+        '305 - SALA SLOTS',
+        '306 - SALA SLOTS',
+        '307 - SALA SLOTS',
+        '308 - SALA SLOTS',
+        '309 - SALA SLOTS',
+        '310 - SALA SLOTS',
+        '311 - SALA SLOTS',
+        '312 - SALA SLOTS',
+        '313 - SALA SLOTS',
+        '314 - SALA SLOTS',
+        '315 - SALA SLOTS',
+        '316 - SALA SLOTS'
+      ],
+      'DVR 4': [
+        '401 - SALA SLOTS',
+        '402 - SALA SLOTS',
+        '403 - SALA SLOTS',
+        '404 - SALA SLOTS',
+        '405 - SALA SLOTS',
+        '406 - TABLERO',
+        '407 - SALA SLOTS',
+        '408 - DEPOSITO',
+        '409 - OFICINAS',
+        '410 - RACK',
+        '411 - DPTO. Técnico',
+        '412 - DESCANSO',
+        '413 - DESCANSO',
+        '414 - DESCANSO',
+        '415 - DESCANSO',
+        '416 - CCTV'
+      ],
+      'DVR 5': [
+        '501 - SALA JV',
+        '502 - SALA JV',
+        '503 - SALA JV',
+        '504 - SALA JV',
+        '505 - SALA JV',
+        '506 - SALA JV',
+        '507 - SALA JV',
+        '508 - SALA JV',
+        '509 - SALA JV',
+        '510 - SALA JV',
+        '511 - SALA JV',
+        '512 - SALA JV',
+        '513 - SALA JV',
+        '514 - SALA JV',
+        '515 - SALA JV',
+        '516 - SALA JV'
+      ],
+      'DVR 6': [
+        '601 - CAJA JV',
+        '602 - CAJA JV',
+        '603 - CAJA JV',
+        '604 - CAJA JV',
+        '605 - CAJA JV',
+        '606 - CAJA JV',
+        '607 - CAJA JV',
+        '608 - CAJA JV',
+        '609 - TESORO JV',
+        '610 - TESORO JV',
+        '611 - SALA JV',
+        '612 - SALA JV',
+        '613 - SALA JV',
+        '614 - SALA JV',
+        '615 - SALA JV',
+        '616 - SALA JV',
+        '617 - SALA JV',
+        '618 - SALA JV',
+        '619 - SALA JV',
+        '620 - SALA JV'
+      ],
+      'DVR 7': [
+        '701 - SALA JV',
+        '702 - PASILLO',
+        '703 - PASILLO',
+        '704 - PASILLO',
+        '705 - PASILLO',
+        '706 - ACCESO',
+        '707 - ESCALERA',
+        '708 - ESCALERA',
+        '709 - RELOJ',
+        '710 - PASILLO',
+        '711 - PASILLO',
+        '712 - DEPOSITO JV',
+        '713 - DEPOSITO JV',
+        '714 - PASILLO',
+        '715 - RECEPCION',
+        '716 - RECEPCION'
+      ],
+      'DVR 8': [
+        '801 - SALA SLOTS',
+        '802 - SALA SLOTS',
+        '803 - SALA SLOTS',
+        '804 - DEPOSITO JV',
+        '805 - RECEPCION',
+        '806 - CCTV',
+        '807 - CCTV'
+      ]
+    };
+
+    let catalogoCctv = null;
+    const selectorCctv = { paso: 1, sala: '', dvr: '', filtro: '', editando: false, listaSalas: [], listaDvrs: [], listaCams: [], listaGlobalSala: [] };
 
     function construirCatalogoCctvPorDefecto() {
       const cat = {};
       SALAS_CCTV.forEach(s => {
         if (esSalaBoulevard(s)) {
           cat[s] = {};
-          DVRS_BOULEVARD.forEach(d => { cat[s][d] = generarCamarasGenericas(16); });
+          Object.keys(CAMARAS_CASINO_BOULEVARD).forEach(d => {
+            cat[s][d] = CAMARAS_CASINO_BOULEVARD[d].slice();
+          });
         } else {
           cat[s] = { 'DVR 1': CAMARAS_BASE.slice() };
         }
       });
       return cat;
+    }
+
+    function buscarCamaraEnBoulevard(valorInput) {
+      const limpio = String(valorInput || '').trim();
+      if (!limpio) return null;
+      const cat = obtenerCatalogoCctv();
+      const salaKey = resolverSalaCatalogo('Casino Boulevard') || 'Casino Boulevard';
+      const dvrsObj = cat[salaKey] || CAMARAS_CASINO_BOULEVARD;
+      const soloIdMatch = limpio.match(/^(\d{3})(?:\b|\s|-)/);
+      const idBuscado = soloIdMatch ? soloIdMatch[1] : (/^\d{3}$/.test(limpio) ? limpio : '');
+
+      for (const dvr of ordenarDvrs(Object.keys(dvrsObj))) {
+        const cams = dvrsObj[dvr] || [];
+        for (const c of cams) {
+          if (c.toLowerCase() === limpio.toLowerCase()) {
+            return { dvr, camara: c };
+          }
+          if (idBuscado && c.startsWith(`${idBuscado} -`)) {
+            return { dvr, camara: c, soloId: /^\d{3}$/.test(limpio) };
+          }
+        }
+      }
+      return null;
+    }
+
+    let sugerenciasCamaraActuales = [];
+    let indiceActivoCamara = -1;
+
+    function buscarCamaraEnSalaGeneral(valorInput, salaNombre) {
+      const limpio = String(valorInput || '').trim();
+      if (!limpio) return null;
+      const salaKey = resolverSalaCatalogo(salaNombre);
+      const cams = salaKey ? Object.values(obtenerCatalogoCctv()[salaKey] || {}).flat() : CAMARAS_BASE;
+      const mDosDigitos = limpio.match(/^0?(\d{1,2})$/);
+      if (!mDosDigitos) return null;
+      const numPadded = mDosDigitos[1].padStart(2, '0');
+      const encontrada = cams.find(c => {
+        const m = String(c).match(/^CAM[-\s]?0?(\d{1,2})\b/i);
+        return m && m[1].padStart(2, '0') === numPadded;
+      });
+      return encontrada ? { camara: encontrada, exactoDosDigitos: /^\d{2}$/.test(limpio), prefijoLen: limpio.length } : null;
+    }
+
+    window.alCambiarInputDvr = function () {
+      actualizarDatalistCamaras();
+      guardarBorradorFormulario();
+    };
+
+    function renderizarDropdownSugerenciasCamara(query) {
+      const menu = document.getElementById('dropdownSugerenciasCamara');
+      if (!menu) return;
+      const q = normalizarTextoBusqueda(query);
+      if (!q) {
+        menu.classList.add('hidden');
+        sugerenciasCamaraActuales = [];
+        return;
+      }
+
+      const ficha = obtenerFichaActual();
+      const cat = obtenerCatalogoCctv();
+      const usarBoulevard = esSalaBoulevard(ficha.sala) || (!ficha.sala && /^[1-8]\d{0,2}$/.test(q));
+      sugerenciasCamaraActuales = [];
+
+      if (usarBoulevard) {
+        const salaKey = resolverSalaCatalogo('Casino Boulevard') || 'Casino Boulevard';
+        const dvrsObj = cat[salaKey] || CAMARAS_CASINO_BOULEVARD;
+        ordenarDvrs(Object.keys(dvrsObj)).forEach(dvr => {
+          (dvrsObj[dvr] || []).forEach(cam => {
+            if (normalizarTextoBusqueda(cam).includes(q) && normalizarTextoBusqueda(cam) !== q) {
+              sugerenciasCamaraActuales.push({ camara: cam, dvr });
+            }
+          });
+        });
+      } else {
+        const salaKey = resolverSalaCatalogo(ficha.sala);
+        const cams = salaKey ? Object.values(cat[salaKey] || {}).flat() : CAMARAS_BASE;
+        Array.from(new Set([...cams, ...CAMARAS_BASE])).forEach(cam => {
+          if (normalizarTextoBusqueda(cam).includes(q) && normalizarTextoBusqueda(cam) !== q) {
+            sugerenciasCamaraActuales.push({ camara: cam, dvr: '' });
+          }
+        });
+      }
+
+      sugerenciasCamaraActuales = sugerenciasCamaraActuales.slice(0, 12);
+      if (!sugerenciasCamaraActuales.length) {
+        menu.classList.add('hidden');
+        return;
+      }
+
+      if (indiceActivoCamara < 0 || indiceActivoCamara >= sugerenciasCamaraActuales.length) {
+        indiceActivoCamara = 0;
+      }
+
+      menu.innerHTML = sugerenciasCamaraActuales.map((item, idx) => {
+        const actCls = idx === indiceActivoCamara ? 'bg-indigo-50 dark:bg-indigo-950/70' : 'hover:bg-slate-50 dark:hover:bg-slate-800/70';
+        return `
+          <button type="button" onmousedown="event.preventDefault(); seleccionarSugerenciaCamaraPorIndice(${idx})"
+            class="w-full text-left px-3 py-2 transition flex items-center justify-between gap-2 cursor-pointer ${actCls}">
+            <span class="text-xs font-bold text-slate-900 dark:text-white truncate">📹 ${escapeHTML(item.camara)}</span>
+            ${item.dvr ? `<span class="shrink-0 px-1.5 py-0.5 rounded bg-indigo-600 text-white font-bold text-[10px]">${escapeHTML(item.dvr)}</span>` : ''}
+          </button>
+        `;
+      }).join('');
+      menu.classList.remove('hidden');
+    }
+
+    window.seleccionarSugerenciaCamaraPorIndice = function (idx) {
+      const item = sugerenciasCamaraActuales[idx];
+      if (!item) return;
+      const inpCam = document.getElementById('inputCamara');
+      const inpDvr = document.getElementById('inputDvr');
+      const inpSala = document.getElementById('fichaSala');
+
+      if (item.dvr && inpSala && !inpSala.value.trim()) {
+        inpSala.value = 'Casino Boulevard';
+        guardarFichaYActualizar();
+      }
+      if (inpCam) inpCam.value = item.camara;
+      if (item.dvr && inpDvr && DVRS_BOULEVARD.includes(item.dvr)) {
+        inpDvr.value = item.dvr;
+      }
+      document.getElementById('dropdownSugerenciasCamara')?.classList.add('hidden');
+      sugerenciasCamaraActuales = [];
+      indiceActivoCamara = -1;
+      guardarBorradorFormulario();
+    };
+
+    window.alEscribirInputCamara = function (forzarExpansion = false, evento = null) {
+      const inpCam = document.getElementById('inputCamara');
+      const inpDvr = document.getElementById('inputDvr');
+      const inpSala = document.getElementById('fichaSala');
+      if (!inpCam) return;
+
+      const rawVal = inpCam.value;
+      const limpio = rawVal.trim();
+      const borrando = Boolean(evento && typeof evento.inputType === 'string' && evento.inputType.startsWith('delete'));
+      const ficha = obtenerFichaActual();
+      const enBoulevardOSinSala = esSalaBoulevard(ficha.sala) || !ficha.sala;
+
+      if (enBoulevardOSinSala) {
+        // Si escribe el 1.er dígito (1 a 8) en Casino Boulevard, ya preselecciona ese DVR
+        if (esSalaBoulevard(ficha.sala) && /^[1-8]\d{0,1}$/.test(limpio) && inpDvr) {
+          const dvrPrefijo = `DVR ${limpio[0]}`;
+          if (DVRS_BOULEVARD.includes(dvrPrefijo)) inpDvr.value = dvrPrefijo;
+        }
+
+        const hallada = buscarCamaraEnBoulevard(limpio);
+        if (hallada) {
+          if (inpSala && !inpSala.value.trim() && hallada.soloId) {
+            inpSala.value = 'Casino Boulevard';
+            guardarFichaYActualizar();
+          }
+          if (inpDvr && DVRS_BOULEVARD.includes(hallada.dvr)) {
+            inpDvr.value = hallada.dvr;
+          }
+          // Autoselección instantánea apenas completa los 3 dígitos (ej: 412 -> 412 - DESCANSO)
+          if (hallada.soloId && (!borrando || forzarExpansion)) {
+            inpCam.value = hallada.camara;
+            if (!forzarExpansion && document.activeElement === inpCam) {
+              inpCam.setSelectionRange(3, hallada.camara.length);
+            }
+            document.getElementById('dropdownSugerenciasCamara')?.classList.add('hidden');
+            sugerenciasCamaraActuales = [];
+            guardarBorradorFormulario();
+            return;
+          }
+        }
+      } else {
+        // En otras salas (ej: Sala Luxor): escribir "08" autoselecciona "CAM-08 (Caja)" al instante (o "8" al salir/Enter)
+        const halladaGral = buscarCamaraEnSalaGeneral(limpio, ficha.sala);
+        if (halladaGral && ((!borrando && halladaGral.exactoDosDigitos) || forzarExpansion)) {
+          inpCam.value = halladaGral.camara;
+          document.getElementById('dropdownSugerenciasCamara')?.classList.add('hidden');
+          sugerenciasCamaraActuales = [];
+          guardarBorradorFormulario();
+          return;
+        }
+      }
+
+      if (!forzarExpansion) {
+        renderizarDropdownSugerenciasCamara(limpio);
+      }
+      guardarBorradorFormulario();
+    };
+
+    window.alSalirInputCamara = function () {
+      alEscribirInputCamara(true, null);
+      setTimeout(() => {
+        document.getElementById('dropdownSugerenciasCamara')?.classList.add('hidden');
+      }, 150);
+    };
+
+    window.teclaInputCamara = function (e) {
+      const menu = document.getElementById('dropdownSugerenciasCamara');
+      const abierto = menu && !menu.classList.contains('hidden') && sugerenciasCamaraActuales.length > 0;
+      if (abierto && e.key === 'ArrowDown') {
+        e.preventDefault();
+        indiceActivoCamara = (indiceActivoCamara + 1) % sugerenciasCamaraActuales.length;
+        renderizarDropdownSugerenciasCamara(document.getElementById('inputCamara')?.value || '');
+      } else if (abierto && e.key === 'ArrowUp') {
+        e.preventDefault();
+        indiceActivoCamara = (indiceActivoCamara - 1 + sugerenciasCamaraActuales.length) % sugerenciasCamaraActuales.length;
+        renderizarDropdownSugerenciasCamara(document.getElementById('inputCamara')?.value || '');
+      } else if (e.key === 'Enter' && abierto) {
+        e.preventDefault();
+        seleccionarSugerenciaCamaraPorIndice(Math.max(0, indiceActivoCamara));
+      }
+    };
+
+    function resumirSectoresDeDvr(listaCamaras) {
+      const sectores = [];
+      (listaCamaras || []).forEach(c => {
+        const partes = String(c).split(' - ');
+        const ub = (partes.length > 1 ? partes.slice(1).join(' - ') : c).trim();
+        if (ub && !sectores.includes(ub)) sectores.push(ub);
+      });
+      return sectores.join(' · ');
     }
 
     function obtenerCatalogoCctv() {
@@ -2557,15 +2952,28 @@
       if (paso === 2) {
         selectorCctv.listaDvrs = ordenarDvrs(Object.keys(cat[selectorCctv.sala] || {}));
         body.innerHTML = `
-          <p class="text-xs text-slate-500 dark:text-slate-400 mb-3">Paso 2: elegí el DVR de <b>${escapeHTML(selectorCctv.sala)}</b>.</p>
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-            ${selectorCctv.listaDvrs.map((d, i) => `
+          <p class="text-xs text-slate-500 dark:text-slate-400 mb-2.5">Paso 2: elegí el DVR de <b>${escapeHTML(selectorCctv.sala)}</b> o buscá directo por ID / sector.</p>
+          <input type="search" id="buscadorGlobalSalaCctv" autocomplete="off"
+            placeholder="🔎 Buscar en todos los DVR de ${escapeHTML(selectorCctv.sala)} (ej: 412, Descanso, Reloj, Tesoro, Recepción)..."
+            oninput="filtrarGlobalSalaCctv(this.value)" onkeydown="teclaBuscadorGlobalSalaCctv(event)"
+            class="w-full mb-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-3 py-2 text-xs text-slate-900 dark:text-white focus:border-indigo-500 outline-none" />
+          <div id="resultadosBusquedaGlobalSala" class="hidden mb-3 grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
+          <div id="gridDvrsSalaCctv" class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+            ${selectorCctv.listaDvrs.map((d, i) => {
+              const listaD = cat[selectorCctv.sala][d] || [];
+              const resumenSec = resumirSectoresDeDvr(listaD);
+              return `
               <button type="button" onclick="elegirDvrCctv(${i})" class="${btnCardBase} ${d === selectorCctv.dvr ? btnCardOn : btnCardOff}">
-                <span class="block text-sm font-bold text-indigo-700 dark:text-indigo-300">${escapeHTML(d)}</span>
-                <span class="block text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">${(cat[selectorCctv.sala][d] || []).length} cámaras</span>
-              </button>`).join('')}
+                <span class="flex items-center justify-between gap-1">
+                  <span class="text-sm font-bold text-indigo-700 dark:text-indigo-300">${escapeHTML(d)}</span>
+                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">${listaD.length} cám.</span>
+                </span>
+                <span class="block text-[10px] text-slate-500 dark:text-slate-400 mt-1 line-clamp-2 leading-snug" title="${escapeHTML(resumenSec)}">${escapeHTML(resumenSec || 'Sin cámaras')}</span>
+              </button>`;
+            }).join('')}
             <button type="button" onclick="agregarDvrCctv()" class="${btnAgregar}">➕ Agregar DVR</button>
           </div>`;
+        setTimeout(() => document.getElementById('buscadorGlobalSalaCctv')?.focus(), 30);
         return;
       }
 
@@ -2614,12 +3022,73 @@
         return;
       }
       grid.innerHTML = selectorCctv.listaCams.length
-        ? selectorCctv.listaCams.map((c, i) => `
+        ? selectorCctv.listaCams.map((c, i) => {
+          const mId = String(c).match(/^(\d{3})\s*-\s*(.+)$/);
+          const contenidoCam = mId
+            ? `<span class="inline-block font-mono font-bold px-1.5 py-0.5 rounded bg-indigo-600 text-white text-[11px] mr-1.5">${escapeHTML(mId[1])}</span><span class="font-semibold">${escapeHTML(mId[2])}</span>`
+            : `📹 ${escapeHTML(c)}`;
+          return `
             <button type="button" onclick="elegirCamaraCctv(${i})"
-              class="text-left px-3 py-2.5 rounded-xl border text-xs font-semibold transition cursor-pointer ${c === camActual ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-800 dark:text-indigo-200' : 'border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 hover:border-indigo-400 hover:bg-slate-50 dark:hover:bg-slate-800'}">
-              📹 ${escapeHTML(c)}
-            </button>`).join('')
+              class="text-left px-3 py-2.5 rounded-xl border text-xs transition cursor-pointer flex items-center ${c === camActual ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-800 dark:text-indigo-200 ring-1 ring-indigo-500/30' : 'border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 hover:border-indigo-400 hover:bg-slate-50 dark:hover:bg-slate-800'}">
+              ${contenidoCam}
+            </button>`;
+        }).join('')
         : `<p class="col-span-full text-xs text-slate-400 italic text-center py-6">Sin coincidencias.</p>`;
+    };
+
+    window.filtrarGlobalSalaCctv = function (q) {
+      const qn = normalizarTextoBusqueda(q || '');
+      const resCont = document.getElementById('resultadosBusquedaGlobalSala');
+      const gridDvrs = document.getElementById('gridDvrsSalaCctv');
+      if (!resCont || !gridDvrs) return;
+
+      if (!qn) {
+        selectorCctv.listaGlobalSala = [];
+        resCont.classList.add('hidden');
+        resCont.innerHTML = '';
+        gridDvrs.classList.remove('hidden');
+        return;
+      }
+
+      const cat = obtenerCatalogoCctv();
+      const objSala = cat[selectorCctv.sala] || {};
+      const hallazgos = [];
+      ordenarDvrs(Object.keys(objSala)).forEach(dvr => {
+        (objSala[dvr] || []).forEach(cam => {
+          if (normalizarTextoBusqueda(`${dvr} ${cam}`).includes(qn)) {
+            hallazgos.push({ dvr, cam });
+          }
+        });
+      });
+
+      selectorCctv.listaGlobalSala = hallazgos;
+      gridDvrs.classList.add('hidden');
+      resCont.classList.remove('hidden');
+
+      resCont.innerHTML = hallazgos.length
+        ? hallazgos.map((item, idx) => `
+            <button type="button" onclick="elegirCamaraGlobalSalaCctv(${idx})"
+              class="text-left px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-indigo-400 hover:bg-indigo-50/50 dark:hover:bg-slate-800 text-xs flex items-center justify-between gap-2 transition cursor-pointer">
+              <span class="font-semibold text-slate-900 dark:text-white truncate">📹 ${escapeHTML(item.cam)}</span>
+              <span class="shrink-0 px-2 py-0.5 rounded bg-indigo-600 text-white font-bold text-[10px]">${escapeHTML(item.dvr)}</span>
+            </button>
+          `).join('')
+        : `<p class="col-span-full text-xs text-slate-400 italic text-center py-6">No se encontraron cámaras con "${escapeHTML(q)}" en ${escapeHTML(selectorCctv.sala)}.</p>`;
+    };
+
+    window.teclaBuscadorGlobalSalaCctv = function (e) {
+      if (e.key === 'Enter' && selectorCctv.listaGlobalSala.length > 0) {
+        e.preventDefault();
+        elegirCamaraGlobalSalaCctv(0);
+      }
+    };
+
+    window.elegirCamaraGlobalSalaCctv = function (idx) {
+      const item = selectorCctv.listaGlobalSala[idx];
+      if (!item) return;
+      selectorCctv.dvr = item.dvr;
+      selectorCctv.listaCams = [item.cam];
+      elegirCamaraCctv(0);
     };
 
     window.teclaBuscadorCamarasCctv = function (e) {
@@ -3055,11 +3524,30 @@
       copiarTextoPortapapeles(texto, '📋 Orden DVR copiada al portapapeles');
     };
 
+    function adaptarCamaraParaBoulevard(camaraGenerica) {
+      const f = obtenerFichaActual();
+      if (!esSalaBoulevard(f.sala)) return { camara: camaraGenerica, dvr: '' };
+      const cNorm = normalizarTextoBusqueda(camaraGenerica);
+      if (cNorm.includes('descanso')) return { dvr: 'DVR 4', camara: '412 - DESCANSO' };
+      if (cNorm.includes('caja')) return { dvr: 'DVR 1', camara: '106 - CAJA SLOTS' };
+      if (cNorm.includes('tesoro')) return { dvr: 'DVR 1', camara: '110 - TESORO SLOTS' };
+      if (cNorm.includes('acceso')) return { dvr: 'DVR 1', camara: '116 - ACCESO PERSONAL' };
+      if (cNorm.includes('recepcion')) return { dvr: 'DVR 7', camara: '715 - RECEPCION' };
+      if (cNorm.includes('oficina')) return { dvr: 'DVR 4', camara: '409 - OFICINAS' };
+      if (cNorm.includes('sala') || cNorm.includes('contadores')) return { dvr: 'DVR 1', camara: '101 - SALA SLOTS' };
+      return { camara: camaraGenerica, dvr: '' };
+    }
+
     window.aplicarPlantilla = function (tipo, categoria, camara, detalle) {
       cerrarArmadorObservacion();
       document.getElementById('inputTipo').value = tipo;
       document.getElementById('inputCategoria').value = categoria;
-      document.getElementById('inputCamara').value = camara;
+      const adaptada = adaptarCamaraParaBoulevard(camara);
+      document.getElementById('inputCamara').value = adaptada.camara;
+      if (adaptada.dvr && document.getElementById('inputDvr')) {
+        document.getElementById('inputDvr').value = adaptada.dvr;
+        actualizarDatalistCamaras();
+      }
       document.getElementById('inputDetalle').value = detalle;
       document.getElementById('inputFin').focus();
       guardarBorradorFormulario();
@@ -3117,9 +3605,11 @@
       document.getElementById('dropdownPersonalFicha')?.classList.add('hidden');
       document.getElementById('dropdownPersonalArmador')?.classList.add('hidden');
       document.getElementById('dropdownSugerenciasDetalle')?.classList.add('hidden');
+      document.getElementById('dropdownSugerenciasCamara')?.classList.add('hidden');
       indiceActivoFicha = -1;
       indiceActivoArmador = -1;
       indiceActivoDetalle = -1;
+      indiceActivoCamara = -1;
     }
 
     // --- 1. Autocompletado en Personal Auditado (#fichaEmpleado) ---

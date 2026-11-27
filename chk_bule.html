@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Control de Botones - Casino Bulevard</title>
+    <title>Control de Botones · Casino Bulevard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -30,11 +30,36 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/global.css">
     <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .report-font {
+            font-family: 'JetBrains Mono', Consolas, monospace;
+        }
+        .history-item {
+            transition: all 0.16s ease;
+            border-left: 3px solid transparent;
+        }
+        .history-item:hover {
+            border-left-color: #6366f1;
+        }
+        @media print {
+            body {
+                background: #ffffff !important;
+                color: #0f172a !important;
+                padding: 0 !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+            #printSheet {
+                display: block !important;
+            }
+        }
+    </style>
 </head>
 <body class="bg-slate-100 dark:bg-slate-950 p-3 sm:p-5 md:p-8 text-slate-800 dark:text-slate-100 min-h-screen font-sans transition-colors duration-200">
 
     <div class="max-w-6xl mx-auto bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 transition-colors duration-200">
-        
+
         <!-- Header Estándar -->
         <header class="no-print bg-slate-900 dark:bg-slate-950 border-b border-slate-800 px-4 sm:px-6 py-4 rounded-t-2xl text-white flex flex-wrap justify-between items-center gap-3">
             <div class="flex items-center gap-3">
@@ -42,15 +67,23 @@
                     <i data-lucide="bell-ring" class="w-6 h-6 text-white"></i>
                 </div>
                 <div>
-                    <h1 class="text-lg sm:text-xl font-bold leading-tight text-white">Control de Botones · Bulevard</h1>
-                    <p class="text-slate-400 text-xs uppercase tracking-wider">CCTV · Chequeo de Pulsadores Antipánico</p>
+                    <h1 class="text-lg sm:text-xl font-bold leading-tight text-white flex items-center gap-2 flex-wrap">
+                        Control de Botones · Bulevard
+                        <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Autoguardado</span>
+                    </h1>
+                    <p class="text-slate-400 text-xs uppercase tracking-wider">CCTV · Chequeo de Pulsadores Antipánico con Central Argos</p>
                 </div>
             </div>
             <div class="flex flex-wrap items-center gap-2">
-                <a href="chk_luxor.html" class="px-3 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-xl transition text-xs font-semibold text-white flex items-center gap-1.5" title="Ir a Chequeo Sala Luxor">
+                <a href="chk_luxor.html" class="px-3 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-xl transition text-xs font-semibold text-white flex items-center gap-1.5 shadow-sm" title="Ir a Chequeo Sala Luxor">
                     <i data-lucide="shield-alert" class="w-4 h-4"></i>
                     <span class="hidden sm:inline">Sala Luxor</span>
                 </a>
+
+                <button type="button" onclick="limpiarChequeo()" class="p-2 bg-slate-800 hover:bg-rose-600 border border-slate-700 rounded-xl transition text-slate-200 hover:text-white cursor-pointer" title="Restablecer formulario">
+                    <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
+                </button>
+
                 <div class="hidden md:flex items-center gap-2 bg-slate-800/90 border border-slate-700 px-3 py-1.5 rounded-xl text-xs font-mono text-slate-200">
                     <i data-lucide="clock" class="w-3.5 h-3.5 text-indigo-400"></i>
                     <span data-cctv-clock class="tabular-nums">00:00:00 Hs.</span>
@@ -66,358 +99,829 @@
             </div>
         </header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 rounded-b-2xl overflow-hidden">
-            
-            <!-- COLUMNA IZQUIERDA: FORMULARIO -->
-            <div class="lg:col-span-7 p-5 sm:p-6 space-y-4 bg-slate-50 dark:bg-slate-900/60">
-                
-                <!-- CARGAR ÚLTIMO REGISTRO -->
-                <div id="loadLastContainer" class="hidden bg-blue-50 border border-blue-300 rounded-lg p-3 flex items-center justify-between">
-                    <span class="text-xs text-blue-700">✓ Último registro disponible</span>
-                    <button type="button" id="loadLastBtn" class="px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition">Cargar</button>
+        <!-- Hoja exclusiva de Impresión -->
+        <div id="printSheet" class="hidden p-8 space-y-4">
+            <div class="border-b-2 border-slate-800 pb-3 flex justify-between items-start">
+                <div>
+                    <h2 class="text-lg font-bold uppercase">Acta CCTV · Control de Botones Antipánico (Bulevard)</h2>
+                    <p class="text-xs text-slate-600">Registro Operativo de Monitoreo y Seguridad</p>
                 </div>
-
-                <form id="formulario-informe" class="space-y-4">
-                    
-                    <div class="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
-                        <h3 class="font-bold text-slate-700 text-sm mb-4">📍 Evento 1</h3>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-500 mb-1">⏰ Hora</label>
-                                <input type="time" id="hora1" required class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
-                                <small id="error-hora1" class="text-red-600 text-xs hidden">⚠️ Hora 2 debe ser posterior</small>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-500 mb-1">👤 Personal/Control Interno</label>
-                                <input type="text" id="informante1" required placeholder="Nombre del informante" list="informantes-list" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
-                        <h3 class="font-bold text-slate-700 text-sm mb-4">📍 Evento 2</h3>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-500 mb-1">⏰ Hora</label>
-                                <input type="time" id="hora2" required class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
-                                <small id="error-hora2" class="text-red-600 text-xs hidden">⚠️ Debe ser posterior a Evento 1</small>
-                                <small id="duracion" class="text-green-600 text-xs hidden"></small>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-500 mb-1">👤 Personal/Control Interno</label>
-                                <input type="text" id="informante2" required placeholder="Nombre del informante" list="informantes-list" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-500 mb-1">🏢 Personal Argos</label>
-                        <input type="text" id="argos" required placeholder="Nombre del personal de Argos" class="w-full p-2 bg-white border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
-                    </div>
-
-                    <div class="flex gap-2 pt-4">
-                        <button type="button" id="generarBtn" class="flex-1 px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded font-semibold text-sm transition flex items-center justify-center gap-2">
-                            <i data-lucide="file-text" class="w-4 h-4"></i>
-                            <span>Generar Informe</span>
-                        </button>
-                        <button type="button" id="guardarBtn" class="px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded font-semibold text-sm transition flex items-center justify-center gap-2">
-                            <i data-lucide="save" class="w-4 h-4"></i>
-                            <span>Guardar</span>
-                        </button>
-                    </div>
-                </form>
+                <span id="printFechaHora" class="text-xs font-mono text-slate-600"></span>
             </div>
-
-            <!-- COLUMNA DERECHA: RESULTADO -->
-            <div class="lg:col-span-5 bg-slate-100 border-l border-slate-200 flex flex-col">
-                <div class="p-6 sticky top-0 max-h-screen overflow-y-auto">
-                    <div class="flex items-center justify-between mb-4">
-                        <h2 class="font-bold text-slate-800">📄 Informe Generado</h2>
-                        <div class="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded-full">Historial</div>
-                    </div>
-                    
-                    <!-- HISTORIAL DE INFORMES -->
-                    <div class="mb-4 p-3 bg-slate-50 rounded-lg border border-slate-200">
-                        <select id="historicoSelect" class="w-full p-2 bg-white border border-slate-300 rounded text-xs focus:ring-2 focus:ring-indigo-500 outline-none hover:border-blue-400 transition">
-                            <option value="">📜 Seleccionar informe anterior...</option>
-                        </select>
-                        <small class="text-slate-500 mt-1 block">Últimos 10 registros guardados</small>
-                    </div>
-
-                    <div id="reportContainer" class="hidden">
-                        <div class="bg-white rounded-lg shadow-sm border border-slate-300 p-4 mb-4">
-                            <div id="informe" class="text-sm whitespace-pre-wrap leading-relaxed text-slate-700"></div>
-                        </div>
-                        <button type="button" id="copiarBtn" class="w-full px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded font-semibold text-sm transition flex items-center justify-center gap-2">
-                            <i data-lucide="copy" class="w-4 h-4"></i>
-                            <span>Copiar al Portapapeles</span>
-                        </button>
-                        <div id="timestamp" class="text-xs text-slate-500 text-center italic mt-3"></div>
-                    </div>
-
-                    <div id="noReport" class="bg-slate-200 rounded-lg p-6 text-center text-slate-600 text-sm">
-                        <i data-lucide="clipboard" class="w-8 h-8 mx-auto mb-2 opacity-50"></i>
-                        <p>El informe aparecerá aquí una vez generado</p>
-                    </div>
-                </div>
-            </div>
+            <pre id="printTexto" class="report-font whitespace-pre-wrap text-sm leading-relaxed p-4 border border-slate-300 rounded-lg bg-slate-50"></pre>
         </div>
+
+        <main class="no-print grid grid-cols-1 lg:grid-cols-12 rounded-b-2xl overflow-hidden">
+
+            <!-- COLUMNA IZQUIERDA: FORMULARIO (7/12) -->
+            <div class="lg:col-span-7 p-4 sm:p-6 space-y-4 bg-slate-50 dark:bg-slate-900/60">
+
+                <!-- Banner Cargar Último Registro -->
+                <div id="loadLastContainer" class="hidden bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800/80 rounded-xl p-3 flex items-center justify-between gap-2">
+                    <span class="text-xs font-medium text-indigo-800 dark:text-indigo-200 flex items-center gap-1.5">
+                        <i data-lucide="history" class="w-4 h-4 text-indigo-500"></i>
+                        Último personal / operador Argos guardado disponible
+                    </span>
+                    <button type="button" onclick="cargarUltimos()" class="px-3 py-1 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-lg transition cursor-pointer shrink-0">
+                        Reutilizar nombres
+                    </button>
+                </div>
+
+                <!-- 1. EVENTO 1: INICIO DE CHEQUEO -->
+                <div class="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 space-y-4">
+                    <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-2.5">
+                        <h2 class="font-bold text-slate-800 dark:text-slate-100 text-sm flex items-center gap-2">
+                            <span class="bg-indigo-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">1</span>
+                            Evento 1 · Aviso de Inicio de Chequeo
+                        </h2>
+                        <label class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 dark:text-slate-300 cursor-pointer select-none">
+                            <input type="checkbox" id="chkIncluirTituloBule" checked onchange="sincronizarInforme()" class="rounded border-slate-300 text-indigo-600">
+                            Incluir título "Control de Botones - Bulevard"
+                        </label>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-12 gap-3.5">
+                        <div class="sm:col-span-4">
+                            <label for="hora1" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">⏰ Hora Inicio</label>
+                            <div class="flex items-stretch">
+                                <input type="time" id="hora1" oninput="alCambiarHora1()" class="w-full min-w-0 px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-r-0 border-slate-300 dark:border-slate-700 rounded-l-xl text-xs sm:text-sm font-mono text-slate-900 dark:text-white outline-none focus:border-indigo-500">
+                                <button type="button" onclick="ponerHoraBule('hora1')" class="px-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-r-xl text-[11px] font-semibold transition cursor-pointer shrink-0">Ahora</button>
+                            </div>
+                        </div>
+
+                        <div class="sm:col-span-8 relative">
+                            <div class="flex items-center justify-between mb-1">
+                                <label for="informante1" class="block text-xs font-semibold text-slate-600 dark:text-slate-300">👤 Personal / Control Interno (1 letra p/ buscar)</label>
+                                <button type="button" onclick="limpiarInputBule('informante1')" class="text-[11px] text-slate-400 hover:text-rose-500 cursor-pointer">Borrar</button>
+                            </div>
+                            <input type="text" id="informante1" autocomplete="off" placeholder="Ej: Control Interno Castaño Pablo / Zamboni Rodrigo..."
+                                class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-white outline-none focus:border-indigo-500">
+                            <div id="dropInformante1" class="hidden absolute left-0 right-0 top-full mt-1 z-50 max-h-52 overflow-y-auto rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-xl divide-y divide-slate-100 dark:divide-slate-800"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. EVENTO 2: CONFIRMACIÓN ARGOS -->
+                <div class="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 space-y-4">
+                    <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-2.5">
+                        <h2 class="font-bold text-slate-800 dark:text-slate-100 text-sm flex items-center gap-2">
+                            <span class="bg-emerald-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">2</span>
+                            Evento 2 · Confirmación de Central Argos
+                            <span id="duracion" class="hidden text-[11px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800"></span>
+                        </h2>
+                        <span id="error-hora2" class="hidden text-[11px] font-semibold text-rose-600 dark:text-rose-400">⚠️ Hora 2 anterior a Hora 1</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-12 gap-3.5">
+                        <div class="sm:col-span-5">
+                            <div class="flex items-center justify-between mb-1">
+                                <label for="hora2" class="text-xs font-semibold text-slate-600 dark:text-slate-300">⏰ Hora Confirmación</label>
+                                <div class="flex items-center gap-1">
+                                    <button type="button" onclick="sumarMinHora2(3)" class="text-[10px] font-mono font-semibold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer">+3m</button>
+                                    <button type="button" onclick="sumarMinHora2(5)" class="text-[10px] font-mono font-semibold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer">+5m</button>
+                                    <button type="button" onclick="sumarMinHora2(8)" class="text-[10px] font-mono font-semibold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer">+8m</button>
+                                </div>
+                            </div>
+                            <div class="flex items-stretch">
+                                <input type="time" id="hora2" oninput="validarHoras(); sincronizarInforme()" class="w-full min-w-0 px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-r-0 border-slate-300 dark:border-slate-700 rounded-l-xl text-xs sm:text-sm font-mono text-slate-900 dark:text-white outline-none focus:border-emerald-500">
+                                <button type="button" onclick="ponerHoraBule('hora2')" class="px-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-r-xl text-[11px] font-semibold transition cursor-pointer shrink-0">Ahora</button>
+                            </div>
+                        </div>
+
+                        <div class="sm:col-span-7 relative">
+                            <div class="flex items-center justify-between mb-1">
+                                <label for="informante2" class="text-xs font-semibold text-slate-600 dark:text-slate-300">👤 Quién Informa Confirmación</label>
+                                <button type="button" onclick="igualarInformante2()" class="text-[11px] text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer">= Igual a Evento 1</button>
+                            </div>
+                            <input type="text" id="informante2" autocomplete="off" placeholder="Mismo informante u otro..."
+                                class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-white outline-none focus:border-emerald-500">
+                            <div id="dropInformante2" class="hidden absolute left-0 right-0 top-full mt-1 z-50 max-h-52 overflow-y-auto rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-xl divide-y divide-slate-100 dark:divide-slate-800"></div>
+                        </div>
+                    </div>
+
+                    <!-- Operador de Argos -->
+                    <div class="relative">
+                        <div class="flex items-center justify-between mb-1">
+                            <label for="argos" class="block text-xs font-semibold text-slate-600 dark:text-slate-300">🏢 Operador / Personal de Argos</label>
+                            <button type="button" onclick="limpiarInputBule('argos')" class="text-[11px] text-slate-400 hover:text-rose-500 cursor-pointer">Borrar</button>
+                        </div>
+                        <input type="text" id="argos" autocomplete="off" placeholder="Ej: Sr. Gómez / Sra. López / Op. Martínez..."
+                            class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-white outline-none focus:border-indigo-500">
+                        <div id="dropArgos" class="hidden absolute left-0 right-0 top-full mt-1 z-50 max-h-48 overflow-y-auto rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-xl divide-y divide-slate-100 dark:divide-slate-800"></div>
+                        <div class="flex flex-wrap items-center gap-1 mt-1.5">
+                            <span class="text-[10px] font-semibold text-slate-400">Trato:</span>
+                            <button type="button" onclick="aplicarTratoArgos('Sr.')" class="px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 text-[10px] font-semibold cursor-pointer">Sr.</button>
+                            <button type="button" onclick="aplicarTratoArgos('Sra.')" class="px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 text-[10px] font-semibold cursor-pointer">Sra.</button>
+                            <button type="button" onclick="aplicarTratoArgos('Op.')" class="px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 text-[10px] font-semibold cursor-pointer">Op.</button>
+                        </div>
+                    </div>
+
+                    <!-- Estado de Recepción de Señales -->
+                    <div class="space-y-2.5 pt-1 border-t border-slate-100 dark:border-slate-800">
+                        <label for="estadoSenales" class="block text-xs font-semibold text-slate-600 dark:text-slate-300">📡 Resultado Informado por Argos</label>
+                        <select id="estadoSenales" onchange="alCambiarEstadoSenales()" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs sm:text-sm font-semibold text-slate-900 dark:text-white outline-none focus:border-indigo-500">
+                            <option value="que se recibieron todas las señales de los pulsadores">🟢 Se recibieron todas las señales de los pulsadores (Clásico)</option>
+                            <option value="excepcion">🟠 Se recibieron las señales excepto un pulsador puntual...</option>
+                            <option value="falla">🔴 No se recibieron señales / falla de enlace...</option>
+                            <option value="custom">✏️ Redactar resultado personalizado...</option>
+                        </select>
+
+                        <div id="bloqueDetalleFalla" class="hidden space-y-2">
+                            <input type="text" id="detalleSenales" oninput="sincronizarInforme()" placeholder="Ej: pulsador de Caja Slots Ventanilla 2 (se informa a Dpto. Técnico)"
+                                class="w-full px-3 py-2 bg-amber-50/60 dark:bg-amber-950/30 border border-amber-300 dark:border-amber-800 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-white outline-none focus:border-amber-500">
+                            <div class="flex flex-wrap gap-1">
+                                <span class="text-[10px] text-slate-400 font-semibold self-center">Sectores Bulevard:</span>
+                                <button type="button" onclick="insertarSectorFalla('pulsador de Caja Slots')" class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-[10px] font-semibold text-slate-700 dark:text-slate-300 cursor-pointer">Caja Slots</button>
+                                <button type="button" onclick="insertarSectorFalla('pulsador de Tesoro Slots')" class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-[10px] font-semibold text-slate-700 dark:text-slate-300 cursor-pointer">Tesoro Slots</button>
+                                <button type="button" onclick="insertarSectorFalla('pulsador de Caja JV')" class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-[10px] font-semibold text-slate-700 dark:text-slate-300 cursor-pointer">Caja JV</button>
+                                <button type="button" onclick="insertarSectorFalla('pulsador de Tesoro JV')" class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-[10px] font-semibold text-slate-700 dark:text-slate-300 cursor-pointer">Tesoro JV</button>
+                                <button type="button" onclick="insertarSectorFalla('pulsador de Recepción')" class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-[10px] font-semibold text-slate-700 dark:text-slate-300 cursor-pointer">Recepción</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- COLUMNA DERECHA: VISTA PREVIA EN VIVO E HISTORIAL (5/12) -->
+            <div class="lg:col-span-5 bg-slate-100/80 dark:bg-slate-950/60 border-t lg:border-t-0 lg:border-l border-slate-200 dark:border-slate-800 p-4 sm:p-6 flex flex-col justify-between space-y-4">
+                <div class="space-y-4">
+
+                    <!-- Vista Previa Editable -->
+                    <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-4 space-y-3">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <h2 class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-200 flex items-center gap-2">
+                                <span class="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-pulse"></span>
+                                Informe en Vivo
+                            </h2>
+                            <div class="flex items-center gap-1.5">
+                                <button type="button" onclick="restaurarInformeBule()" class="px-2 py-1 rounded-lg text-[11px] font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition inline-flex items-center gap-1 cursor-pointer">
+                                    <i data-lucide="refresh-cw" class="w-3 h-3"></i>
+                                    Restaurar
+                                </button>
+                                <button type="button" onclick="window.print()" class="px-2 py-1 rounded-lg text-[11px] font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition inline-flex items-center gap-1 cursor-pointer" title="Imprimir">
+                                    <i data-lucide="printer" class="w-3 h-3"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <textarea id="informe" rows="12" spellcheck="false" oninput="actualizarImpresionBule()"
+                            class="report-font w-full min-h-[270px] p-3.5 bg-slate-50 dark:bg-slate-950 border-2 border-indigo-200 dark:border-indigo-900/80 rounded-xl text-xs sm:text-sm leading-relaxed text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-indigo-500 resize-y"></textarea>
+
+                        <!-- Copiar Evento 1 o Evento 2 por separado -->
+                        <div class="grid grid-cols-2 gap-2">
+                            <button type="button" onclick="copiarEventoBule(1)" class="py-1.5 px-2.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900 text-indigo-700 dark:text-indigo-300 border border-indigo-200/70 dark:border-indigo-800 text-[11px] font-semibold transition cursor-pointer">
+                                Copiar Evento 1 (Inicio)
+                            </button>
+                            <button type="button" onclick="copiarEventoBule(2)" class="py-1.5 px-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900 text-emerald-700 dark:text-emerald-300 border border-emerald-200/70 dark:border-emerald-800 text-[11px] font-semibold transition cursor-pointer">
+                                Copiar Evento 2 (Argos)
+                            </button>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-12 gap-2">
+                            <button type="button" id="copiarBtn" onclick="copiarYGuardarBule()" class="sm:col-span-8 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold text-xs sm:text-sm transition flex items-center justify-center gap-2 shadow-md cursor-pointer active:scale-[0.99]">
+                                <i data-lucide="copy" class="w-4 h-4"></i>
+                                <span>Copiar y Guardar</span>
+                            </button>
+                            <button type="button" onclick="copiarWhatsAppBule()" class="sm:col-span-4 px-3 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-sm cursor-pointer active:scale-[0.99]">
+                                <i data-lucide="message-square" class="w-3.5 h-3.5"></i>
+                                <span>WhatsApp</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Historial de Chequeos -->
+                    <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-4 space-y-3">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-200 flex items-center gap-1.5">
+                                <i data-lucide="history" class="w-4 h-4 text-indigo-500"></i>
+                                Historial Bulevard (<span id="countHistorialBule">0</span>)
+                            </h3>
+                            <div class="flex items-center gap-1.5">
+                                <button type="button" onclick="exportarCSVBule()" class="px-2 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900 text-emerald-700 dark:text-emerald-300 text-[11px] font-semibold transition inline-flex items-center gap-1 cursor-pointer">
+                                    <i data-lucide="sheet" class="w-3 h-3"></i> CSV
+                                </button>
+                                <button type="button" onclick="exportarTXTBule()" class="px-2 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900 text-indigo-700 dark:text-indigo-300 text-[11px] font-semibold transition inline-flex items-center gap-1 cursor-pointer">
+                                    <i data-lucide="download" class="w-3 h-3"></i> TXT
+                                </button>
+                                <button type="button" onclick="vaciarHistorialBule()" class="p-1 rounded-lg text-slate-400 hover:text-rose-500 transition cursor-pointer" title="Vaciar historial">
+                                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="relative">
+                            <input type="text" id="buscarHistorialBule" oninput="renderizarHistorialBule()" placeholder="Filtrar por Control Interno, Argos o fecha..."
+                                class="w-full pl-8 pr-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-xs text-slate-800 dark:text-slate-200 outline-none focus:border-indigo-500">
+                            <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2"></i>
+                        </div>
+
+                        <div id="listaHistorialBule" class="space-y-1.5 max-h-52 overflow-y-auto pr-0.5 text-xs">
+                            <p class="text-slate-400 text-center py-3">Sin chequeos guardados</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
     </div>
 
-    <!-- DATALISTS -->
-    <datalist id="informantes-list">
-        <option value="Supervisor de Seguridad Padilla Jorge"></option>
-        <option value="Control Interno Zamboni Rodrigo"></option>
-        <option value="Control Interno Flores Julian"></option>
-        <option value="Control Interno Argañaraz Lorena"></option>
-        <option value="Control Interno Frias Ximena"></option>
-        <option value="Control Interno Castaño Pablo"></option>
-        <option value="Control Interno Zambrana Celeste"></option>
-        <option value="Control Interno Caqui Victoria"></option>
-    </datalist>
-
     <!-- TOAST NOTIFICACIONES -->
-    <div id="notification" class="hidden fixed bottom-4 right-4 bg-green-100 text-green-800 px-4 py-3 rounded-lg shadow-lg flex items-center gap-2 fade-in z-40">
-        <i data-lucide="check-circle" class="w-4 h-4"></i>
+    <div id="notification" class="no-print hidden fixed bottom-5 right-5 bg-slate-900 dark:bg-slate-800 text-white border border-slate-700 px-4 py-3 rounded-xl shadow-2xl flex items-center gap-2 text-xs font-semibold z-50">
+        <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>
         <span id="notification-text">Operación exitosa</span>
     </div>
 
-<script>
-    lucide.createIcons();
+    <script>
+        const BULE_STORAGE = {
+            draftKey: 'chkBuleDraft_v2',
+            lastKey: 'chkBuleLastRecord',
+            historyKey: 'chkBuleHistorial',
+            informantesExtraKey: 'chkBuleInformantesFrecuentes',
+            argosExtraKey: 'chkBuleArgosFrecuentes',
+            maxHistory: 50
+        };
 
-    const formulario = document.getElementById('formulario-informe');
-    const informeDiv = document.getElementById('informe');
-    const reportContainer = document.getElementById('reportContainer');
-    const noReport = document.getElementById('noReport');
-    const copiarBtn = document.getElementById('copiarBtn');
-    const generarBtn = document.getElementById('generarBtn');
-    const guardarBtn = document.getElementById('guardarBtn');
-    const timestampElement = document.getElementById('timestamp');
-    const historicoSelect = document.getElementById('historicoSelect');
-    const loadLastContainer = document.getElementById('loadLastContainer');
-    const loadLastBtn = document.getElementById('loadLastBtn');
+        const INFORMANTES_BULE_BASE = [
+            'Supervisor de Seguridad Padilla Jorge',
+            'Supervisora de Control Interno Rojas Dolly',
+            'Supervisor de Control Interno Urbano Daniel',
+            'Control Interno Zamboni Rodrigo',
+            'Control Interno Flores Julian',
+            'Control Interno Argañaraz Lorena',
+            'Control Interno Frias Ximena',
+            'Control Interno Castaño Pablo',
+            'Control Interno Zambrana Celeste',
+            'Control Interno Caqui Victoria',
+            'Control Interno Yujra Fernando',
+            'Control Interno Rizzato Enzo',
+            'Control Interno Robinson Gonzalo'
+        ];
 
-    // Auto-completar informante2 cuando se cambia informante1
-    document.getElementById('informante1').addEventListener('input', function() {
-        document.getElementById('informante2').value = this.value;
-    });
+        let historialBule = [];
+        let informantesExtra = [];
+        let argosExtra = [];
+        let textoAutoBule = '';
+        let eventosBule = ['', ''];
+        let toastBuleTimer = null;
 
-    // Validación de horas en tiempo real
-    document.getElementById('hora1').addEventListener('change', validarHoras);
-    document.getElementById('hora2').addEventListener('change', validarHoras);
-
-    function validarHoras() {
-        const hora1 = document.getElementById('hora1').value;
-        const hora2 = document.getElementById('hora2').value;
-        const error1 = document.getElementById('error-hora1');
-        const error2 = document.getElementById('error-hora2');
-        const duracion = document.getElementById('duracion');
-
-        if (!hora1 || !hora2) return;
-
-        const [h1, m1] = hora1.split(':').map(Number);
-        const [h2, m2] = hora2.split(':').map(Number);
-        const minutos1 = h1 * 60 + m1;
-        const minutos2 = h2 * 60 + m2;
-
-        // Determinar si es válido: puede ser mismo día o cruzar medianoche
-        let esValido = false;
-        let diff = 0;
-        
-        if (minutos2 > minutos1) {
-            // Caso normal: mismo día
-            esValido = true;
-            diff = minutos2 - minutos1;
-        } else if (h1 >= 12 && minutos2 < minutos1) {
-            // Si entrada es en tarde/noche y salida es menor, asumir día siguiente
-            esValido = true;
-            diff = (24 * 60 - minutos1) + minutos2;
+        function normStr(s) {
+            return String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
         }
 
-        if (!esValido) {
-            error1.classList.remove('hidden');
-            error2.classList.remove('hidden');
-            duracion.classList.add('hidden');
-        } else {
-            error1.classList.add('hidden');
-            error2.classList.add('hidden');
-            const mins = diff % 60;
-            const hrs = Math.floor(diff / 60);
-            duracion.textContent = `⏱️ Duración: ${hrs}h ${mins}m`;
-            duracion.classList.remove('hidden');
+        function escHtml(s) {
+            return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
         }
-    }
 
-    // Verificar si existe último registro y cargarlo bajo demanda
-    function verificarUltimoDisponible() {
-        const ultimo = localStorage.getItem('chkBuleLastRecord');
-        if (ultimo) {
-            loadLastContainer.classList.remove('hidden');
+        function getNowStr() {
+            const now = new Date();
+            return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
         }
-    }
 
-    function cargarUltimos() {
-        const ultimo = localStorage.getItem('chkBuleLastRecord');
-        if (ultimo) {
-            try {
-                const data = JSON.parse(ultimo);
-                document.getElementById('hora1').value = data.hora1 || '';
-                document.getElementById('informante1').value = data.informante1 || '';
-                document.getElementById('hora2').value = data.hora2 || '';
-                document.getElementById('informante2').value = data.informante2 || '';
-                document.getElementById('argos').value = data.argos || '';
+        function sumarMinutosStr(hora, mins) {
+            if (!hora || !hora.includes(':')) return '';
+            const [h, m] = hora.split(':').map(Number);
+            if (isNaN(h) || isNaN(m)) return '';
+            const tot = ((h * 60 + m + mins) % 1440 + 1440) % 1440;
+            return `${String(Math.floor(tot / 60)).padStart(2, '0')}:${String(tot % 60).padStart(2, '0')}`;
+        }
+
+        window.ponerHoraBule = function (id) {
+            document.getElementById(id).value = getNowStr();
+            if (id === 'hora1') alCambiarHora1();
+            else {
                 validarHoras();
-                showNotification('Último registro cargado');
+                sincronizarInforme();
+            }
+        };
+
+        window.alCambiarHora1 = function () {
+            validarHoras();
+            sincronizarInforme();
+        };
+
+        window.sumarMinHora2 = function (mins) {
+            const base = document.getElementById('hora1').value || getNowStr();
+            document.getElementById('hora1').value = base;
+            document.getElementById('hora2').value = sumarMinutosStr(base, mins);
+            validarHoras();
+            sincronizarInforme();
+        };
+
+        window.igualarInformante2 = function () {
+            const i2 = document.getElementById('informante2');
+            i2.value = document.getElementById('informante1').value;
+            delete i2.dataset.manualEdit;
+            sincronizarInforme();
+        };
+
+        window.limpiarInputBule = function (id) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.value = '';
+            el.focus();
+            sincronizarInforme();
+        };
+
+        window.aplicarTratoArgos = function (trato) {
+            const inp = document.getElementById('argos');
+            const limpio = inp.value.trim().replace(/^(Sr\.?|Sra\.?|Srta\.?|Op\.?)\s+/i, '');
+            inp.value = limpio ? `${trato} ${limpio}` : `${trato} `;
+            inp.focus();
+            const len = inp.value.length;
+            inp.setSelectionRange(len, len);
+            sincronizarInforme();
+        };
+
+        window.alCambiarEstadoSenales = function () {
+            const val = document.getElementById('estadoSenales').value;
+            const bloque = document.getElementById('bloqueDetalleFalla');
+            bloque.classList.toggle('hidden', val === 'que se recibieron todas las señales de los pulsadores');
+            if (!bloque.classList.contains('hidden')) {
+                document.getElementById('detalleSenales').focus();
+            }
+            sincronizarInforme();
+        };
+
+        window.insertarSectorFalla = function (texto) {
+            const inp = document.getElementById('detalleSenales');
+            inp.value = inp.value.trim() ? `${inp.value.trim()}, ${texto}` : texto;
+            inp.focus();
+            sincronizarInforme();
+        };
+
+        function validarHoras() {
+            const hora1 = document.getElementById('hora1').value;
+            const hora2 = document.getElementById('hora2').value;
+            const error2 = document.getElementById('error-hora2');
+            const duracion = document.getElementById('duracion');
+
+            if (!hora1 || !hora2) {
+                error2.classList.add('hidden');
+                duracion.classList.add('hidden');
+                return true;
+            }
+
+            const [h1, m1] = hora1.split(':').map(Number);
+            const [h2, m2] = hora2.split(':').map(Number);
+            const min1 = h1 * 60 + m1;
+            const min2 = h2 * 60 + m2;
+
+            let esValido = false;
+            let diff = 0;
+            if (min2 >= min1) {
+                esValido = true;
+                diff = min2 - min1;
+            } else if (h1 >= 18 && min2 < min1) {
+                esValido = true;
+                diff = (1440 - min1) + min2;
+            }
+
+            if (!esValido) {
+                error2.classList.remove('hidden');
+                duracion.classList.add('hidden');
+                return false;
+            } else {
+                error2.classList.add('hidden');
+                const hrs = Math.floor(diff / 60);
+                const mins = diff % 60;
+                duracion.textContent = hrs > 0 ? `⏱ ${hrs}h ${mins}m` : `⏱ ${mins} min`;
+                duracion.classList.remove('hidden');
+                return true;
+            }
+        }
+
+        // Autocompletado de 1 letra
+        function configurarAutocompleteBule(inputId, dropId, listGetterFn, esArgos = false) {
+            const inp = document.getElementById(inputId);
+            const dd = document.getElementById(dropId);
+            if (!inp || !dd) return;
+
+            const mostrar = () => {
+                const q = normStr(inp.value);
+                if (!q) { dd.classList.add('hidden'); return; }
+                const matches = listGetterFn().filter(it => normStr(it.valor).includes(q) && normStr(it.valor) !== q).slice(0, 10);
+                if (!matches.length) { dd.classList.add('hidden'); return; }
+                dd._matches = matches;
+                dd.innerHTML = matches.map((m, i) => `
+                    <div class="flex items-center justify-between hover:bg-indigo-50 dark:hover:bg-indigo-950/60 transition">
+                        <button type="button" onmousedown="event.preventDefault(); window._pickBuleAuto('${dropId}','${inputId}',${i})"
+                            class="flex-1 text-left px-3 py-2 text-xs font-semibold text-slate-800 dark:text-slate-100 cursor-pointer truncate">
+                            ${escHtml(m.valor)}
+                            ${m.custom ? '<span class="ml-1.5 text-[10px] font-normal text-indigo-500">frecuente</span>' : ''}
+                        </button>
+                        ${m.custom ? `
+                            <button type="button" onmousedown="event.preventDefault(); window._delBuleAuto(${esArgos ? 'true' : 'false'}, '${escHtml(m.valor).replace(/'/g, "\\'")}', '${inputId}')"
+                                class="px-2.5 py-2 text-slate-400 hover:text-rose-500 text-xs cursor-pointer" title="Olvidar">✕</button>
+                        ` : ''}
+                    </div>
+                `).join('');
+                dd.classList.remove('hidden');
+            };
+
+            inp.addEventListener('input', () => {
+                if (inputId === 'informante1' && !document.getElementById('informante2').dataset.manualEdit) {
+                    document.getElementById('informante2').value = inp.value;
+                } else if (inputId === 'informante2') {
+                    inp.dataset.manualEdit = '1';
+                }
+                mostrar();
+                sincronizarInforme();
+            });
+            inp.addEventListener('focus', mostrar);
+            inp.addEventListener('blur', () => setTimeout(() => dd.classList.add('hidden'), 150));
+        }
+
+        window._pickBuleAuto = function (dropId, inputId, idx) {
+            const dd = document.getElementById(dropId);
+            const inp = document.getElementById(inputId);
+            const item = dd?._matches?.[idx];
+            if (!inp || !item) return;
+            inp.value = item.valor;
+            if (inputId === 'informante1' && !document.getElementById('informante2').dataset.manualEdit) {
+                document.getElementById('informante2').value = item.valor;
+            }
+            dd.classList.add('hidden');
+            sincronizarInforme();
+        };
+
+        window._delBuleAuto = function (esArgos, valor, inputId) {
+            if (esArgos) {
+                argosExtra = argosExtra.filter(x => x !== valor);
+                localStorage.setItem(BULE_STORAGE.argosExtraKey, JSON.stringify(argosExtra));
+            } else {
+                informantesExtra = informantesExtra.filter(x => x !== valor);
+                localStorage.setItem(BULE_STORAGE.informantesExtraKey, JSON.stringify(informantesExtra));
+            }
+            document.getElementById(inputId)?.dispatchEvent(new Event('focus'));
+        };
+
+        function obtenerListaInformantesBule() {
+            const vistos = new Set();
+            const out = [];
+            informantesExtra.forEach(v => {
+                const k = normStr(v);
+                if (k && !vistos.has(k)) { vistos.add(k); out.push({ valor: v, custom: true }); }
+            });
+            INFORMANTES_BULE_BASE.forEach(v => {
+                const k = normStr(v);
+                if (k && !vistos.has(k)) { vistos.add(k); out.push({ valor: v, custom: false }); }
+            });
+            return out;
+        }
+
+        function obtenerListaArgosBule() {
+            return argosExtra.map(v => ({ valor: v, custom: true }));
+        }
+
+        // Generador del Informe en Vivo
+        window.sincronizarInforme = function () {
+            const h1 = document.getElementById('hora1').value || '--:--';
+            const h2 = document.getElementById('hora2').value || '--:--';
+            const inf1 = document.getElementById('informante1').value.trim() || '[Control Interno]';
+            const inf2 = document.getElementById('informante2').value.trim() || inf1;
+            const argos = document.getElementById('argos').value.trim() || '[Personal Argos]';
+
+            const estado = document.getElementById('estadoSenales').value;
+            const det = document.getElementById('detalleSenales').value.trim().replace(/\.+-?$/, '');
+            let fraseResultado = 'que se recibieron todas las señales de los pulsadores';
+
+            if (estado === 'excepcion') {
+                fraseResultado = `que se recibieron las señales de los pulsadores a excepción de ${det || '[especificar pulsador]'}`;
+            } else if (estado === 'falla') {
+                fraseResultado = `que no se recibieron señales de ${det || 'los pulsadores (se verifica enlace)'}`;
+            } else if (estado === 'custom') {
+                fraseResultado = det.startsWith('que ') ? det : `que ${det || 'se verificó el estado de los pulsadores'}`;
+            }
+
+            const ev1 = `A las ${h1} Hs. CCTV recibe llamada de ${inf1}, informa que realizará chequeo de botones antipánico.-`;
+            const ev2 = `A las ${h2} Hs. ${inf2}, informa que se comunicó personal de Argos ${argos} informando ${fraseResultado}.-`;
+
+            eventosBule = [ev1, ev2];
+            const conTitulo = document.getElementById('chkIncluirTituloBule').checked;
+            textoAutoBule = `${conTitulo ? 'Control de Botones - Bulevard\n\n' : ''}${ev1}\n\n${ev2}`;
+
+            document.getElementById('informe').value = textoAutoBule;
+            guardarBorradorBule();
+            actualizarImpresionBule();
+        };
+
+        window.actualizarImpresionBule = function () {
+            const area = document.getElementById('informe');
+            area.style.height = 'auto';
+            area.style.height = Math.max(270, area.scrollHeight + 6) + 'px';
+            document.getElementById('printTexto').textContent = area.value;
+            document.getElementById('printFechaHora').textContent = new Date().toLocaleString('es-AR');
+        };
+
+        window.restaurarInformeBule = function () {
+            document.getElementById('informe').value = textoAutoBule;
+            actualizarImpresionBule();
+            showNotification('Informe automático restaurado');
+        };
+
+        function guardarBorradorBule() {
+            const draft = {
+                incluirTitulo: document.getElementById('chkIncluirTituloBule').checked,
+                hora1: document.getElementById('hora1').value,
+                informante1: document.getElementById('informante1').value,
+                hora2: document.getElementById('hora2').value,
+                informante2: document.getElementById('informante2').value,
+                argos: document.getElementById('argos').value,
+                estadoSenales: document.getElementById('estadoSenales').value,
+                detalleSenales: document.getElementById('detalleSenales').value
+            };
+            try {
+                localStorage.setItem(BULE_STORAGE.draftKey, JSON.stringify(draft));
             } catch (e) {}
         }
-    }
 
-    loadLastBtn.addEventListener('click', cargarUltimos);
+        window.cargarUltimos = function () {
+            try {
+                const data = JSON.parse(localStorage.getItem(BULE_STORAGE.lastKey) || 'null');
+                if (!data) return;
+                if (data.informante1) document.getElementById('informante1').value = data.informante1;
+                if (data.informante2) document.getElementById('informante2').value = data.informante2;
+                if (data.argos) document.getElementById('argos').value = data.argos;
+                sincronizarInforme();
+                showNotification('Personal de Control Interno y Argos reutilizados');
+            } catch (e) {}
+        };
 
-    // Cargar historial desde localStorage
-    function actualizarHistorial() {
-        const historial = JSON.parse(localStorage.getItem('chkBuleHistorial') || '[]');
-        historicoSelect.innerHTML = '<option value="">📜 Seleccionar informe anterior...</option>';
-        historial.forEach((item, idx) => {
-            const option = document.createElement('option');
-            option.value = idx;
-            option.textContent = `${item.fecha} - ${item.hora1} a ${item.hora2} (${item.informante1})`;
-            historicoSelect.appendChild(option);
+        function inicializarBule() {
+            try {
+                informantesExtra = JSON.parse(localStorage.getItem(BULE_STORAGE.informantesExtraKey) || '[]');
+                argosExtra = JSON.parse(localStorage.getItem(BULE_STORAGE.argosExtraKey) || '[]');
+                historialBule = JSON.parse(localStorage.getItem(BULE_STORAGE.historyKey) || '[]');
+            } catch (e) {}
+
+            if (localStorage.getItem(BULE_STORAGE.lastKey)) {
+                document.getElementById('loadLastContainer').classList.remove('hidden');
+            }
+
+            let draft = null;
+            try {
+                draft = JSON.parse(localStorage.getItem(BULE_STORAGE.draftKey) || 'null');
+            } catch (e) {}
+
+            const ahora = getNowStr();
+            if (draft) {
+                if (draft.incluirTitulo !== undefined) document.getElementById('chkIncluirTituloBule').checked = Boolean(draft.incluirTitulo);
+                document.getElementById('hora1').value = draft.hora1 || ahora;
+                document.getElementById('hora2').value = draft.hora2 || sumarMinutosStr(ahora, 5);
+                document.getElementById('informante1').value = draft.informante1 || '';
+                document.getElementById('informante2').value = draft.informante2 || draft.informante1 || '';
+                document.getElementById('argos').value = draft.argos || '';
+                if (draft.estadoSenales) document.getElementById('estadoSenales').value = draft.estadoSenales;
+                document.getElementById('detalleSenales').value = draft.detalleSenales || '';
+                document.getElementById('bloqueDetalleFalla').classList.toggle('hidden', document.getElementById('estadoSenales').value === 'que se recibieron todas las señales de los pulsadores');
+            } else {
+                document.getElementById('hora1').value = ahora;
+                document.getElementById('hora2').value = sumarMinutosStr(ahora, 5);
+            }
+
+            validarHoras();
+            renderizarHistorialBule();
+            sincronizarInforme();
+        }
+
+        async function escribirPortapapelesBule(txt) {
+            try {
+                if (navigator.clipboard && window.isSecureContext) {
+                    await navigator.clipboard.writeText(txt);
+                    return true;
+                }
+            } catch (e) {}
+            try {
+                const t = document.createElement('textarea');
+                t.value = txt;
+                t.style.position = 'fixed';
+                t.style.opacity = '0';
+                document.body.appendChild(t);
+                t.select();
+                const ok = document.execCommand('copy');
+                t.remove();
+                return ok;
+            } catch (e) {
+                return false;
+            }
+        }
+
+        window.copiarEventoBule = async function (num) {
+            const txt = eventosBule[num - 1] || '';
+            if (!txt) return;
+            await escribirPortapapelesBule(txt);
+            showNotification(`Evento ${num} copiado al portapapeles`);
+        };
+
+        function registrarGuardadoBule(contenido) {
+            const hora1 = document.getElementById('hora1').value || '--:--';
+            const hora2 = document.getElementById('hora2').value || '--:--';
+            const informante1 = document.getElementById('informante1').value.trim();
+            const informante2 = document.getElementById('informante2').value.trim() || informante1;
+            const argos = document.getElementById('argos').value.trim();
+
+            if (informante1 || argos) {
+                localStorage.setItem(BULE_STORAGE.lastKey, JSON.stringify({ hora1, informante1, hora2, informante2, argos }));
+                document.getElementById('loadLastContainer').classList.remove('hidden');
+            }
+
+            [informante1, informante2].forEach(inf => {
+                if (inf.length >= 5 && !INFORMANTES_BULE_BASE.some(b => normStr(b) === normStr(inf))) {
+                    informantesExtra = [inf, ...informantesExtra.filter(x => normStr(x) !== normStr(inf))].slice(0, 20);
+                }
+            });
+            localStorage.setItem(BULE_STORAGE.informantesExtraKey, JSON.stringify(informantesExtra));
+
+            if (argos.length >= 3) {
+                argosExtra = [argos, ...argosExtra.filter(x => normStr(x) !== normStr(argos))].slice(0, 25);
+                localStorage.setItem(BULE_STORAGE.argosExtraKey, JSON.stringify(argosExtra));
+            }
+
+            if (historialBule.length > 0 && historialBule[0].contenido === contenido) return;
+            historialBule.unshift({
+                fecha: new Date().toLocaleString('es-AR'),
+                fechaISO: new Date().toISOString(),
+                hora1,
+                hora2,
+                informante1: informante1 || 'Sin especificar',
+                argos: argos || '',
+                contenido
+            });
+            historialBule = historialBule.slice(0, BULE_STORAGE.maxHistory);
+            localStorage.setItem(BULE_STORAGE.historyKey, JSON.stringify(historialBule));
+            renderizarHistorialBule();
+        }
+
+        window.copiarYGuardarBule = async function () {
+            const contenido = document.getElementById('informe').value.trim();
+            if (!contenido) return;
+            const ok = await escribirPortapapelesBule(contenido);
+            if (!ok) return;
+            registrarGuardadoBule(contenido);
+
+            const btn = document.getElementById('copiarBtn');
+            const orig = btn.innerHTML;
+            btn.innerHTML = '<i data-lucide="check" class="w-4 h-4"></i><span>¡Copiado y Guardado!</span>';
+            btn.classList.replace('bg-indigo-600', 'bg-emerald-600');
+            lucide.createIcons({ nodes: [btn] });
+            setTimeout(() => {
+                btn.innerHTML = orig;
+                btn.classList.replace('bg-emerald-600', 'bg-indigo-600');
+                lucide.createIcons({ nodes: [btn] });
+            }, 1700);
+
+            showNotification('¡Informe copiado y guardado en historial!');
+        };
+
+        window.copiarWhatsAppBule = async function () {
+            const limpio = document.getElementById('informe').value.trim().replace(/^Control de Botones\s*-\s*Bulevard\s*/i, '');
+            if (!limpio) return;
+            const msg = `🔔 *CONTROL DE BOTONES ANTIPÁNICO - BULEVARD*\n\n${limpio}`;
+            const ok = await escribirPortapapelesBule(msg);
+            if (ok) {
+                registrarGuardadoBule(document.getElementById('informe').value.trim());
+                showNotification('Copiado con formato WhatsApp');
+            }
+        };
+
+        window.renderizarHistorialBule = function () {
+            document.getElementById('countHistorialBule').textContent = String(historialBule.length);
+            const lista = document.getElementById('listaHistorialBule');
+            const q = normStr(document.getElementById('buscarHistorialBule')?.value || '');
+
+            const items = historialBule
+                .map((it, idx) => ({ it, idx }))
+                .filter(({ it }) => !q || normStr(`${it.informante1 || ''} ${it.argos || ''} ${it.fecha || ''} ${it.hora1 || ''} ${it.contenido || ''}`).includes(q));
+
+            if (!items.length) {
+                lista.innerHTML = `<p class="text-slate-400 text-center py-3">${historialBule.length ? 'Sin coincidencias' : 'Sin chequeos guardados'}</p>`;
+                return;
+            }
+
+            lista.innerHTML = items.map(({ it, idx }) => `
+                <div class="history-item p-2.5 rounded-lg bg-slate-50 dark:bg-slate-950/70 hover:bg-indigo-50/70 dark:hover:bg-slate-800/80 border border-slate-200/70 dark:border-slate-800 flex items-center justify-between gap-2">
+                    <button type="button" onclick="cargarItemBule(${idx})" class="flex-1 min-w-0 text-left cursor-pointer">
+                        <div class="flex items-center gap-1.5 flex-wrap">
+                            <span class="px-1.5 py-0.5 rounded bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 font-mono font-bold text-[10px]">${escHtml(it.hora1 || '--:--')}–${escHtml(it.hora2 || '--:--')}</span>
+                            <span class="text-[10px] font-mono text-slate-400">${escHtml((it.fecha || '').split(',')[0])}</span>
+                        </div>
+                        <p class="text-xs font-bold text-slate-800 dark:text-slate-100 truncate mt-0.5">${escHtml(it.informante1 || 'Control Interno')}</p>
+                        ${it.argos ? `<p class="text-[11px] text-slate-500 dark:text-slate-400 truncate">Argos: ${escHtml(it.argos)}</p>` : ''}
+                    </button>
+                    <div class="flex items-center gap-1 shrink-0">
+                        <button type="button" onclick="recopiarItemBule(${idx})" class="p-1.5 rounded-md text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-white dark:hover:bg-slate-900 cursor-pointer" title="Copiar">
+                            <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                        </button>
+                        <button type="button" onclick="eliminarItemBule(${idx})" class="p-1.5 rounded-md text-slate-400 hover:text-rose-500 hover:bg-white dark:hover:bg-slate-900 cursor-pointer" title="Eliminar">
+                            <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+            lucide.createIcons({ nodes: [lista] });
+        };
+
+        window.cargarItemBule = function (idx) {
+            const it = historialBule[idx];
+            if (!it) return;
+            document.getElementById('informe').value = it.contenido || '';
+            actualizarImpresionBule();
+            showNotification('Chequeo cargado en vista previa');
+        };
+
+        window.recopiarItemBule = async function (idx) {
+            const it = historialBule[idx];
+            if (!it?.contenido) return;
+            await escribirPortapapelesBule(it.contenido);
+            showNotification('Registro copiado del historial');
+        };
+
+        window.eliminarItemBule = function (idx) {
+            historialBule.splice(idx, 1);
+            localStorage.setItem(BULE_STORAGE.historyKey, JSON.stringify(historialBule));
+            renderizarHistorialBule();
+        };
+
+        window.vaciarHistorialBule = function () {
+            if (!historialBule.length || !confirm('¿Vaciar el historial de chequeos de Bulevard?')) return;
+            historialBule = [];
+            localStorage.removeItem(BULE_STORAGE.historyKey);
+            renderizarHistorialBule();
+        };
+
+        function descargarArchivoBule(contenido, nombre, mime) {
+            const blob = new Blob([contenido], { type: mime });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = nombre;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        window.exportarTXTBule = function () {
+            if (!historialBule.length) return showNotification('No hay registros para exportar', 'error');
+            let txt = '=== HISTORIAL CONTROL DE BOTONES - BULEVARD ===\n\n';
+            historialBule.forEach((it, i) => {
+                txt += `${i + 1}. ${it.fecha || ''}\n${it.contenido || ''}\n\n---\n\n`;
+            });
+            descargarArchivoBule(txt, `chequeo-botones-bulevard-${new Date().toISOString().split('T')[0]}.txt`, 'text/plain;charset=utf-8');
+        };
+
+        window.exportarCSVBule = function () {
+            if (!historialBule.length) return showNotification('No hay registros para exportar', 'error');
+            const esc = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
+            const rows = [['Fecha', 'Hora Inicio', 'Hora Fin', 'Control Interno', 'Operador Argos', 'Informe']];
+            historialBule.forEach(it => {
+                rows.push([it.fecha || '', it.hora1 || '', it.hora2 || '', it.informante1 || '', it.argos || '', it.contenido || '']);
+            });
+            descargarArchivoBule('\uFEFF' + rows.map(r => r.map(esc).join(';')).join('\r\n'), `chequeo-botones-bulevard-${new Date().toISOString().split('T')[0]}.csv`, 'text/csv;charset=utf-8');
+        };
+
+        window.limpiarChequeo = function () {
+            if ((document.getElementById('informante1').value.trim() || document.getElementById('argos').value.trim()) &&
+                !confirm('¿Restablecer los campos del chequeo actual?')) {
+                return;
+            }
+            const ahora = getNowStr();
+            document.getElementById('hora1').value = ahora;
+            document.getElementById('hora2').value = sumarMinutosStr(ahora, 5);
+            document.getElementById('informante1').value = '';
+            document.getElementById('informante2').value = '';
+            delete document.getElementById('informante2').dataset.manualEdit;
+            document.getElementById('argos').value = '';
+            document.getElementById('estadoSenales').value = 'que se recibieron todas las señales de los pulsadores';
+            document.getElementById('detalleSenales').value = '';
+            document.getElementById('bloqueDetalleFalla').classList.add('hidden');
+            localStorage.removeItem(BULE_STORAGE.draftKey);
+            validarHoras();
+            sincronizarInforme();
+            showNotification('Formulario restablecido');
+        };
+
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            document.getElementById('notification-text').textContent = message;
+            notification.classList.remove('hidden', 'border-rose-500', 'border-slate-700');
+            notification.classList.add(type === 'error' ? 'border-rose-500' : 'border-slate-700');
+            clearTimeout(toastBuleTimer);
+            toastBuleTimer = setTimeout(() => notification.classList.add('hidden'), 2600);
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            configurarAutocompleteBule('informante1', 'dropInformante1', obtenerListaInformantesBule, false);
+            configurarAutocompleteBule('informante2', 'dropInformante2', obtenerListaInformantesBule, false);
+            configurarAutocompleteBule('argos', 'dropArgos', obtenerListaArgosBule, true);
+            inicializarBule();
+
+            document.addEventListener('keydown', (e) => {
+                if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                    e.preventDefault();
+                    copiarYGuardarBule();
+                }
+            });
+            lucide.createIcons();
         });
-    }
-
-    historicoSelect.addEventListener('change', function() {
-        if (this.value === '') return;
-        const historial = JSON.parse(localStorage.getItem('chkBuleHistorial') || '[]');
-        const item = historial[Number(this.value)];
-        if (item) {
-            informeDiv.textContent = item.contenido;
-            timestampElement.textContent = `Generado el: ${item.fecha}`;
-            reportContainer.classList.remove('hidden');
-            noReport.classList.add('hidden');
-        }
-    });
-
-    // Generar informe
-    generarBtn.addEventListener('click', function() {
-        const hora1 = document.getElementById('hora1').value;
-        const informante1 = document.getElementById('informante1').value.trim();
-        const hora2 = document.getElementById('hora2').value;
-        const informante2 = document.getElementById('informante2').value.trim();
-        const argos = document.getElementById('argos').value.trim();
-
-        if (!hora1 || !informante1 || !hora2 || !informante2 || !argos) {
-            showNotification('Complete todos los campos obligatorios', 'error');
-            return;
-        }
-
-        // Validar horas (permitiendo cruce de medianoche en turno tarde/noche)
-        const [h1, m1] = hora1.split(':').map(Number);
-        const [h2, m2] = hora2.split(':').map(Number);
-        const min1 = h1 * 60 + m1;
-        const min2 = h2 * 60 + m2;
-        const horarioValido = (min2 > min1) || (h1 >= 12 && min2 < min1);
-        if (!horarioValido) {
-            showNotification('La hora 2 debe ser posterior a la hora 1', 'error');
-            return;
-        }
-
-        const contenido = `Control de Botones - Bulevard
-
-A las ${hora1} Hs. CCTV recibe llamada de ${informante1}, informa que realizará chequeo de botones antipánico.
-
-A las ${hora2} Hs. ${informante2}, informa que se comunicó personal de Argos ${argos} informando que se recibieron todas las señales de los pulsadores.`;
-
-        informeDiv.textContent = contenido;
-        timestampElement.textContent = `Generado el: ${new Date().toLocaleString('es-AR')}`;
-        reportContainer.classList.remove('hidden');
-        noReport.classList.add('hidden');
-        showNotification('¡Informe generado exitosamente!');
-    });
-
-    // Guardar registro
-    guardarBtn.addEventListener('click', function() {
-        const hora1 = document.getElementById('hora1').value;
-        const informante1 = document.getElementById('informante1').value.trim();
-        const hora2 = document.getElementById('hora2').value;
-        const informante2 = document.getElementById('informante2').value.trim();
-        const argos = document.getElementById('argos').value.trim();
-
-        if (!hora1 || !informante1 || !hora2 || !informante2 || !argos) {
-            showNotification('Complete todos los campos', 'error');
-            return;
-        }
-
-        // Guardar como último registro
-        localStorage.setItem('chkBuleLastRecord', JSON.stringify({
-            hora1, informante1, hora2, informante2, argos
-        }));
-        loadLastContainer.classList.remove('hidden');
-
-        // Guardar en historial (máx 10)
-        const contenido = informeDiv.textContent || `Control de Botones - Bulevard\n\nA las ${hora1} Hs. CCTV recibe llamada de ${informante1}, informa que realizará chequeo de botones antipánico.\n\nA las ${hora2} Hs. ${informante2}, informa que se comunicó personal de Argos ${argos} informando que se recibieron todas las señales de los pulsadores.`;
-        const historial = JSON.parse(localStorage.getItem('chkBuleHistorial') || '[]');
-        historial.unshift({
-            fecha: new Date().toLocaleString('es-AR'),
-            hora1, hora2, informante1,
-            contenido
-        });
-        if (historial.length > 10) historial.pop();
-        localStorage.setItem('chkBuleHistorial', JSON.stringify(historial));
-
-        actualizarHistorial();
-        showNotification('¡Registro guardado!');
-    });
-
-    // Copiar al portapapeles
-    copiarBtn.addEventListener('click', async () => {
-        const textoParaCopiar = informeDiv.textContent;
-        try {
-            await navigator.clipboard.writeText(textoParaCopiar);
-            showNotification('¡Copiado al portapapeles!');
-        } catch (err) {
-            const textArea = document.createElement('textarea');
-            textArea.value = textoParaCopiar;
-            document.body.appendChild(textArea);
-            textArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textArea);
-            showNotification('¡Copiado al portapapeles!');
-        }
-    });
-
-    // Establecer hora actual en los inputs
-    function establecerHoraActual() {
-        const now = new Date();
-        const horas = String(now.getHours()).padStart(2, '0');
-        const minutos = String(now.getMinutes()).padStart(2, '0');
-        const dFin = new Date(now.getTime() + 5 * 60000);
-        document.getElementById('hora1').value = `${horas}:${minutos}`;
-        document.getElementById('hora2').value = `${String(dFin.getHours()).padStart(2, '0')}:${String(dFin.getMinutes()).padStart(2, '0')}`;
-        validarHoras();
-    }
-
-    // Mostrar notificación
-    function showNotification(message, type = 'success') {
-        const notification = document.getElementById('notification');
-        document.getElementById('notification-text').textContent = message;
-        notification.classList.remove('hidden', 'bg-red-100', 'text-red-800', 'bg-green-100', 'text-green-800');
-        if (type === 'error') {
-            notification.classList.add('bg-red-100', 'text-red-800');
-        } else {
-            notification.classList.add('bg-green-100', 'text-green-800');
-        }
-        setTimeout(() => notification.classList.add('hidden'), 3000);
-    }
-
-    // Inicializar al cargar página
-    window.addEventListener('DOMContentLoaded', function() {
-        establecerHoraActual();
-        actualizarHistorial();
-        verificarUltimoDisponible();
-    });
-</script>
-<script src="js/global.js"></script>
-
+    </script>
+    <script src="js/global.js"></script>
 </body>
 </html>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Traslado de Valores - CCTV</title>
+    <title>Traslado de Valores · Tesorería CCTV</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -30,6 +30,31 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/global.css">
     <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .report-font {
+            font-family: 'JetBrains Mono', Consolas, monospace;
+        }
+        .history-item {
+            transition: all 0.16s ease;
+            border-left: 3px solid transparent;
+        }
+        .history-item:hover {
+            border-left-color: #6366f1;
+        }
+        @media print {
+            body {
+                background: #ffffff !important;
+                color: #0f172a !important;
+                padding: 0 !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+            #printSheet {
+                display: block !important;
+            }
+        }
+    </style>
 </head>
 <body class="bg-slate-100 dark:bg-slate-950 p-3 sm:p-5 md:p-8 text-slate-800 dark:text-slate-100 min-h-screen font-sans transition-colors duration-200">
 
@@ -42,16 +67,23 @@
                     <i data-lucide="banknote" class="w-6 h-6 text-white"></i>
                 </div>
                 <div>
-                    <h1 class="text-lg sm:text-xl font-bold leading-tight text-white">Traslado de Valores</h1>
-                    <p class="text-slate-400 text-xs uppercase tracking-wider">CCTV · Tesorería Multidivisa</p>
+                    <h1 class="text-lg sm:text-xl font-bold leading-tight text-white flex items-center gap-2 flex-wrap">
+                        Traslado de Valores
+                        <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Autoguardado</span>
+                    </h1>
+                    <p class="text-slate-400 text-xs uppercase tracking-wider">CCTV · Ingreso y Egreso de Efectivo en Tesoro (ARS / USD / EUR)</p>
                 </div>
             </div>
 
             <div class="flex flex-wrap items-center gap-2">
-                <div class="flex items-center gap-2 bg-slate-800 border border-slate-700 px-3 py-1.5 rounded-xl">
-                    <span class="text-xs font-semibold text-indigo-400">Hora Inicio:</span>
-                    <input type="time" id="horaBase" oninput="sincronizarTodo()" class="bg-transparent text-white font-mono text-xs outline-none">
-                </div>
+                <a href="calculadora2.html" class="px-3 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-xl text-xs font-semibold text-white transition inline-flex items-center gap-1.5 shadow-sm" title="Ir a Calculadora y Arqueo de Billetes">
+                    <i data-lucide="calculator" class="w-4 h-4"></i>
+                    <span class="hidden sm:inline">Arqueo</span>
+                </a>
+
+                <button type="button" onclick="limpiarCampos()" class="p-2 bg-slate-800 hover:bg-rose-600 border border-slate-700 rounded-xl transition text-slate-200 hover:text-white cursor-pointer" title="Restablecer formulario">
+                    <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
+                </button>
 
                 <div class="hidden md:flex items-center gap-2 bg-slate-800/90 border border-slate-700 px-3 py-1.5 rounded-xl text-xs font-mono text-slate-200">
                     <i data-lucide="clock" class="w-3.5 h-3.5 text-indigo-400"></i>
@@ -73,184 +105,1005 @@
             </div>
         </header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 rounded-b-2xl overflow-hidden">
-
-            <!-- COLUMNA IZQUIERDA: FORMULARIO -->
-            <div class="lg:col-span-7 p-5 sm:p-6 space-y-5 bg-slate-50 dark:bg-slate-900/60">
-                <div class="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
-                    <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2.5">
-                        <span class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
-                            <i data-lucide="briefcase" class="w-4 h-4"></i> 1. Datos del Operativo
-                        </span>
-                    </div>
-
-                    <div class="space-y-4">
-                        <div>
-                            <label for="g-jefe" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Jefe de Caja</label>
-                            <input type="text" id="g-jefe" placeholder="Nombre completo" oninput="sincronizarTodo()"
-                                class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition">
-                        </div>
-
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                            <div>
-                                <label for="g-monto" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Monto ARS ($)</label>
-                                <input type="text" id="g-monto" placeholder="000.000,00" oninput="sincronizarTodo()"
-                                    class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm font-mono text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition">
-                            </div>
-                            <div>
-                                <label for="g-usd" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Monto USD (u$s)</label>
-                                <input type="text" id="g-usd" placeholder="0.000,00" oninput="sincronizarTodo()"
-                                    class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm font-mono text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition">
-                            </div>
-                        </div>
-
-                        <div>
-                            <label for="g-destino" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Destino de Transferencia</label>
-                            <input type="text" id="g-destino" placeholder="Lugar o sala de destino" oninput="sincronizarTodo()"
-                                class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition">
-                        </div>
-
-                        <div>
-                            <label for="g-responsable" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Responsable de Traslado</label>
-                            <input type="text" id="g-responsable" placeholder="Nombre de quien traslada" oninput="sincronizarTodo()"
-                                class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="flex flex-wrap gap-2.5">
-                    <button type="button" onclick="volverAlInicio()" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2 shadow-sm cursor-pointer">
-                        <i data-lucide="refresh-cw" class="w-4 h-4"></i>
-                        <span>Hora Actual</span>
-                    </button>
-                    <button type="button" onclick="limpiarCampos()" class="px-4 py-2.5 bg-rose-600 hover:bg-rose-500 text-white rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2 shadow-sm cursor-pointer">
-                        <i data-lucide="trash-2" class="w-4 h-4"></i>
-                        <span>Limpiar Campos</span>
-                    </button>
-                </div>
-
-                <div class="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/50 rounded-xl p-3.5 flex items-center gap-2.5">
-                    <i data-lucide="info" class="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0"></i>
-                    <p class="text-xs text-amber-800 dark:text-amber-300">Si dejas uno de los montos vacío (ARS o USD), el sistema redactará únicamente la moneda informada.</p>
-                </div>
-            </div>
-
-            <!-- COLUMNA DERECHA: RESULTADO -->
-            <div class="lg:col-span-5 bg-slate-100/80 dark:bg-slate-950/60 border-t lg:border-t-0 lg:border-l border-slate-200 dark:border-slate-800 p-5 sm:p-6 flex flex-col justify-between">
+        <!-- Hoja exclusiva de Impresión -->
+        <div id="printSheet" class="hidden p-8 space-y-4">
+            <div class="border-b-2 border-slate-800 pb-3 flex justify-between items-start">
                 <div>
-                    <div class="flex items-center justify-between mb-3">
-                        <h2 class="text-sm font-bold uppercase tracking-wider text-slate-700 dark:text-slate-200 flex items-center gap-2">
-                            <i data-lucide="file-text" class="w-4 h-4 text-indigo-500"></i> Texto Generado
-                        </h2>
-                        <span class="text-[11px] bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/50 px-2 py-0.5 rounded-full font-semibold">Editable</span>
+                    <h2 class="text-lg font-bold uppercase">Acta CCTV · Operativo de Traslado de Valores (Tesoro)</h2>
+                    <p class="text-xs text-slate-600">Registro Cronológico de Monitoreo</p>
+                </div>
+                <span id="printFechaHora" class="text-xs font-mono text-slate-600"></span>
+            </div>
+            <pre id="printTexto" class="report-font whitespace-pre-wrap text-sm leading-relaxed p-4 border border-slate-300 rounded-lg bg-slate-50"></pre>
+        </div>
+
+        <main class="no-print grid grid-cols-1 lg:grid-cols-12 rounded-b-2xl overflow-hidden">
+
+            <!-- COLUMNA IZQUIERDA: FORMULARIO (7/12) -->
+            <div class="lg:col-span-7 p-4 sm:p-6 space-y-4 bg-slate-50 dark:bg-slate-900/60">
+
+                <!-- 1. Tipo de Operación (Egreso vs Ingreso) + Responsables -->
+                <div class="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+                    <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-2.5">
+                        <span class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
+                            <i data-lucide="briefcase" class="w-4 h-4"></i> 1. Tipo de Movimiento y Responsables
+                        </span>
+                        <span class="text-[11px] text-slate-400 font-mono">Ctrl+Enter copia y registra</span>
                     </div>
 
-                    <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-3 mb-4">
-                        <textarea id="outputEditable" spellcheck="false"
-                            class="report-font w-full h-96 p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs sm:text-sm text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-indigo-500 transition resize-none"></textarea>
+                    <!-- Selector Egreso vs Ingreso de Valores -->
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <button type="button" id="btnModoEgreso" onclick="cambiarTipoOperacion('egreso')" class="py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition cursor-pointer bg-indigo-600 text-white shadow-sm flex items-center justify-center gap-2">
+                            <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
+                            <span>📤 Egreso / Envío de Valores</span>
+                        </button>
+                        <button type="button" id="btnModoIngreso" onclick="cambiarTipoOperacion('ingreso')" class="py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition cursor-pointer bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center gap-2">
+                            <i data-lucide="arrow-down-left" class="w-4 h-4"></i>
+                            <span>📥 Ingreso / Recepción en Tesoro</span>
+                        </button>
+                    </div>
+
+                    <!-- Cargo + Jefe/a de Caja / Tesoro -->
+                    <div class="grid grid-cols-1 sm:grid-cols-12 gap-3.5">
+                        <div class="sm:col-span-4">
+                            <label for="g-rol-tesoro" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Cargo en Tesoro / Caja</label>
+                            <select id="g-rol-tesoro" onchange="sincronizarTodo()" class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs sm:text-sm font-semibold text-slate-900 dark:text-white outline-none focus:border-indigo-500">
+                                <option value="Jefe de Caja">Jefe de Caja</option>
+                                <option value="Jefa de Caja">Jefa de Caja</option>
+                                <option value="Tesorero">Tesorero</option>
+                                <option value="Tesorera">Tesorera</option>
+                                <option value="Asistente de Caja">Asistente de Caja</option>
+                                <option value="Enc. de Turno">Enc. de Turno</option>
+                            </select>
+                        </div>
+
+                        <div class="sm:col-span-8 relative">
+                            <div class="flex items-center justify-between mb-1">
+                                <label for="g-jefe" class="block text-xs font-semibold text-slate-600 dark:text-slate-300">Nombre en Tesoro / Caja (1 letra p/ buscar)</label>
+                                <button type="button" onclick="limpiarInputIedin('g-jefe')" class="text-[11px] text-slate-400 hover:text-rose-500 cursor-pointer">Borrar</button>
+                            </div>
+                            <input type="text" id="g-jefe" autocomplete="off" placeholder="Ej: Carrizo Natalia / Moises Ariel / Denz..."
+                                class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-white outline-none focus:border-indigo-500">
+                            <div id="dropJefeTesoro" class="hidden absolute left-0 right-0 top-full mt-1 z-50 max-h-48 overflow-y-auto rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-xl divide-y divide-slate-100 dark:divide-slate-800"></div>
+                        </div>
+                    </div>
+
+                    <!-- Montos Multidivisa (ARS, USD, EUR) -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div>
+                            <label for="g-monto" class="block text-xs font-bold text-emerald-700 dark:text-emerald-400 mb-1">🇦🇷 Monto ARS ($)</label>
+                            <input type="text" id="g-monto" inputmode="decimal" autocomplete="off" placeholder="Ej: 15.000.000,00"
+                                oninput="sincronizarTodo()" onblur="formatearDivisaBlur(this)"
+                                class="w-full px-3 py-2 bg-emerald-50/50 dark:bg-emerald-950/25 border border-emerald-300 dark:border-emerald-800 rounded-xl text-xs sm:text-sm font-mono font-bold text-slate-900 dark:text-white outline-none focus:border-emerald-500">
+                        </div>
+
+                        <div>
+                            <label for="g-usd" class="block text-xs font-bold text-indigo-700 dark:text-indigo-400 mb-1">💵 Monto USD (u$s)</label>
+                            <input type="text" id="g-usd" inputmode="decimal" autocomplete="off" placeholder="Ej: 5.000,00"
+                                oninput="sincronizarTodo()" onblur="formatearDivisaBlur(this)"
+                                class="w-full px-3 py-2 bg-indigo-50/40 dark:bg-indigo-950/25 border border-indigo-300 dark:border-indigo-800 rounded-xl text-xs sm:text-sm font-mono font-bold text-slate-900 dark:text-white outline-none focus:border-indigo-500">
+                        </div>
+
+                        <div>
+                            <label for="g-eur" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">💶 Monto EUR (€ · Opc.)</label>
+                            <input type="text" id="g-eur" inputmode="decimal" autocomplete="off" placeholder="Opcional"
+                                oninput="sincronizarTodo()" onblur="formatearDivisaBlur(this)"
+                                class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs sm:text-sm font-mono text-slate-900 dark:text-white outline-none focus:border-indigo-500">
+                        </div>
+                    </div>
+
+                    <!-- Destino u Origen + Chips Rápidos -->
+                    <div>
+                        <div class="flex items-center justify-between mb-1">
+                            <label id="lblDestinoOrigen" for="g-destino" class="block text-xs font-semibold text-slate-600 dark:text-slate-300">📍 Destino de la Transferencia</label>
+                            <button type="button" onclick="limpiarInputIedin('g-destino')" class="text-[11px] text-slate-400 hover:text-rose-500 cursor-pointer">Borrar</button>
+                        </div>
+                        <input type="text" id="g-destino" autocomplete="off" placeholder="Ej: Tesorería Central / Sala Luxor / Banco..." oninput="sincronizarTodo()"
+                            class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-white outline-none focus:border-indigo-500">
+                        <div class="flex flex-wrap gap-1 mt-1.5">
+                            <button type="button" onclick="setDestinoRapido('Tesorería Central')" class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 hover:bg-indigo-100 dark:hover:bg-indigo-950 text-[10px] font-semibold text-slate-600 dark:text-slate-300 cursor-pointer">Tesorería Central</button>
+                            <button type="button" onclick="setDestinoRapido('Sala Luxor')" class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 hover:bg-indigo-100 dark:hover:bg-indigo-950 text-[10px] font-semibold text-slate-600 dark:text-slate-300 cursor-pointer">Sala Luxor</button>
+                            <button type="button" onclick="setDestinoRapido('Casino Boulevard')" class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 hover:bg-indigo-100 dark:hover:bg-indigo-950 text-[10px] font-semibold text-slate-600 dark:text-slate-300 cursor-pointer">Casino Boulevard</button>
+                            <button type="button" onclick="setDestinoRapido('Caja Principal')" class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 hover:bg-indigo-100 dark:hover:bg-indigo-950 text-[10px] font-semibold text-slate-600 dark:text-slate-300 cursor-pointer">Caja Principal</button>
+                            <button type="button" onclick="setDestinoRapido('Caja Juegos Vivos')" class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 hover:bg-indigo-100 dark:hover:bg-indigo-950 text-[10px] font-semibold text-slate-600 dark:text-slate-300 cursor-pointer">Caja JV</button>
+                            <button type="button" onclick="setDestinoRapido('Administración / Contaduría')" class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 hover:bg-indigo-100 dark:hover:bg-indigo-950 text-[10px] font-semibold text-slate-600 dark:text-slate-300 cursor-pointer">Contaduría</button>
+                        </div>
+                    </div>
+
+                    <!-- Responsable de Traslado -->
+                    <div class="relative">
+                        <div class="flex items-center justify-between mb-1">
+                            <label for="g-responsable" class="block text-xs font-semibold text-slate-600 dark:text-slate-300">🛡️ Responsable de Traslado (1 o varios con "y")</label>
+                            <button type="button" onclick="limpiarInputIedin('g-responsable')" class="text-[11px] text-slate-400 hover:text-rose-500 cursor-pointer">Borrar</button>
+                        </div>
+                        <input type="text" id="g-responsable" autocomplete="off" placeholder="Ej: Sr. Padilla Jorge / Gerencia / Caudales..."
+                            class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-white outline-none focus:border-indigo-500">
+                        <div id="dropResponsableTraslado" class="hidden absolute left-0 right-0 top-full mt-1 z-50 max-h-48 overflow-y-auto rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-xl divide-y divide-slate-100 dark:divide-slate-800"></div>
                     </div>
                 </div>
 
-                <button type="button" onclick="copiarTexto()" class="w-full px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2 shadow-sm cursor-pointer">
-                    <i data-lucide="copy" class="w-4 h-4"></i>
-                    <span>Copiar al Portapapeles</span>
-                </button>
+                <!-- 2. Secuencia Cronológica de 4 Pasos (Editables + Encadenados) -->
+                <div class="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3.5">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="clock" class="w-4 h-4 text-indigo-500"></i>
+                            <h2 class="text-sm font-bold text-slate-800 dark:text-slate-100">2. Cronología de los 4 Pasos</h2>
+                            <span id="badgeDuracionTraslado" class="text-[11px] font-mono font-bold px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">2 min</span>
+                        </div>
+                        <label class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 dark:text-slate-300 cursor-pointer select-none">
+                            <input type="checkbox" id="chkEncadenarIedin" checked onchange="alCambiarEncadenadoIedin()" class="rounded border-slate-300 text-indigo-600">
+                            Encadenar desde Inicio
+                        </label>
+                    </div>
+
+                    <!-- Presets rápidos de intervalos -->
+                    <div class="flex flex-wrap items-center gap-1.5">
+                        <span class="text-[10px] font-semibold text-slate-400">Tiempos de conteo:</span>
+                        <button type="button" id="btnSeqClasico" onclick="aplicarSecuenciaIedin(1, 2, 2)" class="px-2 py-1 rounded-lg bg-indigo-600 text-white text-[11px] font-mono font-semibold transition cursor-pointer">+1 / +2 / +2m (Clásico)</button>
+                        <button type="button" id="btnSeqMedia" onclick="aplicarSecuenciaIedin(1, 4, 5)" class="px-2 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-indigo-100 dark:hover:bg-indigo-950 text-slate-700 dark:text-slate-300 text-[11px] font-mono font-semibold transition cursor-pointer">+1 / +4 / +5m</button>
+                        <button type="button" id="btnSeqLarga" onclick="aplicarSecuenciaIedin(1, 8, 9)" class="px-2 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-indigo-100 dark:hover:bg-indigo-950 text-slate-700 dark:text-slate-300 text-[11px] font-mono font-semibold transition cursor-pointer">+1 / +8 / +9m</button>
+                    </div>
+
+                    <!-- 4 tarjetas de horario con Ahora + Copiar Paso -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800 space-y-1.5">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[11px] font-bold text-indigo-600 dark:text-indigo-400">1° Llamada / Aviso</span>
+                                <button type="button" onclick="copiarPasoIedin(1)" class="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:text-indigo-600 cursor-pointer">Copiar 1°</button>
+                            </div>
+                            <div class="flex items-stretch">
+                                <input type="time" id="horaBase" oninput="alCambiarHoraInicioIedin()" class="w-full min-w-0 px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-r-0 border-slate-300 dark:border-slate-700 rounded-l-lg text-xs font-mono font-bold text-slate-900 dark:text-white outline-none">
+                                <button type="button" onclick="ponerHoraPaso('horaBase')" class="px-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-r-lg text-[10px] font-semibold cursor-pointer">Ahora</button>
+                            </div>
+                        </div>
+
+                        <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800 space-y-1.5">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[11px] font-bold text-sky-600 dark:text-sky-400">2° Área de Conteo</span>
+                                <button type="button" onclick="copiarPasoIedin(2)" class="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:text-sky-600 cursor-pointer">Copiar 2°</button>
+                            </div>
+                            <div class="flex items-stretch">
+                                <input type="time" id="horaConteo" oninput="alEditarPasoManual()" class="w-full min-w-0 px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-r-0 border-slate-300 dark:border-slate-700 rounded-l-lg text-xs font-mono font-bold text-slate-900 dark:text-white outline-none">
+                                <button type="button" onclick="ponerHoraPaso('horaConteo')" class="px-2.5 bg-slate-200 dark:bg-slate-800 hover:bg-sky-600 hover:text-white rounded-r-lg text-[10px] font-semibold cursor-pointer">Ahora</button>
+                            </div>
+                        </div>
+
+                        <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800 space-y-1.5">
+                            <div class="flex items-center justify-between">
+                                <span id="lblPaso3" class="text-[11px] font-bold text-emerald-600 dark:text-emerald-400">3° Entrega Efectivo</span>
+                                <button type="button" onclick="copiarPasoIedin(3)" class="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:text-emerald-600 cursor-pointer">Copiar 3°</button>
+                            </div>
+                            <div class="flex items-stretch">
+                                <input type="time" id="horaEntregaVal" oninput="alEditarPasoManual()" class="w-full min-w-0 px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-r-0 border-slate-300 dark:border-slate-700 rounded-l-lg text-xs font-mono font-bold text-slate-900 dark:text-white outline-none">
+                                <button type="button" onclick="ponerHoraPaso('horaEntregaVal')" class="px-2.5 bg-slate-200 dark:bg-slate-800 hover:bg-emerald-600 hover:text-white rounded-r-lg text-[10px] font-semibold cursor-pointer">Ahora</button>
+                            </div>
+                        </div>
+
+                        <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800 space-y-1.5">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[11px] font-bold text-amber-600 dark:text-amber-400">4° Retiro de Tesoro</span>
+                                <button type="button" onclick="copiarPasoIedin(4)" class="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:text-amber-600 cursor-pointer">Copiar 4°</button>
+                            </div>
+                            <div class="flex items-stretch">
+                                <input type="time" id="horaRetiroTesoro" oninput="alEditarPasoManual()" class="w-full min-w-0 px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-r-0 border-slate-300 dark:border-slate-700 rounded-l-lg text-xs font-mono font-bold text-slate-900 dark:text-white outline-none">
+                                <button type="button" onclick="ponerHoraPaso('horaRetiroTesoro')" class="px-2.5 bg-amber-600 hover:bg-amber-500 text-white rounded-r-lg text-[10px] font-semibold cursor-pointer">Ahora</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Datos Opcionales de Seguridad (Sector Tesoro, Precinto/Bolso, Custodia, Cámara) -->
+                <details class="group bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                    <summary class="cursor-pointer list-none px-4 sm:px-5 py-3.5 flex items-center justify-between text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 select-none">
+                        <span class="flex items-center gap-2">
+                            <i data-lucide="shield-check" class="w-4 h-4 text-indigo-500"></i>
+                            3. Seguridad Opcional (Sector Tesoro, Precinto/Bolso, Custodia o Cámara)
+                            <span id="badgeExtrasIedin" class="hidden text-[10px] font-mono px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300">Activos</span>
+                        </span>
+                        <span class="text-xs text-slate-400 group-open:rotate-180 transition-transform">▼</span>
+                    </summary>
+
+                    <div class="px-4 sm:px-5 pb-4 pt-2 border-t border-slate-100 dark:border-slate-800 grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                        <div>
+                            <label for="g-sector-tesoro" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Denominación Sector</label>
+                            <select id="g-sector-tesoro" onchange="sincronizarTodo()" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white outline-none">
+                                <option value="sector tesoro">sector tesoro (Clásico)</option>
+                                <option value="Tesoro Slots">Tesoro Slots</option>
+                                <option value="Tesoro Juegos Vivos">Tesoro Juegos Vivos</option>
+                                <option value="Tesoro Principal">Tesoro Principal</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="g-precinto" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Bolso / Saca / Precinto N° (Opc.)</label>
+                            <input type="text" id="g-precinto" autocomplete="off" oninput="sincronizarTodo()" placeholder="Ej: en saca precinto N° 084512"
+                                class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-mono text-slate-900 dark:text-white outline-none">
+                        </div>
+
+                        <div>
+                            <label for="g-custodia" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Custodia / Acompañamiento (Opc.)</label>
+                            <input type="text" id="g-custodia" autocomplete="off" oninput="sincronizarTodo()" placeholder="Ej: acompañado por Adicional Policial / CI"
+                                class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white outline-none">
+                        </div>
+
+                        <div>
+                            <label for="g-camara" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Cámara Tesoro (Ej: 110..115, 609, 610)</label>
+                            <input type="text" id="g-camara" autocomplete="off" oninput="alEscribirCamaraTesoro()" placeholder="Escribe 3 dígitos p/ autocompletar"
+                                class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-mono text-slate-900 dark:text-white outline-none">
+                        </div>
+                    </div>
+                </details>
             </div>
-        </div>
+
+            <!-- COLUMNA DERECHA: VISTA PREVIA E HISTORIAL (5/12) -->
+            <div class="lg:col-span-5 bg-slate-100/80 dark:bg-slate-950/60 border-t lg:border-t-0 lg:border-l border-slate-200 dark:border-slate-800 p-4 sm:p-6 flex flex-col justify-between space-y-4">
+                <div class="space-y-4">
+
+                    <!-- Vista Previa Editable -->
+                    <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-4 space-y-3">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <h2 class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-200 flex items-center gap-2">
+                                <span class="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-pulse"></span>
+                                Acta en Vivo
+                            </h2>
+                            <div class="flex items-center gap-1.5">
+                                <button type="button" onclick="restaurarTextoAuto()" class="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition inline-flex items-center gap-1 cursor-pointer">
+                                    <i data-lucide="refresh-cw" class="w-3 h-3"></i>
+                                    Restaurar
+                                </button>
+                                <button type="button" onclick="window.print()" class="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition inline-flex items-center gap-1 cursor-pointer" title="Imprimir">
+                                    <i data-lucide="printer" class="w-3 h-3"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <textarea id="outputEditable" rows="13" spellcheck="false" oninput="ajustarAlturaYPrint()"
+                            class="report-font w-full min-h-[300px] p-3.5 bg-slate-50 dark:bg-slate-950 border-2 border-indigo-200 dark:border-indigo-900/80 rounded-xl text-xs sm:text-sm text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-indigo-500 transition resize-y leading-relaxed"></textarea>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-12 gap-2">
+                            <button type="button" id="btnCopiarIedin" onclick="copiarTexto()" class="sm:col-span-8 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold text-xs sm:text-sm transition flex items-center justify-center gap-2 shadow-md cursor-pointer active:scale-[0.99]">
+                                <i data-lucide="copy" class="w-4 h-4"></i>
+                                <span>Copiar y Registrar</span>
+                            </button>
+                            <button type="button" onclick="copiarWhatsAppIedin()" class="sm:col-span-4 px-3 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-sm cursor-pointer active:scale-[0.99]">
+                                <i data-lucide="message-square" class="w-3.5 h-3.5"></i>
+                                <span>WhatsApp</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Historial de Traslados -->
+                    <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-4 space-y-3">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-200 flex items-center gap-1.5">
+                                <i data-lucide="history" class="w-4 h-4 text-indigo-500"></i>
+                                Historial Tesoro (<span id="countHistorialIedin">0</span>)
+                            </h3>
+                            <div class="flex items-center gap-1.5">
+                                <button type="button" onclick="exportarCSVIedin()" class="px-2 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900 text-emerald-700 dark:text-emerald-300 text-[11px] font-semibold transition inline-flex items-center gap-1 cursor-pointer">
+                                    <i data-lucide="sheet" class="w-3 h-3"></i> CSV
+                                </button>
+                                <button type="button" onclick="exportarTXTIedin()" class="px-2 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900 text-indigo-700 dark:text-indigo-300 text-[11px] font-semibold transition inline-flex items-center gap-1 cursor-pointer">
+                                    <i data-lucide="download" class="w-3 h-3"></i> TXT
+                                </button>
+                                <button type="button" onclick="vaciarHistorialIedin()" class="p-1 rounded-lg text-slate-400 hover:text-rose-500 transition cursor-pointer" title="Vaciar historial">
+                                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="relative">
+                            <input type="text" id="buscarHistorialIedin" oninput="renderizarHistorialIedin()" placeholder="Filtrar por destino, responsable o monto..."
+                                class="w-full pl-8 pr-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-xs text-slate-800 dark:text-slate-200 outline-none focus:border-indigo-500">
+                            <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2"></i>
+                        </div>
+
+                        <div id="listaHistorialIedin" class="space-y-1.5 max-h-52 overflow-y-auto pr-0.5 text-xs">
+                            <p class="text-slate-400 text-center py-3">Sin traslados registrados</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
     </div>
 
     <!-- TOAST NOTIFICACIONES -->
-    <div id="notification" class="hidden fixed bottom-5 right-5 bg-emerald-600 text-white px-4 py-3 rounded-xl shadow-xl flex items-center gap-2.5 fade-in z-50 text-sm font-medium">
-        <i data-lucide="check-circle" class="w-4 h-4"></i>
+    <div id="notification" class="no-print hidden fixed bottom-5 right-5 bg-slate-900 dark:bg-slate-800 text-white border border-slate-700 px-4 py-3 rounded-xl shadow-2xl flex items-center gap-2.5 z-50 text-xs font-semibold">
+        <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>
         <span id="notification-text">Texto copiado al portapapeles</span>
     </div>
 
     <script src="js/global.js"></script>
     <script>
+        const IEDIN_STORAGE = {
+            draftKey: 'cctv_iedin_draft_v2',
+            historyKey: 'cctv_iedin_historial_v2',
+            jefeExtraKey: 'cctv_iedin_jefes_frecuentes',
+            respExtraKey: 'cctv_iedin_responsables_frecuentes',
+            maxHistory: 50
+        };
+
+        const TESORO_STAFF_BASE = [
+            { nombre: 'CARRIZO, NATALIA VALERIA', rol: 'Jefa de Caja' },
+            { nombre: 'DENZ GIMENEZ, DEBORA ADRIANA', rol: 'Enc. de Turno' },
+            { nombre: 'MOISES, ARIEL JESUS', rol: 'Enc. de Turno' },
+            { nombre: 'RODRIGUEZ, MONICA ELIANA', rol: 'Enc. de Turno' },
+            { nombre: 'ZAMBRANA, CARINA DEL VALLE', rol: 'Enc. de Turno' },
+            { nombre: 'MARTINEZ GUAYMAS, CAROLINA ALEJANDRA', rol: 'Enc. de Turno' },
+            { nombre: 'CHOCOBAR, GISELA NOEMI', rol: 'Asistente de Caja' },
+            { nombre: 'FLORES, ROMINA PAOLA', rol: 'Asistente de Caja' },
+            { nombre: 'MAMANI, SILVANA SOLEDAD', rol: 'Asistente de Caja' },
+            { nombre: 'LAZARTE, LAURA LORENA', rol: 'Asistente de Caja' }
+        ];
+
+        const RESPONSABLES_BASE = [
+            'Supervisor de Control Interno Padilla Jorge',
+            'Supervisora de Control Interno Rojas Dolly',
+            'Supervisor de Control Interno Urbano Daniel',
+            'Control Interno Castaño Pablo',
+            'Control Interno Yujra Fernando',
+            'Control Interno Rizzato Enzo',
+            'Personal de Tesorería Central',
+            'Empresa Transportadora de Caudales'
+        ];
+
+        const CAMARAS_TESORO = {
+            '106':'CAJA SLOTS (DVR 1)','107':'CAJA SLOTS (DVR 1)','108':'CAJA SLOTS (DVR 1)','109':'CAJA SLOTS (DVR 1)',
+            '110':'TESORO SLOTS (DVR 1)','111':'TESORO SLOTS (DVR 1)','112':'TESORO SLOTS (DVR 1)',
+            '113':'TESORO SLOTS (DVR 1)','114':'TESORO SLOTS (DVR 1)','115':'TESORO SLOTS (DVR 1)','116':'ACCESO PERSONAL (DVR 1)',
+            '601':'CAJA JV (DVR 6)','608':'CAJA JV (DVR 6)','609':'TESORO JV (DVR 6)','610':'TESORO JV (DVR 6)',
+            '706':'ACCESO (DVR 7)','715':'RECEPCION (DVR 7)','805':'RECEPCION (DVR 8)'
+        };
+
+        let tipoOperacion = 'egreso'; // 'egreso' | 'ingreso'
+        let offsets = { conteo: 1, entrega: 2, retiro: 2 };
+        let pasosTexto = ['', '', '', ''];
+        let textoAutoIedin = '';
+        let historialIedin = [];
+        let jefesExtra = [];
+        let respExtra = [];
+        let toastTimer = null;
+
+        function normStr(s) {
+            return String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+        }
+
+        function escHtml(s) {
+            return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        function getNowStr() {
+            const now = new Date();
+            return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+        }
+
         function sumarMinutos(hora, minutos) {
             if (!hora || !hora.includes(':')) return '--:--';
             const [h, m] = hora.split(':').map(Number);
             if (isNaN(h) || isNaN(m)) return '--:--';
-            const d = new Date();
-            d.setHours(h, m + minutos, 0, 0);
-            return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+            const tot = ((h * 60 + m + minutos) % 1440 + 1440) % 1440;
+            return `${String(Math.floor(tot / 60)).padStart(2, '0')}:${String(tot % 60).padStart(2, '0')}`;
         }
 
-        function sincronizarTodo() {
+        function diffMinutos(h1, h2) {
+            if (!h1 || !h2 || !h1.includes(':') || !h2.includes(':')) return 0;
+            const [a1, b1] = h1.split(':').map(Number);
+            const [a2, b2] = h2.split(':').map(Number);
+            if (isNaN(a1) || isNaN(b1) || isNaN(a2) || isNaN(b2)) return 0;
+            let d = (a2 * 60 + b2) - (a1 * 60 + b1);
+            if (d < 0) d += 1440;
+            return d;
+        }
+
+        // Parseo y formato monetario Argentino seguro
+        function parseMontoDivisa(str) {
+            if (!str) return NaN;
+            let s = String(str).trim().replace(/[$€uUsS\s]/g, '').replace(/[.,]+$/, '');
+            if (!s) return NaN;
+            if (s.includes(',') && s.includes('.')) {
+                return s.lastIndexOf(',') > s.lastIndexOf('.')
+                    ? parseFloat(s.replace(/\./g, '').replace(',', '.'))
+                    : parseFloat(s.replace(/,/g, ''));
+            }
+            if (s.includes(',')) return parseFloat(s.replace(',', '.'));
+            if (s.includes('.')) {
+                const p = s.split('.');
+                if (p.length === 2 && p[1].length !== 3) return parseFloat(s);
+                return parseFloat(s.replace(/\./g, ''));
+            }
+            return parseFloat(s);
+        }
+
+        function formatDivisaAR(num) {
+            if (typeof num !== 'number' || isNaN(num) || num <= 0) return '';
+            return num.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        window.formatearDivisaBlur = function (inp) {
+            const v = parseMontoDivisa(inp.value);
+            if (!isNaN(v) && v > 0) {
+                inp.value = formatDivisaAR(v);
+                sincronizarTodo();
+            }
+        };
+
+        // Modos Egreso vs Ingreso
+        window.cambiarTipoOperacion = function (modo) {
+            tipoOperacion = modo;
+            const activeCls = 'py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition cursor-pointer bg-indigo-600 text-white shadow-sm flex items-center justify-center gap-2';
+            const activeIngCls = 'py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition cursor-pointer bg-emerald-600 text-white shadow-sm flex items-center justify-center gap-2';
+            const inactiveCls = 'py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition cursor-pointer bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center gap-2';
+
+            document.getElementById('btnModoEgreso').className = modo === 'egreso' ? activeCls : inactiveCls;
+            document.getElementById('btnModoIngreso').className = modo === 'ingreso' ? activeIngCls : inactiveCls;
+
+            document.getElementById('lblDestinoOrigen').textContent = modo === 'egreso'
+                ? '📍 Destino de la Transferencia'
+                : '📍 Origen / Procedencia de los Valores';
+            document.getElementById('lblPaso3').textContent = modo === 'egreso'
+                ? '3° Entrega Efectivo'
+                : '3° Recepción Conforme';
+
+            sincronizarTodo();
+        };
+
+        // Secuencia de 4 Horarios
+        window.aplicarSecuenciaIedin = function (c, e, r) {
+            offsets = { conteo: c, entrega: e, retiro: r };
+            document.getElementById('chkEncadenarIedin').checked = true;
+            actualizarBotonesSecuenciaUI();
+            recalcularHorariosEncadenados();
+            sincronizarTodo();
+        };
+
+        function actualizarBotonesSecuenciaUI() {
+            const activeCls = 'px-2 py-1 rounded-lg bg-indigo-600 text-white text-[11px] font-mono font-semibold transition cursor-pointer';
+            const inactiveCls = 'px-2 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-indigo-100 dark:hover:bg-indigo-950 text-slate-700 dark:text-slate-300 text-[11px] font-mono font-semibold transition cursor-pointer';
+            const enc = document.getElementById('chkEncadenarIedin').checked;
+
+            document.getElementById('btnSeqClasico').className = (enc && offsets.conteo === 1 && offsets.entrega === 2 && offsets.retiro === 2) ? activeCls : inactiveCls;
+            document.getElementById('btnSeqMedia').className = (enc && offsets.conteo === 1 && offsets.entrega === 4 && offsets.retiro === 5) ? activeCls : inactiveCls;
+            document.getElementById('btnSeqLarga').className = (enc && offsets.conteo === 1 && offsets.entrega === 8 && offsets.retiro === 9) ? activeCls : inactiveCls;
+        }
+
+        function recalcularHorariosEncadenados() {
             const hBase = document.getElementById('horaBase').value;
-            const jefe = document.getElementById('g-jefe').value || "[Jefe de Caja]";
-            const montoPesos = document.getElementById('g-monto').value.trim();
-            const montoUsd = document.getElementById('g-usd').value.trim();
-            const destino = document.getElementById('g-destino').value || "[Destino]";
-            const resp = document.getElementById('g-responsable').value || "[Responsable]";
+            if (!hBase) return;
+            document.getElementById('horaConteo').value = sumarMinutos(hBase, offsets.conteo);
+            document.getElementById('horaEntregaVal').value = sumarMinutos(hBase, offsets.entrega);
+            document.getElementById('horaRetiroTesoro').value = sumarMinutos(hBase, offsets.retiro);
+        }
 
-            const h1 = hBase || '--:--';
-            const h2 = sumarMinutos(hBase, 1);
-            const h3 = sumarMinutos(hBase, 2);
+        window.alCambiarHoraInicioIedin = function () {
+            if (document.getElementById('chkEncadenarIedin').checked) {
+                recalcularHorariosEncadenados();
+            }
+            sincronizarTodo();
+        };
 
-            let textoMonto = "";
-            if (montoPesos && montoUsd) {
-                textoMonto = `$ ${montoPesos} y u$s ${montoUsd}`;
-            } else if (montoPesos) {
-                textoMonto = `$ ${montoPesos}`;
-            } else if (montoUsd) {
-                textoMonto = `u$s ${montoUsd}`;
+        window.alCambiarEncadenadoIedin = function () {
+            if (document.getElementById('chkEncadenarIedin').checked) {
+                recalcularHorariosEncadenados();
+            }
+            actualizarBotonesSecuenciaUI();
+            sincronizarTodo();
+        };
+
+        window.alEditarPasoManual = function () {
+            document.getElementById('chkEncadenarIedin').checked = false;
+            actualizarBotonesSecuenciaUI();
+            sincronizarTodo();
+        };
+
+        window.ponerHoraPaso = function (id) {
+            const ahora = getNowStr();
+            document.getElementById(id).value = ahora;
+            if (id === 'horaBase' && document.getElementById('chkEncadenarIedin').checked) {
+                recalcularHorariosEncadenados();
+            } else if (id !== 'horaBase') {
+                document.getElementById('chkEncadenarIedin').checked = false;
+                actualizarBotonesSecuenciaUI();
+            }
+            sincronizarTodo();
+            showNotification('Hora actualizada sin borrar los datos cargados');
+        };
+
+        window.setDestinoRapido = function (val) {
+            document.getElementById('g-destino').value = val;
+            sincronizarTodo();
+        };
+
+        window.limpiarInputIedin = function (id) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.value = '';
+            el.focus();
+            sincronizarTodo();
+        };
+
+        window.alEscribirCamaraTesoro = function () {
+            const inp = document.getElementById('g-camara');
+            const v = inp.value.trim();
+            if (/^\d{3}$/.test(v) && CAMARAS_TESORO[v]) {
+                inp.value = `${v} - ${CAMARAS_TESORO[v]}`;
+            }
+            sincronizarTodo();
+        };
+
+        // Autocompletado de 1 letra para Tesoro y Responsable
+        function configurarAutocompletesIedin() {
+            const inpJefe = document.getElementById('g-jefe');
+            const dropJefe = document.getElementById('dropJefeTesoro');
+
+            const mostrarJefe = () => {
+                const q = normStr(inpJefe.value);
+                if (!q) { dropJefe.classList.add('hidden'); return; }
+                const todos = [
+                    ...jefesExtra.map(n => ({ nombre: n, rol: '' })),
+                    ...TESORO_STAFF_BASE
+                ].filter((it, i, arr) => arr.findIndex(x => normStr(x.nombre) === normStr(it.nombre)) === i)
+                 .filter(it => normStr(it.nombre).includes(q) && normStr(it.nombre) !== q)
+                 .slice(0, 10);
+
+                if (!todos.length) { dropJefe.classList.add('hidden'); return; }
+                dropJefe._matches = todos;
+                dropJefe.innerHTML = todos.map((it, idx) => `
+                    <button type="button" onmousedown="event.preventDefault(); elegirJefeTesoro(${idx})"
+                        class="w-full text-left px-3 py-2 text-xs font-semibold text-slate-800 dark:text-slate-100 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 flex items-center justify-between cursor-pointer">
+                        <span>${escHtml(it.nombre)}</span>
+                        ${it.rol ? `<span class="text-[10px] text-indigo-500 font-normal">${escHtml(it.rol)}</span>` : ''}
+                    </button>
+                `).join('');
+                dropJefe.classList.remove('hidden');
+            };
+            inpJefe.addEventListener('input', () => { mostrarJefe(); sincronizarTodo(); });
+            inpJefe.addEventListener('focus', mostrarJefe);
+            inpJefe.addEventListener('blur', () => setTimeout(() => dropJefe.classList.add('hidden'), 150));
+
+            const inpResp = document.getElementById('g-responsable');
+            const dropResp = document.getElementById('dropResponsableTraslado');
+
+            const mostrarResp = () => {
+                const m = inpResp.value.match(/^(.*?(?:\s+y\s+|\s*\/\s*))([^\/]*)$/i);
+                const pref = m ? m[1] : '';
+                const term = m ? m[2] : inpResp.value;
+                const q = normStr(term);
+                if (!q) { dropResp.classList.add('hidden'); return; }
+
+                const opciones = [...respExtra, ...RESPONSABLES_BASE]
+                    .filter((v, i, arr) => arr.findIndex(x => normStr(x) === normStr(v)) === i)
+                    .filter(v => normStr(v).includes(q) && normStr(v) !== q && !normStr(pref).includes(normStr(v)))
+                    .slice(0, 10);
+
+                if (!opciones.length) { dropResp.classList.add('hidden'); return; }
+                dropResp._matches = opciones;
+                dropResp._pref = pref;
+                dropResp.innerHTML = opciones.map((v, idx) => `
+                    <button type="button" onmousedown="event.preventDefault(); elegirRespTraslado(${idx})"
+                        class="w-full text-left px-3 py-2 text-xs font-semibold text-slate-800 dark:text-slate-100 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 cursor-pointer">
+                        ${escHtml(v)}
+                    </button>
+                `).join('');
+                dropResp.classList.remove('hidden');
+            };
+            inpResp.addEventListener('input', () => { mostrarResp(); sincronizarTodo(); });
+            inpResp.addEventListener('focus', mostrarResp);
+            inpResp.addEventListener('blur', () => setTimeout(() => dropResp.classList.add('hidden'), 150));
+        }
+
+        window.elegirJefeTesoro = function (idx) {
+            const item = document.getElementById('dropJefeTesoro')?._matches?.[idx];
+            if (!item) return;
+            document.getElementById('g-jefe').value = item.nombre;
+            if (item.rol) document.getElementById('g-rol-tesoro').value = item.rol;
+            document.getElementById('dropJefeTesoro').classList.add('hidden');
+            sincronizarTodo();
+        };
+
+        window.elegirRespTraslado = function (idx) {
+            const dd = document.getElementById('dropResponsableTraslado');
+            const val = dd?._matches?.[idx];
+            if (!val) return;
+            document.getElementById('g-responsable').value = `${dd._pref || ''}${val}`;
+            dd.classList.add('hidden');
+            sincronizarTodo();
+        };
+
+        // Generador del Acta Multidivisa
+        window.sincronizarTodo = function () {
+            const h1 = document.getElementById('horaBase').value || '--:--';
+            const h2 = document.getElementById('horaConteo').value || sumarMinutos(h1, offsets.conteo);
+            const h3 = document.getElementById('horaEntregaVal').value || sumarMinutos(h1, offsets.entrega);
+            const h4 = document.getElementById('horaRetiroTesoro').value || sumarMinutos(h1, offsets.retiro);
+
+            document.getElementById('badgeDuracionTraslado').textContent = `${diffMinutos(h1, h4)} min`;
+
+            const rolTesoro = document.getElementById('g-rol-tesoro').value || 'Jefe de Caja';
+            const jefe = document.getElementById('g-jefe').value.trim() || `[${rolTesoro}]`;
+            const lugar = document.getElementById('g-destino').value.trim() || (tipoOperacion === 'egreso' ? '[Destino]' : '[Origen]');
+            const resp = document.getElementById('g-responsable').value.trim() || '[Responsable]';
+
+            // Construir texto multidivisa limpio
+            const nArs = parseMontoDivisa(document.getElementById('g-monto').value);
+            const nUsd = parseMontoDivisa(document.getElementById('g-usd').value);
+            const nEur = parseMontoDivisa(document.getElementById('g-eur').value);
+
+            const partesMonto = [];
+            if (!isNaN(nArs) && nArs > 0) partesMonto.push(`$ ${formatDivisaAR(nArs)}`);
+            else if (document.getElementById('g-monto').value.trim()) partesMonto.push(`$ ${document.getElementById('g-monto').value.trim()}`);
+
+            if (!isNaN(nUsd) && nUsd > 0) partesMonto.push(`u$s ${formatDivisaAR(nUsd)}`);
+            else if (document.getElementById('g-usd').value.trim()) partesMonto.push(`u$s ${document.getElementById('g-usd').value.trim()}`);
+
+            if (!isNaN(nEur) && nEur > 0) partesMonto.push(`€ ${formatDivisaAR(nEur)}`);
+            else if (document.getElementById('g-eur').value.trim()) partesMonto.push(`€ ${document.getElementById('g-eur').value.trim()}`);
+
+            let textoMonto = '$ [Monto]';
+            if (partesMonto.length === 1) textoMonto = partesMonto[0];
+            else if (partesMonto.length === 2) textoMonto = `${partesMonto[0]} y ${partesMonto[1]}`;
+            else if (partesMonto.length === 3) textoMonto = `${partesMonto[0]}, ${partesMonto[1]} y ${partesMonto[2]}`;
+
+            const sectorTesoro = document.getElementById('g-sector-tesoro').value || 'sector tesoro';
+            const precinto = document.getElementById('g-precinto').value.trim();
+            const custodia = document.getElementById('g-custodia').value.trim();
+            const camara = document.getElementById('g-camara').value.trim();
+
+            const precintoTxt = precinto ? ` (${precinto})` : '';
+            const custodiaTxt = custodia ? `, ${custodia}` : '';
+            const camTxt = camara ? ` (Cám. ${camara})` : '';
+
+            let t1 = '', t2 = '', t3 = '', t4 = '';
+
+            if (tipoOperacion === 'egreso') {
+                t1 = `A las ${h1} Hs. CCTV recibe llamada de ${rolTesoro} ${jefe}, informa que presenta sobre área de conteo un total de ${textoMonto} que serán enviados a ${lugar} como transferencia y será trasladado por ${resp}.-`;
+                t2 = `A las ${h2} Hs. ${rolTesoro} ${jefe} presenta efectivo sobre área de conteo y controla el mismo en presencia de ${resp}${camTxt}.-`;
+                t3 = `A las ${h3} Hs. ${rolTesoro} ${jefe} entrega efectivo${precintoTxt} a ${resp}.-`;
+                t4 = `A las ${h4} Hs. ${resp} se retira de ${sectorTesoro} con efectivo${custodiaTxt}.-`;
             } else {
-                textoMonto = "$ [Monto]";
+                t1 = `A las ${h1} Hs. CCTV recibe llamada de ${rolTesoro} ${jefe}, informa que ingresa a ${sectorTesoro} ${resp}${custodiaTxt} trayendo un total de ${textoMonto}${precintoTxt} provenientes de ${lugar} como transferencia.-`;
+                t2 = `A las ${h2} Hs. ${resp} presenta efectivo sobre área de conteo y ${rolTesoro} ${jefe} controla el mismo en su presencia${camTxt}.-`;
+                t3 = `A las ${h3} Hs. ${rolTesoro} ${jefe} recibe conforme la totalidad del efectivo.-`;
+                t4 = `A las ${h4} Hs. ${resp} se retira de ${sectorTesoro} sin valores.-`;
             }
 
-            const t1 = `A las ${h1} Hs. CCTV recibe llamada de Jefe de Caja ${jefe}, informa que presenta sobre área de conteo un total de ${textoMonto} que serán enviados a ${destino} como transferencia y será trasladado por ${resp}.-`;
-            const t2 = `A las ${h2} Hs. Jefe de Caja ${jefe} presenta efectivo sobre área de conteo y controla el mismo en presencia de ${resp}.-`;
-            const t3 = `A las ${h3} Hs. Jefe de Caja ${jefe} entrega efectivo a ${resp}.-`;
-            const t4 = `A las ${h3} Hs. ${resp} se retira de sector tesoro con efectivo.-`;
+            pasosTexto = [t1, t2, t3, t4];
+            textoAutoIedin = `${t1}\n\n${t2}\n\n${t3}\n\n${t4}`;
 
-            document.getElementById('outputEditable').value = `${t1}\n\n${t2}\n\n${t3}\n\n${t4}`;
+            document.getElementById('outputEditable').value = textoAutoIedin;
+            document.getElementById('badgeExtrasIedin').classList.toggle('hidden', sectorTesoro === 'sector tesoro' && !precinto && !custodia && !camara);
+            guardarBorradorIedin();
+            ajustarAlturaYPrint();
+        };
+
+        window.ajustarAlturaYPrint = function () {
+            const area = document.getElementById('outputEditable');
+            area.style.height = 'auto';
+            area.style.height = Math.max(300, area.scrollHeight + 6) + 'px';
+            document.getElementById('printTexto').textContent = area.value;
+            document.getElementById('printFechaHora').textContent = new Date().toLocaleString('es-AR');
+        };
+
+        window.restaurarTextoAuto = function () {
+            document.getElementById('outputEditable').value = textoAutoIedin;
+            ajustarAlturaYPrint();
+            showNotification('Texto automático restaurado');
+        };
+
+        // Persistencia e Historial
+        function guardarBorradorIedin() {
+            const draft = {
+                tipoOperacion,
+                offsets,
+                encadenar: document.getElementById('chkEncadenarIedin').checked,
+                horaBase: document.getElementById('horaBase').value,
+                horaConteo: document.getElementById('horaConteo').value,
+                horaEntregaVal: document.getElementById('horaEntregaVal').value,
+                horaRetiroTesoro: document.getElementById('horaRetiroTesoro').value,
+                rolTesoro: document.getElementById('g-rol-tesoro').value,
+                jefe: document.getElementById('g-jefe').value,
+                monto: document.getElementById('g-monto').value,
+                usd: document.getElementById('g-usd').value,
+                eur: document.getElementById('g-eur').value,
+                destino: document.getElementById('g-destino').value,
+                responsable: document.getElementById('g-responsable').value,
+                sectorTesoro: document.getElementById('g-sector-tesoro').value,
+                precinto: document.getElementById('g-precinto').value,
+                custodia: document.getElementById('g-custodia').value,
+                camara: document.getElementById('g-camara').value
+            };
+            try {
+                localStorage.setItem(IEDIN_STORAGE.draftKey, JSON.stringify(draft));
+            } catch (e) {}
         }
 
-        function limpiarCampos() {
-            document.getElementById('g-jefe').value = "";
-            document.getElementById('g-monto').value = "";
-            document.getElementById('g-usd').value = "";
-            document.getElementById('g-destino').value = "";
-            document.getElementById('g-responsable').value = "";
+        function inicializarIedin() {
+            try {
+                jefesExtra = JSON.parse(localStorage.getItem(IEDIN_STORAGE.jefeExtraKey) || '[]');
+                respExtra = JSON.parse(localStorage.getItem(IEDIN_STORAGE.respExtraKey) || '[]');
+                historialIedin = JSON.parse(localStorage.getItem(IEDIN_STORAGE.historyKey) || '[]');
+            } catch (e) {}
+
+            let saved = null;
+            try {
+                saved = JSON.parse(localStorage.getItem(IEDIN_STORAGE.draftKey) || 'null');
+            } catch (e) {}
+
+            const ahora = getNowStr();
+            if (saved) {
+                if (saved.offsets) offsets = saved.offsets;
+                document.getElementById('chkEncadenarIedin').checked = saved.encadenar !== undefined ? Boolean(saved.encadenar) : true;
+                document.getElementById('horaBase').value = saved.horaBase || ahora;
+                document.getElementById('horaConteo').value = saved.horaConteo || sumarMinutos(ahora, offsets.conteo);
+                document.getElementById('horaEntregaVal').value = saved.horaEntregaVal || sumarMinutos(ahora, offsets.entrega);
+                document.getElementById('horaRetiroTesoro').value = saved.horaRetiroTesoro || sumarMinutos(ahora, offsets.retiro);
+                if (saved.rolTesoro) document.getElementById('g-rol-tesoro').value = saved.rolTesoro;
+                document.getElementById('g-jefe').value = saved.jefe || '';
+                document.getElementById('g-monto').value = saved.monto || '';
+                document.getElementById('g-usd').value = saved.usd || '';
+                document.getElementById('g-eur').value = saved.eur || '';
+                document.getElementById('g-destino').value = saved.destino || '';
+                document.getElementById('g-responsable').value = saved.responsable || '';
+                if (saved.sectorTesoro) document.getElementById('g-sector-tesoro').value = saved.sectorTesoro;
+                document.getElementById('g-precinto').value = saved.precinto || '';
+                document.getElementById('g-custodia').value = saved.custodia || '';
+                document.getElementById('g-camara').value = saved.camara || '';
+                cambiarTipoOperacion(saved.tipoOperacion || 'egreso');
+            } else {
+                document.getElementById('horaBase').value = ahora;
+                recalcularHorariosEncadenados();
+                cambiarTipoOperacion('egreso');
+            }
+
+            actualizarBotonesSecuenciaUI();
+            renderizarHistorialIedin();
             sincronizarTodo();
         }
 
-        function volverAlInicio() {
-            const now = new Date();
-            const horas = String(now.getHours()).padStart(2, '0');
-            const minutos = String(now.getMinutes()).padStart(2, '0');
-            document.getElementById('horaBase').value = `${horas}:${minutos}`;
-            document.getElementById('g-jefe').value = "";
-            document.getElementById('g-monto').value = "";
-            document.getElementById('g-usd').value = "";
-            document.getElementById('g-destino').value = "";
-            document.getElementById('g-responsable').value = "";
-            sincronizarTodo();
+        async function escribirPortapapeles(txt) {
+            try {
+                if (navigator.clipboard && window.isSecureContext) {
+                    await navigator.clipboard.writeText(txt);
+                    return true;
+                }
+            } catch (e) {}
+            try {
+                const t = document.createElement('textarea');
+                t.value = txt;
+                t.style.position = 'fixed';
+                t.style.opacity = '0';
+                document.body.appendChild(t);
+                t.select();
+                const ok = document.execCommand('copy');
+                t.remove();
+                return ok;
+            } catch (e) {
+                return false;
+            }
         }
 
-        function copiarTexto() {
-            const areaEditable = document.getElementById('outputEditable');
-            const textoParaCopiar = areaEditable.value;
+        window.copiarPasoIedin = async function (num) {
+            const txt = pasosTexto[num - 1] || '';
+            if (!txt) return;
+            await escribirPortapapeles(txt);
+            showNotification(`Paso ${num}° copiado al portapapeles`);
+        };
 
-            navigator.clipboard.writeText(textoParaCopiar).then(() => {
-                showNotification('¡Texto copiado al portapapeles!');
-            }).catch(() => {
-                areaEditable.select();
-                document.execCommand('copy');
-                showNotification('¡Texto copiado al portapapeles!');
+        function registrarTrasladoHistorial(texto) {
+            const jefe = document.getElementById('g-jefe').value.trim();
+            if (jefe.length >= 4 && !TESORO_STAFF_BASE.some(p => normStr(p.nombre) === normStr(jefe))) {
+                jefesExtra = [jefe, ...jefesExtra.filter(x => normStr(x) !== normStr(jefe))].slice(0, 20);
+                localStorage.setItem(IEDIN_STORAGE.jefeExtraKey, JSON.stringify(jefesExtra));
+            }
+            const resp = document.getElementById('g-responsable').value.trim();
+            if (resp.length >= 4 && !RESPONSABLES_BASE.some(r => normStr(r) === normStr(resp))) {
+                respExtra = [resp, ...respExtra.filter(x => normStr(x) !== normStr(resp))].slice(0, 25);
+                localStorage.setItem(IEDIN_STORAGE.respExtraKey, JSON.stringify(respExtra));
+            }
+
+            if (historialIedin.length > 0 && historialIedin[0].texto === texto) return;
+            const resumenDivisas = [
+                document.getElementById('g-monto').value.trim() ? `$${document.getElementById('g-monto').value.trim()}` : '',
+                document.getElementById('g-usd').value.trim() ? `u$s ${document.getElementById('g-usd').value.trim()}` : '',
+                document.getElementById('g-eur').value.trim() ? `€ ${document.getElementById('g-eur').value.trim()}` : ''
+            ].filter(Boolean).join(' + ') || 'Sin monto';
+
+            historialIedin.unshift({
+                fechaISO: new Date().toISOString(),
+                tipo: tipoOperacion,
+                hora: document.getElementById('horaBase').value || '--:--',
+                lugar: document.getElementById('g-destino').value.trim() || 'Sin especificar',
+                responsable: resp || 'Sin especificar',
+                divisas: resumenDivisas,
+                texto
             });
+            historialIedin = historialIedin.slice(0, IEDIN_STORAGE.maxHistory);
+            localStorage.setItem(IEDIN_STORAGE.historyKey, JSON.stringify(historialIedin));
+            renderizarHistorialIedin();
         }
+
+        window.copiarTexto = async function () {
+            const txt = document.getElementById('outputEditable').value.trim();
+            if (!txt) return;
+            const ok = await escribirPortapapeles(txt);
+            if (!ok) return;
+            registrarTrasladoHistorial(txt);
+
+            const btn = document.getElementById('btnCopiarIedin');
+            const orig = btn.innerHTML;
+            btn.innerHTML = '<i data-lucide="check" class="w-4 h-4"></i><span>¡Copiado y Registrado!</span>';
+            btn.classList.replace('bg-indigo-600', 'bg-emerald-600');
+            lucide.createIcons({ nodes: [btn] });
+            setTimeout(() => {
+                btn.innerHTML = orig;
+                btn.classList.replace('bg-emerald-600', 'bg-indigo-600');
+                lucide.createIcons({ nodes: [btn] });
+            }, 1700);
+
+            showNotification('¡Traslado copiado y guardado en historial!');
+        };
+
+        window.copiarWhatsAppIedin = async function () {
+            const txt = document.getElementById('outputEditable').value.trim();
+            if (!txt) return;
+            const titulo = tipoOperacion === 'egreso'
+                ? '💼 *TRASLADO DE VALORES (EGRESO DE TESORO) - CCTV*'
+                : '💼 *RECEPCIÓN DE VALORES (INGRESO A TESORO) - CCTV*';
+            const ok = await escribirPortapapeles(`${titulo}\n\n${txt}`);
+            if (ok) {
+                registrarTrasladoHistorial(txt);
+                showNotification('Copiado con formato WhatsApp');
+            }
+        };
+
+        window.renderizarHistorialIedin = function () {
+            document.getElementById('countHistorialIedin').textContent = String(historialIedin.length);
+            const lista = document.getElementById('listaHistorialIedin');
+            const q = normStr(document.getElementById('buscarHistorialIedin')?.value || '');
+
+            const items = historialIedin
+                .map((it, idx) => ({ it, idx }))
+                .filter(({ it }) => !q || normStr(`${it.lugar} ${it.responsable} ${it.divisas} ${it.hora} ${it.texto}`).includes(q));
+
+            if (!items.length) {
+                lista.innerHTML = `<p class="text-slate-400 text-center py-3">${historialIedin.length ? 'Sin coincidencias' : 'Sin traslados registrados'}</p>`;
+                return;
+            }
+
+            lista.innerHTML = items.map(({ it, idx }) => {
+                const badge = it.tipo === 'ingreso'
+                    ? '<span class="px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 font-bold text-[10px]">📥 INGRESO</span>'
+                    : '<span class="px-1.5 py-0.5 rounded bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 font-bold text-[10px]">📤 EGRESO</span>';
+                const fechaCorta = new Date(it.fechaISO).toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit' });
+                return `
+                    <div class="history-item p-2.5 rounded-lg bg-slate-50 dark:bg-slate-950/70 hover:bg-indigo-50/70 dark:hover:bg-slate-800/80 border border-slate-200/70 dark:border-slate-800 flex items-center justify-between gap-2">
+                        <button type="button" onclick="cargarItemIedin(${idx})" class="flex-1 min-w-0 text-left cursor-pointer">
+                            <div class="flex items-center gap-1.5 flex-wrap">
+                                ${badge}
+                                <span class="font-mono font-bold text-slate-700 dark:text-slate-200">${escHtml(it.hora)} Hs.</span>
+                                <span class="text-[10px] font-mono text-slate-400">${escHtml(fechaCorta)}</span>
+                            </div>
+                            <p class="text-xs font-bold text-emerald-700 dark:text-emerald-400 font-mono truncate mt-0.5">${escHtml(it.divisas)}</p>
+                            <p class="text-[11px] text-slate-600 dark:text-slate-300 truncate">${escHtml(it.lugar)} · ${escHtml(it.responsable)}</p>
+                        </button>
+                        <div class="flex items-center gap-1 shrink-0">
+                            <button type="button" onclick="recopiarItemIedin(${idx})" class="p-1.5 rounded-md text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-white dark:hover:bg-slate-900 cursor-pointer" title="Copiar">
+                                <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                            </button>
+                            <button type="button" onclick="eliminarItemIedin(${idx})" class="p-1.5 rounded-md text-slate-400 hover:text-rose-500 hover:bg-white dark:hover:bg-slate-900 cursor-pointer" title="Eliminar">
+                                <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            lucide.createIcons({ nodes: [lista] });
+        };
+
+        window.cargarItemIedin = function (idx) {
+            const it = historialIedin[idx];
+            if (!it) return;
+            document.getElementById('outputEditable').value = it.texto;
+            ajustarAlturaYPrint();
+            showNotification('Operativo cargado en vista previa');
+        };
+
+        window.recopiarItemIedin = async function (idx) {
+            const it = historialIedin[idx];
+            if (!it) return;
+            await escribirPortapapeles(it.texto);
+            showNotification('Traslado copiado del historial');
+        };
+
+        window.eliminarItemIedin = function (idx) {
+            historialIedin.splice(idx, 1);
+            localStorage.setItem(IEDIN_STORAGE.historyKey, JSON.stringify(historialIedin));
+            renderizarHistorialIedin();
+        };
+
+        window.vaciarHistorialIedin = function () {
+            if (!historialIedin.length || !confirm('¿Vaciar el historial de traslados de valores?')) return;
+            historialIedin = [];
+            localStorage.removeItem(IEDIN_STORAGE.historyKey);
+            renderizarHistorialIedin();
+        };
+
+        function descargarBlob(contenido, nombre, mime) {
+            const blob = new Blob([contenido], { type: mime });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = nombre;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        window.exportarTXTIedin = function () {
+            if (!historialIedin.length) return showNotification('No hay registros para exportar', 'error');
+            let txt = '=== HISTORIAL TRASLADO DE VALORES (TESORO CCTV) ===\n\n';
+            historialIedin.forEach((it, i) => {
+                txt += `${i + 1}. [${(it.tipo || 'egreso').toUpperCase()}] ${new Date(it.fechaISO).toLocaleString('es-AR')} | ${it.divisas}\n${it.texto}\n\n---\n\n`;
+            });
+            descargarBlob(txt, `traslado-valores-${new Date().toISOString().split('T')[0]}.txt`, 'text/plain;charset=utf-8');
+        };
+
+        window.exportarCSVIedin = function () {
+            if (!historialIedin.length) return showNotification('No hay registros para exportar', 'error');
+            const esc = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
+            const rows = [['Fecha', 'Hora', 'Tipo', 'Monto / Divisas', 'Destino / Origen', 'Responsable', 'Acta Completa']];
+            historialIedin.forEach(it => {
+                rows.push([
+                    new Date(it.fechaISO).toLocaleDateString('es-AR'),
+                    it.hora,
+                    (it.tipo || 'egreso').toUpperCase(),
+                    it.divisas,
+                    it.lugar,
+                    it.responsable,
+                    it.texto
+                ]);
+            });
+            descargarBlob('\uFEFF' + rows.map(r => r.map(esc).join(';')).join('\r\n'), `traslado-valores-${new Date().toISOString().split('T')[0]}.csv`, 'text/csv;charset=utf-8');
+        };
+
+        window.limpiarCampos = function () {
+            if ((document.getElementById('g-monto').value.trim() || document.getElementById('g-usd').value.trim() || document.getElementById('g-responsable').value.trim()) &&
+                !confirm('¿Limpiar los datos del traslado actual?')) {
+                return;
+            }
+            ['g-jefe', 'g-monto', 'g-usd', 'g-eur', 'g-destino', 'g-responsable', 'g-precinto', 'g-custodia', 'g-camara'].forEach(id => {
+                document.getElementById(id).value = '';
+            });
+            document.getElementById('g-sector-tesoro').value = 'sector tesoro';
+            offsets = { conteo: 1, entrega: 2, retiro: 2 };
+            document.getElementById('chkEncadenarIedin').checked = true;
+            document.getElementById('horaBase').value = getNowStr();
+            recalcularHorariosEncadenados();
+            actualizarBotonesSecuenciaUI();
+            localStorage.removeItem(IEDIN_STORAGE.draftKey);
+            cambiarTipoOperacion('egreso');
+            showNotification('Formulario restablecido');
+        };
 
         function showNotification(message, type = 'success') {
             const notification = document.getElementById('notification');
             document.getElementById('notification-text').textContent = message;
-            notification.classList.remove('hidden', 'bg-rose-600', 'bg-emerald-600');
-            notification.classList.add(type === 'error' ? 'bg-rose-600' : 'bg-emerald-600');
-            setTimeout(() => notification.classList.add('hidden'), 3000);
+            notification.classList.remove('hidden', 'border-rose-500', 'border-slate-700');
+            notification.classList.add(type === 'error' ? 'border-rose-500' : 'border-slate-700');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => notification.classList.add('hidden'), 2600);
         }
 
-        window.addEventListener('DOMContentLoaded', volverAlInicio);
+        window.addEventListener('DOMContentLoaded', () => {
+            configurarAutocompletesIedin();
+            inicializarIedin();
+
+            document.addEventListener('keydown', (e) => {
+                if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                    e.preventDefault();
+                    copiarTexto();
+                }
+            });
+            lucide.createIcons();
+        });
     </script>
 </body>
 </html>
