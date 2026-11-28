@@ -499,6 +499,19 @@
             document.execCommand('copy');
             showNotification('📋 ¡Acta de corte copiada al portapapeles!');
         });
+        if (window.CCTVBitacora) {
+            const salaVal = document.getElementById('sala').value.trim();
+            const recVal = document.getElementById('reclamo').value.trim();
+            window.CCTVBitacora.registrar({
+                categoria: 'Técnica y Sala',
+                modulo: 'Corte de Suministro',
+                origen_archivo: 'corte_luz.html',
+                sala: salaVal,
+                hora_evento: document.getElementById('horaCorte').value || '',
+                referencia: `${salaVal || 'Sala'}${recVal ? ' · Reclamo ' + recVal : ''}`,
+                acta_texto: txt
+            });
+        }
     };
 
     window.descargarCorteTXT = function () {

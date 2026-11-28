@@ -33,6 +33,9 @@
         rel="stylesheet">
     <link rel="stylesheet" href="css/global.css">
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/cloud-bitacora.js"></script>
 </head>
 
 <body
@@ -70,6 +73,12 @@
 
                 <div data-cctv-nav></div>
 
+                <button type="button" onclick="window.CCTVAuthGate && window.CCTVAuthGate.logout()" title="Cerrar sesión del operador"
+                    class="px-2.5 py-2 bg-slate-800 hover:bg-rose-600 border border-slate-700 rounded-xl transition inline-flex items-center gap-1.5 text-xs font-semibold text-slate-200 hover:text-white cursor-pointer">
+                    <i data-lucide="log-out" class="w-4 h-4"></i>
+                    <span class="hidden lg:inline" data-cctv-operator-short>Salir</span>
+                </button>
+
                 <button type="button" onclick="toggleTheme()" title="Cambiar modo claro / oscuro"
                     class="p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl transition inline-flex items-center justify-center text-slate-200 cursor-pointer">
                     <i data-lucide="sun" class="w-5 h-5 text-amber-400 hidden dark:block"></i>
@@ -90,6 +99,24 @@
             </div>
 
             <div id="modulesGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 fade-in">
+
+                <!-- Bitácora Central de Reportes (Nube & Local) -->
+                <a href="bitacora.html" data-card-search="bitacora nube supabase historial reportes guardados archivo turno excel"
+                    class="module-card group bg-white dark:bg-slate-900 p-5 rounded-2xl shadow-sm border border-sky-200 dark:border-sky-900/70 flex items-start gap-4 cursor-pointer relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-sky-500 to-indigo-600"></div>
+                    <div
+                        class="bg-sky-50 dark:bg-sky-950/50 p-3.5 rounded-xl shrink-0 group-hover:scale-105 transition-transform">
+                        <i data-lucide="database" class="w-7 h-7 text-sky-600 dark:text-sky-400"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <span
+                            class="text-[10px] font-bold uppercase tracking-wider text-sky-600 dark:text-sky-400">Nube &amp; Turno</span>
+                        <h3
+                            class="text-base font-bold text-slate-800 dark:text-slate-100 mt-0.5 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                            Bitácora de Reportes</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Archivo central automático en Supabase y cierre de turno</p>
+                    </div>
+                </a>
 
                 <!-- Modelos de Jackpot -->
                 <a href="jackpot.html" data-card-search="jackpot premios mayores pagos modelo 1 2 luxor"

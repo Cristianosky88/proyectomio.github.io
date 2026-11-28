@@ -749,6 +749,20 @@
             document.execCommand('copy');
             showNotification('📋 ¡Informe copiado al portapapeles!');
         });
+        if (window.CCTVBitacora) {
+            const salaVal = document.getElementById('salaCerado').value.trim();
+            const tecVal = document.getElementById('tecnico').value.trim();
+            const cantMaq = maquinas.filter(m => m.id && m.id.trim()).length;
+            window.CCTVBitacora.registrar({
+                categoria: 'Técnica y Sala',
+                modulo: 'Cerado de Máquinas',
+                origen_archivo: 'cerado.html',
+                sala: salaVal,
+                hora_evento: document.getElementById('horaLlamada').value || '',
+                referencia: `${cantMaq} máq. · ${tecVal || 'Técnico'}`,
+                acta_texto: textoParaCopiar
+            });
+        }
     };
 
     window.descargarTXT = function () {

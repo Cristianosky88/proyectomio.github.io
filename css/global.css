@@ -345,7 +345,8 @@ html.dark textarea::placeholder {
 
 /* Reglas universales de impresión */
 @media print {
-    .no-print {
+    .no-print,
+    #cctvAuthGateOverlay {
         display: none !important;
     }
     body {
@@ -353,4 +354,18 @@ html.dark textarea::placeholder {
         color: #0f172a !important;
         padding: 0 !important;
     }
+}
+
+/* ==========================================================================
+   BLOQUEO GLOBAL DE ACCESO (SUPABASE AUTH GATE)
+   Oculta toda la interfaz sin parpadeos hasta validar la sesión del operador
+   ========================================================================== */
+html:not(.cctv-auth-unlocked) body {
+    overflow: hidden !important;
+}
+
+html:not(.cctv-auth-unlocked) body > *:not(#cctvAuthGateOverlay) {
+    visibility: hidden !important;
+    pointer-events: none !important;
+    user-select: none !important;
 }

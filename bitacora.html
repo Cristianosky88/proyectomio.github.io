@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="es" class="">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bitácora Central de Reportes · Nube &amp; Local · CCTV</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'Segoe UI', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'Consolas', 'monospace']
+                    }
+                }
+            }
+        };
+        (function () {
+            try {
+                if (localStorage.getItem('cctv_theme') === 'dark') {
+                    document.documentElement.classList.add('dark');
+                }
+            } catch (e) {}
+        })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/global.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/cloud-bitacora.js"></script>
+    <style>
+        @media print {
+            body {
+                background: #ffffff !important;
+                color: #0f172a !important;
+                padding: 0 !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+            #printSheet {
+                display: block !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-100 dark:bg-slate-950 p-3 sm:p-5 md:p-8 text-slate-800 dark:text-slate-100 min-h-screen font-sans transition-colors duration-200">
+
+    <!-- Hoja exclusiva de Impresión (Libro de Turno / Acta) -->
+    <div id="printSheet" class="hidden p-8 bg-white text-slate-900">
+        <div class="border-b-2 border-slate-900 pb-3 mb-5 flex justify-between items-start">
+            <div>
+                <h1 id="printTitle" class="text-xl font-bold uppercase tracking-wide">Bitácora de Reportes CCTV</h1>
+                <p id="printSubtitle" class="text-xs text-slate-600 mt-0.5">Centro de Monitoreo · Registro Consolidado</p>
+            </div>
+            <div id="printTimestamp" class="text-xs font-mono text-slate-600 text-right"></div>
+        </div>
+        <div id="printContent" class="space-y-4 font-mono text-xs leading-relaxed whitespace-pre-wrap"></div>
+    </div>
+
+    <div class="no-print max-w-6xl mx-auto bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 transition-colors duration-200">
+
+        <!-- Header Estándar -->
+        <header class="bg-slate-900 dark:bg-slate-950 border-b border-slate-800 px-4 sm:px-6 py-4 rounded-t-2xl text-white flex flex-wrap justify-between items-center gap-3">
+            <div class="flex items-center gap-3">
+                <div class="bg-sky-600 p-2.5 rounded-xl shadow-sm shrink-0 flex items-center justify-center">
+                    <i data-lucide="database" class="w-6 h-6 text-white"></i>
+                </div>
+                <div>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <h1 class="text-lg sm:text-xl font-bold leading-tight text-white">Bitácora Central de Reportes</h1>
+                        <span id="headerSessionBadge" onclick="openAuthModal()" class="cursor-pointer inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-slate-800 text-amber-300 border border-slate-700 hover:border-sky-500 transition">
+                            <span id="headerSessionDot" class="w-2 h-2 rounded-full bg-amber-400"></span>
+                            <span id="headerSessionText">Modo Local · Iniciar sesión Nube</span>
+                        </span>
+                    </div>
+                    <p class="text-slate-400 text-xs uppercase tracking-wider">Archivo Automático en Supabase + Respaldo Local de Turno</p>
+                </div>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2">
+                <button type="button" id="btnSyncPending" onclick="syncPendingManual()" class="hidden px-3 py-2 rounded-xl text-xs font-semibold bg-amber-500 hover:bg-amber-400 text-slate-950 transition flex items-center gap-1.5 cursor-pointer">
+                    <i data-lucide="cloud-upload" class="w-4 h-4"></i>
+                    <span>Subir pendientes (<span id="pendingCountNum">0</span>)</span>
+                </button>
+
+                <button type="button" onclick="openManualModal()" class="px-3 py-2 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white transition flex items-center gap-1.5 cursor-pointer">
+                    <i data-lucide="plus" class="w-4 h-4"></i>
+                    <span class="hidden sm:inline">Nuevo Manual</span>
+                </button>
+
+                <button type="button" onclick="openAuthModal()" class="px-3 py-2 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 transition flex items-center gap-1.5 cursor-pointer" title="Cuenta Operador Supabase">
+                    <i data-lucide="user-check" class="w-4 h-4 text-sky-400"></i>
+                    <span class="hidden md:inline">Cuenta Nube</span>
+                </button>
+
+                <div class="hidden md:flex items-center gap-2 bg-slate-800/90 border border-slate-700 px-3 py-1.5 rounded-xl text-xs font-mono text-slate-200">
+                    <i data-lucide="clock" class="w-3.5 h-3.5 text-indigo-400"></i>
+                    <span data-cctv-clock class="tabular-nums">00:00:00 Hs.</span>
+                </div>
+
+                <div data-cctv-nav></div>
+
+                <button type="button" onclick="toggleTheme()" title="Cambiar modo claro / oscuro" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 transition inline-flex items-center justify-center cursor-pointer">
+                    <i data-lucide="sun" class="w-5 h-5 text-amber-400 hidden dark:block"></i>
+                    <i data-lucide="moon" class="w-5 h-5 text-slate-200 block dark:hidden"></i>
+                </button>
+
+                <a href="index.html" title="Volver al Menú Principal" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 transition inline-flex items-center justify-center">
+                    <i data-lucide="home" class="w-5 h-5"></i>
+                </a>
+            </div>
+        </header>
+
+        <main class="p-4 sm:p-6 bg-slate-50 dark:bg-slate-900/60 rounded-b-2xl space-y-5">
+
+            <!-- Tarjetas KPI -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3.5 shadow-sm flex items-center justify-between">
+                    <div>
+                        <span class="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 block">Total en Vista</span>
+                        <span id="kpiTotal" class="text-2xl font-bold font-mono text-slate-900 dark:text-white">0</span>
+                    </div>
+                    <div class="p-2.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400">
+                        <i data-lucide="files" class="w-5 h-5"></i>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3.5 shadow-sm flex items-center justify-between">
+                    <div>
+                        <span class="text-[11px] font-semibold uppercase tracking-wider text-amber-600 dark:text-amber-400 block">Jackpots</span>
+                        <span id="kpiJackpots" class="text-2xl font-bold font-mono text-amber-600 dark:text-amber-400">0</span>
+                    </div>
+                    <div class="p-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400">
+                        <i data-lucide="trophy" class="w-5 h-5"></i>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3.5 shadow-sm flex items-center justify-between">
+                    <div>
+                        <span class="text-[11px] font-semibold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 block">Pagos / DDJJ / Tesoro</span>
+                        <span id="kpiPagos" class="text-2xl font-bold font-mono text-emerald-600 dark:text-emerald-400">0</span>
+                    </div>
+                    <div class="p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400">
+                        <i data-lucide="banknote" class="w-5 h-5"></i>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3.5 shadow-sm flex items-center justify-between">
+                    <div>
+                        <span class="text-[11px] font-semibold uppercase tracking-wider text-sky-600 dark:text-sky-400 block">Seguridad y Técnica</span>
+                        <span id="kpiSeguridad" class="text-2xl font-bold font-mono text-sky-600 dark:text-sky-400">0</span>
+                    </div>
+                    <div class="p-2.5 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400">
+                        <i data-lucide="shield-check" class="w-5 h-5"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Barra de Filtros y Acciones Masivas -->
+            <section class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm space-y-3">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3">
+                    <div class="lg:col-span-3">
+                        <label for="filterSource" class="block text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase mb-1">Origen de Datos</label>
+                        <select id="filterSource" onchange="applyFiltersAndRender()" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 dark:text-white outline-none focus:border-indigo-500">
+                            <option value="combined">☁️ + 💾 Todos (Nube + esta PC)</option>
+                            <option value="cloud">☁️ Solo Nube Supabase</option>
+                            <option value="mine">👤 Solo Mis Reportes</option>
+                            <option value="pending">⏳ Pendientes de Subir</option>
+                        </select>
+                    </div>
+
+                    <div class="lg:col-span-2">
+                        <label for="filterCategoria" class="block text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase mb-1">Categoría</label>
+                        <select id="filterCategoria" onchange="applyFiltersAndRender()" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-white outline-none focus:border-indigo-500">
+                            <option value="ALL">Todas las categorías</option>
+                            <option value="Jackpots">Jackpots</option>
+                            <option value="Pagos y Valores">Pagos y Valores</option>
+                            <option value="Seguridad y Accesos">Seguridad y Accesos</option>
+                            <option value="Técnica y Sala">Técnica y Sala</option>
+                        </select>
+                    </div>
+
+                    <div class="lg:col-span-2">
+                        <label for="filterSala" class="block text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase mb-1">Sala / Objetivo</label>
+                        <select id="filterSala" onchange="applyFiltersAndRender()" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-white outline-none focus:border-indigo-500">
+                            <option value="ALL">Todas las salas</option>
+                            <option value="Casino Boulevard">Casino Boulevard</option>
+                            <option value="Sala Luxor">Sala Luxor</option>
+                            <option value="Tesorería">Tesorería</option>
+                            <option value="Slots Salvador Mazza">Slots Salvador Mazza</option>
+                            <option value="Slots Lajitas">Slots Lajitas</option>
+                            <option value="Slots Mosconi">Slots Mosconi</option>
+                            <option value="Slots Refinor">Slots Refinor</option>
+                            <option value="General">General</option>
+                        </select>
+                    </div>
+
+                    <div class="lg:col-span-2">
+                        <label for="filterDesde" class="block text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase mb-1">Desde Fecha</label>
+                        <input type="date" id="filterDesde" onchange="refreshCloudReports()" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-2.5 py-2 text-xs font-mono text-slate-800 dark:text-white outline-none focus:border-indigo-500">
+                    </div>
+
+                    <div class="lg:col-span-3">
+                        <label for="filterSearch" class="block text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase mb-1">Búsqueda Rápida</label>
+                        <div class="relative">
+                            <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5"></i>
+                            <input type="search" id="filterSearch" oninput="applyFiltersAndRender()" placeholder="Máquina, cliente, monto, OP..."
+                                class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl pl-8 pr-3 py-2 text-xs text-slate-800 dark:text-white placeholder-slate-400 outline-none focus:border-indigo-500">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-100 dark:border-slate-800 text-xs">
+                    <div class="flex flex-wrap items-center gap-3">
+                        <label class="inline-flex items-center gap-2 cursor-pointer select-none text-slate-600 dark:text-slate-300" title="Cuando está activo, los otros operadores autenticados del equipo CCTV también pueden consultar los reportes que subas a Supabase">
+                            <input type="checkbox" id="chkShareTeam" checked onchange="toggleSharePreference()" class="rounded text-indigo-600 focus:ring-indigo-500">
+                            <span>Compartir mis nuevos reportes con el equipo CCTV</span>
+                        </label>
+                        <button type="button" onclick="importPreviousModuleHistories()" class="text-indigo-600 dark:text-sky-400 hover:underline font-medium cursor-pointer">
+                            + Importar historiales previos de esta PC
+                        </button>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-1.5">
+                        <button type="button" onclick="refreshCloudReports()" class="px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold flex items-center gap-1 cursor-pointer">
+                            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+                            Actualizar
+                        </button>
+                        <button type="button" onclick="exportFilteredCSV()" class="px-2.5 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 font-semibold flex items-center gap-1 cursor-pointer">
+                            <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5"></i>
+                            Excel CSV
+                        </button>
+                        <button type="button" onclick="exportFilteredTXT()" class="px-2.5 py-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 font-semibold flex items-center gap-1 cursor-pointer">
+                            <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+                            Libro TXT
+                        </button>
+                        <button type="button" onclick="printShiftBook()" class="px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold flex items-center gap-1 cursor-pointer">
+                            <i data-lucide="printer" class="w-3.5 h-3.5"></i>
+                            Imprimir Lista
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Consola Dividida: Listado + Lector de Acta -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+
+                <!-- Columna Izquierda: Tarjetas de Reportes -->
+                <div class="lg:col-span-5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm space-y-3">
+                    <div class="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
+                        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-200">
+                            Reportes Registrados (<span id="listCountLabel">0</span>)
+                        </h2>
+                        <span id="cloudSyncStatusText" class="text-[11px] font-mono text-slate-400">Listo</span>
+                    </div>
+
+                    <div id="reportsListContainer" class="space-y-2 max-h-[540px] overflow-y-auto pr-1"></div>
+                </div>
+
+                <!-- Columna Derecha: Visor y Edición de Notas del Reporte Seleccionado -->
+                <div class="lg:col-span-7 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
+                    <div id="emptyDetailState" class="py-20 text-center space-y-2 text-slate-400">
+                        <i data-lucide="inbox" class="w-10 h-10 mx-auto opacity-50"></i>
+                        <p class="text-sm font-semibold text-slate-600 dark:text-slate-300">Selecciona un reporte a la izquierda</p>
+                        <p class="text-xs max-w-md mx-auto">Cada vez que uses "Copiar y Guardar" en Jackpots, Pal Var, DDJJ, Ingreso, Policial o Tesorería, aparecerá automáticamente aquí.</p>
+                    </div>
+
+                    <div id="activeDetailPane" class="hidden space-y-4">
+                        <div class="flex flex-wrap items-start justify-between gap-3 pb-3 border-b border-slate-200 dark:border-slate-800">
+                            <div class="space-y-1">
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <span id="detCatBadge" class="px-2 py-0.5 rounded-md text-[11px] font-bold bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300"></span>
+                                    <h3 id="detModulo" class="text-base font-bold text-slate-900 dark:text-white"></h3>
+                                    <span id="detOriginBadge" class="px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold"></span>
+                                </div>
+                                <p id="detMetaLine" class="text-xs text-slate-500 dark:text-slate-400 font-mono"></p>
+                                <p id="detReferencia" class="text-xs font-semibold text-indigo-600 dark:text-sky-400"></p>
+                            </div>
+
+                            <div class="flex flex-wrap items-center gap-1.5">
+                                <a id="detOpenModuleLink" href="index.html" class="px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-1">
+                                    <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+                                    Ir al módulo
+                                </a>
+                                <button type="button" onclick="printSingleSelected()" class="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 cursor-pointer" title="Imprimir solo esta acta">
+                                    <i data-lucide="printer" class="w-4 h-4"></i>
+                                </button>
+                                <button type="button" id="btnDeleteSelected" onclick="deleteSelectedReport()" class="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-rose-600 text-slate-500 hover:text-white transition cursor-pointer" title="Eliminar reporte">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="detActaTextarea" class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Texto Oficial del Acta CCTV</label>
+                            <textarea id="detActaTextarea" rows="11" spellcheck="false"
+                                class="w-full min-h-[250px] bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 focus:border-indigo-500 rounded-xl p-4 font-mono text-xs sm:text-sm leading-relaxed text-slate-800 dark:text-slate-100 outline-none resize-y"></textarea>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
+                            <div class="sm:col-span-8">
+                                <label for="detNotasInput" class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Nota interna / seguimiento (opcional)</label>
+                                <input type="text" id="detNotasInput" placeholder="Ej: Verificado por Sup. Padilla · Pendiente firma OP..."
+                                    class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 focus:border-indigo-500 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-white outline-none">
+                            </div>
+                            <div class="sm:col-span-4">
+                                <button type="button" id="btnSaveChanges" onclick="saveSelectedChanges()" class="w-full py-2 px-3 rounded-xl bg-slate-800 dark:bg-slate-700 hover:bg-indigo-600 text-white text-xs font-semibold transition flex items-center justify-center gap-1.5 cursor-pointer">
+                                    <i data-lucide="save" class="w-3.5 h-3.5"></i>
+                                    Guardar Cambios
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="pt-2 border-t border-slate-100 dark:border-slate-800 grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                            <button type="button" onclick="copySelectedActa()" class="py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow-sm transition flex items-center justify-center gap-2 cursor-pointer">
+                                <i data-lucide="copy" class="w-4 h-4"></i>
+                                Copiar Acta al Portapapeles
+                            </button>
+                            <button type="button" onclick="whatsappSelectedActa()" class="py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-sm transition flex items-center justify-center gap-2 cursor-pointer">
+                                <i data-lucide="message-square" class="w-4 h-4"></i>
+                                Enviar por WhatsApp
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL DE CUENTA SUPABASE (LOGIN / REGISTRO) -->
+    <div id="authModal" class="no-print fixed inset-0 z-50 bg-slate-950/75 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-md w-full p-5 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="cloud" class="w-5 h-5 text-sky-500"></i>
+                    <h3 class="text-sm font-bold text-slate-900 dark:text-white">Sesión Operador CCTV (Supabase)</h3>
+                </div>
+                <button type="button" onclick="closeAuthModal()" class="text-slate-400 hover:text-slate-700 dark:hover:text-white text-xs font-bold cursor-pointer">✕</button>
+            </div>
+
+            <div id="loggedInBox" class="hidden space-y-3">
+                <div class="p-3.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-xs space-y-1">
+                    <div class="font-bold text-emerald-800 dark:text-emerald-300">🟢 Sesión activa en la Nube</div>
+                    <div id="loggedUserEmail" class="font-mono text-emerald-700 dark:text-emerald-400"></div>
+                    <p class="text-[11px] text-slate-600 dark:text-slate-400 pt-1">Todos los reportes que copies en cualquier módulo se guardan automáticamente en Supabase.</p>
+                </div>
+                <button type="button" onclick="logoutSupabaseBitacora()" class="w-full py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold cursor-pointer">
+                    Cerrar Sesión
+                </button>
+            </div>
+
+            <form id="loginFormBitacora" onsubmit="loginSupabaseBitacora(event)" class="space-y-3">
+                <p class="text-xs text-slate-500 dark:text-slate-400">Usa la misma cuenta de operador de <b>Auditoría de Turno</b> o crea una nueva para sincronizar reportes entre equipos.</p>
+                <div>
+                    <label for="authEmailInput" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Correo del Operador</label>
+                    <input type="email" id="authEmailInput" required placeholder="operador@casino.com"
+                        class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white outline-none focus:border-indigo-500">
+                </div>
+                <div>
+                    <label for="authPassInput" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Contraseña (mín. 6 caracteres)</label>
+                    <input type="password" id="authPassInput" required minlength="6" placeholder="••••••••"
+                        class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white outline-none focus:border-indigo-500">
+                </div>
+                <div class="pt-1 space-y-2">
+                    <button type="submit" id="btnAuthLogin" class="w-full py-2.5 px-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold cursor-pointer">
+                        Iniciar Sesión
+                    </button>
+                    <p class="text-[11px] text-center text-slate-400">El alta de nuevos operadores se realiza desde el panel administrador de Supabase.</p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL PARA AGREGAR REPORTE MANUAL -->
+    <div id="manualModal" class="no-print fixed inset-0 z-50 bg-slate-950/75 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-lg w-full p-5 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+                <h3 class="text-sm font-bold text-slate-900 dark:text-white">Guardar Novedad / Acta Libre en Bitácora</h3>
+                <button type="button" onclick="closeManualModal()" class="text-slate-400 hover:text-slate-700 dark:hover:text-white text-xs font-bold cursor-pointer">✕</button>
+            </div>
+            <form id="manualReportForm" onsubmit="submitManualReport(event)" class="space-y-3">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label for="manCategoria" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Categoría</label>
+                        <select id="manCategoria" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white outline-none">
+                            <option value="Jackpots">Jackpots</option>
+                            <option value="Pagos y Valores">Pagos y Valores</option>
+                            <option value="Seguridad y Accesos" selected>Seguridad y Accesos</option>
+                            <option value="Técnica y Sala">Técnica y Sala</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="manSala" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Sala / Sector</label>
+                        <input type="text" id="manSala" placeholder="Ej: Casino Boulevard"
+                            class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white outline-none">
+                    </div>
+                </div>
+                <div>
+                    <label for="manReferencia" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Título / Referencia breve</label>
+                    <input type="text" id="manReferencia" required placeholder="Ej: Novedad en Isla 4 · Cám. 208"
+                        class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white outline-none">
+                </div>
+                <div>
+                    <label for="manTexto" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Texto del Acta</label>
+                    <textarea id="manTexto" rows="5" required placeholder="Pega o redacta aquí la novedad de monitoreo..."
+                        class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl p-3 font-mono text-xs text-slate-900 dark:text-white outline-none"></textarea>
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeManualModal()" class="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300 cursor-pointer">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white cursor-pointer">Guardar en Bitácora</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div id="toast" class="no-print fixed bottom-5 right-5 z-50 hidden bg-slate-900 text-white border border-slate-700 px-4 py-3 rounded-xl shadow-2xl text-xs font-semibold items-center gap-2">
+        <span id="toastMsg">Operación exitosa</span>
+    </div>
+
+    <script>
+        (function () {
+            'use strict';
+
+            let cloudRows = [];
+            let combinedView = [];
+            let selectedKey = null;
+            let toastTimer = null;
+
+            function escapeHtml(str) {
+                return String(str ?? '')
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#39;');
+            }
+
+            function showToast(msg) {
+                const el = document.getElementById('toast');
+                document.getElementById('toastMsg').textContent = msg;
+                el.classList.remove('hidden');
+                el.classList.add('flex');
+                clearTimeout(toastTimer);
+                toastTimer = setTimeout(() => {
+                    el.classList.add('hidden');
+                    el.classList.remove('flex');
+                }, 2800);
+            }
+
+            function updateSessionUI() {
+                const session = window.CCTVBitacora ? window.CCTVBitacora.getSession() : null;
+                const pending = window.CCTVBitacora ? window.CCTVBitacora.getPendingCount() : 0;
+
+                const dot = document.getElementById('headerSessionDot');
+                const txt = document.getElementById('headerSessionText');
+                const badge = document.getElementById('headerSessionBadge');
+                const loggedBox = document.getElementById('loggedInBox');
+                const loginForm = document.getElementById('loginFormBitacora');
+                const syncBtn = document.getElementById('btnSyncPending');
+                const pendingNum = document.getElementById('pendingCountNum');
+
+                if (pendingNum) pendingNum.textContent = String(pending);
+                if (syncBtn) {
+                    syncBtn.classList.toggle('hidden', !(pending > 0 && session?.user));
+                }
+
+                if (session?.user) {
+                    dot.className = 'w-2 h-2 rounded-full bg-emerald-400';
+                    txt.textContent = `☁️ Nube: ${session.user.email}`;
+                    badge.className = 'cursor-pointer inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 hover:border-emerald-400 transition';
+                    loggedBox.classList.remove('hidden');
+                    loginForm.classList.add('hidden');
+                    document.getElementById('loggedUserEmail').textContent = session.user.email || '';
+                } else {
+                    dot.className = 'w-2 h-2 rounded-full bg-amber-400';
+                    txt.textContent = pending > 0 ? `Modo Local (${pending} sin subir)` : 'Modo Local · Iniciar sesión Nube';
+                    badge.className = 'cursor-pointer inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-slate-800 text-amber-300 border border-slate-700 hover:border-sky-500 transition';
+                    loggedBox.classList.add('hidden');
+                    loginForm.classList.remove('hidden');
+                }
+            }
+
+            async function refreshCloudReports() {
+                const statusEl = document.getElementById('cloudSyncStatusText');
+                if (!window.CCTVBitacora) return;
+
+                const client = await window.CCTVBitacora.ensureSupabaseReady();
+                const session = window.CCTVBitacora.getSession();
+                updateSessionUI();
+
+                if (!client || !session?.user) {
+                    cloudRows = [];
+                    if (statusEl) statusEl.textContent = 'Vista local activa';
+                    applyFiltersAndRender();
+                    return;
+                }
+
+                if (statusEl) statusEl.textContent = 'Consultando Supabase...';
+
+                try {
+                    let query = client
+                        .from('reportes_cctv')
+                        .select('*')
+                        .order('fecha_reporte', { ascending: false })
+                        .order('created_at', { ascending: false })
+                        .limit(200);
+
+                    const desde = document.getElementById('filterDesde').value;
+                    if (desde) {
+                        query = query.gte('fecha_reporte', desde);
+                    }
+
+                    const { data, error } = await query;
+                    if (error) {
+                        if (statusEl) statusEl.textContent = 'Error nube (mostrando local)';
+                    } else {
+                        cloudRows = Array.isArray(data) ? data : [];
+                        const hhmm = new Date().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
+                        if (statusEl) statusEl.textContent = `☁️ Sincronizado ${hhmm}`;
+                    }
+                } catch (e) {
+                    if (statusEl) statusEl.textContent = 'Sin red (mostrando local)';
+                }
+
+                applyFiltersAndRender();
+            }
+
+            function buildMergedDataset() {
+                const localList = window.CCTVBitacora ? window.CCTVBitacora.getLocalEntries() : [];
+                const session = window.CCTVBitacora ? window.CCTVBitacora.getSession() : null;
+                const myUid = session?.user?.id || null;
+
+                const mapByUid = new Map();
+
+                cloudRows.forEach(r => {
+                    const key = r.id || r.client_uid;
+                    mapByUid.set(r.client_uid || key, {
+                        key: 'cloud:' + r.id,
+                        cloud_id: r.id,
+                        client_uid: r.client_uid,
+                        created_by: r.created_by,
+                        isMine: Boolean(myUid && r.created_by === myUid),
+                        synced: true,
+                        sourceType: 'cloud',
+                        created_at: r.created_at,
+                        fecha_reporte: r.fecha_reporte || '',
+                        hora_evento: r.hora_evento || '',
+                        categoria: r.categoria || 'General',
+                        modulo: r.modulo || 'Reporte CCTV',
+                        origen_archivo: r.origen_archivo || '',
+                        sala: r.sala || 'General',
+                        referencia: r.referencia || '',
+                        acta_texto: r.acta_texto || '',
+                        notas: r.notas || '',
+                        es_compartido: r.es_compartido !== false,
+                        operator_email: r.operator_email || ''
+                    });
+                });
+
+                localList.forEach(loc => {
+                    if (loc.client_uid && mapByUid.has(loc.client_uid)) return;
+                    mapByUid.set(loc.client_uid, {
+                        key: 'local:' + loc.client_uid,
+                        cloud_id: loc.cloud_id || null,
+                        client_uid: loc.client_uid,
+                        created_by: myUid,
+                        isMine: true,
+                        synced: Boolean(loc.synced),
+                        sourceType: loc.synced ? 'cloud' : 'local',
+                        created_at: loc.created_at,
+                        fecha_reporte: loc.fecha_reporte || '',
+                        hora_evento: loc.hora_evento || '',
+                        categoria: loc.categoria || 'General',
+                        modulo: loc.modulo || 'Reporte CCTV',
+                        origen_archivo: loc.origen_archivo || '',
+                        sala: loc.sala || 'General',
+                        referencia: loc.referencia || '',
+                        acta_texto: loc.acta_texto || '',
+                        notas: loc.notas || '',
+                        es_compartido: loc.es_compartido !== false,
+                        operator_email: loc.operator_email || 'Esta PC'
+                    });
+                });
+
+                return Array.from(mapByUid.values()).sort((a, b) => {
+                    return String(b.created_at || '').localeCompare(String(a.created_at || ''));
+                });
+            }
+
+            function getCategoryBadgeStyle(cat) {
+                if (cat === 'Jackpots') return 'bg-amber-100 dark:bg-amber-950/70 text-amber-800 dark:text-amber-300';
+                if (cat === 'Pagos y Valores') return 'bg-emerald-100 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-300';
+                if (cat === 'Seguridad y Accesos') return 'bg-rose-100 dark:bg-rose-950/70 text-rose-800 dark:text-rose-300';
+                return 'bg-sky-100 dark:bg-sky-950/70 text-sky-800 dark:text-sky-300';
+            }
+
+            function formatFechaCorta(isoDate) {
+                if (!isoDate || !isoDate.includes('-')) return isoDate || '';
+                const parts = isoDate.split('-');
+                return parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : isoDate;
+            }
+
+            function applyFiltersAndRender() {
+                const all = buildMergedDataset();
+                const srcFilter = document.getElementById('filterSource').value;
+                const catFilter = document.getElementById('filterCategoria').value;
+                const salaFilter = document.getElementById('filterSala').value;
+                const desde = document.getElementById('filterDesde').value;
+                const q = (document.getElementById('filterSearch').value || '').trim().toLowerCase();
+
+                combinedView = all.filter(item => {
+                    if (srcFilter === 'cloud' && !item.synced) return false;
+                    if (srcFilter === 'mine' && !item.isMine) return false;
+                    if (srcFilter === 'pending' && item.synced) return false;
+                    if (catFilter !== 'ALL' && item.categoria !== catFilter) return false;
+                    if (salaFilter !== 'ALL' && item.sala !== salaFilter) return false;
+                    if (desde && item.fecha_reporte && item.fecha_reporte < desde) return false;
+                    if (q) {
+                        const hay = `${item.modulo} ${item.sala} ${item.referencia} ${item.acta_texto} ${item.notas} ${item.operator_email} ${item.hora_evento}`.toLowerCase();
+                        if (!hay.includes(q)) return false;
+                    }
+                    return true;
+                });
+
+                // Actualizar KPIs
+                document.getElementById('kpiTotal').textContent = String(combinedView.length);
+                document.getElementById('kpiJackpots').textContent = String(combinedView.filter(x => x.categoria === 'Jackpots').length);
+                document.getElementById('kpiPagos').textContent = String(combinedView.filter(x => x.categoria === 'Pagos y Valores').length);
+                document.getElementById('kpiSeguridad').textContent = String(combinedView.filter(x => x.categoria === 'Seguridad y Accesos' || x.categoria === 'Técnica y Sala').length);
+                document.getElementById('listCountLabel').textContent = String(combinedView.length);
+
+                const listEl = document.getElementById('reportsListContainer');
+                if (combinedView.length === 0) {
+                    listEl.innerHTML = '<div class="py-12 text-center text-xs text-slate-400">No hay reportes que coincidan con los filtros actuales.</div>';
+                    selectedKey = null;
+                    renderDetailPane();
+                    return;
+                }
+
+                if (!selectedKey || !combinedView.some(x => x.key === selectedKey)) {
+                    selectedKey = combinedView[0].key;
+                }
+
+                listEl.innerHTML = combinedView.map((item, idx) => {
+                    const active = item.key === selectedKey;
+                    const borderCls = active
+                        ? 'border-indigo-500 ring-1 ring-indigo-500/40 bg-indigo-50/40 dark:bg-indigo-950/30'
+                        : 'border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 hover:border-indigo-300 dark:hover:border-slate-700';
+                    const syncIcon = item.synced ? '☁️' : '⏳';
+                    return `
+                        <button type="button" onclick="selectReportByIdx(${idx})"
+                            class="w-full text-left p-3 rounded-xl border transition cursor-pointer block space-y-1 ${borderCls}">
+                            <div class="flex items-center justify-between gap-2">
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold ${getCategoryBadgeStyle(item.categoria)}">${escapeHtml(item.modulo)}</span>
+                                <span class="text-[11px] font-mono text-slate-500 dark:text-slate-400 shrink-0">${syncIcon} ${escapeHtml(item.hora_evento || '--:--')} Hs.</span>
+                            </div>
+                            <div class="text-xs font-bold text-slate-800 dark:text-slate-100 truncate">${escapeHtml(item.referencia || item.modulo)}</div>
+                            <div class="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
+                                <span class="truncate">${escapeHtml(item.sala)} · ${escapeHtml(formatFechaCorta(item.fecha_reporte))}</span>
+                                <span class="font-mono text-[10px] truncate max-w-[120px]">${escapeHtml(item.operator_email || 'Local')}</span>
+                            </div>
+                        </button>
+                    `;
+                }).join('');
+
+                renderDetailPane();
+            }
+
+            function selectReportByIdx(idx) {
+                const item = combinedView[idx];
+                if (!item) return;
+                selectedKey = item.key;
+                applyFiltersAndRender();
+            }
+
+            function getSelectedItem() {
+                return combinedView.find(x => x.key === selectedKey) || null;
+            }
+
+            function renderDetailPane() {
+                const item = getSelectedItem();
+                const emptyState = document.getElementById('emptyDetailState');
+                const pane = document.getElementById('activeDetailPane');
+
+                if (!item) {
+                    emptyState.classList.remove('hidden');
+                    pane.classList.add('hidden');
+                    return;
+                }
+
+                emptyState.classList.add('hidden');
+                pane.classList.remove('hidden');
+
+                const catBadge = document.getElementById('detCatBadge');
+                catBadge.textContent = item.categoria;
+                catBadge.className = `px-2 py-0.5 rounded-md text-[11px] font-bold ${getCategoryBadgeStyle(item.categoria)}`;
+
+                document.getElementById('detModulo').textContent = item.modulo;
+
+                const origBadge = document.getElementById('detOriginBadge');
+                if (item.synced) {
+                    origBadge.textContent = item.es_compartido ? '☁️ Nube Compartida' : '🔒 Nube Privada';
+                    origBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300';
+                } else {
+                    origBadge.textContent = '💾 Local (pendiente nube)';
+                    origBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300';
+                }
+
+                document.getElementById('detMetaLine').textContent =
+                    `${formatFechaCorta(item.fecha_reporte)} · ${item.hora_evento || '--:--'} Hs. · Sala: ${item.sala} · Operador: ${item.operator_email || 'Local'}`;
+                document.getElementById('detReferencia').textContent = item.referencia || '';
+                document.getElementById('detActaTextarea').value = item.acta_texto || '';
+                document.getElementById('detNotasInput').value = item.notas || '';
+
+                const modLink = document.getElementById('detOpenModuleLink');
+                if (item.origen_archivo && item.origen_archivo !== 'bitacora.html') {
+                    modLink.href = item.origen_archivo;
+                    modLink.classList.remove('hidden');
+                } else {
+                    modLink.classList.add('hidden');
+                }
+
+                // Solo el autor puede editar/borrar en Supabase
+                const canModify = item.isMine || !item.synced;
+                document.getElementById('detActaTextarea').readOnly = !canModify;
+                document.getElementById('detNotasInput').readOnly = !canModify;
+                document.getElementById('btnSaveChanges').classList.toggle('hidden', !canModify);
+                document.getElementById('btnDeleteSelected').classList.toggle('hidden', !canModify);
+            }
+
+            async function saveSelectedChanges() {
+                const item = getSelectedItem();
+                if (!item) return;
+
+                const newActa = document.getElementById('detActaTextarea').value.trim();
+                const newNotas = document.getElementById('detNotasInput').value.trim();
+                if (!newActa) {
+                    showToast('El texto del acta no puede quedar vacío');
+                    return;
+                }
+
+                // Actualizar copia local si existe
+                if (window.CCTVBitacora) {
+                    const locals = window.CCTVBitacora.getLocalEntries();
+                    const lIdx = locals.findIndex(x => x.client_uid === item.client_uid);
+                    if (lIdx !== -1) {
+                        locals[lIdx].acta_texto = newActa;
+                        locals[lIdx].notas = newNotas;
+                        window.CCTVBitacora.saveLocalEntries(locals);
+                    }
+                }
+
+                if (item.cloud_id && window.CCTVBitacora) {
+                    const client = window.CCTVBitacora.getClient();
+                    if (client) {
+                        const { error } = await client
+                            .from('reportes_cctv')
+                            .update({ acta_texto: newActa, notas: newNotas })
+                            .eq('id', item.cloud_id);
+                        if (error) {
+                            showToast('Error al actualizar en nube: ' + error.message);
+                            return;
+                        }
+                    }
+                }
+
+                await refreshCloudReports();
+                showToast('✓ Cambios guardados correctamente');
+            }
+
+            async function deleteSelectedReport() {
+                const item = getSelectedItem();
+                if (!item) return;
+                if (!window.confirm(`¿Eliminar el reporte "${item.referencia || item.modulo}" de la bitácora?`)) return;
+
+                if (item.cloud_id && window.CCTVBitacora) {
+                    const client = window.CCTVBitacora.getClient();
+                    if (client) {
+                        const { error } = await client.from('reportes_cctv').delete().eq('id', item.cloud_id);
+                        if (error) {
+                            showToast('No se pudo eliminar de Supabase: ' + error.message);
+                            return;
+                        }
+                    }
+                }
+
+                if (window.CCTVBitacora) {
+                    const remaining = window.CCTVBitacora.getLocalEntries().filter(x => x.client_uid !== item.client_uid);
+                    window.CCTVBitacora.saveLocalEntries(remaining);
+                }
+
+                selectedKey = null;
+                await refreshCloudReports();
+                showToast('Reporte eliminado');
+            }
+
+            async function copySelectedActa() {
+                const txt = document.getElementById('detActaTextarea').value.trim();
+                if (!txt) return;
+                try {
+                    await navigator.clipboard.writeText(txt);
+                    showToast('📋 ¡Acta copiada al portapapeles!');
+                } catch (e) {
+                    const area = document.getElementById('detActaTextarea');
+                    area.select();
+                    document.execCommand('copy');
+                    showToast('📋 ¡Acta copiada al portapapeles!');
+                }
+            }
+
+            function whatsappSelectedActa() {
+                const txt = document.getElementById('detActaTextarea').value.trim();
+                if (!txt) return;
+                window.open('https://wa.me/?text=' + encodeURIComponent(txt), '_blank', 'noopener');
+            }
+
+            function toggleSharePreference() {
+                const checked = document.getElementById('chkShareTeam').checked;
+                if (window.CCTVBitacora) {
+                    window.CCTVBitacora.setSharePreference(checked);
+                }
+                showToast(checked ? 'Nuevos reportes visibles para el equipo CCTV' : 'Nuevos reportes en modo privado');
+            }
+
+            async function syncPendingManual() {
+                if (!window.CCTVBitacora) return;
+                const res = await window.CCTVBitacora.syncPendingToCloud();
+                updateSessionUI();
+                await refreshCloudReports();
+                showToast(res.uploaded > 0 ? `☁️ ${res.uploaded} reporte(s) subidos a Supabase` : 'No había pendientes o revisa tu conexión');
+            }
+
+            async function importPreviousModuleHistories() {
+                if (!window.CCTVBitacora) return;
+                const sources = [
+                    { key: 'jackpot_luxor_history_v1', modulo: 'Jackpot · Sala Luxor', categoria: 'Jackpots', archivo: 'jackpotluxor.html', sala: 'Sala Luxor' },
+                    { key: 'jackpot_m1_history', modulo: 'Jackpot · Modelo 1', categoria: 'Jackpots', archivo: 'jackpot.html', sala: '' },
+                    { key: 'jackpot_m2_history_v1', modulo: 'Jackpot · Modelo 2', categoria: 'Jackpots', archivo: 'Jackpot2.html', sala: '' },
+                    { key: 'ticketHistorial', modulo: 'Pal Var · Pagos Altos', categoria: 'Pagos y Valores', archivo: 'palvar.html', sala: '' },
+                    { key: 'cctv_luxor_history', modulo: 'Pago Alto · Sala Luxor', categoria: 'Pagos y Valores', archivo: 'pagoaltoluxor.html', sala: 'Sala Luxor' },
+                    { key: 'cctv_palcap_historial_v2', modulo: 'Pal Cap · Caja Capital', categoria: 'Pagos y Valores', archivo: 'palcap.html', sala: 'Casino Boulevard' },
+                    { key: 'cctv_ddjj_historial_v2', modulo: 'Declaración Jurada (DDJJ)', categoria: 'Pagos y Valores', archivo: 'ddj.html', sala: '' },
+                    { key: 'cctv_iedin_historial_v2', modulo: 'Traslado de Valores', categoria: 'Pagos y Valores', archivo: 'iedin.html', sala: 'Tesorería' },
+                    { key: 'ingresoHistorial', modulo: 'Ingreso Personal Externo', categoria: 'Seguridad y Accesos', archivo: 'ingreso.html', sala: '' },
+                    { key: 'cctv_policial_historial', modulo: 'Adicional Policial', categoria: 'Seguridad y Accesos', archivo: 'Inpol.html', sala: '' },
+                    { key: 'chkBuleHistorial', modulo: 'Botones Bulevard', categoria: 'Seguridad y Accesos', archivo: 'chk_bule.html', sala: 'Casino Boulevard' },
+                    { key: 'chkLuxorHistorial', modulo: 'Botones Sala Luxor', categoria: 'Seguridad y Accesos', archivo: 'chk_luxor.html', sala: 'Sala Luxor' }
+                ];
+
+                const existingTexts = new Set(combinedView.map(x => x.acta_texto.trim()));
+                let imported = 0;
+
+                for (const src of sources) {
+                    try {
+                        const raw = localStorage.getItem(src.key);
+                        const arr = raw ? JSON.parse(raw) : [];
+                        if (!Array.isArray(arr)) continue;
+                        for (const entry of arr) {
+                            const txt = String(entry.texto || entry.fullText || entry.text || entry.contenido || '').trim();
+                            if (!txt || existingTexts.has(txt)) continue;
+                            existingTexts.add(txt);
+                            await window.CCTVBitacora.registrar({
+                                categoria: src.categoria,
+                                modulo: src.modulo,
+                                origen_archivo: src.archivo,
+                                sala: entry.sala || src.sala,
+                                referencia: entry.summary || entry.maquina ? `Máq. ${entry.maquina || ''} ${entry.monto || entry.importe || ''}`.trim() : src.modulo,
+                                acta_texto: txt
+                            }, true);
+                            imported++;
+                        }
+                    } catch (e) {}
+                }
+
+                await refreshCloudReports();
+                showToast(imported > 0 ? `✓ ${imported} reporte(s) previos importados` : 'Todos los historiales de esta PC ya estaban en la bitácora');
+            }
+
+            // Auth Modal
+            function openAuthModal() {
+                updateSessionUI();
+                const m = document.getElementById('authModal');
+                m.classList.remove('hidden');
+                m.classList.add('flex');
+            }
+
+            function closeAuthModal() {
+                const m = document.getElementById('authModal');
+                m.classList.add('hidden');
+                m.classList.remove('flex');
+            }
+
+            async function loginSupabaseBitacora(e) {
+                e.preventDefault();
+                const client = await window.CCTVBitacora.ensureSupabaseReady();
+                if (!client) {
+                    showToast('No se pudo conectar con Supabase');
+                    return;
+                }
+                const email = document.getElementById('authEmailInput').value.trim();
+                const password = document.getElementById('authPassInput').value;
+                const btn = document.getElementById('btnAuthLogin');
+                btn.disabled = true;
+                btn.textContent = 'Ingresando...';
+
+                const { error } = await client.auth.signInWithPassword({ email, password });
+                btn.disabled = false;
+                btn.textContent = 'Iniciar Sesión';
+
+                if (error) {
+                    showToast('Error: ' + error.message);
+                    return;
+                }
+                document.getElementById('authPassInput').value = '';
+                await window.CCTVBitacora.syncPendingToCloud();
+                updateSessionUI();
+                closeAuthModal();
+                await refreshCloudReports();
+                showToast('☁️ Sesión iniciada y bitácora sincronizada');
+            }
+
+            async function logoutSupabaseBitacora() {
+                if (window.CCTVAuthGate && typeof window.CCTVAuthGate.logout === 'function') {
+                    await window.CCTVAuthGate.logout();
+                    return;
+                }
+                const client = window.CCTVBitacora ? window.CCTVBitacora.getClient() : null;
+                if (client) await client.auth.signOut();
+                cloudRows = [];
+                updateSessionUI();
+                closeAuthModal();
+                applyFiltersAndRender();
+                showToast('Sesión cerrada');
+            }
+
+            // Manual Modal
+            function openManualModal() {
+                const m = document.getElementById('manualModal');
+                m.classList.remove('hidden');
+                m.classList.add('flex');
+            }
+
+            function closeManualModal() {
+                const m = document.getElementById('manualModal');
+                m.classList.add('hidden');
+                m.classList.remove('flex');
+            }
+
+            async function submitManualReport(e) {
+                e.preventDefault();
+                if (!window.CCTVBitacora) return;
+                const categoria = document.getElementById('manCategoria').value;
+                const sala = document.getElementById('manSala').value.trim() || 'General';
+                const referencia = document.getElementById('manReferencia').value.trim();
+                const acta_texto = document.getElementById('manTexto').value.trim();
+                if (!acta_texto) return;
+
+                await window.CCTVBitacora.registrar({
+                    categoria,
+                    modulo: 'Novedad Manual CCTV',
+                    origen_archivo: 'bitacora.html',
+                    sala,
+                    referencia,
+                    acta_texto
+                }, true);
+
+                document.getElementById('manualReportForm').reset();
+                closeManualModal();
+                await refreshCloudReports();
+                showToast('✓ Novedad guardada en Bitácora');
+            }
+
+            // Exportaciones e Impresión
+            function downloadFile(filename, content, mime) {
+                const blob = new Blob([content], { type: mime });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+
+            function exportFilteredCSV() {
+                if (combinedView.length === 0) {
+                    showToast('No hay reportes en la vista actual para exportar');
+                    return;
+                }
+                const esc = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
+                const rows = [['Fecha', 'Hora', 'Categoría', 'Módulo', 'Sala', 'Referencia', 'Operador', 'Notas', 'Acta Completa'].join(';')];
+                combinedView.forEach(r => {
+                    rows.push([
+                        esc(formatFechaCorta(r.fecha_reporte)),
+                        esc(r.hora_evento),
+                        esc(r.categoria),
+                        esc(r.modulo),
+                        esc(r.sala),
+                        esc(r.referencia),
+                        esc(r.operator_email),
+                        esc(r.notas),
+                        esc((r.acta_texto || '').replace(/\r?\n/g, ' | '))
+                    ].join(';'));
+                });
+                const today = new Date().toISOString().slice(0, 10);
+                downloadFile(`bitacora_cctv_${today}.csv`, '\uFEFF' + rows.join('\r\n'), 'text/csv;charset=utf-8;');
+                showToast('Planilla CSV descargada');
+            }
+
+            function exportFilteredTXT() {
+                if (combinedView.length === 0) {
+                    showToast('No hay reportes en la vista actual para exportar');
+                    return;
+                }
+                const txt = combinedView.map((r, i) => {
+                    const notaLine = r.notas ? `\nNota: ${r.notas}` : '';
+                    return `[#${i + 1}] ${formatFechaCorta(r.fecha_reporte)} ${r.hora_evento} Hs. | ${r.modulo} | ${r.sala} | ${r.referencia}\n${r.acta_texto}${notaLine}`;
+                }).join('\n\n' + '-'.repeat(72) + '\n\n');
+                const today = new Date().toISOString().slice(0, 10);
+                downloadFile(`libro_turno_cctv_${today}.txt`, txt, 'text/plain;charset=utf-8;');
+                showToast('Libro TXT descargado');
+            }
+
+            function printShiftBook() {
+                if (combinedView.length === 0) {
+                    showToast('No hay reportes en vista para imprimir');
+                    return;
+                }
+                document.getElementById('printTitle').textContent = 'Libro Consolidado de Reportes CCTV';
+                document.getElementById('printSubtitle').textContent = `${combinedView.length} reporte(s) incluido(s)`;
+                document.getElementById('printTimestamp').textContent = 'Impreso: ' + new Date().toLocaleString('es-AR', { hour12: false });
+                document.getElementById('printContent').textContent = combinedView.map((r, i) =>
+                    `${i + 1}. [${formatFechaCorta(r.fecha_reporte)} ${r.hora_evento} Hs.] ${r.modulo} (${r.sala}) — ${r.referencia}\n${r.acta_texto}${r.notas ? '\nNota: ' + r.notas : ''}`
+                ).join('\n\n────────────────────────────────────────────────────────\n\n');
+                window.print();
+            }
+
+            function printSingleSelected() {
+                const item = getSelectedItem();
+                if (!item) return;
+                document.getElementById('printTitle').textContent = item.modulo;
+                document.getElementById('printSubtitle').textContent = `${item.sala} · ${item.referencia}`;
+                document.getElementById('printTimestamp').textContent = `${formatFechaCorta(item.fecha_reporte)} ${item.hora_evento} Hs.`;
+                document.getElementById('printContent').textContent = document.getElementById('detActaTextarea').value;
+                window.print();
+            }
+
+            Object.assign(window, {
+                applyFiltersAndRender,
+                refreshCloudReports,
+                selectReportByIdx,
+                saveSelectedChanges,
+                deleteSelectedReport,
+                copySelectedActa,
+                whatsappSelectedActa,
+                toggleSharePreference,
+                syncPendingManual,
+                importPreviousModuleHistories,
+                openAuthModal,
+                closeAuthModal,
+                loginSupabaseBitacora,
+                logoutSupabaseBitacora,
+                openManualModal,
+                closeManualModal,
+                submitManualReport,
+                exportFilteredCSV,
+                exportFilteredTXT,
+                printShiftBook,
+                printSingleSelected
+            });
+
+            window.addEventListener('DOMContentLoaded', () => {
+                if (window.CCTVBitacora) {
+                    document.getElementById('chkShareTeam').checked = window.CCTVBitacora.getSharePreference();
+                    window.CCTVBitacora.onChange(() => {
+                        updateSessionUI();
+                        applyFiltersAndRender();
+                    });
+                }
+                applyFiltersAndRender();
+                refreshCloudReports();
+                if (window.lucide) window.lucide.createIcons();
+            });
+        })();
+    </script>
+    <script src="js/global.js"></script>
+</body>
+</html>

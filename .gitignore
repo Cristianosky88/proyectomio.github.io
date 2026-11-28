@@ -2,9 +2,13 @@
 supabase_setup.sql
 *.sql
 
-# Variables de entorno o secretos locales (nunca subir)
+# Variables de entorno, tokens MCP o secretos locales (nunca subir)
 .env
 .env.*
+.mcp.json
+*.pem
+*.key
+node_modules/
 
 # Archivos temporales del sistema operativo
 .DS_Store
