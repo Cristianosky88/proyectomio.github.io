@@ -843,7 +843,7 @@
             }
 
             banner.classList.remove('hidden');
-            lucide.createIcons({ nodes: [banner] });
+            if (window.lucide) window.lucide.createIcons({ nodes: [banner] });
         }
 
         window.prepararDesdeGuardia = function (modo) {
@@ -1106,7 +1106,7 @@
                 `;
             }).join('');
 
-            lucide.createIcons({ nodes: [historialLista] });
+            if (window.lucide) window.lucide.createIcons({ nodes: [historialLista] });
         };
 
         function extraerPoliciaDeTexto(txt) {
@@ -1250,12 +1250,12 @@
             const originalHTML = btnCopiar.innerHTML;
             btnCopiar.innerHTML = '<i data-lucide="check" class="w-4 h-4"></i><span>¡Copiado y Registrado!</span>';
             btnCopiar.classList.replace('bg-indigo-600', 'bg-emerald-600');
-            lucide.createIcons({ nodes: [btnCopiar] });
+            if (window.lucide) window.lucide.createIcons({ nodes: [btnCopiar] });
 
             setTimeout(() => {
                 btnCopiar.innerHTML = originalHTML;
                 btnCopiar.classList.replace('bg-emerald-600', 'bg-indigo-600');
-                lucide.createIcons({ nodes: [btnCopiar] });
+                if (window.lucide) window.lucide.createIcons({ nodes: [btnCopiar] });
             }, 1800);
 
             showToast('Novedad copiada al portapapeles', 'success');
@@ -1327,7 +1327,7 @@
             toast.className = `${styles[type] || styles.info} px-4 py-2.5 rounded-xl shadow-xl flex items-center gap-2 border text-xs font-semibold transition-opacity duration-300`;
             toast.innerHTML = `<i data-lucide="${icons[type] || 'info'}" class="w-4 h-4 shrink-0 text-indigo-400"></i><span>${escHtml(message)}</span>`;
             container.appendChild(toast);
-            lucide.createIcons({ nodes: [toast] });
+            if (window.lucide) window.lucide.createIcons({ nodes: [toast] });
             setTimeout(() => {
                 toast.style.opacity = '0';
                 setTimeout(() => toast.remove(), 300);
@@ -1414,7 +1414,7 @@
             toggleTiempos();
             actualizarIndicadorOpciones();
             generarTexto();
-            lucide.createIcons();
+            if (window.lucide) window.lucide.createIcons();
         }
 
         setupEventListeners();

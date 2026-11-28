@@ -379,7 +379,6 @@
         <span id="toastText">Copiado al portapapeles</span>
     </div>
 
-    <script src="js/global.js"></script>
     <script>
         const PALCAP_STORAGE = {
             draftKey: 'cctv_palcap_draft_v2',
@@ -540,7 +539,7 @@
                     </div>
                 </div>
             `).join('');
-            lucide.createIcons({ nodes: [cont] });
+            if (window.lucide) window.lucide.createIcons({ nodes: [cont] });
         }
 
         window.actualizarFilaTicket = function (idx, campo, valor) {
@@ -642,7 +641,7 @@
                         <button type="button" onclick="igualarEfectivoATickets()" class="underline font-bold cursor-pointer shrink-0">Ajustar efectivo</button>
                     `;
                 }
-                lucide.createIcons({ nodes: [alerta] });
+                if (window.lucide) window.lucide.createIcons({ nodes: [alerta] });
             } else {
                 alerta.classList.add('hidden');
             }
@@ -970,7 +969,7 @@
                     </div>
                 `;
             }).join('');
-            lucide.createIcons({ nodes: [lista] });
+            if (window.lucide) window.lucide.createIcons({ nodes: [lista] });
         };
 
         window.cargarItemPalCap = function (idx) {
@@ -1070,8 +1069,9 @@
                     copiarTexto();
                 }
             });
-            lucide.createIcons();
+            if (window.lucide) window.lucide.createIcons();
         });
     </script>
+    <script src="js/global.js"></script>
 </body>
 </html>

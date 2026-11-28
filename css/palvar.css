@@ -131,17 +131,24 @@ input:focus, select:focus {
 }
 
 /* ===== Modo Oscuro ===== */
+html.dark body,
 body.dark-mode {
   background: #1e1e1e;
   color: #f5f5f5;
 }
 
+html.dark .header-section h2,
+html.dark .header-section p,
+html.dark label,
 body.dark-mode .header-section h2,
 body.dark-mode .header-section p,
 body.dark-mode label {
   color: #f5f5f5;
 }
 
+html.dark form,
+html.dark .historial-section,
+html.dark .reporte-section,
 body.dark-mode form,
 body.dark-mode .historial-section,
 body.dark-mode .reporte-section {
@@ -149,6 +156,8 @@ body.dark-mode .reporte-section {
   color: #f5f5f5;
 }
 
+html.dark input,
+html.dark select,
 body.dark-mode input,
 body.dark-mode select {
   background: #3a3a3a;

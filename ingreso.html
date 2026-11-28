@@ -921,7 +921,7 @@
                     </div>
                 </div>
             `).join('');
-            lucide.createIcons({ nodes: [lista] });
+            if (window.lucide) window.lucide.createIcons({ nodes: [lista] });
         }
 
         // Generador en Vivo del Informe
@@ -1131,11 +1131,11 @@
             const orig = btn.innerHTML;
             btn.innerHTML = '<i data-lucide="check" class="w-4 h-4"></i><span>¡Copiado y Registrado!</span>';
             btn.classList.replace('bg-indigo-600', 'bg-emerald-600');
-            lucide.createIcons({ nodes: [btn] });
+            if (window.lucide) window.lucide.createIcons({ nodes: [btn] });
             setTimeout(() => {
                 btn.innerHTML = orig;
                 btn.classList.replace('bg-emerald-600', 'bg-indigo-600');
-                lucide.createIcons({ nodes: [btn] });
+                if (window.lucide) window.lucide.createIcons({ nodes: [btn] });
             }, 1700);
 
             showNotification('Informe copiado al portapapeles', 'success');
@@ -1219,7 +1219,7 @@
                     </div>
                 `;
             }).join('');
-            lucide.createIcons({ nodes: [lista] });
+            if (window.lucide) window.lucide.createIcons({ nodes: [lista] });
         };
 
         window.cargarItemHistorial = function (idx) {
@@ -1353,7 +1353,7 @@
             el.className = `${styles[type] || styles.info} px-4 py-2.5 rounded-xl shadow-xl flex items-center gap-2 border text-xs font-semibold transition-opacity duration-300`;
             el.innerHTML = `<i data-lucide="${icons[type] || 'info'}" class="w-4 h-4 shrink-0 text-indigo-400"></i><span>${escHtml(message)}</span>`;
             container.appendChild(el);
-            lucide.createIcons({ nodes: [el] });
+            if (window.lucide) window.lucide.createIcons({ nodes: [el] });
             setTimeout(() => {
                 el.style.opacity = '0';
                 setTimeout(() => el.remove(), 300);
@@ -1378,7 +1378,7 @@
                 }
             });
 
-            lucide.createIcons();
+            if (window.lucide) window.lucide.createIcons();
         });
     })();
     </script>

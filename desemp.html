@@ -2076,7 +2076,7 @@
           : (esDescanso ? "text-sky-700 dark:text-sky-400" : "text-amber-700 dark:text-amber-400");
 
         tr.innerHTML = `
-          <td class="py-2 px-2.5 font-mono-nums font-medium text-slate-700 dark:text-slate-200 whitespace-nowrap">${reg.inicio} - ${reg.fin}</td>
+          <td class="py-2 px-2.5 font-mono-nums font-medium text-slate-700 dark:text-slate-200 whitespace-nowrap">${escapeHTML(reg.inicio)} - ${escapeHTML(reg.fin)}</td>
           <td class="py-2 px-2.5">
             <div class="flex flex-wrap items-center gap-1">
               ${badgeDvr}
@@ -3326,10 +3326,10 @@
             <span class="font-mono-nums font-bold text-rose-600 dark:text-rose-400 shrink-0">#${i + 1}</span>
             ${r.dvr ? `<span class="px-1.5 py-0.5 rounded bg-indigo-600 text-white font-bold text-[10px] shrink-0">${escapeHTML(r.dvr)}</span>` : ''}
             <span class="px-2 py-0.5 rounded bg-slate-900 dark:bg-indigo-950 text-white dark:text-indigo-200 border border-slate-700 font-semibold text-[11px] shrink-0">${escapeHTML(r.camara)}</span>
-            <span class="font-mono-nums font-bold text-slate-800 dark:text-slate-100 shrink-0">${r.inicio} a ${r.fin}</span>
+            <span class="font-mono-nums font-bold text-slate-800 dark:text-slate-100 shrink-0">${escapeHTML(r.inicio)} a ${escapeHTML(r.fin)}</span>
             <span class="text-slate-600 dark:text-slate-400 truncate">${escapeHTML(r.detalle)}</span>
           </div>
-          <span class="font-mono-nums font-semibold text-slate-700 dark:text-slate-300 shrink-0">${r.minutos}m (${minutosADuracionStr(r.minutos)})</span>
+          <span class="font-mono-nums font-semibold text-slate-700 dark:text-slate-300 shrink-0">${Number(r.minutos) || 0}m (${minutosADuracionStr(r.minutos)})</span>
         </div>
       `).join('');
     }

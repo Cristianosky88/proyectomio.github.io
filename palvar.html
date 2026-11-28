@@ -1063,7 +1063,7 @@
                     </div>
                 </div>
             `).join('');
-            lucide.createIcons();
+            if (window.lucide) window.lucide.createIcons();
         }
 
         function cargarReporte(id) {
@@ -1325,7 +1325,11 @@
             };
 
             showNotification('Generando PDF...');
-            html2pdf().set(opt).from(element).save();
+            if (typeof window.html2pdf !== 'function') {
+                showNotification('Librería PDF no disponible sin conexión; usa Imprimir → Guardar como PDF', 'error');
+                return;
+            }
+            window.html2pdf().set(opt).from(element).save();
         }
 
         document.getElementById('exportPDFBtn').addEventListener('click', exportToPDF);
@@ -1340,6 +1344,7 @@
                 showNotification('Habilita las ventanas emergentes para imprimir', 'error');
                 return;
             }
+            try { ventana.opener = null; } catch (e) {}
             ventana.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Reporte Pal Var<\/title><\/head><body style="font-family:'Segoe UI',sans-serif;padding:32px;color:#0f172a;"><h2 style="margin:0 0 6px 0;">Reporte de Pago Alto - Pal Var<\/h2><p style="margin:0 0 20px 0;font-size:12px;color:#64748b;">Emitido: ${escapeHtml(new Date().toLocaleString('es-AR'))}<\/p><div style="font-family:monospace;white-space:pre-wrap;line-height:1.65;border:1px solid #cbd5e1;padding:16px;border-radius:8px;">${escapeHtml(text)}<\/div><\/body><\/html>`);
             ventana.document.close();
             ventana.focus();
@@ -1446,7 +1451,7 @@
 
         // ==================== INICIALIZAR ====================
         function initApp() {
-            lucide.createIcons();
+            if (window.lucide) window.lucide.createIcons();
             updateLiveClock();
             setInterval(updateLiveClock, 1000);
 

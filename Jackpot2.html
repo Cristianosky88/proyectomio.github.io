@@ -762,7 +762,7 @@
                     </div>
                 </div>
             `).join('');
-            lucide.createIcons({ nodes: [lista] });
+            if (window.lucide) window.lucide.createIcons({ nodes: [lista] });
         }
 
         window.cargarItemJp2 = function (idx) {

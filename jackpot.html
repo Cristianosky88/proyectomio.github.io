@@ -943,7 +943,7 @@
                     </div>
                 </div>
             `).join('');
-            lucide.createIcons({ nodes: [lista] });
+            if (window.lucide) window.lucide.createIcons({ nodes: [lista] });
         }
 
         window.cargarItemHistorialM1 = function (idx) {
@@ -1036,7 +1036,7 @@
                     copiarInforme();
                 }
             });
-            lucide.createIcons();
+            if (window.lucide) window.lucide.createIcons();
         });
     </script>
     <script src="js/global.js"></script>

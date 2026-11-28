@@ -402,7 +402,6 @@
         <span id="notification-text">Texto copiado al portapapeles</span>
     </div>
 
-    <script src="js/global.js"></script>
     <script>
         const DDJJ_STORAGE = {
             stateKey: 'cctv_ddjj_state_v2',
@@ -912,11 +911,11 @@
             const orig = btn.innerHTML;
             btn.innerHTML = '<i data-lucide="check" class="w-4 h-4"></i><span>¡Copiado y Registrado!</span>';
             btn.classList.replace('bg-indigo-600', 'bg-emerald-600');
-            lucide.createIcons({ nodes: [btn] });
+            if (window.lucide) window.lucide.createIcons({ nodes: [btn] });
             setTimeout(() => {
                 btn.innerHTML = orig;
                 btn.classList.replace('bg-emerald-600', 'bg-indigo-600');
-                lucide.createIcons({ nodes: [btn] });
+                if (window.lucide) window.lucide.createIcons({ nodes: [btn] });
             }, 1700);
 
             showNotification('¡Acta DDJJ copiada y guardada en historial!');
@@ -992,7 +991,7 @@
                 `;
             }).join('');
 
-            lucide.createIcons({ nodes: [lista] });
+            if (window.lucide) window.lucide.createIcons({ nodes: [lista] });
         };
 
         window.cargarItemHistorial = function (idx) {
@@ -1112,8 +1111,9 @@
                 }
             });
 
-            lucide.createIcons();
+            if (window.lucide) window.lucide.createIcons();
         });
     </script>
+    <script src="js/global.js"></script>
 </body>
 </html>
